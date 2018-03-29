@@ -1,0 +1,214 @@
+#pragma once
+#include "glm/glm/gtc/matrix_transform.hpp"
+#include "glm/glm/gtc/type_ptr.hpp"
+#include "glm/glm/glm.hpp"
+#include <GL/gl3w.h>   
+#include "glfw\include\GLFW\glfw3.h"
+#include <vector>
+#include <fstream>
+#include <streambuf>
+#include <iostream>
+#include <random>
+#include "GameScene.h"
+#include "ShaderProgramLib.h"
+
+// Cube Map defines for its positions
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_X  0x8515 
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_X  0x8516 
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Y  0x8517 
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y  0x8518 
+#define GL_TEXTURE_CUBE_MAP_POSITIVE_Z  0x8519 
+#define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z  0x851A
+
+struct QuadVertex
+{
+	float x, y, u, v;
+};
+
+class RenderManager
+{
+public:
+	RenderManager();
+	RenderManager(GameScene *otherGameScene, GLFWwindow* otherWindow, ShaderProgramLib* shaderProgram);
+	~RenderManager();
+
+	GameScene *gameScene;
+	void FindObjectsToRender();
+	void Render(float dT, int ssaoOnorOFF);
+	void createBuffers();
+	void renderQuad();
+	void renderSkyQuad();
+
+private:
+	unsigned int loadCubemap(std::vector<std::string> faces);
+
+	std::vector<GameObject*> gameObjectsToRender;
+	std::vector<Light*> lightsToRender;
+	std::vector<glm::vec3> kernel;
+
+	glm::mat4x4 view_matrix;
+	glm::mat4x4 projection_matrix;
+	glm::mat4x4 currentCubeMapView;
+
+	unsigned int cubeVAO;
+	unsigned int cubeVBO;
+	unsigned int skyboxVAO;
+	unsigned int skyboxVBO;
+	unsigned int skyboxEBO;
+	unsigned int ebo;
+	unsigned int vbo;
+	unsigned int vao;
+	unsigned int gbo;
+	unsigned int skyFBO;
+	unsigned int rboDepth;
+	unsigned int ssaoFBO;
+	unsigned int ssaoColorBuffer;
+	unsigned int ssaoBlurFBO;
+	unsigned int ssaoColorBufferBlur;
+	unsigned int finalFBO;
+	unsigned int finalColorBuffer;
+	unsigned int finalDepthStensil;
+	unsigned int fxaaFBO;
+	unsigned int fxaaColorBuffer;
+
+	unsigned int noiseTexture;
+	unsigned int cubemapTexture;
+	unsigned int gAlbedo;
+	unsigned int gNormal;
+	unsigned int gPosition;
+	unsigned int gSpecular;
+	unsigned int gMetallic;
+	unsigned int gAO;
+	unsigned int attachments[6] = {
+		GL_COLOR_ATTACHMENT0,
+		GL_COLOR_ATTACHMENT1,
+		GL_COLOR_ATTACHMENT2,
+		GL_COLOR_ATTACHMENT3,
+		GL_COLOR_ATTACHMENT4,
+		GL_COLOR_ATTACHMENT5 };
+
+	std::vector<std::string> faces
+	{
+		"right.jpg",
+		"left.jpg",
+		"top.jpg",
+		"bottom.jpg",
+		"front.jpg",
+		"back.jpg"
+	};
+
+	QuadVertex vertices;
+	unsigned int indices;
+	GLFWwindow* window;
+
+	GLuint geometryShaderProgram;
+	GLuint cubeMapShaderProgram;
+	GLuint lightpassShaderProgram;
+	GLuint ssaoShaderProgram;
+	GLuint ssaoBlurShaderProgram;
+	GLuint gaussianBlurShaderProgram;
+	GLuint skyboxShaderProgram;
+	GLuint fxaaShaderProgram;
+	int display_w, display_h;
+	unsigned int cubeMapSize = 64;
+
+	float skyboxArray[72] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+
+		-1.0f, -1.0f, -1.0f,//BL
+		-1.0f, -1.0f,  1.0f,//BR
+		1.0f, -1.0f, -1.0f,//FL
+		1.0f, -1.0f,  1.0f//FR
+	};
+
+	unsigned int skyboxIndices[36] = {
+		// positions          
+		0, 1, 2, //Left
+		2, 3, 0,
+
+		4, 5, 6, //Back
+		6, 7, 4,
+
+		8, 9, 10, //Front
+		10, 11, 8,
+
+		12, 13, 14, //Right
+		14, 15, 12,
+
+		16, 17, 18, //Top
+		18, 19, 16,
+
+		20, 21, 22, //Bottom
+		21, 23, 22
+	};
+
+	float cubeVertices[216] = {
+		// positions          // normals
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, 1.0f,//LEFT
+		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, 1.0f,
+
+		0.5f, 0.5f,  0.5f,  0.0f,  0.0f, -1.0f,//RIGHT
+		0.5f, -0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f,  -0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f,  -0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
+		0.5f, 0.5f,  0.5f,  0.0f,  0.0f, -1.0f,
+
+		-0.5f,  -0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,//FRONT
+		-0.5f,  0.5f, -0.5f, 1.0f,  0.0f,  0.0f,
+		-0.5f, 0.5f, 0.5f, 1.0f,  0.0f,  0.0f,
+		-0.5f, 0.5f, 0.5f, 1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f, 1.0f,  0.0f,  0.0f,
+		-0.5f,  -0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,
+
+		0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,//BACK
+		0.5f,  0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,
+
+		0.5f, -0.5f, 0.5f,  0.0f, 1.0f,  0.0f,//BOTTOM
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  0.0f,
+		-0.5f, -0.5f,  -0.5f,  0.0f, 1.0f,  0.0f,
+		-0.5f, -0.5f,  -0.5f,  0.0f, 1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 1.0f,  0.0f,
+		0.5f, -0.5f, 0.5f,  0.0f, 1.0f,  0.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f,  -1.0f,  0.0f,//TOP
+		0.5f,  0.5f, -0.5f,  0.0f,  -1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  -1.0f,  0.0f,
+		0.5f,  0.5f,  0.5f,  0.0f,  -1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  -1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  -1.0f,  0.0f
+	};
+
+};

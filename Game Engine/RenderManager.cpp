@@ -1,0 +1,589 @@
+#include "RenderManager.h"
+
+RenderManager::RenderManager()
+{
+	createBuffers();
+}
+
+RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow, ShaderProgramLib* shaderProgram)
+{
+	gameScene = otherGameScene;
+	window = otherWindow;
+	this->geometryShaderProgram = shaderProgram->getShader<GeometryShaders>()->geometryShaderProgram;
+	this->cubeMapShaderProgram = shaderProgram->getShader<CubeMapShaders>()->cubeMapShaderProgram;
+	this->lightpassShaderProgram = shaderProgram->getShader<LightpassShaders>()->lightpassShaderProgram;
+	this->ssaoShaderProgram = shaderProgram->getShader<SSAOShaders>()->ssaoShaderProgram;
+	this->ssaoBlurShaderProgram = shaderProgram->getShader<SSAOBlurShaders>()->ssaoBlurShaderProgram;
+	this->gaussianBlurShaderProgram = shaderProgram->getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram;
+	this->skyboxShaderProgram = shaderProgram->getShader<SkyboxShaders>()->skyboxShaderProgram;
+	this->fxaaShaderProgram = shaderProgram->getShader<FXAAShaders>()->fxaaShaderProgram;
+	createBuffers();
+	vao = 0;
+	skyboxVAO = 0;
+}
+
+RenderManager::~RenderManager()
+{
+}
+
+void RenderManager::FindObjectsToRender() {
+	for (unsigned int i = 0; i < gameScene->gameObjects.size(); i++) {
+		if (gameScene->gameObjects[i].getIsRenderable() == true) {
+			gameObjectsToRender.push_back(&gameScene->gameObjects[i]);
+		}
+		if (gameScene->gameObjects[i].hasLight == true) {
+			lightsToRender.push_back(gameScene->gameObjects[i].lightComponent);
+		}
+	}
+}
+
+void RenderManager::createBuffers()
+{
+	//screen size
+	glfwGetFramebufferSize(window, &display_w, &display_h);
+	std::cout << "construct " << display_w << " " << display_h << std::endl;
+
+	// cube VAO
+	glGenVertexArrays(1, &cubeVAO);
+	glGenBuffers(1, &cubeVBO);
+	glBindVertexArray(cubeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+	//... Create textures for Skybox Cube Map
+	glGenFramebuffers(1, &skyFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, skyFBO);
+	cubemapTexture = loadCubemap(faces);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, cubemapTexture, 0);
+
+	//... Create G-buffers
+	//framebufferobject
+	glGenFramebuffers(1, &gbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
+	//g-buffer position
+	glGenTextures(1, &gPosition);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//attach texture to current framebuffer
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
+	//g-buffer normal
+	glGenTextures(1, &gNormal);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//attach texture to current framebuffer
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+	//g-buffer albedo
+	glGenTextures(1, &gAlbedo);
+	glBindTexture(GL_TEXTURE_2D, gAlbedo);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//attach texture to current framebuffer
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedo, 0);
+
+	//g-buffer specular
+	glGenTextures(1, &gSpecular);
+	glBindTexture(GL_TEXTURE_2D, gSpecular);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//attach texture to current framebuffer
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gSpecular, 0);
+
+	//g-buffer metallic
+	glGenTextures(1, &gMetallic);
+	glBindTexture(GL_TEXTURE_2D, gMetallic);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//attach texture to current framebuffer
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, gMetallic, 0);
+
+	//g-buffer AO
+	glGenTextures(1, &gAO);
+	glBindTexture(GL_TEXTURE_2D, gAO);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//attach texture to current framebuffer
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, gAO, 0);
+
+	glDrawBuffers(6, attachments);
+
+	//... Create and attach depth buffer
+	glGenRenderbuffers(1, &rboDepth);
+	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, display_w, display_h);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+	// finally check if framebuffer is complete
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer not complete!" << std::endl;
+
+	//... SSAO & BLUR PASS
+	//... Create frambuffers for SSAO
+	glGenFramebuffers(1, &ssaoFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+	//...  SSAO color buffer
+	glGenTextures(1, &ssaoColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "SSAO Framebuffer not complete!" << std::endl;
+
+	//... SSAO blur buffer
+	glGenFramebuffers(1, &ssaoBlurFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
+	glGenTextures(1, &ssaoColorBufferBlur);
+	glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBufferBlur, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "SSAO Blur Framebuffer not complete!" << std::endl;
+
+	//... Create sample kernel
+	std::uniform_real_distribution<GLfloat> randomNumber(-1.0f, 1.0f); // generates random floats between 0.0 and 1.0
+	std::default_random_engine generator;
+
+	//... Create noise texture
+	// ----------------------
+	std::vector<glm::vec3> noiseVec;
+	for (unsigned int i = 0; i < 16; i++)
+	{
+		// Rotate around z-axis in tangent space
+		glm::vec3 noise(
+			randomNumber(generator) * 2.0 - 1.0,
+			randomNumber(generator) * 2.0 - 1.0,
+			0.0f);
+		noiseVec.push_back(noise);
+	}
+
+	//... Generate noise texture
+	glGenTextures(1, &noiseTexture);
+	glBindTexture(GL_TEXTURE_2D, noiseTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, 4, 4, 0, GL_RGB, GL_FLOAT, &noiseVec[0]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//... Create Colorbuffer
+	glGenFramebuffers(1, &finalFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
+	glGenTextures(1, &finalColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalColorBuffer, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "SSAO Framebuffer not complete!" << std::endl;
+
+	//... Create and attach depth and stencil buffer
+	glGenRenderbuffers(1, &finalDepthStensil);
+	glBindRenderbuffer(GL_RENDERBUFFER, finalDepthStensil);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, display_w, display_h);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, finalDepthStensil);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, finalDepthStensil);
+	// finally check if framebuffer is complete
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer not complete!" << std::endl;
+
+	//... Create FXAA Frame Buffer
+	glGenFramebuffers(1, &fxaaFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, fxaaFBO);
+	glGenTextures(1, &fxaaColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, fxaaColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fxaaColorBuffer, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "SSAO Framebuffer not complete!" << std::endl;
+}
+
+void RenderManager::Render(float dT, int ssaoOnorOFF) {
+	FindObjectsToRender();
+
+	//... Set view and projection matrix
+	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform.position, gameScene->gameObjects[0].transform.position + gameScene->gameObjects[0].transform.forward, gameScene->gameObjects[0].transform.up);
+	projection_matrix = glm::perspective(glm::radians(90.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
+
+	glm::mat4 world_matrix = glm::mat4(1);
+	world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
+	world_matrix = glm::rotate(world_matrix, glm::radians(dT), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	//... Clear Back Buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, display_w, display_h);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	//... Clear finalFBO
+	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glUseProgram(geometryShaderProgram);
+
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilMask(0xFF); // enable writing to the stencil buffer
+
+	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
+	{
+		gameObjectsToRender[i]->materialComponent->bindTextures();
+		gameObjectsToRender[i]->materialComponent->bindFoundTextures();
+		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
+
+		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
+	}
+
+	//... CUBE MAP GEOMETREY PASS------------------------------------------------------------------------------------------------------------------------------
+	glBindVertexArray(cubeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	glUseProgram(cubeMapShaderProgram);
+
+	// Reflective Cube Map World Matrix
+	glm::mat4 cube_world_matrix = glm::mat4(1);
+	cube_world_matrix = glm::translate(cube_world_matrix, glm::vec3(2, 0.5, 0));
+	cube_world_matrix = glm::rotate(cube_world_matrix, glm::radians(dT), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(cube_world_matrix));
+	glUniform3fv(glGetUniformLocation(cubeMapShaderProgram, "cameraPos"), 1, glm::value_ptr(gameScene->gameObjects[0].transform.position));
+
+	glStencilFunc(GL_ALWAYS, 2, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	//... CUBE MAP REFLECTION PASS TO FINAL IMAGE--------------------------------------------------------------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDisable(GL_CULL_FACE);
+
+	//... Copy Stencil Buffer from gbo to finalFBO
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, gbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, finalFBO);
+	glBlitFramebuffer(0, 0, display_w, display_h, 0, 0, display_w, display_h, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+
+	if (ssaoOnorOFF)
+	{
+		//... SSAO PASS--------------------------------------------------------------------------------------------------------------------------------------------
+		// SSAO texture
+		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glUseProgram(ssaoShaderProgram);
+
+		glUniformMatrix4fv(glGetUniformLocation(ssaoShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+
+		glUniform1i(glGetUniformLocation(ssaoShaderProgram, "gPosition"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gPosition);
+		glUniform1i(glGetUniformLocation(ssaoShaderProgram, "gNormal"), 1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gNormal);
+		glUniform1i(glGetUniformLocation(ssaoShaderProgram, "noiseTexture"), 2);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, noiseTexture);
+
+		renderQuad();
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		//... SSAO BLUR PASS---------------------------------------------------------------------------------------------------------------------------------------
+		// ------------------------------------
+		glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glUseProgram(ssaoBlurShaderProgram);
+
+		glUniform1i(glGetUniformLocation(ssaoBlurShaderProgram, "ssaoInput"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+
+		renderQuad();
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	}
+	else
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+
+	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
+	glUseProgram(lightpassShaderProgram);
+
+	//CAM pos
+	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[2].transform.position));
+
+	//Lights
+	for (unsigned int i = 0; i < lightsToRender.size(); i++)
+	{
+		//position
+		std::string lightUniform = "lights[" + std::to_string(i) + "].Position";
+		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(lightsToRender.at(i)->gameObject->transform.position));
+
+		//Color
+		lightUniform = "lights[" + std::to_string(i) + "].Color";
+		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(lightsToRender.at(i)->color));
+
+		//Attenuation linear
+		lightUniform = "lights[" + std::to_string(i) + "].Linear";
+		glUniform1f(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), lightsToRender.at(i)->Linear);
+
+		//Attenuation quadratic
+		lightUniform = "lights[" + std::to_string(i) + "].Quadratic";
+		glUniform1f(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), lightsToRender.at(i)->Quadratic);
+	}
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gPosition"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gNormal"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gAlbedo"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, gAlbedo);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gSpecular"), 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, gSpecular);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gMetallic"), 4);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, gMetallic);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gAO"), 5);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, gAO);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ssao"), 6);
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_EQUAL, 1, 0xFF);
+	glStencilMask(0x00); // disable writing to the stencil buffer
+
+	renderQuad();
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	//... SKYBOX PASS--------------------------------------------------------------------------------------------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
+	glUseProgram(skyboxShaderProgram);
+
+	view_matrix = glm::mat4(glm::mat3(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(skyboxShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(skyboxShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	glUniform1i(glGetUniformLocation(skyboxShaderProgram, "skybox"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_EQUAL, 0, 0xFF);
+	glStencilMask(0x00); // disable writing to the stencil buffer
+
+	renderSkyQuad();
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+	glDisable(GL_STENCIL_TEST);
+
+	//... FXAA PASS--------------------------------------------------------------------------------------------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, fxaaFBO);
+	glUseProgram(fxaaShaderProgram);
+
+	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
+	glUniform1i(glGetUniformLocation(fxaaShaderProgram, "width"), display_w);
+	glUniform1i(glGetUniformLocation(fxaaShaderProgram, "height"), display_h);
+
+	renderQuad();
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+	//... GAUSSIAN BLUR PASS-----------------------------------------------------------------------------------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(gaussianBlurShaderProgram);
+
+	glBindTexture(GL_TEXTURE_2D, fxaaColorBuffer);
+
+	renderQuad();
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	glStencilMask(0xFF);
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glDisable(GL_STENCIL_TEST);
+
+	gameObjectsToRender.clear();
+	lightsToRender.clear();
+}
+
+void RenderManager::renderQuad()
+{
+	if (vao == 0)
+	{
+		unsigned int vertexPos;
+		vertexPos = glGetAttribLocation(ssaoShaderProgram, "aPos");
+
+		unsigned int uvPos;
+		uvPos = glGetAttribLocation(ssaoShaderProgram, "aTexCoords");
+		//create vertices
+		QuadVertex vertices[] = {
+			// pos and normal and uv for each vertex
+			{ 1,  1, 1.0f, 1.0f },
+			{ 1, -1, 1.0f, 0.0f },
+			{ -1, -1, 0.0f, 0.0f },
+			{ -1,  1, 0.0f, 1.0f },
+		};
+
+		unsigned int indices[] = {
+			0,1,3,
+			1,2,3,
+		};
+
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+
+		glEnableVertexAttribArray(0);
+
+		if (vertexPos == -1) {
+			OutputDebugStringA("Error, can't find aPos attribute in vertex shader\n");
+			return;
+		}
+
+		glVertexAttribPointer(
+			0,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(QuadVertex),
+			BUFFER_OFFSET(0)
+		);
+
+		glEnableVertexAttribArray(1);
+
+		if (uvPos == -1) {
+			OutputDebugStringA("Error, cannt find aTexCoords attribute in vertex shader\n");
+			return;
+		}
+
+		glVertexAttribPointer(
+			1,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(QuadVertex),
+			BUFFER_OFFSET(sizeof(float) * 2)
+		);
+
+		//ebo
+		glGenBuffers(1, &ebo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	}
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+}
+
+void RenderManager::renderSkyQuad()
+{
+	if (skyboxVAO == 0)
+	{
+		glGenVertexArrays(1, &skyboxVAO);
+		glBindVertexArray(skyboxVAO);
+		glGenBuffers(1, &skyboxVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxArray), skyboxArray, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+		//ebo
+		glGenBuffers(1, &skyboxEBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(skyboxIndices), skyboxIndices, GL_STATIC_DRAW);
+	}
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEBO);
+}
+
+unsigned int RenderManager::loadCubemap(std::vector<std::string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
