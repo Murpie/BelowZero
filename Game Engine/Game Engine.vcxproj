@@ -186,6 +186,7 @@
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="ShaderBase.cpp" />
     <ClCompile Include="ShaderProgramLib.cpp" />
+    <ClCompile Include="ShadowMapShaders.cpp" />
     <ClCompile Include="SkyboxShaders.cpp" />
     <ClCompile Include="SSAOBlurShaders.cpp" />
     <ClCompile Include="SSAOShaders.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="ShaderProgramLib.h" />
+    <ClInclude Include="ShadowMapShaders.h" />
     <ClInclude Include="SkyboxShaders.h" />
     <ClInclude Include="SSAOBlurShaders.h" />
     <ClInclude Include="SSAOShaders.h" />
@@ -241,6 +243,8 @@
     <None Include="GeometryVS.glsl" />
     <None Include="lightpassFS.glsl" />
     <None Include="lightpassVS.glsl" />
+    <None Include="ShadowMapFS.glsl" />
+    <None Include="ShadowMapVS.glsl" />
     <None Include="SkyboxFS.glsl" />
     <None Include="SkyboxVS.glsl" />
     <None Include="ssaoBlurFS.glsl" />
