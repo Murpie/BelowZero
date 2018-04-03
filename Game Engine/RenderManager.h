@@ -34,7 +34,7 @@ public:
 
 	GameScene *gameScene;
 	void FindObjectsToRender();
-	void Render(float dT, int ssaoOnorOFF);
+	void Render(int ssaoOnorOFF);
 	void createBuffers();
 	void renderQuad();
 	void renderSkyQuad();

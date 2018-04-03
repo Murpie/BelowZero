@@ -41,7 +41,6 @@ void RenderManager::createBuffers()
 {
 	//screen size
 	glfwGetFramebufferSize(window, &display_w, &display_h);
-	std::cout << "construct " << display_w << " " << display_h << std::endl;
 
 	// cube VAO
 	glGenVertexArrays(1, &cubeVAO);
@@ -232,7 +231,7 @@ void RenderManager::createBuffers()
 		std::cout << "SSAO Framebuffer not complete!" << std::endl;
 }
 
-void RenderManager::Render(float dT, int ssaoOnorOFF) {
+void RenderManager::Render(int ssaoOnorOFF) {
 	FindObjectsToRender();
 
 	//... Set view and projection matrix
@@ -241,7 +240,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 
 	glm::mat4 world_matrix = glm::mat4(1);
 	world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
-	world_matrix = glm::rotate(world_matrix, glm::radians(dT), glm::vec3(0.0f, 1.0f, 0.0f));
+	world_matrix = glm::rotate(world_matrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	//... Clear Back Buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -285,7 +284,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	// Reflective Cube Map World Matrix
 	glm::mat4 cube_world_matrix = glm::mat4(1);
 	cube_world_matrix = glm::translate(cube_world_matrix, glm::vec3(2, 0.5, 0));
-	cube_world_matrix = glm::rotate(cube_world_matrix, glm::radians(dT), glm::vec3(0.0f, 1.0f, 0.0f));
+	cube_world_matrix = glm::rotate(cube_world_matrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
