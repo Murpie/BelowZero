@@ -5,8 +5,6 @@
 #include "imgui\imgui_impl_glfw_gl3.h"
 #include <stdio.h>
 
-// test 
-
 /////////////
 #include "MaterialLib.h"
 #include "TextureLib.h"
@@ -32,6 +30,76 @@
 #define _CRTDBG_MAP_ALLOC
 ////////////
 //Render
+
+
+void mouse_callback(GLFWwindow* window, double xPos, double yPos)
+{
+
+}
+
+void mouse_enter_callback(GLFWwindow * window, int entered)
+{
+	if (entered)
+		std::cout << "CURSOR::ENTER::WINDOW" << std::endl;
+	else
+		std::cout << "CURSOR::EXIT::WINDOW" << std::endl;
+}
+
+void mouse_button_callback(GLFWwindow * window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	{
+		std::cout << "MOUSEBUTTON::LEFT::PRESS" << std::endl;
+	}
+
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+	{
+		std::cout << "MOUSEBUTTON::LEFT::RELEASE" << std::endl;
+	}
+
+	// entity.processMouseEvent(window, button, action);
+	//
+}
+
+void processInput(GLFWwindow *window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+
+	//run process - this is how we should use the processInput funtion.
+	// entity.processEvents(window);
+	// gui.processEvents(window);
+	
+	//------------------------------------
+
+	//This statement should be used inside the GUI class
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	{
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		std::cout << "CUROSR::X::POSITION::" << xpos << std::endl;
+		std::cout << "CUROSR::Y::POSITION::" << ypos << std::endl;
+	}
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+	{
+
+	}
+
+	// Add this inside the player class, processEvents() function for movement etc. 
+	/*
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{}
+	*/
+}
 
 static void ShowHelpMarker(const char* desc)
 {
@@ -75,6 +143,15 @@ int main(int, char**)
 		// Setup style
 		ImGui::StyleColorsClassic();
 		//ImGui::StyleColorsDark();
+
+		//? Mouse stuff -----------------------------------------------------------------------------------------
+		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		//glfwSetCursorPosCallback(window, mouse_callback);
+		glfwSetCursorEnterCallback(window, mouse_enter_callback);	//? Needed to check when inside and outside of window
+		glfwSetMouseButtonCallback(window, mouse_button_callback);
+		glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, 1);
+
 
 		bool show_demo_window = false;
 		bool show_hierarchy_window = true;
@@ -374,6 +451,10 @@ int main(int, char**)
 			// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
 			// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 			glfwPollEvents();
+			// Test function
+			processInput(window);
+			//
+
 			ImGui_ImplGlfwGL3_NewFrame();
 
 			// 1. Show a simple window.
