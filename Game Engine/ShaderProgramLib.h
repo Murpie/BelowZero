@@ -12,6 +12,7 @@
 #include <string>
 #include "Mesh.h"
 #include "ShaderBase.h"
+#include "ShadowMapShaders.h"
 
 class ShaderProgramLib
 {
@@ -28,6 +29,7 @@ public:
 	void addGaussianBlurShaders();
 	void addSkyboxShaders();
 	void addFXAAShaders();
+	void addShadowMapShaders();
 
 	template <class T>
 	T* getShader() {

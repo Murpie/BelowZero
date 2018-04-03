@@ -17,6 +17,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->gaussianBlurShaderProgram = shaderProgram->getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram;
 	this->skyboxShaderProgram = shaderProgram->getShader<SkyboxShaders>()->skyboxShaderProgram;
 	this->fxaaShaderProgram = shaderProgram->getShader<FXAAShaders>()->fxaaShaderProgram;
+	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
 	createBuffers();
 	vao = 0;
 	skyboxVAO = 0;
@@ -42,6 +43,24 @@ void RenderManager::createBuffers()
 	//screen size
 	glfwGetFramebufferSize(window, &display_w, &display_h);
 	std::cout << "construct " << display_w << " " << display_h << std::endl;
+
+	//ShadowMap FBO
+	glGenFramebuffers(1, &shadowFBO);
+	glGenTextures(1, &shadowMap);
+	glBindTexture(GL_TEXTURE_2D, shadowMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// cube VAO
 	glGenVertexArrays(1, &cubeVAO);
@@ -253,6 +272,29 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+	//SHADOWMAP PASS----------------------------------------------------------------------------------------------------------------------------------------
+	glUseProgram(shadowMapShaderProgram);
+	setupMatrices(shadowMapShaderProgram);
+	glViewport(0, 0, 1024, 1024);
+	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+
+
+	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
+	{
+		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
+		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glViewport(0, 0, display_w, display_h);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
+
 	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -356,6 +398,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glUseProgram(lightpassShaderProgram);
+	setupMatrices(lightpassShaderProgram);
 
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[2].transform.position));
@@ -406,6 +449,10 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ssao"), 6);
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, ssaoColorBufferBlur);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "depthMap"), 7);
+	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D, shadowMap);
 
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_EQUAL, 1, 0xFF);
@@ -555,6 +602,16 @@ void RenderManager::renderSkyQuad()
 	glBindVertexArray(skyboxVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEBO);
+}
+
+void RenderManager::setupMatrices(unsigned int shaderToUse)
+{
+
+	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 9.5f);
+	glm::mat4 lightView = glm::lookAt(glm::vec3(0, 7, 0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0));
+	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 }
 
 unsigned int RenderManager::loadCubemap(std::vector<std::string> faces)

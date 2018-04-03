@@ -67,3 +67,10 @@ void ShaderProgramLib::addFXAAShaders()
 	FXAAShaders* newShaderProgram = new FXAAShaders();
 	shaders.push_back(newShaderProgram);
 }
+
+void ShaderProgramLib::addShadowMapShaders()
+{
+	//add your shader here
+	ShadowMapShader* newShaderProgram = new ShadowMapShader();
+	shaders.push_back(newShaderProgram);
+}

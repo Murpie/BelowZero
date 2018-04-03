@@ -21,6 +21,9 @@ uniform sampler2D gSpecular;
 uniform sampler2D gMetallic;
 uniform sampler2D gAO;
 uniform sampler2D ssao;
+uniform sampler2D depthMap;
+
+uniform mat4 LightSpaceMatrix;
 
 void main()
 { 
@@ -55,6 +58,34 @@ void main()
         lighting += diffuse + specular + metallic;
     }
     
-    FragColor = lighting;
+				// ----------==========SHADOWTHINGAMAJIGS==========----------
+	//vec3 lightDirForShadow = normalize(lights[1].Position - FragPos);
+	vec3 lightDirForShadow = normalize(vec3(0.0, 7.0, 0.0) - FragPos);
+	vec4 shadowCoordinates = LightSpaceMatrix * vec4(FragPos, 1.0);
+	vec3 projectionCoordinates = shadowCoordinates.xyz / shadowCoordinates.w;
+	projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
+
+	float closestDepth = texture(depthMap, projectionCoordinates.xy).r;
+	float bias = max(0.05 * (1.0 - dot(Normal, lightDirForShadow)), 0.005);
+	float shadowFactor = 0.0;
+
+	vec2 texelSize = 1.0 / textureSize(depthMap, 0);
+	for (int x = -1; x <= 1; ++x)
+	{
+		for (int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(depthMap, projectionCoordinates.xy + vec2(x, y) * texelSize).r;
+			shadowFactor += projectionCoordinates.z - bias > pcfDepth ? 1.0 : 0.0;
+		}
+	}
+	shadowFactor /= 9.0;
+
+	if (projectionCoordinates.z > 1.0)
+		shadowFactor = 0.0;
+				// ----------==========SHADOWTHINGAMAJIGS==========----------
+
+    
+	
+	FragColor = lighting * (1.0 - shadowFactor);
 
 }
