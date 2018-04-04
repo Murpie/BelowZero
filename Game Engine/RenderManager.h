@@ -55,6 +55,9 @@ private:
 	unsigned int skyboxVAO;
 	unsigned int skyboxVBO;
 	unsigned int skyboxEBO;
+	unsigned int animationVAO;
+	unsigned int animationVBO;
+	unsigned int animationEBO;
 	unsigned int ebo;
 	unsigned int vbo;
 	unsigned int vao;
@@ -109,6 +112,7 @@ private:
 	GLuint gaussianBlurShaderProgram;
 	GLuint skyboxShaderProgram;
 	GLuint fxaaShaderProgram;
+	GLuint animationShaderProgram;
 	int display_w, display_h;
 	unsigned int cubeMapSize = 64;
 

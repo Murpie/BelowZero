@@ -98,8 +98,9 @@ int main(int, char**)
 		shaderProgramLibrary.addSkyboxShaders();
 		shaderProgramLibrary.addGaussianBlurShaders();
 		shaderProgramLibrary.addFXAAShaders();
+		shaderProgramLibrary.addAnimationShaders();
 
-		RenderManager renderManager = RenderManager( &gameScene, window, &shaderProgramLibrary );
+		RenderManager renderManager = RenderManager(&gameScene, window, &shaderProgramLibrary);
 
 		MaterialLib materialLibrary;
 		TextureLib textureLibrary;
@@ -125,8 +126,7 @@ int main(int, char**)
 		int nrOfObjects = gameScene.gameObjects.size();
 
 		//... Add name of OBJ to add to scene
-		std::string meshName[] = { "Floor.obj" };
-
+		std::string meshName[] = { "Floor.obj", "Tower1.obj" };
 		int nrOfMeshes = sizeof(meshName) / sizeof(meshName[0]);
 
 		//... Read OBJ and MTL File
@@ -314,6 +314,8 @@ int main(int, char**)
 				}
 			}
 		}
+
+
 
 		//... Set Game Objects
 		gameScene.gameObjects[0].name = "Camera";

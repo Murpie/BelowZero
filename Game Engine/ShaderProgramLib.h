@@ -9,6 +9,7 @@
 #include "SkyboxShaders.h"
 #include "GaussianBlurShaders.h"
 #include "FXAAShaders.h"
+#include "AnimationShaders.h"
 #include <string>
 #include "Mesh.h"
 #include "ShaderBase.h"
@@ -28,6 +29,7 @@ public:
 	void addGaussianBlurShaders();
 	void addSkyboxShaders();
 	void addFXAAShaders();
+	void addAnimationShaders();
 
 	template <class T>
 	T* getShader() {

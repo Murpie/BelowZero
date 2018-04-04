@@ -67,3 +67,9 @@ void ShaderProgramLib::addFXAAShaders()
 	FXAAShaders* newShaderProgram = new FXAAShaders();
 	shaders.push_back(newShaderProgram);
 }
+
+void ShaderProgramLib::addAnimationShaders()
+{
+	AnimationShaders* newShaderProgram = new AnimationShaders();
+	shaders.push_back(newShaderProgram);
+}

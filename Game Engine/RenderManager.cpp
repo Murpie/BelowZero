@@ -17,6 +17,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->gaussianBlurShaderProgram = shaderProgram->getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram;
 	this->skyboxShaderProgram = shaderProgram->getShader<SkyboxShaders>()->skyboxShaderProgram;
 	this->fxaaShaderProgram = shaderProgram->getShader<FXAAShaders>()->fxaaShaderProgram;
+	this->animationShaderProgram = shaderProgram->getShader<AnimationShaders>()->animationShaderProgram;
 	createBuffers();
 	vao = 0;
 	skyboxVAO = 0;
@@ -246,7 +247,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	//... Clear Back Buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, display_w, display_h);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(0.749f, 0.843f, 0.823f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//... Clear finalFBO
@@ -276,6 +277,12 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
 	}
+
+	//------=====================Animation Pass=======================-------
+	//glUseProgram(animationShaderProgram);
+
+
+
 
 	//... CUBE MAP GEOMETREY PASS------------------------------------------------------------------------------------------------------------------------------
 	glBindVertexArray(cubeVAO);
@@ -358,7 +365,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	glUseProgram(lightpassShaderProgram);
 
 	//CAM pos
-	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[2].transform.position));
+	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0].transform.position));
 
 	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)
@@ -475,9 +482,9 @@ void RenderManager::renderQuad()
 		QuadVertex vertices[] = {
 			// pos and normal and uv for each vertex
 			{ 1,  1, 1.0f, 1.0f },
-			{ 1, -1, 1.0f, 0.0f },
-			{ -1, -1, 0.0f, 0.0f },
-			{ -1,  1, 0.0f, 1.0f },
+		{ 1, -1, 1.0f, 0.0f },
+		{ -1, -1, 0.0f, 0.0f },
+		{ -1,  1, 0.0f, 1.0f },
 		};
 
 		unsigned int indices[] = {
