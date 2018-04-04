@@ -54,12 +54,10 @@ int main(int, char**)
 		//glfwSwapInterval(1); // Enable vsync
 		gl3wInit();
 
-		int gaussianblur = 0;
-		int fxaa = 0;
-		int ssao = 1;
+		bool gaussianblur = false;
+		bool fxaa = false;
+		bool ssao = true;
 
-		////////////////
-		
 		int initial_time = time(NULL);
 		int final_time;
 		int frameCount = 0;
