@@ -4,10 +4,10 @@ layout(location = 0) out vec3 FragColor;
 in vec2 TexCoords;
 uniform vec3 view_position;
 
-
 struct Light {
     vec3 Position;
     vec3 Color;
+	int lightType;
 	float Linear;
     float Quadratic;
 };
@@ -22,8 +22,51 @@ uniform sampler2D gMetallic;
 uniform sampler2D gAO;
 uniform sampler2D ssao;
 uniform sampler2D depthMap;
-
+uniform samplerCube cubeMapdepthMap;
 uniform mat4 LightSpaceMatrix;
+
+// ----------========== DIRECTIONAL LIGHT SHADOW CALCULATION ==========----------
+float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal)
+{
+	vec3 lightDirForShadow = normalize(vec3(0.0, 7.0, 0.0) - FragPos);
+	vec4 shadowCoordinates = LightSpaceMatrix * vec4(FragPos, 1.0);
+	vec3 projectionCoordinates = shadowCoordinates.xyz / shadowCoordinates.w;
+	projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
+
+	float closestDepth = texture(depthMap, projectionCoordinates.xy).r;
+	float bias = max(0.005 * (1.0 - dot(Normal, lightDirForShadow)), 0.005);
+	float directionalLightshadowFactor = 0.0f;
+
+	vec2 texelSize = 1.0 / textureSize(depthMap, 0);
+	for (int x = -1; x <= 1; ++x)
+	{
+		for (int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(depthMap, projectionCoordinates.xy + vec2(x, y) * texelSize).r;
+			directionalLightshadowFactor += projectionCoordinates.z - bias > pcfDepth ? 0.7 : 0.0;
+		}
+	}
+	directionalLightshadowFactor /= 9.0;
+
+	if (projectionCoordinates.z > 1.0)
+		directionalLightshadowFactor = 0.0;
+
+	return directionalLightshadowFactor;
+}
+
+// ----------========== POINT LIGHT SHADOW CALCULATION ==========----------
+float PointLightShadowMapCalculation(vec3 FragPos, vec3 Normal)
+{
+	vec3 fragPositionToLightPosition = FragPos - lights[1].Position;
+	float cubeMapClosestDepth = texture(cubeMapdepthMap, fragPositionToLightPosition).r;
+	cubeMapClosestDepth *= 25.0f; //Far Plane
+	float cubeMapCurrentDepth = length(fragPositionToLightPosition);
+	//float cubeMapBias = max(0.005 * (1.0 - dot(Normal, lightDirForShadow)), 0.005);
+	float cubeMapBias = 0.005;
+	float CubeMapShadowFactor = cubeMapCurrentDepth - cubeMapBias > cubeMapClosestDepth ? 0.5 : 0.0;
+
+	return CubeMapShadowFactor;
+}
 
 void main()
 { 
@@ -57,35 +100,13 @@ void main()
         specular *= attenuation;
         lighting += diffuse + specular + metallic;
     }
-    
-				// ----------==========SHADOWTHINGAMAJIGS==========----------
-	//vec3 lightDirForShadow = normalize(lights[1].Position - FragPos);
-	vec3 lightDirForShadow = normalize(vec3(0.0, 7.0, 0.0) - FragPos);
-	vec4 shadowCoordinates = LightSpaceMatrix * vec4(FragPos, 1.0);
-	vec3 projectionCoordinates = shadowCoordinates.xyz / shadowCoordinates.w;
-	projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
 
-	float closestDepth = texture(depthMap, projectionCoordinates.xy).r;
-	float bias = max(0.05 * (1.0 - dot(Normal, lightDirForShadow)), 0.005);
-	float shadowFactor = 0.0;
 
-	vec2 texelSize = 1.0 / textureSize(depthMap, 0);
-	for (int x = -1; x <= 1; ++x)
-	{
-		for (int y = -1; y <= 1; ++y)
-		{
-			float pcfDepth = texture(depthMap, projectionCoordinates.xy + vec2(x, y) * texelSize).r;
-			shadowFactor += projectionCoordinates.z - bias > pcfDepth ? 1.0 : 0.0;
-		}
-	}
-	shadowFactor /= 9.0;
+	float shadowFactor = 0.0f;
+	//if (lights[1].lightType == 0)
+	//shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal);
+	//else if (lights[1].lightType == 1)
+	shadowFactor = PointLightShadowMapCalculation(FragPos, Normal);
 
-	if (projectionCoordinates.z > 1.0)
-		shadowFactor = 0.0;
-				// ----------==========SHADOWTHINGAMAJIGS==========----------
-
-    
-	
-	FragColor = lighting * (1.0 - shadowFactor);
-
+	FragColor = lighting * (1.0f - shadowFactor);
 }

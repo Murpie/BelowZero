@@ -74,3 +74,10 @@ void ShaderProgramLib::addShadowMapShaders()
 	ShadowMapShader* newShaderProgram = new ShadowMapShader();
 	shaders.push_back(newShaderProgram);
 }
+
+void ShaderProgramLib::addPointLightShadowMapShaders()
+{
+	//add your shader here
+	PointLightShadowMapShaders* newShaderProgram = new PointLightShadowMapShaders();
+	shaders.push_back(newShaderProgram);
+}

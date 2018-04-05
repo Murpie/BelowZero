@@ -27,13 +27,11 @@ void ShadowMapShader::CreateShaderData()
 	shaderFile.close();
 
 	const char* shaderTextPtr = shaderText.c_str();
-
 	glShaderSource(vs, 1, &shaderTextPtr, nullptr);
-
 	glCompileShader(vs);
-
 	glGetShaderiv(vs, GL_COMPILE_STATUS, &compileResult);
-	if (compileResult == GL_FALSE) {
+	if (compileResult == GL_FALSE) 
+	{
 		glGetShaderInfoLog(vs, 1024, nullptr, buff);
 		OutputDebugStringA(buff);
 	}
@@ -47,7 +45,8 @@ void ShadowMapShader::CreateShaderData()
 	glCompileShader(fs);
 	compileResult = GL_FALSE;
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &compileResult);
-	if (compileResult == GL_FALSE) {
+	if (compileResult == GL_FALSE) 
+	{
 		memset(buff, 0, 1024);
 		glGetShaderInfoLog(fs, 1024, nullptr, buff);
 		OutputDebugStringA(buff);
@@ -61,7 +60,8 @@ void ShadowMapShader::CreateShaderData()
 
 	compileResult = GL_FALSE;
 	glGetProgramiv(ShadowMapShaderProgram, GL_LINK_STATUS, &compileResult);
-	if (compileResult == GL_FALSE) {
+	if (compileResult == GL_FALSE) 
+	{
 		memset(buff, 0, 1024);
 		glGetProgramInfoLog(ShadowMapShaderProgram, 1024, nullptr, buff);
 		OutputDebugStringA(buff);
@@ -71,4 +71,5 @@ void ShadowMapShader::CreateShaderData()
 	glDetachShader(ShadowMapShaderProgram, fs);
 	glDeleteShader(vs);
 	glDeleteShader(fs);
+
 }

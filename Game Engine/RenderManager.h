@@ -39,6 +39,7 @@ public:
 	void renderQuad();
 	void renderSkyQuad();
 	void setupMatrices(unsigned int shaderToUse);
+	void setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition);
 
 private:
 	unsigned int loadCubemap(std::vector<std::string> faces);
@@ -53,6 +54,8 @@ private:
 
 	unsigned int shadowMap;
 	unsigned int shadowFBO;
+	unsigned int cubeMapShadowMap;
+	unsigned int cubeMapShadowFBO;
 	unsigned int cubeVAO;
 	unsigned int cubeVBO;
 	unsigned int skyboxVAO;
@@ -105,6 +108,7 @@ private:
 	GLFWwindow* window;
 
 	GLuint shadowMapShaderProgram;
+	GLuint pointLightShaderProgram;
 	GLuint geometryShaderProgram;
 	GLuint cubeMapShaderProgram;
 	GLuint lightpassShaderProgram;
