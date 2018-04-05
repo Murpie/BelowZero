@@ -88,7 +88,7 @@ void main()
 		bool is1Steepest = abs(gradient1) >= abs(gradient2);
 
 		//Normalize the direction's gradient
-		float gradientScaled = 0.01 * max(abs(gradient1), abs(gradient2));
+		float gradientScaled = 0.02 * max(abs(gradient1), abs(gradient2));
 
 		//... Time to get the length and move half a pixel in the chosen direction
 		//Choose step size for this direction
