@@ -31,12 +31,6 @@
 ////////////
 //Render
 
-
-void mouse_callback(GLFWwindow* window, double xPos, double yPos)
-{
-
-}
-
 void mouse_enter_callback(GLFWwindow * window, int entered)
 {
 	if (entered)
@@ -69,7 +63,8 @@ void processInput(GLFWwindow *window)
 	}
 
 	//run process - this is how we should use the processInput funtion.
-	// entity.processEvents(window);
+	// entityHandler.processEvents(window); 	//for each entity*
+	
 	// gui.processEvents(window);
 	
 	//------------------------------------
@@ -147,7 +142,6 @@ int main(int, char**)
 		//? Mouse stuff -----------------------------------------------------------------------------------------
 		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		//glfwSetCursorPosCallback(window, mouse_callback);
 		glfwSetCursorEnterCallback(window, mouse_enter_callback);	//? Needed to check when inside and outside of window
 		glfwSetMouseButtonCallback(window, mouse_button_callback);
 		glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, 1);

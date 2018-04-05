@@ -46,6 +46,9 @@
     <Filter Include="Header Files\GLSL">
       <UniqueIdentifier>{d8f50d1a-e7be-4514-8806-632b655c5511}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Intersection">
+      <UniqueIdentifier>{e29c1648-c099-4d72-9a90-21abf48eb638}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -242,6 +245,12 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files\Engine Core</Filter>
     </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>Header Files\Intersection</Filter>
+    </ClInclude>
+    <ClInclude Include="Intersection.h">
+      <Filter>Header Files\Intersection</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="lightpassFS.glsl">
@@ -295,5 +304,10 @@
     <None Include="SkyboxVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="test.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
