@@ -1,24 +1,14 @@
-newmtl cube_mtl:phong1SG
+newmtl Tree:lambert2SG
 illum 4
 Kd 0.00 0.00 0.00
-Ka 0.59 0.59 0.59
-Tf 1.00 1.00 1.00
-Ni 1.00
-Ks 0.00 0.00 0.00
-Ns 18.00
-newmtl ground:initialShadingGroup
-illum 4
-Kd 0.50 0.50 0.50
 Ka 0.00 0.00 0.00
 Tf 1.00 1.00 1.00
+map_Kd Colors.png
 Ni 1.00
-Ks 0.50 0.50 0.50
-Ns 18.00
-map_Kd Stone_Floor_003_COLOR.jpg
-map_Normal Stone_Floor_003_NORM.jpg
-map_Ks Stone_Floor_003_ROUGH.jpg
-map_AO Stone_Floor_003_OCC.jpg
-
-
-
-
+newmtl initialShadingGroup
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd Colors.png
+Ni 1.00

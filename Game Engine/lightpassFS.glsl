@@ -49,7 +49,7 @@ void main()
 		vec3 metallic = lights[i].Color * spec * Metallic;
         // attenuation
         float distance = length(lights[i].Position - FragPos);
-        float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
+        float attenuation = 1.7 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
         diffuse *= attenuation;
         specular *= attenuation;
         lighting += diffuse + specular + metallic;
