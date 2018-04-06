@@ -384,7 +384,7 @@ int main(int, char**)
 
 			renderManager.getDeltaTime(deltaTime);
 			renderManager.getSeconds(seconds);
-			renderManager.Render(elapsedTime, ssao);
+			renderManager.Render(ssao);
 
 			glfwSwapBuffers(window);
 
