@@ -373,7 +373,6 @@ int main(int, char**)
 				initial_time = final_time;
 			}
 		}
-
 		glfwTerminate();
 	}
 	_CrtDumpMemoryLeaks();
