@@ -7,6 +7,7 @@ Light::Light():Component()
 	color = glm::vec4(1, 0.9, 0.7, 1);
 	Linear=0.05;
 	Quadratic=0.15;
+	lightType = -1;
 }
 
 Light::~Light()
