@@ -293,8 +293,11 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//DIRECTIONAL LIGHT SHADOWMAP PASS----------------------------------------------------------------------------------------------------------------------------------------
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+
 	glUseProgram(shadowMapShaderProgram);
-	setupMatrices(shadowMapShaderProgram);
+	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[1].transform.position);
 	glViewport(0, 0, 1024, 1024);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -333,7 +336,8 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 
 	
 	glEnable(GL_DEPTH_TEST);
-
+	glCullFace(GL_BACK);
+	glDisable(GL_CULL_FACE);
 	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -437,7 +441,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glUseProgram(lightpassShaderProgram);
-	setupMatrices(lightpassShaderProgram);
+	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[1].transform.position);
 
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[2].transform.position));
@@ -647,12 +651,12 @@ void RenderManager::renderSkyQuad()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEBO);
 }
 
-void RenderManager::setupMatrices(unsigned int shaderToUse)
+void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 {
 	glUseProgram(shaderToUse);
 
 	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 9.5f);
-	glm::mat4 lightView = glm::lookAt(glm::vec3(0, 7, 0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0));
+	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0));
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));

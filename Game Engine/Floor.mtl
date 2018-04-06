@@ -14,10 +14,7 @@ Tf 1.00 1.00 1.00
 Ni 1.00
 Ks 0.50 0.50 0.50
 Ns 18.00
-map_Kd Stone_Floor_003_COLOR.jpg
-map_Normal Stone_Floor_003_NORM.jpg
-map_Ks Stone_Floor_003_ROUGH.jpg
-map_AO Stone_Floor_003_OCC.jpg
+map_Kd Cube_cube_BaseColor.png
 
 
 

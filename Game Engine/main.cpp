@@ -116,19 +116,19 @@ int main(int, char**)
 		//... Create Lights and add empty game object
 		Light light1 = Light();
 		Light light2 = Light();
-		Light light3 = Light();
+		/*Light light3 = Light();
 		Light light4 = Light();
-		Light light5 = Light();
+		Light light5 = Light();*/
 		gameScene.addEmptyGameObject();
 		gameScene.addEmptyGameObject();
+		/*gameScene.addEmptyGameObject();
 		gameScene.addEmptyGameObject();
-		gameScene.addEmptyGameObject();
-		gameScene.addEmptyGameObject();
+		gameScene.addEmptyGameObject();*/
 
 		int nrOfObjects = gameScene.gameObjects.size();
 
 		//... Add name of OBJ to add to scene
-		std::string meshName[] = { "Floor.obj", "House2.obj", "House1.obj" };
+		std::string meshName[] = { "Floor.obj", "House2.obj"};
 
 		int nrOfMeshes = sizeof(meshName) / sizeof(meshName[0]);
 
@@ -325,36 +325,36 @@ int main(int, char**)
 		gameScene.gameObjects[1].name = "Light 1";
 		gameScene.gameObjects[1].addComponent(&light1);
 		gameScene.gameObjects[1].transform = glm::vec3(7, 9, -4);
-		gameScene.gameObjects[1].lightComponent->lightType = 1;
+		gameScene.gameObjects[1].lightComponent->lightType = 0;
 
 		gameScene.gameObjects[2].name = "Light 2";
 		gameScene.gameObjects[2].addComponent(&light2);
 		gameScene.gameObjects[2].transform = glm::vec3(4, 0.4, -2);
-		gameScene.gameObjects[2].lightComponent->lightType = 2;
+		gameScene.gameObjects[2].lightComponent->lightType = 1;
 
-		gameScene.gameObjects[3].name = "Light 3";
+		/*gameScene.gameObjects[3].name = "Light 3";
 		gameScene.gameObjects[3].addComponent(&light3);
 		gameScene.gameObjects[3].transform = glm::vec3(1, 0.4, -3);
-		gameScene.gameObjects[3].lightComponent->lightType = 2;
+		gameScene.gameObjects[3].lightComponent->lightType = 1;
 
 		gameScene.gameObjects[4].name = "Light 4";
 		gameScene.gameObjects[4].addComponent(&light4);
 		gameScene.gameObjects[4].transform = glm::vec3(-5, 0.4, -4);
-		gameScene.gameObjects[4].lightComponent->lightType = 2;
+		gameScene.gameObjects[4].lightComponent->lightType = 1;
 
 		gameScene.gameObjects[5].name = "Light 5";
 		gameScene.gameObjects[5].addComponent(&light5);
 		gameScene.gameObjects[5].transform = glm::vec3(-5, 0.4, 3);
-		gameScene.gameObjects[5].lightComponent->lightType = 2;
+		gameScene.gameObjects[5].lightComponent->lightType = 1;*/
 
 		MeshFilter meshFilter[sizeof(meshName) / sizeof(meshName[0])];
 
 		for (int i = 0; i < nrOfMeshes; i++)
 		{
 			meshFilter[i] = MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).gElementBuffer, meshLibrary.getMesh(i).vertexCount);
-			gameScene.gameObjects[i + 2].name = meshName[i];
-			gameScene.gameObjects[i + 2].addComponent(&meshFilter[i]);
-			gameScene.gameObjects[i + 2].addComponent(materialLibrary.getMaterial(i));
+			gameScene.gameObjects[i + 3].name = meshName[i];
+			gameScene.gameObjects[i + 3].addComponent(&meshFilter[i]);
+			gameScene.gameObjects[i + 3].addComponent(materialLibrary.getMaterial(i));
 		}
 
 		//... Uniform in int that tells gaussian to be turned off

@@ -38,7 +38,7 @@ public:
 	void createBuffers();
 	void renderQuad();
 	void renderSkyQuad();
-	void setupMatrices(unsigned int shaderToUse);
+	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
 	void setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition);
 
 private:
