@@ -276,7 +276,7 @@ void RenderManager::Render(int ssaoOnorOFF) {
 
 	//... Set view and projection matrix
 	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform.position, gameScene->gameObjects[0].transform.position + gameScene->gameObjects[0].transform.forward, gameScene->gameObjects[0].transform.up);
-	projection_matrix = glm::perspective(glm::radians(90.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
+	projection_matrix = glm::perspective(glm::radians(90.0f), float(display_w) / float(display_h), 0.1f, 35.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
 	world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));

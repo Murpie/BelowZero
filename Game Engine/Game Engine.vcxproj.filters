@@ -343,8 +343,6 @@
     <None Include="SkyboxVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
-    <None Include="AnimationFS.glsl" />
-    <None Include="AnimationVS.glsl" />
     <None Include="ShadowMapFS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
@@ -358,6 +356,12 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="PointLightShadowMapVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="AnimationVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="AnimationFS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>

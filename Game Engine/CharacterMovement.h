@@ -16,8 +16,6 @@ public:
 	CharacterMovement(GLFWwindow* window);
 	~CharacterMovement();
 
-	void getInformation(float time);
-
 	Physics physics;
 	GLFWwindow* window;
 

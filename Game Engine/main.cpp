@@ -97,14 +97,14 @@ int main(int, char**)
 		//... Create Lights and add empty game object
 		Light light1 = Light();
 		Light light2 = Light();
-		/*Light light3 = Light();
+		Light light3 = Light();
 		Light light4 = Light();
-		Light light5 = Light();*/
+		Light light5 = Light();
 		gameScene.addEmptyGameObject();
 		gameScene.addEmptyGameObject();
-		/*gameScene.addEmptyGameObject();
 		gameScene.addEmptyGameObject();
-		gameScene.addEmptyGameObject();*/
+		gameScene.addEmptyGameObject();
+		gameScene.addEmptyGameObject();
 
 		int nrOfObjects = gameScene.gameObjects.size();
 
@@ -335,9 +335,9 @@ int main(int, char**)
 		for (int i = 0; i < nrOfMeshes; i++)
 		{
 			meshFilter[i] = MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).gElementBuffer, meshLibrary.getMesh(i).vertexCount);
-			gameScene.gameObjects[i + 3].name = meshName[i];
-			gameScene.gameObjects[i + 3].addComponent(&meshFilter[i]);
-			gameScene.gameObjects[i + 3].addComponent(materialLibrary.getMaterial(i));
+			gameScene.gameObjects[i + 6].name = meshName[i];
+			gameScene.gameObjects[i + 6].addComponent(&meshFilter[i]);
+			gameScene.gameObjects[i + 6].addComponent(materialLibrary.getMaterial(i));
 		}
 
 		//... Uniform in int that tells gaussian to be turned off
