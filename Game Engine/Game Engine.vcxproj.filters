@@ -266,28 +266,28 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files\Engine Core</Filter>
     </ClInclude>
-    <ClInclude Include="AnimatedMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimationShaders.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Joint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SkelletonVertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PointLightShadowMapShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="ShadowMapShaders.h">
+      <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimatedMesh.h">
+      <Filter>Header Files\Data Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Header Files\Data Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Joint.h">
+      <Filter>Header Files\Data Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.h">
+      <Filter>Header Files\Data Types</Filter>
+    </ClInclude>
+    <ClInclude Include="SkelletonVertex.h">
+      <Filter>Header Files\Data Types</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
@@ -343,8 +343,6 @@
     <None Include="SkyboxVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
-    <None Include="AnimationFS.glsl" />
-    <None Include="AnimationVS.glsl" />
     <None Include="ShadowMapFS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
@@ -358,6 +356,12 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="PointLightShadowMapVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="AnimationFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="AnimationVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>
