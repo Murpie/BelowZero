@@ -362,33 +362,33 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
 	}
 
-	//... CUBE MAP GEOMETREY PASS------------------------------------------------------------------------------------------------------------------------------
-	glBindVertexArray(cubeVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-	glUseProgram(cubeMapShaderProgram);
+	////... CUBE MAP GEOMETREY PASS------------------------------------------------------------------------------------------------------------------------------
+	//glBindVertexArray(cubeVAO);
+	//glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	//glUseProgram(cubeMapShaderProgram);
 
-	// Reflective Cube Map World Matrix
-	glm::mat4 cube_world_matrix = glm::mat4(1);
-	cube_world_matrix = glm::translate(cube_world_matrix, glm::vec3(2, 0.5, 0));
-	cube_world_matrix = glm::rotate(cube_world_matrix, glm::radians(dT), glm::vec3(0.0f, 1.0f, 0.0f));
+	//// Reflective Cube Map World Matrix
+	//glm::mat4 cube_world_matrix = glm::mat4(1);
+	//cube_world_matrix = glm::translate(cube_world_matrix, glm::vec3(2, 0.5, 0));
+	//cube_world_matrix = glm::rotate(cube_world_matrix, glm::radians(dT), glm::vec3(0.0f, 1.0f, 0.0f));
 
-	glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
-	glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
-	glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(cube_world_matrix));
-	glUniform3fv(glGetUniformLocation(cubeMapShaderProgram, "cameraPos"), 1, glm::value_ptr(gameScene->gameObjects[0].transform.position));
+	//glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	//glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+	//glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(cube_world_matrix));
+	//glUniform3fv(glGetUniformLocation(cubeMapShaderProgram, "cameraPos"), 1, glm::value_ptr(gameScene->gameObjects[0].transform.position));
 
-	glStencilFunc(GL_ALWAYS, 2, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	//glStencilFunc(GL_ALWAYS, 2, 0xFF);
+	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT);
 
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	//glDrawArrays(GL_TRIANGLES, 0, 36);
 
-	//... CUBE MAP REFLECTION PASS TO FINAL IMAGE--------------------------------------------------------------------------------------------------------------
-	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
+	////... CUBE MAP REFLECTION PASS TO FINAL IMAGE--------------------------------------------------------------------------------------------------------------
+	//glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glDisable(GL_CULL_FACE);
+	//glDrawArrays(GL_TRIANGLES, 0, 36);
+	//glDisable(GL_CULL_FACE);
 
 	//... Copy Stencil Buffer from gbo to finalFBO
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gbo);
