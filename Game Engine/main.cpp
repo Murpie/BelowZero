@@ -26,10 +26,14 @@
 #include "LightpassShaders.h"
 #include "FXAAShaders.h"
 #include "CubeMapShaders.h"
+
+#include <chrono>
 #include "PointLightShadowMapShaders.h"
 #define _CRTDBG_MAP_ALLOC
 ////////////
 //Render
+auto startSeconds = chrono::high_resolution_clock::now();
+auto startDeltaTime = chrono::high_resolution_clock::now();
 
 static void error_callback(int error, const char* description)
 {
@@ -76,14 +80,16 @@ int main(int, char**)
 		shaderProgramLibrary.addFXAAShaders();
 		shaderProgramLibrary.addShadowMapShaders();
 		shaderProgramLibrary.addPointLightShadowMapShaders();
+		shaderProgramLibrary.addAnimationShaders();
 
-		RenderManager renderManager = RenderManager( &gameScene, window, &shaderProgramLibrary );
+		RenderManager renderManager = RenderManager(&gameScene, window, &shaderProgramLibrary);
 
 		MaterialLib materialLibrary;
 		TextureLib textureLibrary;
 		MeshLib meshLibrary;
 
 
+		
 		//... Create Camera and add empty game object
 		CharacterMovement moveScript = CharacterMovement(window);
 		gameScene.addEmptyGameObject();
@@ -293,6 +299,8 @@ int main(int, char**)
 			}
 		}
 
+
+
 		//... Set Game Objects
 		gameScene.gameObjects[0].name = "Camera";
 		gameScene.gameObjects[0].addComponent(&moveScript);
@@ -349,6 +357,21 @@ int main(int, char**)
 													// Main loop
 		while (!glfwWindowShouldClose(window))
 		{
+			float deltaTime;
+			auto nowDeltaTime = chrono::high_resolution_clock::now();
+			deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count();
+			nowDeltaTime = startDeltaTime;
+
+			float secondsTime;
+			auto nowSeconds = chrono::high_resolution_clock::now();
+			float seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
+			nowSeconds = startSeconds;
+
+
+			// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+			// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
+			// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
+			// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 			glfwPollEvents();
 
 			for (unsigned int b = 0; b < gameScene.gameObjects.size(); b++)
@@ -359,7 +382,9 @@ int main(int, char**)
 				}
 			}
 
-			renderManager.Render(ssao);
+			renderManager.getDeltaTime(deltaTime);
+			renderManager.getSeconds(seconds);
+			renderManager.Render(elapsedTime, ssao);
 
 			glfwSwapBuffers(window);
 

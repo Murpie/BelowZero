@@ -144,6 +144,24 @@
     <ClCompile Include="stb.cpp">
       <Filter>Source Files\Engine Core</Filter>
     </ClCompile>
+    <ClCompile Include="AnimatedMesh.cpp">
+      <Filter>Source Files\Data Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Source Files\Data Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Joint.cpp">
+      <Filter>Source Files\Data Types</Filter>
+    </ClCompile>
+    <ClCompile Include="SkelletonVertex.cpp">
+      <Filter>Source Files\Data Types</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationShaders.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics.cpp">
+      <Filter>Source Files\Data Types</Filter>
+    </ClCompile>
     <ClCompile Include="ShadowMapShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
@@ -248,12 +266,6 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files\Engine Core</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowMapShaders.h">
-      <Filter>Header Files\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="PointLightShadowMapShaders.h">
-      <Filter>Header Files\Shaders</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="lightpassFS.glsl">
@@ -305,21 +317,6 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="SkyboxVS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="ShadowMapFS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="ShadowMapVS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="PointLightShadowMapVS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="PointLightShadowMapGS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="PointLightShadowMapFS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>

@@ -38,6 +38,9 @@ public:
 	void createBuffers();
 	void renderQuad();
 	void renderSkyQuad();
+	void Update();
+	void getDeltaTime(float deltaTime);
+	void getSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
 	void setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition);
 
@@ -45,12 +48,16 @@ private:
 	unsigned int loadCubemap(std::vector<std::string> faces);
 
 	std::vector<GameObject*> gameObjectsToRender;
+	
 	std::vector<Light*> lightsToRender;
 	std::vector<glm::vec3> kernel;
 
 	glm::mat4x4 view_matrix;
 	glm::mat4x4 projection_matrix;
 	glm::mat4x4 currentCubeMapView;
+
+	float deltaTime;
+	float seconds;
 
 	unsigned int shadowMap;
 	unsigned int shadowFBO;
@@ -61,6 +68,9 @@ private:
 	unsigned int skyboxVAO;
 	unsigned int skyboxVBO;
 	unsigned int skyboxEBO;
+	unsigned int animationVAO;
+	unsigned int animationVBO;
+	unsigned int animationEBO;
 	unsigned int ebo;
 	unsigned int vbo;
 	unsigned int vao;
@@ -117,6 +127,7 @@ private:
 	GLuint gaussianBlurShaderProgram;
 	GLuint skyboxShaderProgram;
 	GLuint fxaaShaderProgram;
+	GLuint animationShaderProgram;
 	int display_w, display_h;
 	unsigned int cubeMapSize = 64;
 

@@ -17,6 +17,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->gaussianBlurShaderProgram = shaderProgram->getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram;
 	this->skyboxShaderProgram = shaderProgram->getShader<SkyboxShaders>()->skyboxShaderProgram;
 	this->fxaaShaderProgram = shaderProgram->getShader<FXAAShaders>()->fxaaShaderProgram;
+	this->animationShaderProgram = shaderProgram->getShader<AnimationShaders>()->animationShaderProgram;
 	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
 	this->pointLightShaderProgram = shaderProgram->getShader<PointLightShadowMapShaders>()->PointLightShaderProgram;
 	createBuffers();
@@ -284,7 +285,7 @@ void RenderManager::Render(int ssaoOnorOFF) {
 	//... Clear Back Buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, display_w, display_h);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(0.749f, 0.843f, 0.823f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//... Clear finalFBO
@@ -360,6 +361,12 @@ void RenderManager::Render(int ssaoOnorOFF) {
 
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
 	}
+
+	//------=====================Animation Pass=======================-------
+	//glUseProgram(animationShaderProgram);
+
+
+
 
 	//... CUBE MAP GEOMETREY PASS------------------------------------------------------------------------------------------------------------------------------
 	glBindVertexArray(cubeVAO);
@@ -443,7 +450,7 @@ void RenderManager::Render(int ssaoOnorOFF) {
 	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[1].transform.position);
 
 	//CAM pos
-	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[2].transform.position));
+	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0].transform.position));
 
 	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)
@@ -553,6 +560,8 @@ void RenderManager::Render(int ssaoOnorOFF) {
 
 	gameObjectsToRender.clear();
 	lightsToRender.clear();
+
+	Update();
 }
 
 void RenderManager::renderQuad()
@@ -568,9 +577,9 @@ void RenderManager::renderQuad()
 		QuadVertex vertices[] = {
 			// pos and normal and uv for each vertex
 			{ 1,  1, 1.0f, 1.0f },
-			{ 1, -1, 1.0f, 0.0f },
-			{ -1, -1, 0.0f, 0.0f },
-			{ -1,  1, 0.0f, 1.0f },
+		{ 1, -1, 1.0f, 0.0f },
+		{ -1, -1, 0.0f, 0.0f },
+		{ -1,  1, 0.0f, 1.0f },
 		};
 
 		unsigned int indices[] = {
@@ -718,4 +727,19 @@ unsigned int RenderManager::loadCubemap(std::vector<std::string> faces)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return textureID;
+}
+void RenderManager::Update()
+{
+	
+
+}
+
+void RenderManager::getDeltaTime(float deltaTime)
+{
+	this->deltaTime = deltaTime;
+}
+
+void RenderManager::getSeconds(float seconds)
+{
+	this->seconds = seconds;
 }

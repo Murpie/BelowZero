@@ -11,6 +11,11 @@ struct Light {
 	float Linear;
     float Quadratic;
 };
+
+	vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
+	vec3 drPosition = vec3(0.0f, 200.0f, 400.0f);
+
+
 const int NR_LIGHTS = 32;
 uniform Light lights[NR_LIGHTS];
 
@@ -133,6 +138,33 @@ void main()
         specular *= attenuation;
         lighting += diffuse + specular + metallic;
     }
+
+	//Test Directional Light
+	    vec3 lightDir = normalize(drPosition - FragPos);
+        vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * drColor * AmbientOcclusion;
+
+		vec3 halfwayDir = normalize(lightDir + viewDir);  
+        float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
+        vec3 specular = drColor * spec * Specular;
+		vec3 metallic = drColor * spec * Metallic;
+        // attenuation
+        float distance = length(drPosition - FragPos);
+        float attenuation = 1.0;
+        diffuse *= attenuation;
+        specular *= attenuation;
+        lighting += diffuse + specular + metallic;
+
+
+
+	float density = 0.12;
+	float gradient = 1.5;
+	float distanceToPos = length(view_position - FragPos);
+    float visibility = exp(-pow((distanceToPos * density), gradient));
+	visibility  = clamp(visibility, 0.0, 1.0);
+
+	FragColor = lighting;
+	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor, visibility);
+
 	
 	if (lights[1].lightType == 0)
 		shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal, lights[1].Position);
