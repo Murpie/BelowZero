@@ -27,9 +27,13 @@
 #include "LightpassShaders.h"
 #include "FXAAShaders.h"
 #include "CubeMapShaders.h"
+
+#include <chrono>
 #define _CRTDBG_MAP_ALLOC
 ////////////
 //Render
+auto startSeconds = chrono::high_resolution_clock::now();
+auto startDeltaTime = chrono::high_resolution_clock::now();
 
 static void ShowHelpMarker(const char* desc)
 {
@@ -107,6 +111,7 @@ int main(int, char**)
 		MeshLib meshLibrary;
 
 
+		
 		//... Create Camera and add empty game object
 		CharacterMovement moveScript = CharacterMovement(window);
 		gameScene.addEmptyGameObject();
@@ -126,7 +131,15 @@ int main(int, char**)
 		int nrOfObjects = gameScene.gameObjects.size();
 
 		//... Add name of OBJ to add to scene
-		std::string meshName[] = { "Floor.obj", "Tower1.obj" };
+		std::string meshName[] = { "Floor.obj", "Tower1.obj"
+			//, "Plane1.obj", "Plane2.obj", "Plane3.obj", "Plane4.obj", "Plane5.obj", "Plane6.obj", "Plane7.obj", "Plane8.obj", "Plane9.obj", "Plane10.obj"
+			//, "Plane11.obj", "Plane12.obj", "Plane13.obj", "Plane14.obj", "Plane15.obj", "Plane16.obj", "Plane17.obj", "Plane18.obj", "Plane19.obj", "Plane20.obj"
+			//, "Plane21.obj", "Plane22.obj", "Plane23.obj", "Plane24.obj", "Plane25.obj", "Plane26.obj", "Plane27.obj", "Plane28.obj", "Plane29.obj", "Plane30.obj"
+			//, "Plane31.obj", "Plane32.obj", "Plane33.obj", "Plane34.obj", "Plane35.obj", "Plane36.obj", "Plane37.obj", "Plane38.obj", "Plane39.obj", "Plane40.obj"
+			//, "Plane41.obj", "Plane42.obj", "Plane43.obj", "Plane44.obj", "Plane45.obj", "Plane46.obj", "Plane47.obj", "Plane48.obj", "Plane49.obj", "Plane50.obj"
+			//, "Plane51.obj", "Plane52.obj", "Plane53.obj", "Plane54.obj", "Plane55.obj", "Plane56.obj", "Plane57.obj", "Plane58.obj", "Plane59.obj", "Plane60.obj", "Plane61.obj"
+		};
+
 		int nrOfMeshes = sizeof(meshName) / sizeof(meshName[0]);
 
 		//... Read OBJ and MTL File
@@ -368,6 +381,16 @@ int main(int, char**)
 													// Main loop
 		while (!glfwWindowShouldClose(window))
 		{
+			float deltaTime;
+			auto nowDeltaTime = chrono::high_resolution_clock::now();
+			deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count();
+			nowDeltaTime = startDeltaTime;
+
+			float secondsTime;
+			auto nowSeconds = chrono::high_resolution_clock::now();
+			float seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
+			nowSeconds = startSeconds;
+
 
 			// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 			// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -556,7 +579,10 @@ int main(int, char**)
 				}
 			}
 
+			renderManager.getDeltaTime(deltaTime);
+			renderManager.getSeconds(seconds);
 			renderManager.Render(elapsedTime, ssao);
+			
 
 			ImGui::Render();
 			glfwSwapBuffers(window);

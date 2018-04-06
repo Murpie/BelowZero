@@ -30,6 +30,11 @@ CharacterMovement::~CharacterMovement()
 {
 }
 
+void CharacterMovement::getInformation(float time)
+{
+	this->time += time / 1000;
+}
+
 void CharacterMovement::update()
 {
 	//... Mouse Movement
@@ -83,12 +88,16 @@ void CharacterMovement::update()
 
 	//... WASD Movement
 	float cameraSpeed = 0.03f;
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && frontCollision == false)
 		gameObject->transform.position += cameraSpeed * gameObject->transform.forward;
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && backCollision == false)
         gameObject->transform.position -= cameraSpeed * gameObject->transform.forward;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && leftCollision == false)
         gameObject->transform.position -= gameObject->transform.right * cameraSpeed;
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
         gameObject->transform.position += gameObject->transform.right * cameraSpeed;
+
+	//... Jump mechanic
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false)
+		gameObject->transform.position += cameraSpeed * gameObject->transform.up;
 }

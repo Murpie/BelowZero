@@ -13,7 +13,7 @@ struct Light {
 };
 
 	vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
-	vec3 drPosition = vec3(400.0f, 200.0f, 0.0f);
+	vec3 drPosition = vec3(0.0f, 200.0f, 400.0f);
 
 
 const int NR_LIGHTS = 32;

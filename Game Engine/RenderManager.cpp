@@ -467,6 +467,8 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 
 	gameObjectsToRender.clear();
 	lightsToRender.clear();
+
+	Update();
 }
 
 void RenderManager::renderQuad()
@@ -593,4 +595,19 @@ unsigned int RenderManager::loadCubemap(std::vector<std::string> faces)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return textureID;
+}
+void RenderManager::Update()
+{
+	
+
+}
+
+void RenderManager::getDeltaTime(float deltaTime)
+{
+	this->deltaTime = deltaTime;
+}
+
+void RenderManager::getSeconds(float seconds)
+{
+	this->seconds = seconds;
 }

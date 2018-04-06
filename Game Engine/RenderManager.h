@@ -38,17 +38,24 @@ public:
 	void createBuffers();
 	void renderQuad();
 	void renderSkyQuad();
+	void Update();
+	void getDeltaTime(float deltaTime);
+	void getSeconds(float seconds);
 
 private:
 	unsigned int loadCubemap(std::vector<std::string> faces);
 
 	std::vector<GameObject*> gameObjectsToRender;
+	
 	std::vector<Light*> lightsToRender;
 	std::vector<glm::vec3> kernel;
 
 	glm::mat4x4 view_matrix;
 	glm::mat4x4 projection_matrix;
 	glm::mat4x4 currentCubeMapView;
+
+	float deltaTime;
+	float seconds;
 
 	unsigned int cubeVAO;
 	unsigned int cubeVBO;

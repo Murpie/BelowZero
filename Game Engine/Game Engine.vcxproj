@@ -187,6 +187,7 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshFilter.cpp" />
     <ClCompile Include="MeshLib.cpp" />
+    <ClCompile Include="Physics.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="ShaderBase.cpp" />
     <ClCompile Include="ShaderProgramLib.cpp" />
@@ -226,6 +227,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshFilter.h" />
     <ClInclude Include="MeshLib.h" />
+    <ClInclude Include="Physics.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="ShaderProgramLib.h" />
