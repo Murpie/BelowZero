@@ -15,7 +15,6 @@ struct Light {
 	vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
 	vec3 drPosition = vec3(0.0f, 200.0f, 400.0f);
 
-
 const int NR_LIGHTS = 32;
 uniform Light lights[NR_LIGHTS];
 
@@ -42,7 +41,7 @@ vec3 gridSamplingDisk[20] = vec3[]
 // ----------========== DIRECTIONAL LIGHT SHADOW CALCULATION ==========----------
 float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 {
-	vec3 lightDirForShadow = normalize(vec3(0.0, 7.0, 0.0) - FragPos);
+	vec3 lightDirForShadow = normalize(vec3(lightPos) - FragPos);
 	vec4 shadowCoordinates = LightSpaceMatrix * vec4(FragPos, 1.0);
 	vec3 projectionCoordinates = shadowCoordinates.xyz / shadowCoordinates.w;
 	projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
@@ -160,7 +159,7 @@ void main()
 	float gradient = 1.5;
 	float distanceToPos = length(view_position - FragPos);
     float visibility = exp(-pow((distanceToPos * density), gradient));
-	visibility  = clamp(visibility, 0.0, 1.0);
+	visibility = clamp(visibility, 0.0, 1.0);
 
 	
 	if (lights[1].lightType == 0)
