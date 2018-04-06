@@ -19,6 +19,10 @@ bool Component::operator==(const Component & rhs)
 	return value;
 }
 
+void Component::getInformation(float time)
+{
+}
+
 void Component::update()
 {
 }
