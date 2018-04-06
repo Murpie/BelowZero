@@ -188,9 +188,11 @@
     <ClCompile Include="MeshFilter.cpp" />
     <ClCompile Include="MeshLib.cpp" />
     <ClCompile Include="Physics.cpp" />
+    <ClCompile Include="PointLightShadowMapShaders.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="ShaderBase.cpp" />
     <ClCompile Include="ShaderProgramLib.cpp" />
+    <ClCompile Include="ShadowMapShaders.cpp" />
     <ClCompile Include="SkelletonVertex.cpp" />
     <ClCompile Include="SkyboxShaders.cpp" />
     <ClCompile Include="SSAOBlurShaders.cpp" />
@@ -228,9 +230,11 @@
     <ClInclude Include="MeshFilter.h" />
     <ClInclude Include="MeshLib.h" />
     <ClInclude Include="Physics.h" />
+    <ClInclude Include="PointLightShadowMapShaders.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="ShaderProgramLib.h" />
+    <ClInclude Include="ShadowMapShaders.h" />
     <ClInclude Include="SkelletonVertex.h" />
     <ClInclude Include="SkyboxShaders.h" />
     <ClInclude Include="SSAOBlurShaders.h" />
@@ -255,6 +259,11 @@
     <None Include="GeometryVS.glsl" />
     <None Include="lightpassFS.glsl" />
     <None Include="lightpassVS.glsl" />
+    <None Include="PointLightShadowMapFS.glsl" />
+    <None Include="PointLightShadowMapGS.glsl" />
+    <None Include="PointLightShadowMapVS.glsl" />
+    <None Include="ShadowMapFS.glsl" />
+    <None Include="ShadowMapVS.glsl" />
     <None Include="SkyboxFS.glsl" />
     <None Include="SkyboxVS.glsl" />
     <None Include="ssaoBlurFS.glsl" />

@@ -9,7 +9,7 @@ CharacterMovement::CharacterMovement(GLFWwindow * window)
 {
     assetName = "CharacterMovement";
 	this->window = window;
-	cameraSpeed = 0.03f;
+	cameraSpeed = 0.08f;
 	cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);
 	cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -87,7 +87,6 @@ void CharacterMovement::update()
     lastY = (float)ypos;
 
 	//... WASD Movement
-	float cameraSpeed = 0.03f;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && frontCollision == false)
 		gameObject->transform.position += cameraSpeed * gameObject->transform.forward;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && backCollision == false)

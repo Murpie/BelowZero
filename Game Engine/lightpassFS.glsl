@@ -162,9 +162,6 @@ void main()
     float visibility = exp(-pow((distanceToPos * density), gradient));
 	visibility  = clamp(visibility, 0.0, 1.0);
 
-	FragColor = lighting;
-	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor, visibility);
-
 	
 	if (lights[1].lightType == 0)
 		shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal, lights[1].Position);
@@ -173,4 +170,5 @@ void main()
 	
 
 	FragColor = lighting * (1.0f - shadowFactor);
+	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor, visibility);
 }
