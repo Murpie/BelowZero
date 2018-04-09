@@ -113,7 +113,7 @@ int main(int, char**)
 		int nrOfObjects = gameScene.gameObjects.size();
 
 		//... Add name of OBJ to add to scene
-		std::string meshName[] = { "Floor.obj", "House2.obj"};
+		std::string meshName[] = { "Floor.obj", "Tree.obj", "Bucket.obj", "TreeWithSnow.obj", "Stump.obj", "Stone.obj" };
 
 		int nrOfMeshes = sizeof(meshName) / sizeof(meshName[0]);
 

@@ -322,7 +322,7 @@ void RenderManager::Render(int ssaoOnorOFF) {
 	projection_matrix = glm::perspective(glm::radians(90.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
-	world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
+	world_matrix = glm::translate(world_matrix, glm::vec3(10.0f, -5.0f, 0.0f));
 	world_matrix = glm::rotate(world_matrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	//... Clear Back Buffer

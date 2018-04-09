@@ -10,7 +10,7 @@ CharacterMovement::CharacterMovement(GLFWwindow * window)
     assetName = "CharacterMovement";
 	this->window = window;
 	cameraSpeed = 0.08f;
-	cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);
+	cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	pitch = 0;
