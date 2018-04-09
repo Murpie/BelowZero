@@ -53,8 +53,7 @@ int main(int, char**)
 #if __APPLE__
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-		char windowName[] = "Game Engine";
-		GLFWwindow* window = glfwCreateWindow(1280, 720, windowName, NULL, NULL);
+		GLFWwindow* window = glfwCreateWindow(1280, 720, "Game Engine", NULL, NULL);
 		glfwMakeContextCurrent(window);
 		//glfwSwapInterval(1); // Enable vsync
 		gl3wInit();
@@ -383,6 +382,7 @@ int main(int, char**)
 				}
 			}
 
+
 			renderManager.getDeltaTime(deltaTime);
 			renderManager.getSeconds(seconds);
 			renderManager.Render(ssao);
@@ -393,7 +393,9 @@ int main(int, char**)
 			final_time = time(NULL);
 			if (final_time - initial_time > 0)
 			{
-				sprintf(windowName, "Game Engine FPS : %d", frameCount / (final_time - initial_time));
+				char windowName[20];
+				string temp = "Game Engine FPS : " + std::to_string(frameCount / (final_time - initial_time));
+				strcpy(windowName, temp.c_str());
 				glfwSetWindowTitle(window, windowName);
 				frameCount = 0;
 				initial_time = final_time;
