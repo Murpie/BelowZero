@@ -9,8 +9,10 @@
 #include <streambuf>
 #include <iostream>
 #include <random>
+#include "stb_image.h"
 #include "GameScene.h"
 #include "ShaderProgramLib.h"
+#define STB_IMAGE_IMPLEMENTATION
 
 // Cube Map defines for its positions
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_X  0x8515 
@@ -36,7 +38,7 @@ public:
 	void FindObjectsToRender();
 	void Render(int ssaoOnorOFF);
 	void createBuffers();
-	void renderQuad();
+	void renderQuad(int index);
 	void renderSkyQuad();
 	void Update();
 	void getDeltaTime(float deltaTime);
@@ -58,7 +60,13 @@ private:
 
 	float deltaTime;
 	float seconds;
+	int count;
 
+	unsigned int mainMenuFBO;
+	unsigned int mainMenuTexture;
+	unsigned int mainMenuVao;
+	unsigned int mainMenuVbo;
+	unsigned int mainMenuEbo;
 	unsigned int shadowMap;
 	unsigned int shadowFBO;
 	unsigned int cubeMapShadowMap;
@@ -119,6 +127,7 @@ private:
 
 	GLuint shadowMapShaderProgram;
 	GLuint pointLightShaderProgram;
+	GLuint mainMenuShaderProgram;
 	GLuint geometryShaderProgram;
 	GLuint cubeMapShaderProgram;
 	GLuint lightpassShaderProgram;

@@ -168,6 +168,9 @@
     <ClCompile Include="ShadowMapShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="MainMenuScene.cpp">
+      <Filter>Source Files\Data Types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imgui_impl_glfw_gl3.h">
@@ -290,6 +293,9 @@
     <ClInclude Include="ShadowMapShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="MainMenuScene.h">
+      <Filter>Header Files\Data Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="lightpassFS.glsl">
@@ -358,6 +364,12 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="PointLightShadowMapVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="MainMenuSceneFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="MainMenuSceneVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>

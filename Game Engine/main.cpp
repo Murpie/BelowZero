@@ -80,7 +80,8 @@ int main(int, char**)
 		shaderProgramLibrary.addFXAAShaders();
 		shaderProgramLibrary.addShadowMapShaders();
 		shaderProgramLibrary.addPointLightShadowMapShaders();
-		shaderProgramLibrary.addAnimationShaders();
+		//shaderProgramLibrary.addAnimationShaders();
+		shaderProgramLibrary.addMainMenuShaders();
 
 		RenderManager renderManager = RenderManager(&gameScene, window, &shaderProgramLibrary);
 
@@ -109,7 +110,7 @@ int main(int, char**)
 		int nrOfObjects = gameScene.gameObjects.size();
 
 		//... Add name of OBJ to add to scene
-		std::string meshName[] = { "Floor.obj", "House2.obj", "House1.obj"};
+		std::string meshName[] = { "Floor.obj", "House2.obj"};
 
 		int nrOfMeshes = sizeof(meshName) / sizeof(meshName[0]);
 
@@ -307,7 +308,7 @@ int main(int, char**)
 
 		gameScene.gameObjects[1].name = "Light 1";
 		gameScene.gameObjects[1].addComponent(&light1);
-		gameScene.gameObjects[1].transform = glm::vec3(7, 9, -4);
+		gameScene.gameObjects[1].transform = glm::vec3(0, 9, 0);
 		gameScene.gameObjects[1].lightComponent->lightType = 0;
 
 		gameScene.gameObjects[2].name = "Light 2";

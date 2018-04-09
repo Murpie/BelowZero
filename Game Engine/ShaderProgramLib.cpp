@@ -87,3 +87,9 @@ void ShaderProgramLib::addAnimationShaders()
 	AnimationShaders* newShaderProgram = new AnimationShaders();
 	shaders.push_back(newShaderProgram);
 }
+
+void ShaderProgramLib::addMainMenuShaders()
+{
+	MainMenu* newShaderProgram = new MainMenu();
+	shaders.push_back(newShaderProgram);
+}
