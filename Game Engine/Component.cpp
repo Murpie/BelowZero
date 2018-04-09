@@ -25,5 +25,6 @@ void Component::getInformation(float time)
 
 void Component::update()
 {
+
 }
 

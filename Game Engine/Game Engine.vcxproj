@@ -168,7 +168,11 @@
     <ClCompile Include="CharacterMovement.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="CubeMapShaders.cpp" />
+    <ClCompile Include="deleteThis.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="FXAAShaders.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="GaussianBlurShaders.cpp" />
@@ -211,6 +215,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="CubeMapShaders.h" />
     <ClInclude Include="FXAAShaders.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="GaussianBlurShaders.h" />

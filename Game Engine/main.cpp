@@ -1,45 +1,46 @@
 #pragma warning
-#include <GL/gl3w.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
-#include "glfw\include\GLFW\glfw3.h"
-#include <stdio.h>
-#include <time.h>
+//#include <GL/gl3w.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
+//#include "glfw\include\GLFW\glfw3.h"
+//#include <stdio.h>
+//#include <time.h>
 
 /////////////
-#include "MaterialLib.h"
-#include "TextureLib.h"
-#include "ShaderProgramLib.h"
-#include "MeshLib.h"
-#include "GameScene.h"
-#include "RenderManager.h"
-#include "Transform.h"
-#include "MeshFilter.h"
-#include "CharacterMovement.h"
-#include <string>
-#include "glm\glm\gtc\matrix_transform.hpp"
-#include "glm\glm\gtc\type_ptr.hpp"
-#include "glm\glm\glm.hpp"
-#include "Light.h"
-#include <ctime>
-#include "GeometryShaders.h"
-#include "SSAOShaders.h"
-#include "SSAOBlurShaders.h"
-#include "LightpassShaders.h"
-#include "FXAAShaders.h"
-#include "CubeMapShaders.h"
-
-#include <chrono>
-#include "PointLightShadowMapShaders.h"
-#define _CRTDBG_MAP_ALLOC
+//#include "MaterialLib.h"
+//#include "TextureLib.h"
+//#include "ShaderProgramLib.h"
+//#include "MeshLib.h"
+//#include "GameScene.h"
+//#include "RenderManager.h"
+//#include "Transform.h"
+//#include "MeshFilter.h"
+//#include "CharacterMovement.h"
+//#include <string>
+//#include "glm\glm\gtc\matrix_transform.hpp"
+//#include "glm\glm\gtc\type_ptr.hpp"
+//#include "glm\glm\glm.hpp"
+//#include "Light.h"
+//#include <ctime>
+//#include "GeometryShaders.h"
+//#include "SSAOShaders.h"
+//#include "SSAOBlurShaders.h"
+//#include "LightpassShaders.h"
+//#include "FXAAShaders.h"
+//#include "CubeMapShaders.h"
+//
+//#include <chrono>
+//#include "PointLightShadowMapShaders.h"
+//#define _CRTDBG_MAP_ALLOC
 ////////////
 //Render
-auto startSeconds = chrono::high_resolution_clock::now();
-auto startDeltaTime = chrono::high_resolution_clock::now();
+//auto startSeconds = chrono::high_resolution_clock::now();
+//auto startDeltaTime = chrono::high_resolution_clock::now();
+//
+//static void error_callback(int error, const char* description)
+//{
+//	fprintf(stderr, "Error %d: %s\n", error, description);
+//}
 
-static void error_callback(int error, const char* description)
-{
-	fprintf(stderr, "Error %d: %s\n", error, description);
-}
-
+/*
 int main(int, char**)
 {
 	{
@@ -99,12 +100,12 @@ int main(int, char**)
 		Light light2 = Light();
 		/*Light light3 = Light();
 		Light light4 = Light();
-		Light light5 = Light();*/
+		Light light5 = Light();
 		gameScene.addEmptyGameObject();
 		gameScene.addEmptyGameObject();
 		/*gameScene.addEmptyGameObject();
 		gameScene.addEmptyGameObject();
-		gameScene.addEmptyGameObject();*/
+		gameScene.addEmptyGameObject();
 
 		int nrOfObjects = gameScene.gameObjects.size();
 
@@ -328,7 +329,7 @@ int main(int, char**)
 		gameScene.gameObjects[5].name = "Light 5";
 		gameScene.gameObjects[5].addComponent(&light5);
 		gameScene.gameObjects[5].transform = glm::vec3(-5, 0.4, 3);
-		gameScene.gameObjects[5].lightComponent->lightType = 1;*/
+		gameScene.gameObjects[5].lightComponent->lightType = 1;
 
 		MeshFilter meshFilter[sizeof(meshName) / sizeof(meshName[0])];
 
@@ -400,6 +401,21 @@ int main(int, char**)
 		}
 		glfwTerminate();
 	}
+	_CrtDumpMemoryLeaks();
+
+	return 0;
+}
+*/
+
+#include "Game.h"
+
+#define _CRTDBG_MAP_ALLOC
+
+int main()
+{
+	Game game;
+	game.run();
+
 	_CrtDumpMemoryLeaks();
 
 	return 0;
