@@ -12,6 +12,13 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
+	//deleteAllComponents();
+
+	//These will probably give memory leaks if not deleted.
+
+	//delete materialComponent;
+	//delete meshFilterComponent;
+	//delete lightComponent;
 }
 
 void GameObject::updateMaterialAndMeshFilterPointers() {
@@ -98,6 +105,15 @@ void GameObject::deleteComponent(Component* otherComponent)
 		components.erase(components.begin() + index);
 	}
     updateMaterialAndMeshFilterPointers();
+}
+
+void GameObject::deleteAllComponents()
+{
+	for (int i = 0; i < components.size(); i++)
+	{
+		delete components[i];
+	}
+	components.clear();
 }
 
 const bool GameObject::getIsRenderable() {

@@ -43,7 +43,8 @@ public:
 
 private:
 	GLFWwindow * window;
-	GameScene gameScene; // maybe  vector<GameScene> and switch between gameScene[i].update()
+	GameScene gameScene; // maybe  vector<GameScene> and switch between gameScene[i].update() or just clear the gamescene and reuse
+	GameScene menuScene; // temporary GameScene
 	ShaderProgramLib shaderProgramLibrary;
 	MaterialLib materialLibrary;
 	TextureLib textureLibrary;
@@ -56,13 +57,15 @@ private:
 	vector<string> meshName;
 	vector<MeshFilter> meshFilter;
 
-	Gamestate::ID stateOfGame;
+	Gamestate::ID stateOfGame; // EnumID.h
 	void printCurrentState(Gamestate::ID stateOfGame);
 	void runState();
 
 	char windowName[];
 
 	void initWindow();
+	void initMenu(); //Load Menu
+	void initLevel(); //Load Level
 	void initShaderProgramLib();
 
 	void addGameObjects();

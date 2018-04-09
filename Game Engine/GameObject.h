@@ -30,6 +30,8 @@ public:
     void updateHasLight();
 	void addComponent(Component* otherComponent);
 	void deleteComponent(Component* otherComponent);
+	void deleteAllComponents();
+
     const bool getIsRenderable();
 
 	template <class T>

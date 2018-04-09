@@ -8,7 +8,7 @@ static void error_callback(int error, const char* description)
 
 Game::Game() :
 	shaderProgramLibrary(),
-	gameScene(),
+	gameScene(), menuScene(),
 	windowName("Game Engine"),
 	stateOfGame(Gamestate::ID::INITIALIZE)
 {
@@ -38,17 +38,8 @@ void Game::run()
 	int final_time;
 	int frameCount = 0;
 	
-	addRenderManager();
-	//... Create Camera and add empty game object
-	addCharacterMovement();
-	//... Create Lights and add empty game object
-	addLights();
-	//... Read OBJ and MTL File
-	readMeshName();
-	//... Set Game Objects, this should be automated by a function when reading from level file
-	setGameObjects();
-	//...
-	addMeshFilter();
+	// Loads/Creates the current scene. 
+	initLevel();
 
 	//... Uniform in int that tells gaussian to be turned off
 	glUseProgram(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram);
@@ -116,31 +107,63 @@ void Game::runState()
 {
 	//Add a main state and seperate the function in substates or keep it as it is?
 	/*
-		main-state: MENU_STATE -> sub-states : LOAD_MENU, SHOW_MENU etc;
-					LEVEL_STATE 
+		main-state: MENU_STATE -> sub-states : CLEAR, LOAD, RUN etc;
+					LEVEL_STATE ->				 CLEAR, LOAD, RUN
 	*/
 
 	if (stateOfGame == Gamestate::ID::LOAD_MENU)
 	{
-		//initMenu()
-		//stateOfGame++
+		initMenu();
+		stateOfGame = Gamestate::ID::SHOW_MENU;
 		printCurrentState(stateOfGame);
 	}
 	if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
 		//gameScene[i].update()
+		menuScene.update();
 		/*
 		if(...)
 		{
-		stateOfGame++;
-		printCurrentState(stateOfGame);
+			stateOfGame++;
+			printCurrentState(stateOfGame);
 		}
 		*/
 	}
-
+	if (stateOfGame == Gamestate::ID::CLEAR_MENU)
+	{
+		//clearMenu();
+		//stateOfGame++
+		//printCurrentState(stateOfGame);
+	}
+	if (stateOfGame == Gamestate::ID::LOAD_LEVEL)
+	{
+		initLevel();
+		stateOfGame = Gamestate::ID::RUN_LEVEL;
+		printCurrentState(stateOfGame);
+	}
 	if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
 		gameScene.update();
+		/*
+		if(...)
+		{
+			stateOfGame++; //CLEAR_LEVEL
+			printCurrentState(stateOfGame);
+		}
+		*/
+	}
+	if (stateOfGame == Gamestate::ID::CLEAR_LEVEL)
+	{
+		/* 
+		Not sure how we should handle this.
+		Added a function in GameScene, clearGameObjects(), 
+		this function should call for the destructor on each gameobject 
+		in the vector array, but that is not how the program is working atm. 
+		*/
+
+		//gameScene.clearGameObjects();
+		//stateOfGame =  Gamestate::ID::LOAD_MENU;
+		//printCurrentState(stateOfGame);
 	}
 	if (stateOfGame == Gamestate::ID::CLOSE_GAME)
 	{
@@ -165,6 +188,30 @@ void Game::initWindow()
 	glfwMakeContextCurrent(window);
 	//glfwSwapInterval(1); // Enable vsync
 	gl3wInit();
+}
+
+void Game::initMenu()
+{
+
+}
+
+void Game::initLevel()
+{
+	/*
+		Creates the current scene atm. Something similar to this to load scenes?
+	*/
+	
+	addRenderManager();
+	//... Create Camera and add empty game object
+	addCharacterMovement();
+	//... Create Lights and add empty game object
+	addLights();
+	//... Read OBJ and MTL File
+	readMeshName();
+	//... Set Game Objects, this should be automated by a function when reading from level file
+	setGameObjects();
+	//...
+	addMeshFilter();
 }
 
 void Game::initShaderProgramLib()

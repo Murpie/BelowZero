@@ -10,6 +10,8 @@ public:
 
 	std::vector<GameObject> gameObjects;
 	void addEmptyGameObject();
+	void clearGameObjects();
+
 	void update();
 
 

@@ -14,6 +14,14 @@ void GameScene::addEmptyGameObject()
 	gameObjects.push_back(newEmptyGameObject);
 }
 
+void GameScene::clearGameObjects()
+{
+	while(!gameObjects.empty())
+	{
+		gameObjects.pop_back();
+	}
+}
+
 void GameScene::update()
 {
 	for (unsigned int i = 0; i < gameObjects.size(); i++)
