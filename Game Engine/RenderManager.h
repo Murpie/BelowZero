@@ -9,8 +9,10 @@
 #include <streambuf>
 #include <iostream>
 #include <random>
+#include "stb_image.h"
 #include "GameScene.h"
 #include "ShaderProgramLib.h"
+#define STB_IMAGE_IMPLEMENTATION
 
 // Cube Map defines for its positions
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_X  0x8515 
@@ -34,10 +36,13 @@ public:
 
 	GameScene *gameScene;
 	void FindObjectsToRender();
-	void Render(float dT, int ssaoOnorOFF);
+	void Render(int ssaoOnorOFF);
 	void createBuffers();
-	void renderQuad();
+	void renderQuad(int index);
 	void renderSkyQuad();
+	void Update();
+	void getDeltaTime(float deltaTime);
+	void getSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
 	void setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition);
 
@@ -45,6 +50,7 @@ private:
 	unsigned int loadCubemap(std::vector<std::string> faces);
 
 	std::vector<GameObject*> gameObjectsToRender;
+	
 	std::vector<Light*> lightsToRender;
 	std::vector<glm::vec3> kernel;
 
@@ -52,6 +58,15 @@ private:
 	glm::mat4x4 projection_matrix;
 	glm::mat4x4 currentCubeMapView;
 
+	float deltaTime;
+	float seconds;
+	int count;
+
+	unsigned int mainMenuFBO;
+	unsigned int mainMenuTexture;
+	unsigned int mainMenuVao;
+	unsigned int mainMenuVbo;
+	unsigned int mainMenuEbo;
 	unsigned int shadowMap;
 	unsigned int shadowFBO;
 	unsigned int cubeMapShadowMap;
@@ -61,6 +76,9 @@ private:
 	unsigned int skyboxVAO;
 	unsigned int skyboxVBO;
 	unsigned int skyboxEBO;
+	unsigned int animationVAO;
+	unsigned int animationVBO;
+	unsigned int animationEBO;
 	unsigned int ebo;
 	unsigned int vbo;
 	unsigned int vao;
@@ -109,6 +127,7 @@ private:
 
 	GLuint shadowMapShaderProgram;
 	GLuint pointLightShaderProgram;
+	GLuint mainMenuShaderProgram;
 	GLuint geometryShaderProgram;
 	GLuint cubeMapShaderProgram;
 	GLuint lightpassShaderProgram;
@@ -117,6 +136,7 @@ private:
 	GLuint gaussianBlurShaderProgram;
 	GLuint skyboxShaderProgram;
 	GLuint fxaaShaderProgram;
+	GLuint animationShaderProgram;
 	int display_w, display_h;
 	unsigned int cubeMapSize = 64;
 

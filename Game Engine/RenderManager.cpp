@@ -17,11 +17,15 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->gaussianBlurShaderProgram = shaderProgram->getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram;
 	this->skyboxShaderProgram = shaderProgram->getShader<SkyboxShaders>()->skyboxShaderProgram;
 	this->fxaaShaderProgram = shaderProgram->getShader<FXAAShaders>()->fxaaShaderProgram;
+	//this->animationShaderProgram = shaderProgram->getShader<AnimationShaders>()->animationShaderProgram;
 	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
 	this->pointLightShaderProgram = shaderProgram->getShader<PointLightShadowMapShaders>()->PointLightShaderProgram;
+	this->mainMenuShaderProgram = shaderProgram->getShader<MainMenu>()->mainMenuShaderProgram;
 	createBuffers();
 	vao = 0;
+	count = 0;
 	skyboxVAO = 0;
+	mainMenuVao = 0;
 }
 
 RenderManager::~RenderManager()
@@ -43,7 +47,36 @@ void RenderManager::createBuffers()
 {
 	//screen size
 	glfwGetFramebufferSize(window, &display_w, &display_h);
-	std::cout << "construct " << display_w << " " << display_h << std::endl;
+
+	// ----------========== Main Menu Scene FrameBuffer ==========----------
+	int width, height, nrOfChannels;
+	unsigned char * data = stbi_load("uiTextureFlipped.png", &width, &height, &nrOfChannels, 0);
+
+	glGenFramebuffers(1, &mainMenuFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, mainMenuFBO);
+
+	glGenTextures(1, &mainMenuTexture);
+	glBindTexture(GL_TEXTURE_2D, mainMenuTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load MainMenu Texture from path" << std::endl;
+	}
+
+	stbi_image_free(data);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mainMenuTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Main Menu Framebuffer not complete!" << std::endl;
+	
 
 	//----------========== ShadowMap FBO DIRECTIONAL LIGHTS ==========----------
 	glGenFramebuffers(1, &shadowFBO);
@@ -81,6 +114,16 @@ void RenderManager::createBuffers()
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
+	// MainMenuCube Vao
+	glGenVertexArrays(1, &mainMenuVao);
+	glGenBuffers(1, &mainMenuVbo);
+	glBindVertexArray(mainMenuVao);
+	glBindBuffer(GL_ARRAY_BUFFER, mainMenuVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
 	// cube VAO
 	glGenVertexArrays(1, &cubeVAO);
@@ -271,7 +314,7 @@ void RenderManager::createBuffers()
 		std::cout << "SSAO Framebuffer not complete!" << std::endl;
 }
 
-void RenderManager::Render(float dT, int ssaoOnorOFF) {
+void RenderManager::Render(int ssaoOnorOFF) {
 	FindObjectsToRender();
 
 	//... Set view and projection matrix
@@ -280,12 +323,12 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 
 	glm::mat4 world_matrix = glm::mat4(1);
 	world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
-	world_matrix = glm::rotate(world_matrix, glm::radians(dT), glm::vec3(0.0f, 1.0f, 0.0f));
+	world_matrix = glm::rotate(world_matrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	//... Clear Back Buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, display_w, display_h);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(0.749f, 0.843f, 0.823f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//... Clear finalFBO
@@ -338,6 +381,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
+	
 	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -362,6 +406,9 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
 	}
 
+	//------=====================Animation Pass=======================-------
+	//glUseProgram(animationShaderProgram);
+
 	////... CUBE MAP GEOMETREY PASS------------------------------------------------------------------------------------------------------------------------------
 	//glBindVertexArray(cubeVAO);
 	//glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
@@ -370,7 +417,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	//// Reflective Cube Map World Matrix
 	//glm::mat4 cube_world_matrix = glm::mat4(1);
 	//cube_world_matrix = glm::translate(cube_world_matrix, glm::vec3(2, 0.5, 0));
-	//cube_world_matrix = glm::rotate(cube_world_matrix, glm::radians(dT), glm::vec3(0.0f, 1.0f, 0.0f));
+	//cube_world_matrix = glm::rotate(cube_world_matrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	//glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	//glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
@@ -415,7 +462,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, noiseTexture);
 
-		renderQuad();
+		renderQuad(1);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		//... SSAO BLUR PASS---------------------------------------------------------------------------------------------------------------------------------------
@@ -428,7 +475,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
 
-		renderQuad();
+		renderQuad(1);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 	else
@@ -444,7 +491,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[1].transform.position);
 
 	//CAM pos
-	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[2].transform.position));
+	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0].transform.position));
 
 	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)
@@ -505,7 +552,7 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	glStencilFunc(GL_EQUAL, 1, 0xFF);
 	glStencilMask(0x00); // disable writing to the stencil buffer
 
-	renderQuad();
+	renderQuad(1);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	//... SKYBOX PASS--------------------------------------------------------------------------------------------------------------------------------------------
@@ -536,42 +583,68 @@ void RenderManager::Render(float dT, int ssaoOnorOFF) {
 	glUniform1i(glGetUniformLocation(fxaaShaderProgram, "width"), display_w);
 	glUniform1i(glGetUniformLocation(fxaaShaderProgram, "height"), display_h);
 
-	renderQuad();
+	renderQuad(1);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 	//... GAUSSIAN BLUR PASS-----------------------------------------------------------------------------------------------------------------------------------
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glUseProgram(gaussianBlurShaderProgram);
 
 	glBindTexture(GL_TEXTURE_2D, fxaaColorBuffer);
 
-	renderQuad();
+	renderQuad(1);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	glStencilMask(0xFF);
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
 
+
+	//... TESTING MAIN MENU LOADING-----------------------------------------------------------------------------------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(mainMenuShaderProgram);
+
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "theTexture"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mainMenuTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "SceneTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
+
+	renderQuad(2);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
 	gameObjectsToRender.clear();
 	lightsToRender.clear();
+	Update();
 }
 
-void RenderManager::renderQuad()
+void RenderManager::renderQuad(int index)
 {
-	if (vao == 0)
+	if (vao == 0 || count == 0 && index == 2)
 	{
 		unsigned int vertexPos;
-		vertexPos = glGetAttribLocation(ssaoShaderProgram, "aPos");
-
 		unsigned int uvPos;
-		uvPos = glGetAttribLocation(ssaoShaderProgram, "aTexCoords");
+		if (index == 1)
+		{
+			vertexPos = glGetAttribLocation(ssaoShaderProgram, "aPos");
+			uvPos = glGetAttribLocation(ssaoShaderProgram, "aTexCoords");
+		}
+		if (index == 2)
+		{
+			vertexPos = glGetAttribLocation(mainMenuShaderProgram, "aPos");
+			uvPos = glGetAttribLocation(mainMenuShaderProgram, "aTexCoords");
+			count = 1;
+		}
+
 		//create vertices
 		QuadVertex vertices[] = {
 			// pos and normal and uv for each vertex
 			{ 1,  1, 1.0f, 1.0f },
-			{ 1, -1, 1.0f, 0.0f },
-			{ -1, -1, 0.0f, 0.0f },
-			{ -1,  1, 0.0f, 1.0f },
+		{ 1, -1, 1.0f, 0.0f },
+		{ -1, -1, 0.0f, 0.0f },
+		{ -1,  1, 0.0f, 1.0f },
 		};
 
 		unsigned int indices[] = {
@@ -655,7 +728,7 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 {
 	glUseProgram(shaderToUse);
 
-	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 9.5f);
+	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 12.0f);
 	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0));
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
@@ -719,4 +792,19 @@ unsigned int RenderManager::loadCubemap(std::vector<std::string> faces)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return textureID;
+}
+void RenderManager::Update()
+{
+	
+
+}
+
+void RenderManager::getDeltaTime(float deltaTime)
+{
+	this->deltaTime = deltaTime;
+}
+
+void RenderManager::getSeconds(float seconds)
+{
+	this->seconds = seconds;
 }
