@@ -214,6 +214,7 @@
     <ClInclude Include="CharacterMovement.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="CubeMapShaders.h" />
+    <ClInclude Include="EnumID.h" />
     <ClInclude Include="FXAAShaders.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />

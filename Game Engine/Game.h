@@ -27,6 +27,7 @@
 #include "LightpassShaders.h"
 #include "FXAAShaders.h"
 #include "CubeMapShaders.h"
+#include "EnumID.h"
 
 #include <chrono>
 #include "PointLightShadowMapShaders.h"
@@ -55,6 +56,10 @@ private:
 	vector<string> meshName;
 	vector<MeshFilter> meshFilter;
 
+	Gamestate::ID stateOfGame;
+	void printCurrentState(Gamestate::ID stateOfGame);
+	void runState();
+
 	char windowName[];
 
 	void initWindow();
@@ -67,8 +72,9 @@ private:
 	void addCharacterMovement();
 	void addMeshName();
 	void addMeshFilter();
-	// 
+
 	void readMeshName();
 
+	void setGameObjects();
 };
 

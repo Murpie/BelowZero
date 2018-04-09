@@ -9,7 +9,8 @@ static void error_callback(int error, const char* description)
 Game::Game() :
 	shaderProgramLibrary(),
 	gameScene(),
-	windowName("Game Engine")
+	windowName("Game Engine"),
+	stateOfGame(Gamestate::ID::INITIALIZE)
 {
 	initWindow();
 	initShaderProgramLib();
@@ -19,10 +20,12 @@ Game::Game() :
 
 Game::~Game()
 {
+
 }
 
 void Game::run()
 {
+	printCurrentState(stateOfGame);
 	//Render
 	auto startSeconds = chrono::high_resolution_clock::now();
 	auto startDeltaTime = chrono::high_resolution_clock::now();
@@ -42,20 +45,8 @@ void Game::run()
 	addLights();
 	//... Read OBJ and MTL File
 	readMeshName();
-
 	//... Set Game Objects, this should be automated by a function when reading from level file
-	gameScene.gameObjects[0].name = "Camera";
-	gameScene.gameObjects[0].addComponent(&moveScript[0]);
-
-	gameScene.gameObjects[1].name = "Light 1";
-	gameScene.gameObjects[1].addComponent(&lights[0]);
-	gameScene.gameObjects[1].transform = glm::vec3(7, 9, -4);
-	gameScene.gameObjects[1].lightComponent->lightType = 0;
-
-	gameScene.gameObjects[2].name = "Light 2";
-	gameScene.gameObjects[2].addComponent(&lights[1]);
-	gameScene.gameObjects[2].transform = glm::vec3(4, 0.4, -2);
-	gameScene.gameObjects[2].lightComponent->lightType = 1;
+	setGameObjects();
 	//...
 	addMeshFilter();
 
@@ -73,7 +64,10 @@ void Game::run()
 	//////////////
 	int gameObject_clicked = -1;                // Temporary storage of what node we have clicked to process selection at the end of the loop. May be a pointer to your own node type, etc.
 
-												// Main loop
+	// Should start with menu or some kind of startup screen
+	stateOfGame = Gamestate::ID::RUN_LEVEL;
+
+	// Main loop
 	while (!glfwWindowShouldClose(window))
 	{
 		float deltaTime;
@@ -86,15 +80,14 @@ void Game::run()
 		float seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
 		nowSeconds = startSeconds;
 
-
 		// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
 		// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
 		// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 		glfwPollEvents();
 
-		gameScene.update();
-
+		//gameScene.update();
+		runState();
 		renderManager[0].getDeltaTime(deltaTime);
 		renderManager[0].getSeconds(seconds);
 		renderManager[0].Render(ssao);
@@ -112,6 +105,48 @@ void Game::run()
 		}
 	}
 	glfwTerminate();
+}
+
+void Game::printCurrentState(Gamestate::ID stateOfGame)
+{
+	std::cout << "CURRENT_GAMESTATE:: " << stateOfGame << std::endl;
+}
+
+void Game::runState()
+{
+	//Add a main state and seperate the function in substates or keep it as it is?
+	/*
+		main-state: MENU_STATE -> sub-states : LOAD_MENU, SHOW_MENU etc;
+					LEVEL_STATE 
+	*/
+
+	if (stateOfGame == Gamestate::ID::LOAD_MENU)
+	{
+		//initMenu()
+		//stateOfGame++
+		printCurrentState(stateOfGame);
+	}
+	if (stateOfGame == Gamestate::ID::SHOW_MENU)
+	{
+		//gameScene[i].update()
+		/*
+		if(...)
+		{
+		stateOfGame++;
+		printCurrentState(stateOfGame);
+		}
+		*/
+	}
+
+	if (stateOfGame == Gamestate::ID::RUN_LEVEL)
+	{
+		gameScene.update();
+	}
+	if (stateOfGame == Gamestate::ID::CLOSE_GAME)
+	{
+		//close window
+		glfwTerminate();
+	}
 }
 
 void Game::initWindow()
@@ -401,6 +436,22 @@ void Game::readMeshName()
 			}
 		}
 	}
+}
+
+void Game::setGameObjects()
+{
+	gameScene.gameObjects[0].name = "Camera";
+	gameScene.gameObjects[0].addComponent(&moveScript[0]);
+
+	gameScene.gameObjects[1].name = "Light 1";
+	gameScene.gameObjects[1].addComponent(&lights[0]);
+	gameScene.gameObjects[1].transform = glm::vec3(7, 9, -4);
+	gameScene.gameObjects[1].lightComponent->lightType = 0;
+
+	gameScene.gameObjects[2].name = "Light 2";
+	gameScene.gameObjects[2].addComponent(&lights[1]);
+	gameScene.gameObjects[2].transform = glm::vec3(4, 0.4, -2);
+	gameScene.gameObjects[2].lightComponent->lightType = 1;
 }
 
 
