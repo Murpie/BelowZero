@@ -53,11 +53,15 @@ int main(int, char**)
 #if __APPLE__
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+		int count;
+		GLFWmonitor** primary = glfwGetMonitors(&count);
+		const GLFWvidmode* mode = glfwGetVideoMode(primary[0]);
 		GLFWwindow* window = glfwCreateWindow(1280, 720, "Game Engine", NULL, NULL);
 		glfwMakeContextCurrent(window);
-		//glfwSwapInterval(1); // Enable vsync
+		glfwSwapInterval(1);
 		gl3wInit();
 
+		bool fullscreen = false;
 		bool gaussianblur = false;
 		bool fxaa = false;
 		bool ssao = true;
@@ -357,6 +361,20 @@ int main(int, char**)
 													// Main loop
 		while (!glfwWindowShouldClose(window))
 		{
+			if (glfwGetKey(window, GLFW_KEY_F5) && !fullscreen)
+			{
+				glfwSetWindowMonitor(window, primary[0], 0, 0, 1280, 720, mode->refreshRate);
+				fullscreen = true;
+			}
+			else if (glfwGetKey(window, GLFW_KEY_F5) && fullscreen)
+			{
+				glfwSetWindowMonitor(window, 0, 100, 100, 1280, 720, mode->refreshRate);
+				fullscreen = false;
+			}
+
+			if (glfwGetKey(window, GLFW_KEY_ESCAPE))
+				glfwSetWindowShouldClose(window, GL_TRUE);
+
 			float deltaTime;
 			auto nowDeltaTime = chrono::high_resolution_clock::now();
 			deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count();
@@ -393,9 +411,8 @@ int main(int, char**)
 			final_time = time(NULL);
 			if (final_time - initial_time > 0)
 			{
-				char windowName[20];
 				string temp = "Game Engine FPS : " + std::to_string(frameCount / (final_time - initial_time));
-				strcpy(windowName, temp.c_str());
+				char* windowName = const_cast<char*>(temp.c_str());
 				glfwSetWindowTitle(window, windowName);
 				frameCount = 0;
 				initial_time = final_time;
