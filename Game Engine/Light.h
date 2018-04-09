@@ -12,6 +12,7 @@ public:
 	~Light();
 
 	glm::vec4 color;
+	int lightType;
 	float Linear;
 	float Quadratic;
 	void update();

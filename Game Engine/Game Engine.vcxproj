@@ -162,6 +162,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AnimatedMesh.cpp" />
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationShaders.cpp" />
     <ClCompile Include="CharacterMovement.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="CubeMapShaders.cpp" />
@@ -175,6 +178,7 @@
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="ImGui\imgui_impl_glfw_gl3.cpp" />
+    <ClCompile Include="Joint.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightpassShaders.cpp" />
     <ClCompile Include="main.cpp" />
@@ -183,9 +187,13 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshFilter.cpp" />
     <ClCompile Include="MeshLib.cpp" />
+    <ClCompile Include="Physics.cpp" />
+    <ClCompile Include="PointLightShadowMapShaders.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="ShaderBase.cpp" />
     <ClCompile Include="ShaderProgramLib.cpp" />
+    <ClCompile Include="ShadowMapShaders.cpp" />
+    <ClCompile Include="SkelletonVertex.cpp" />
     <ClCompile Include="SkyboxShaders.cpp" />
     <ClCompile Include="SSAOBlurShaders.cpp" />
     <ClCompile Include="SSAOShaders.cpp" />
@@ -196,6 +204,9 @@
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimatedMesh.h" />
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="AnimationShaders.h" />
     <ClInclude Include="CharacterMovement.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="CubeMapShaders.h" />
@@ -210,6 +221,7 @@
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_impl_glfw_gl3.h" />
     <ClInclude Include="ImGui\imgui_internal.h" />
+    <ClInclude Include="Joint.h" />
     <ClInclude Include="Intersection.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightpassShaders.h" />
@@ -218,10 +230,14 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshFilter.h" />
     <ClInclude Include="MeshLib.h" />
+    <ClInclude Include="Physics.h" />
+    <ClInclude Include="PointLightShadowMapShaders.h" />
     <ClInclude Include="Ray.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="ShaderProgramLib.h" />
+    <ClInclude Include="ShadowMapShaders.h" />
+    <ClInclude Include="SkelletonVertex.h" />
     <ClInclude Include="SkyboxShaders.h" />
     <ClInclude Include="SSAOBlurShaders.h" />
     <ClInclude Include="SSAOShaders.h" />
@@ -232,6 +248,8 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="AnimationFS.glsl" />
+    <None Include="AnimationVS.glsl" />
     <None Include="CubeMapFS.glsl" />
     <None Include="CubeMapVS.glsl" />
     <None Include="FXAA_FS.glsl" />
@@ -243,6 +261,11 @@
     <None Include="GeometryVS.glsl" />
     <None Include="lightpassFS.glsl" />
     <None Include="lightpassVS.glsl" />
+    <None Include="PointLightShadowMapFS.glsl" />
+    <None Include="PointLightShadowMapGS.glsl" />
+    <None Include="PointLightShadowMapVS.glsl" />
+    <None Include="ShadowMapFS.glsl" />
+    <None Include="ShadowMapVS.glsl" />
     <None Include="SkyboxFS.glsl" />
     <None Include="SkyboxVS.glsl" />
     <None Include="ssaoBlurFS.glsl" />
