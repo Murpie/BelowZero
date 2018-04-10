@@ -102,4 +102,33 @@ void Player::addToInventory(int item)
 void Player::equip(int item)
 {
 	this->equiped = item;
+
+	// ----------========== Main Menu Scene FrameBuffer ==========----------
+	int width, height, nrOfChannels;
+	unsigned char * data = stbi_load("axeTexture.png", &width, &height, &nrOfChannels, 0);
+
+	glGenFramebuffers(1, &equipedFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, equipedFBO);
+
+	glGenTextures(1, &equipedTexture);
+	glBindTexture(GL_TEXTURE_2D, equipedTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load MainMenu Texture from path" << std::endl;
+	}
+
+	stbi_image_free(data);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, equipedTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Main Menu Framebuffer not complete!" << std::endl;
 }

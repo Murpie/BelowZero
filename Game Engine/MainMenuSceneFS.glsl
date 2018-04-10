@@ -5,6 +5,7 @@ in vec2 texCoords;
 
 uniform sampler2D theTexture;
 uniform sampler2D SceneTexture;
+uniform sampler2D equipedTexture;
 
 uniform float hp;
 uniform float cold;
@@ -30,4 +31,8 @@ void main()
 
 	if (texture(theTexture, texCoords).w >= 0.01)
 		color = texture(theTexture, texCoords);
+	
+	if (texture(equipedTexture, texCoords).w >= 0.01)
+		color = texture(equipedTexture, texCoords);
+
 }

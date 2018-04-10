@@ -1,5 +1,8 @@
 #pragma once
 #include<string>
+#include <iostream>
+#include "stb_image.h"
+#include <GL/gl3w.h>
 
 class Player
 {
@@ -22,6 +25,9 @@ public:
 	int equiped;
 	int inventory[5];
 	int inventoryCount;
+
+	unsigned int equipedFBO;
+	unsigned int equipedTexture;
 
 	void updateStats(float deltaTime);
 	void setCold(float value);

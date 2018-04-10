@@ -9,6 +9,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 {
 	gameScene = otherGameScene;
 	window = otherWindow;
+	player.equip(1);
 	this->geometryShaderProgram = shaderProgram->getShader<GeometryShaders>()->geometryShaderProgram;
 	this->cubeMapShaderProgram = shaderProgram->getShader<CubeMapShaders>()->cubeMapShaderProgram;
 	this->lightpassShaderProgram = shaderProgram->getShader<LightpassShaders>()->lightpassShaderProgram;
@@ -617,6 +618,11 @@ void RenderManager::Render(int ssaoOnorOFF) {
 	glBindTexture(GL_TEXTURE_2D, mainMenuTexture);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "SceneTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "equipedTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, player.equipedTexture);
+
 
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "hp"), player.hp);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "cold"), player.cold);
