@@ -11,6 +11,7 @@
 #include <random>
 #include "stb_image.h"
 #include "GameScene.h"
+#include "Player.h"
 #include "ShaderProgramLib.h"
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -35,6 +36,7 @@ public:
 	~RenderManager();
 
 	GameScene *gameScene;
+	Player player;
 	void FindObjectsToRender();
 	void Render(int ssaoOnorOFF);
 	void createBuffers();

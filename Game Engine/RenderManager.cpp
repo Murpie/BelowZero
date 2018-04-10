@@ -316,6 +316,14 @@ void RenderManager::createBuffers()
 
 void RenderManager::Render(int ssaoOnorOFF) {
 	FindObjectsToRender();
+	player.updateStats(deltaTime);
+
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+		player.setCold(10);
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+		player.setWater(10);
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+		player.setFood(10);
 
 	//... Set view and projection matrix
 	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform.position, gameScene->gameObjects[0].transform.position + gameScene->gameObjects[0].transform.forward, gameScene->gameObjects[0].transform.up);
@@ -600,7 +608,7 @@ void RenderManager::Render(int ssaoOnorOFF) {
 	glDisable(GL_STENCIL_TEST);
 
 
-	//... TESTING MAIN MENU LOADING-----------------------------------------------------------------------------------------------------------------------------------
+	//... UI -----------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(mainMenuShaderProgram);
 
@@ -609,6 +617,12 @@ void RenderManager::Render(int ssaoOnorOFF) {
 	glBindTexture(GL_TEXTURE_2D, mainMenuTexture);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "SceneTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
+
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "hp"), player.hp);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "cold"), player.cold);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "water"), player.water);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "food"), player.food);
+
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
 	renderQuad(2);

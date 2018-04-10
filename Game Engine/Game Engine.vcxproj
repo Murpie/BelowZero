@@ -202,6 +202,7 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureLib.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -245,6 +246,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureLib.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

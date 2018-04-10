@@ -171,6 +171,9 @@
     <ClCompile Include="MainMenuScene.cpp">
       <Filter>Source Files\Data Types</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\GameObject &amp; Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imgui_impl_glfw_gl3.h">
@@ -295,6 +298,9 @@
     </ClInclude>
     <ClInclude Include="MainMenuScene.h">
       <Filter>Header Files\Data Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

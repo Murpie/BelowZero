@@ -34,6 +34,8 @@
 //Render
 auto startSeconds = chrono::high_resolution_clock::now();
 auto startDeltaTime = chrono::high_resolution_clock::now();
+auto test = chrono::high_resolution_clock::now();
+
 
 static void error_callback(int error, const char* description)
 {
@@ -375,11 +377,13 @@ int main(int, char**)
 			if (glfwGetKey(window, GLFW_KEY_ESCAPE))
 				glfwSetWindowShouldClose(window, GL_TRUE);
 
+			
 			float deltaTime;
 			auto nowDeltaTime = chrono::high_resolution_clock::now();
-			deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count();
-			nowDeltaTime = startDeltaTime;
+			deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - test).count() * 0.1;
+			test = nowDeltaTime;
 
+			
 			float secondsTime;
 			auto nowSeconds = chrono::high_resolution_clock::now();
 			float seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
