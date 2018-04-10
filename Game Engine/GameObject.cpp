@@ -8,6 +8,7 @@ GameObject::GameObject()
     isRenderable = false;
     hasLight = false;
 
+	lightComponent = new Light();
 }
 
 GameObject::~GameObject()
@@ -19,6 +20,15 @@ GameObject::~GameObject()
 	//delete materialComponent;
 	//delete meshFilterComponent;
 	//delete lightComponent;
+}
+
+void GameObject::update(float deltaTime)
+{
+	for (Component* components_ptr : components)
+	{
+		Component& component = *components_ptr;
+		component.update(deltaTime);
+	}
 }
 
 void GameObject::updateMaterialAndMeshFilterPointers() {
@@ -64,7 +74,6 @@ void GameObject::updateHasLight() {
         }
     }
 
-   
     if (foundLight == true) {
         hasLight = true;
     } else {
@@ -91,8 +100,17 @@ void GameObject::addComponent(Component* otherComponent)
     updateHasLight();
 }
 
+/*
+void GameObject::addComponent(Component* otherComponent)
+{
+	components.push_back(otherComponent);
+}
+*/
+
 void GameObject::deleteComponent(Component* otherComponent)
 {
+	//
+
 	//find component
 	int index = -1;
 	for (int i = 0; i < components.size(); i++)
@@ -102,6 +120,7 @@ void GameObject::deleteComponent(Component* otherComponent)
 		}
 	}
 	if (index != -1) {
+		//delete components[index];
 		components.erase(components.begin() + index);
 	}
     updateMaterialAndMeshFilterPointers();
@@ -109,11 +128,15 @@ void GameObject::deleteComponent(Component* otherComponent)
 
 void GameObject::deleteAllComponents()
 {
-	for (int i = 0; i < components.size(); i++)
+	for (Component* component : components)
 	{
-		delete components[i];
+		delete component;
 	}
 	components.clear();
+
+	//delete materialComponent;
+	//delete meshFilterComponent;
+	//delete lightComponent;
 }
 
 const bool GameObject::getIsRenderable() {

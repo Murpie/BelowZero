@@ -6,17 +6,93 @@ static void error_callback(int error, const char* description)
 }
 
 
+void mouse_enter_callback(GLFWwindow * window, int entered)
+{
+	if (entered)
+		std::cout << "CURSOR::ENTER::WINDOW" << std::endl;
+	else
+		std::cout << "CURSOR::EXIT::WINDOW" << std::endl;
+}
+
+void mouse_button_callback(GLFWwindow * window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	{
+		std::cout << "MOUSEBUTTON::LEFT::PRESS" << std::endl;
+	}
+
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+	{
+		std::cout << "MOUSEBUTTON::LEFT::RELEASE" << std::endl;
+	}
+
+	// entity.processMouseEvent(window, button, action);
+	//
+}
+
+void Game::processInput(GLFWwindow *window, float deltaTime) //GameScene& scene
+{
+	/* 
+		In this function we want to call on the sceneObjects.
+		
+		example : 
+			scene.pollEvent(window, deltaTime);
+
+		and check inside the classes if we want to make something 
+		happen depending on which button we press.
+
+		This function should be called on within the correct state in runState().
+	*/
+
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+
+	//------------------------------------
+	//This statement should be used inside the GUI class
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	{
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		std::cout << "CUROSR::X::POSITION::" << xpos << std::endl;
+		std::cout << "CUROSR::Y::POSITION::" << ypos << std::endl;
+
+		//
+		//glm::vec3 worldRay = Ray::getWorldRay(xpos, ypos, glm::mat4(), SCREEN_WIDTH, SCREEN_HEIGHT);
+		//std::cout << "CUROSR::WORLDRAY::" << worldRay.x << " " << worldRay.y << " " << worldRay.z << std::endl;
+
+	}
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+	{
+
+	}
+	// Add this inside the player class, processEvents() function for movement etc. 
+	/*
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{}
+	*/
+}
+
 Game::Game() :
 	shaderProgramLibrary(),
-	gameScene(), menuScene(),
+	//gameScene(), menuScene(),
 	windowName("Game Engine"),
-	stateOfGame(Gamestate::ID::INITIALIZE)
+	stateOfGame(Gamestate::ID::INITIALIZE),
+	deltaTime(0), seconds(0),
+	gaussianblur(false), fxaa(false), ssao(true)
 {
 	initWindow();
 	initShaderProgramLib();
 	addMeshName();
 }
-
 
 Game::~Game()
 {
@@ -30,58 +106,73 @@ void Game::run()
 	auto startSeconds = chrono::high_resolution_clock::now();
 	auto startDeltaTime = chrono::high_resolution_clock::now();
 
-	bool gaussianblur = false;
-	bool fxaa = false;
-	bool ssao = true;
-
 	int initial_time = time(NULL);
 	int final_time;
 	int frameCount = 0;
 	
-	// Loads/Creates the current scene. 
-	initLevel();
+	// Initialize scene;
+	/* Try to hold the scene in a vector<GameScene> and pop the index of the scene and rendermanager*/
+	/* Needs a new function addGameScene() for this, maybe use a enum to ID the scene when creating it */
+	
+	std::cout << "GAMESCENE::SIZE::" << gameScenes.size() << std::endl;
+	addGameScene(Scene::ID::MENU);
+	//addGameScene(Scene::ID::LEVEL_1);
+	initScene(getGameScene(Scene::ID::MENU));
 
-	//... Uniform in int that tells gaussian to be turned off
-	glUseProgram(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram);
-	glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram, "onOrOff"), gaussianblur);
+	// Test code to see if we are clearing the memory correctly
+	for (int i = 0; i < 2; i++)
+	{
+		//
+		deleteGameScene(Scene::ID::MENU);
+		addGameScene(Scene::ID::MENU);
+		initScene(getGameScene(Scene::ID::MENU));
+		std::cout << i << " GAMESCENE::SIZE::" << gameScenes.size() << std::endl;
+	}
+	/*
+		Manually call delete on all the pointers inside of GameScene->GameObject->Component...
+		Data is stacking up atm even if we delete the container for GameScene.
+		Component is base class to gameobject, we  cant call on the destructor in component without
+		killing the gameobject holding the component. This ends up in a error atm. 
 
-	glUseProgram(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram);
-	glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram, "swap"), fxaa);
+		Figure out if it is possible to uncouple gameobject and components. 
+		
+		YEEYEYEYEYEY!
+	*/
 
-	glEnable(GL_DEPTH_TEST);
+	//initScene(getGameScene(Scene::ID::LEVEL_1));
+    /*
+		Find out why we cant init two scenes at the same time.
+	*/
 
-	glDepthFunc(GL_LESS);
 
+	useShaderProgram();
 	//////////////
-	int gameObject_clicked = -1;                // Temporary storage of what node we have clicked to process selection at the end of the loop. May be a pointer to your own node type, etc.
+	//int gameObject_clicked = -1; // Temporary storage of what node we have clicked to process selection at the end of the loop. May be a pointer to your own node type, etc.
 
 	// Should start with menu or some kind of startup screen
-	stateOfGame = Gamestate::ID::RUN_LEVEL;
-
+	//stateOfGame = Gamestate::ID::RUN_LEVEL;
+	stateOfGame = Gamestate::ID::SHOW_MENU;
+	printCurrentState(stateOfGame);
 	// Main loop
 	while (!glfwWindowShouldClose(window))
 	{
-		float deltaTime;
+		//float deltaTime;
 		auto nowDeltaTime = chrono::high_resolution_clock::now();
 		deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count();
 		nowDeltaTime = startDeltaTime;
 
 		float secondsTime;
 		auto nowSeconds = chrono::high_resolution_clock::now();
-		float seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
-		nowSeconds = startSeconds;
+		seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
+		//nowSeconds = startSeconds;
 
 		// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
 		// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
 		// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 		glfwPollEvents();
-
-		//gameScene.update();
 		runState();
-		renderManager[0].getDeltaTime(deltaTime);
-		renderManager[0].getSeconds(seconds);
-		renderManager[0].Render(ssao);
+		processInput(window, deltaTime); //pass deltaTime or seconds?
 
 		glfwSwapBuffers(window);
 
@@ -98,6 +189,43 @@ void Game::run()
 	glfwTerminate();
 }
 
+GameScene & Game::getGameScene(Scene::ID sceneID)
+{
+	for (int i = 0; i < gameScenes.size(); i++)
+	{
+		if (gameScenes[i].sceneID == sceneID)
+		{
+			return gameScenes[i];
+		}
+	}
+	// Always returns the first object in the array if none is found. 
+	return gameScenes[0];
+}
+
+void Game::deleteGameScene(Scene::ID sceneID)
+{
+	int toRemove = -1;
+	int size = gameScenes.size();
+
+	for (int i = 0; i < gameScenes.size(); i++)
+	{
+		if (gameScenes[i].sceneID == sceneID)
+		{
+			toRemove = i;
+			break;
+		}
+	}
+	//manually remove data inside the classes as well... 
+	if (toRemove != -1)
+	{
+		gameScenes[toRemove].clearGameObjects();
+		gameScenes.erase(gameScenes.begin() + toRemove);
+		//gameScenes.resize(size - 1);
+		//gameScenes.shrink_to_fit();
+	}
+	//vector<GameScene>().swap(gameScenes);
+}
+
 void Game::printCurrentState(Gamestate::ID stateOfGame)
 {
 	std::cout << "CURRENT_GAMESTATE:: " << stateOfGame << std::endl;
@@ -107,43 +235,35 @@ void Game::runState()
 {
 	//Add a main state and seperate the function in substates or keep it as it is?
 	/*
-		main-state: MENU_STATE -> sub-states : CLEAR, LOAD, RUN etc;
-					LEVEL_STATE ->				 CLEAR, LOAD, RUN
+		main-state:		sub-states :
+		MENU_STATE	->	CLEAR, LOAD, RUN 
+		LEVEL_STATE ->	CLEAR, LOAD, RUN
 	*/
-
-	if (stateOfGame == Gamestate::ID::LOAD_MENU)
-	{
-		initMenu();
-		stateOfGame = Gamestate::ID::SHOW_MENU;
-		printCurrentState(stateOfGame);
-	}
 	if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
-		//gameScene[i].update()
-		menuScene.update();
-		/*
-		if(...)
-		{
-			stateOfGame++;
-			printCurrentState(stateOfGame);
-		}
-		*/
-	}
-	if (stateOfGame == Gamestate::ID::CLEAR_MENU)
-	{
-		//clearMenu();
-		//stateOfGame++
+		gameScenes[0].update(deltaTime);
+		renderManager[0].setDeltaTime(deltaTime);
+		renderManager[0].setSeconds(seconds);
+		renderManager[0].Render(ssao);
+
 		//printCurrentState(stateOfGame);
+		//deleteGameScene(Scene::ID::MENU);
+		//stateOfGame = Gamestate::ID::RUN_LEVEL;
+		//printCurrentState(stateOfGame);
+
+		//if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+		//{
+		//	deleteGameScene(Scene::ID::MENU);
+		//	stateOfGame = Gamestate::ID::RUN_LEVEL;
+		//	printCurrentState(stateOfGame);
+		//}
 	}
-	if (stateOfGame == Gamestate::ID::LOAD_LEVEL)
+	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
-		initLevel();
-		stateOfGame = Gamestate::ID::RUN_LEVEL;
-		printCurrentState(stateOfGame);
-	}
-	if (stateOfGame == Gamestate::ID::RUN_LEVEL)
-	{
-		gameScene.update();
+		gameScenes[1].update(deltaTime);
+		renderManager[1].setDeltaTime(deltaTime);
+		renderManager[1].setSeconds(seconds);
+		renderManager[1].Render(ssao);
 		/*
 		if(...)
 		{
@@ -151,24 +271,14 @@ void Game::runState()
 			printCurrentState(stateOfGame);
 		}
 		*/
+		if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
+		{
+			stateOfGame = Gamestate::ID::SHOW_MENU;
+			printCurrentState(stateOfGame);
+		}
 	}
-	if (stateOfGame == Gamestate::ID::CLEAR_LEVEL)
-	{
-		/* 
-		Not sure how we should handle this.
-		Added a function in GameScene, clearGameObjects(), 
-		this function should call for the destructor on each gameobject 
-		in the vector array, but that is not how the program is working atm. 
-		*/
-
-		//gameScene.clearGameObjects();
-		//stateOfGame =  Gamestate::ID::LOAD_MENU;
-		//printCurrentState(stateOfGame);
-	}
-	if (stateOfGame == Gamestate::ID::CLOSE_GAME)
-	{
-		//close window
-		glfwTerminate();
+	else {
+		return;
 	}
 }
 
@@ -190,28 +300,23 @@ void Game::initWindow()
 	gl3wInit();
 }
 
-void Game::initMenu()
+void Game::initScene(GameScene & scene)
 {
+	/**/
 
-}
-
-void Game::initLevel()
-{
-	/*
-		Creates the current scene atm. Something similar to this to load scenes?
-	*/
-	
-	addRenderManager();
+	addRenderManager(scene);
 	//... Create Camera and add empty game object
-	addCharacterMovement();
+	addCharacterMovement(scene);
 	//... Create Lights and add empty game object
-	addLights();
+	addLights(scene);
 	//... Read OBJ and MTL File
-	readMeshName();
+	readMeshName(scene);
 	//... Set Game Objects, this should be automated by a function when reading from level file
-	setGameObjects();
+	setGameObjects(scene);
 	//...
-	addMeshFilter();
+	addMeshFilter(scene);
+
+	/*Delete the vectors used*/
 }
 
 void Game::initShaderProgramLib()
@@ -229,47 +334,31 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addAnimationShaders();
 }
 
-void Game::addGameObjects()
+void Game::initInputOptions()
 {
-	addCamera();
-	addLights();
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetCursorEnterCallback(window, mouse_enter_callback);	//? Needed to check when inside and outside of window
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, 1);
 }
 
-void Game::addCamera()
+void Game::useShaderProgram()
 {
-	//CharacterMovement moveScript = CharacterMovement(window);
-	//moveScript = moveScript(window);
-	//gameScene.addEmptyGameObject();
-	//gameScene.gameObjects[0].name = "Camera"; //+std::to_string(i);
-	//gameScene.gameObjects[0].addComponent(&moveScript);
-}
+	glUseProgram(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram);
+	glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram, "onOrOff"), gaussianblur);
 
-void Game::addLights()
-{
-	int numberOfLights = 2;
-	for (int i = 0; i < numberOfLights; i++)
-	{
-		gameScene.addEmptyGameObject();
-		Light light = Light();
-		lights.push_back(light);
-	}
-}
+	glUseProgram(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram);
+	glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram, "swap"), fxaa);
 
-void Game::addRenderManager()
-{
-	RenderManager tempRender = RenderManager(&gameScene, window, &shaderProgramLibrary);
-	renderManager.push_back(tempRender);
-}
+	glEnable(GL_DEPTH_TEST);
 
-void Game::addCharacterMovement()
-{
-	gameScene.addEmptyGameObject();
-	CharacterMovement tempMoveScript = CharacterMovement(window);
-	moveScript.push_back(tempMoveScript);
+	glDepthFunc(GL_LESS);
 }
 
 void Game::addMeshName()
 {
+	//Add file names to vector to load when reading mesh data. 
+
 	std::string tempMeshName;
 
 	tempMeshName = "Floor.obj";
@@ -282,7 +371,33 @@ void Game::addMeshName()
 	meshName.push_back(tempMeshName);
 }
 
-void Game::addMeshFilter()
+void Game::addGameScene(Scene::ID sceneID)
+{
+	GameScene tempGameScene = GameScene(sceneID);
+	gameScenes.push_back(tempGameScene);
+}
+
+void Game::addLights(GameScene &scene)
+{
+	int numberOfLights = 2;
+	for (int i = 0; i < numberOfLights; i++)
+	{
+		scene.addLight();
+	}
+}
+
+void Game::addRenderManager(GameScene &scene)
+{
+	RenderManager tempRender = RenderManager(&scene, window, &shaderProgramLibrary);
+	renderManager.push_back(tempRender);
+}
+
+void Game::addCharacterMovement(GameScene &scene)
+{
+	scene.addCharacterMovement(window);
+}
+
+void Game::addMeshFilter(GameScene &scene)
 {
 	for (int i = 0; i < meshName.size(); i++)
 	{
@@ -291,17 +406,17 @@ void Game::addMeshFilter()
 	}
 	for (int i = 0; i < meshName.size(); i++)
 	{
-		gameScene.gameObjects[i + 3].name = meshName[i];
-		gameScene.gameObjects[i + 3].addComponent(&meshFilter[i]);
-		gameScene.gameObjects[i + 3].addComponent(materialLibrary.getMaterial(i));
+		scene.gameObjects[i + 3].name = meshName[i];
+		scene.gameObjects[i + 3].addComponent(&meshFilter[i]);
+		scene.gameObjects[i + 3].addComponent(materialLibrary.getMaterial(i));
 	}
 }
 
-void Game::readMeshName()
+void Game::readMeshName(GameScene &scene)
 {
 	for (int i = 0; i < meshName.size(); i++)
 	{
-		gameScene.addEmptyGameObject();
+		scene.addEmptyGameObject();
 		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
 		//Add material
 		materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
@@ -485,20 +600,22 @@ void Game::readMeshName()
 	}
 }
 
-void Game::setGameObjects()
+void Game::setGameObjects(GameScene &scene)
 {
-	gameScene.gameObjects[0].name = "Camera";
-	gameScene.gameObjects[0].addComponent(&moveScript[0]);
+	// This function should be automated and get data from the level file
+	scene.gameObjects[0].name = "Camera";
+	scene.gameObjects[0].addComponent(&scene.moveScript[0]);
 
-	gameScene.gameObjects[1].name = "Light 1";
-	gameScene.gameObjects[1].addComponent(&lights[0]);
-	gameScene.gameObjects[1].transform = glm::vec3(7, 9, -4);
-	gameScene.gameObjects[1].lightComponent->lightType = 0;
+	scene.gameObjects[1].name = "Light 1";
+	scene.gameObjects[1].addComponent(&scene.lights[0]);
+	scene.gameObjects[1].transform = glm::vec3(7, 9, -4);
+	scene.gameObjects[1].lightComponent->lightType = 0;
 
-	gameScene.gameObjects[2].name = "Light 2";
-	gameScene.gameObjects[2].addComponent(&lights[1]);
-	gameScene.gameObjects[2].transform = glm::vec3(4, 0.4, -2);
-	gameScene.gameObjects[2].lightComponent->lightType = 1;
+	scene.gameObjects[2].name = "Light 2";
+	scene.gameObjects[2].addComponent(&scene.lights[1]);
+	scene.gameObjects[2].transform = glm::vec3(4, 0.4, -2);
+	scene.gameObjects[2].lightComponent->lightType = 1;
 }
+
 
 

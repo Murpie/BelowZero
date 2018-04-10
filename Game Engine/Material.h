@@ -29,7 +29,7 @@ public:
 	glm::mat3 mtlInfo;
 
 	GLuint geometryShaderProgram;
-	void update();
+	void update(float deltaTime);
 	void bindTextures();
 	void bindFoundTextures();
 	void addAlbedo(int otherTexture);

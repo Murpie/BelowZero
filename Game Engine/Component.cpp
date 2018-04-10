@@ -3,10 +3,12 @@
 
 Component::Component()
 {
+
 }
 
 Component::~Component()
 {
+
 }
 
 bool Component::operator==(const Component & rhs)
@@ -19,11 +21,12 @@ bool Component::operator==(const Component & rhs)
 	return value;
 }
 
-void Component::getInformation(float time)
+void Component::setInformation(float time)
 {
+
 }
 
-void Component::update()
+void Component::update(float deltaTime)
 {
 
 }

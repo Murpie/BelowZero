@@ -21,6 +21,6 @@ Transform::~Transform()
 {
 }
 
-void Transform::update()
+void Transform::update(float deltaTime)
 {
 }

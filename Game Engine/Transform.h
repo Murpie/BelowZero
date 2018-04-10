@@ -21,7 +21,7 @@ public:
     glm::vec3 right = glm::vec3(0, 0, 1);
 
     
-	void update();
+	void update(float deltaTime);
 
 private:
 

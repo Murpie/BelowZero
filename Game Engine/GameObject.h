@@ -11,11 +11,15 @@
 #include "glm/glm/gtc/type_ptr.hpp"
 #include "glm/glm/glm.hpp"
 
-class GameObject : public Component
+class Component;
+
+class GameObject //: public Component 
 {
 public:
 	GameObject();
 	~GameObject();
+
+	void update(float deltaTime);
 
     bool isActive;
     bool hasLight;
@@ -26,9 +30,15 @@ public:
     MeshFilter *meshFilterComponent;
 	Light *lightComponent;
 
+	/*
+		Naterial, MeshFilter and Light are components. 
+		Why are they not stored in componets?
+	*/
+
     void updateMaterialAndMeshFilterPointers();
     void updateHasLight();
 	void addComponent(Component* otherComponent);
+	//void addComponent(Component* otherComponent);
 	void deleteComponent(Component* otherComponent);
 	void deleteAllComponents();
 

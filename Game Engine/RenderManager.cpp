@@ -734,12 +734,12 @@ void RenderManager::Update()
 
 }
 
-void RenderManager::getDeltaTime(float deltaTime)
+void RenderManager::setDeltaTime(float deltaTime)
 {
 	this->deltaTime = deltaTime;
 }
 
-void RenderManager::getSeconds(float seconds)
+void RenderManager::setSeconds(float seconds)
 {
 	this->seconds = seconds;
 }

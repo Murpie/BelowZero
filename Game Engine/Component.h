@@ -11,7 +11,9 @@ public:
     GameObject* gameObject;
 	std::string assetName;
 	bool operator==(const Component &rhs);
-	virtual void getInformation(float time);
-	virtual void update();
+	virtual void setInformation(float time);
+	virtual void update(float deltaTime);
+
 private:
+
 };

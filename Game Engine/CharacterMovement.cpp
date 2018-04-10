@@ -35,7 +35,7 @@ void CharacterMovement::getInformation(float time)
 	this->time += time / 1000;
 }
 
-void CharacterMovement::update()
+void CharacterMovement::update(float deltaTime)
 {
 	//... Mouse Movement
 	glfwGetCursorPos(window, &xpos, &ypos);

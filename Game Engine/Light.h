@@ -15,7 +15,7 @@ public:
 	int lightType;
 	float Linear;
 	float Quadratic;
-	void update();
+	void update(float deltaTime);
 
 private:
 

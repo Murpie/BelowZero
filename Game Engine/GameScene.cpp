@@ -1,7 +1,8 @@
 #include "GameScene.h"
 
-GameScene::GameScene()
+GameScene::GameScene(Scene::ID sceneID)
 {
+	this->sceneID = sceneID;
 }
 
 GameScene::~GameScene()
@@ -18,18 +19,34 @@ void GameScene::clearGameObjects()
 {
 	while(!gameObjects.empty())
 	{
+		//for (unsigned int i = 0; i < gameObjects.size(); i++)
+		//{
+		//	for(int j = 0; i < gameObjects[i].components.size(); i++)
+		//		gameObjects[i].deleteComponent(gameObjects[i].components[j]);
+		//}
 		gameObjects.pop_back();
 	}
 }
 
-void GameScene::update()
+void GameScene::addLight()
+{
+	addEmptyGameObject();
+	Light light = Light();
+	lights.push_back(light);
+}
+
+void GameScene::addCharacterMovement(GLFWwindow * window)
+{
+	addEmptyGameObject();
+	CharacterMovement tempMoveScript = CharacterMovement(window);
+	moveScript.push_back(tempMoveScript);
+}
+
+void GameScene::update(float deltaTime)
 {
 	for (unsigned int i = 0; i < gameObjects.size(); i++)
 	{
-		for (unsigned int j = 0; j < gameObjects[i].components.size(); j++)
-		{
-			gameObjects[i].components[j]->update();
-		}
+		gameObjects[i].update(deltaTime);
 	}
 
 }

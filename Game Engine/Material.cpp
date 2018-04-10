@@ -16,7 +16,7 @@ Material::~Material()
 {
 }
 
-void Material::update()
+void Material::update(float deltaTime)
 {
 }
 

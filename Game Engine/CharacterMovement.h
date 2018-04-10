@@ -21,7 +21,7 @@ public:
 	Physics physics;
 	GLFWwindow* window;
 
-	void update();
+	void update(float deltaTime);
 private:
 	bool frontCollision = false;
 	bool bottomCollision = false;
