@@ -49,14 +49,15 @@ void GameScene::addCharacterMovement(GLFWwindow * window)
 	gameObjects[gameObjects.size()-1].addComponent(moveScript);
 }
 
-void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibrary)
+void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibrary, int meshNameSize)
 {
-	for (int i = 0; i < meshLibrary.getNumberOfMeshes(); i++)
+	for (int i = 0; i < meshNameSize; i++) // 3 - meshLibrary.getNumberOfMeshes(); meshName.size();
 	{
+		addEmptyGameObject();
 		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).gElementBuffer, meshLibrary.getMesh(i).vertexCount);
-		gameObjects[i + camerasInScene + lightsInScene].name = "Mesh " + i; // Maybe pass the name of the object?
-		gameObjects[i + camerasInScene + lightsInScene].addComponent(meshFilter);
-		gameObjects[i + camerasInScene + lightsInScene].addComponent(matertialLibrary.getMaterial(i));
+		gameObjects[gameObjects.size() - 1].name = "Mesh " + i; // Maybe pass the name of the object?
+		gameObjects[gameObjects.size() - 1].addComponent(meshFilter);
+		gameObjects[gameObjects.size() - 1].addComponent(matertialLibrary.getMaterial(i));
 	}
 }
 

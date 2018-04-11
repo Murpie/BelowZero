@@ -41,14 +41,17 @@ public:
 
 private:
 	GLFWwindow * window;
-	GameScene gameScene;
+
+	GameScene gameScene; // Keep scene object and only clear the data inside!
+	GameScene menuScene;
+
 	ShaderProgramLib shaderProgramLibrary;
 	MaterialLib materialLibrary;
 	TextureLib textureLibrary;
 	MeshLib meshLibrary;
 	
 	//
-	vector<RenderManager> renderManager; // use 1 render manager and 
+	vector<RenderManager> renderManager; // use 1 render manager? delete and init new one
 	vector<string> meshName; // Filepaths for the importer?
 
 	Gamestate::ID stateOfGame; // EnumID.h
@@ -72,8 +75,7 @@ private:
 	void addRenderManager(GameScene &scene);
 	void addCharacterMovement(GameScene &scene);
 	void addMeshFilter(GameScene &scene);
-	void readMeshName(GameScene &scene);
-
+	void readMeshName();
 	//...
 	void processInput(GLFWwindow *window, float deltaTime); //GameScene &scene
 
@@ -84,5 +86,8 @@ private:
 	bool gaussianblur;
 	bool fxaa;
 	bool ssao;
+	//
+	bool meshesLoaded;
+	bool testBool; // used in addLights atm to see difference in scenes.
 };
 

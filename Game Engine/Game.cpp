@@ -68,6 +68,17 @@ void Game::processInput(GLFWwindow *window, float deltaTime) //GameScene& scene
 	{
 
 	}
+
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	{
+		stateOfGame = Gamestate::ID::RUN_LEVEL;
+		printCurrentState(stateOfGame);
+	}
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+	{
+		stateOfGame = Gamestate::ID::SHOW_MENU;
+		printCurrentState(stateOfGame);
+	}
 	// Add this inside the player class, processEvents() function for movement etc. 
 	/*
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -83,11 +94,11 @@ void Game::processInput(GLFWwindow *window, float deltaTime) //GameScene& scene
 
 Game::Game() :
 	shaderProgramLibrary(),
-	gameScene(), // menuScene(),
+	gameScene(), menuScene(),
 	windowName("Game Engine"),
 	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
-	gaussianblur(false), fxaa(false), ssao(true)
+	gaussianblur(false), fxaa(false), ssao(true), meshesLoaded(false), testBool(false)
 {
 	initWindow();
 	initShaderProgramLib();
@@ -110,11 +121,12 @@ void Game::run()
 	int final_time;
 	int frameCount = 0;
 	
+	initScene(menuScene);
 	initScene(gameScene);
 
 	useShaderProgram();
 
-	stateOfGame = Gamestate::ID::SHOW_MENU;
+	stateOfGame = Gamestate::ID::RUN_LEVEL;
 	printCurrentState(stateOfGame);
 
 	// Main loop
@@ -136,7 +148,7 @@ void Game::run()
 		// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 		glfwPollEvents();
 		runState();
-		processInput(window, deltaTime); //pass deltaTime or seconds?
+		processInput(window, deltaTime); //...
 
 		glfwSwapBuffers(window);
 
@@ -169,7 +181,8 @@ void Game::runState()
 	*/
 	if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
-		gameScene.update(deltaTime);
+		menuScene.update(deltaTime);
+		//processInput(window, deltaTime);
 		renderManager[0].setDeltaTime(deltaTime);
 		renderManager[0].setSeconds(seconds);
 		renderManager[0].Render(ssao);
@@ -178,21 +191,10 @@ void Game::runState()
 	{
 		//gameScenes[1].update(deltaTime);
 		gameScene.update(deltaTime);
+		//processInput(window, deltaTime);
 		renderManager[1].setDeltaTime(deltaTime);
 		renderManager[1].setSeconds(seconds);
 		renderManager[1].Render(ssao);
-		/*
-		if(...)
-		{
-			stateOfGame++; //CLEAR_LEVEL
-			printCurrentState(stateOfGame);
-		}
-		*/
-		if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
-		{
-			stateOfGame = Gamestate::ID::SHOW_MENU;
-			printCurrentState(stateOfGame);
-		}
 	}
 	else {
 		return;
@@ -219,16 +221,21 @@ void Game::initWindow()
 
 void Game::initScene(GameScene & scene)
 {
-	addRenderManager(scene);
-	//... Create Camera and add empty game object
+	addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
+	//... Create Camera
 	addCharacterMovement(scene);
-	//... Create Lights and add empty game object
+	//... Create Lights
 	addLights(scene);
 	//... Read OBJ and MTL File
-	readMeshName(scene);
+	if(!meshesLoaded)
+	{ 
+		//Load the meshes once and store them.
+		readMeshName();	
+		meshesLoaded = true;
+	}
 	//...
+	/*Add meshes to mesh filter with level file ?*/
 	addMeshFilter(scene);
-
 }
 
 void Game::initShaderProgramLib()
@@ -283,12 +290,19 @@ void Game::addMeshName()
 	meshName.push_back(tempMeshName);
 }
 
-
 void Game::addLights(GameScene &scene)
 {
 	// add for loop and use array for transforms;
-	scene.addLight(glm::vec3(7, 9, -4), 0);
-	scene.addLight(glm::vec3(4, 0.4, -2), 1);
+	if (!testBool)
+	{
+		scene.addLight(glm::vec3(7, 9, -4), 0);
+		scene.addLight(glm::vec3(4, 0.4, -2), 1);
+		testBool = true;
+	}
+	else
+	{
+		scene.gameObjects[0].transform = glm::vec3(4, 0.4, -2);
+	}	
 }
 
 void Game::addRenderManager(GameScene &scene)
@@ -304,26 +318,14 @@ void Game::addCharacterMovement(GameScene &scene)
 
 void Game::addMeshFilter(GameScene &scene)
 {
-	scene.addMeshFilter(meshLibrary, materialLibrary);
-	//move this function to gamescene and use addcomponent
-	//for (int i = 0; i < meshName.size(); i++)
-	//{
-	//	MeshFilter meshFilterTemp = MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).gElementBuffer, meshLibrary.getMesh(i).vertexCount);
-	//	meshFilter.push_back(meshFilterTemp);
-	//}
-	//for (int i = 0; i < meshName.size(); i++)
-	//{
-	//	scene.gameObjects[i + 3].name = meshName[i];
-	//	scene.gameObjects[i + 3].addComponent(&meshFilter[i]);
-	//	scene.gameObjects[i + 3].addComponent(materialLibrary.getMaterial(i));
-	//}
+	scene.addMeshFilter(meshLibrary, materialLibrary, meshName.size());
 }
 
-void Game::readMeshName(GameScene &scene)
+void Game::readMeshName()
 {
 	for (int i = 0; i < meshName.size(); i++)
 	{
-		scene.addEmptyGameObject();
+		//scene.addEmptyGameObject();
 		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
 		//Add material
 		materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);

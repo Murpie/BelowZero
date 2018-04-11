@@ -11,7 +11,7 @@ class GameScene
 {
 public:
 	GameScene(const GameScene&) = delete;
-	GameScene& operator=(const GameScene&) = delete;
+	GameScene& operator=(const GameScene&) = default;
 	GameScene();
 	~GameScene();
 
@@ -20,17 +20,17 @@ public:
 	std::vector<GameObject> gameObjects; 
 
 	void addEmptyGameObject();
-	void clearGameObjects();
+	void clearGameObjects(); // delete all pointers in each gameobject and reload on scene swap
 
 	void addLight(glm::vec3 transform, int lightType);
-	void addCharacterMovement(GLFWwindow* window);
-	void addMeshFilter(MeshLib& meshLibrary, MaterialLib& matertialLibrary);
+	void addCharacterMovement(GLFWwindow* window); //player
+	void addMeshFilter(MeshLib& meshLibrary, MaterialLib& matertialLibrary, int meshNameSize);
 
 	void update(float deltaTime);
 
 private:
 
-	int camerasInScene;
+	int camerasInScene; //player
 	int lightsInScene;
 
 };
