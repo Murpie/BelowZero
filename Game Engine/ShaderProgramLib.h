@@ -15,7 +15,7 @@
 #include "ShaderBase.h"
 #include "ShadowMapShaders.h"
 #include "PointLightShadowMapShaders.h"
-#include "MainMenuScene.h"
+#include "UIShaders.h"
 
 class ShaderProgramLib
 {
@@ -35,7 +35,7 @@ public:
 	void addShadowMapShaders();
 	void addPointLightShadowMapShaders();
 	void addAnimationShaders();
-	void addMainMenuShaders();
+	void addUIShaders();
 
 	template <class T>
 	T* getShader() {

@@ -182,7 +182,7 @@
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightpassShaders.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MainMenuScene.cpp" />
+    <ClCompile Include="UIShaders.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialLib.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -226,7 +226,7 @@
     <ClInclude Include="Joint.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightpassShaders.h" />
-    <ClInclude Include="MainMenuScene.h" />
+    <ClInclude Include="UIShaders.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialLib.h" />
     <ClInclude Include="Mesh.h" />
@@ -263,8 +263,8 @@
     <None Include="GeometryVS.glsl" />
     <None Include="lightpassFS.glsl" />
     <None Include="lightpassVS.glsl" />
-    <None Include="MainMenuSceneFS.glsl" />
-    <None Include="MainMenuSceneVS.glsl" />
+    <None Include="UIFS.glsl" />
+    <None Include="UIVS.glsl" />
     <None Include="PointLightShadowMapFS.glsl" />
     <None Include="PointLightShadowMapGS.glsl" />
     <None Include="PointLightShadowMapVS.glsl" />

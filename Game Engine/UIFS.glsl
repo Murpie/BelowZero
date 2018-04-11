@@ -4,8 +4,8 @@ layout(location = 0) out vec4 color;
 in vec2 texCoords;
 
 uniform sampler2D theTexture;
-uniform sampler2D SceneTexture;
 uniform sampler2D equipedTexture;
+uniform sampler2D SceneTexture;
 
 uniform float hp;
 uniform float cold;
@@ -15,7 +15,7 @@ uniform float food;
 void main()
 {
 
-	if (texture(theTexture, texCoords).w < 0.01)
+	if (texture(theTexture, texCoords).w < 0.01 || texture(equipedTexture, texCoords).w < 0.01)
 	{
 		color = texture(SceneTexture, texCoords);
 	}
@@ -34,5 +34,4 @@ void main()
 	
 	if (texture(equipedTexture, texCoords).w >= 0.01)
 		color = texture(equipedTexture, texCoords);
-
 }

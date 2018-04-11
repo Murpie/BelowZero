@@ -1,28 +1,28 @@
-#include "MainMenuScene.h"
+#include "UIShaders.h"
 
-MainMenu::MainMenu()
+UIShaders::UIShaders()
 {
 	CreateShaderData();
 }
 
-MainMenu::MainMenu(int otherAssetID)
+UIShaders::UIShaders(int otherAssetID)
 {
 	assetID = otherAssetID;
 	CreateShaderData();
 }
 
-MainMenu::~MainMenu()
+UIShaders::~UIShaders()
 {
 }
 
-void MainMenu::CreateShaderData()
+void UIShaders::CreateShaderData()
 {
 	char buff[1024];
 	memset(buff, 0, 1024);
 	GLint compileResult = 0;
 
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-	std::ifstream shaderFile("MainMenuSceneVS.glsl");
+	std::ifstream shaderFile("UIVS.glsl");
 	std::string shaderText((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
 	shaderFile.close();
 
@@ -37,7 +37,7 @@ void MainMenu::CreateShaderData()
 	}
 
 	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-	shaderFile.open("MainMenuSceneFS.glsl");
+	shaderFile.open("UIFS.glsl");
 	shaderText.assign((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
 	shaderFile.close();
 	shaderTextPtr = shaderText.c_str();
@@ -52,23 +52,23 @@ void MainMenu::CreateShaderData()
 		OutputDebugStringA(buff);
 	}
 
-	mainMenuShaderProgram = glCreateProgram();
-	glAttachShader(mainMenuShaderProgram, fs);
-	glAttachShader(mainMenuShaderProgram, vs);
-	glLinkProgram(mainMenuShaderProgram);
+	UIShaderProgram = glCreateProgram();
+	glAttachShader(UIShaderProgram, fs);
+	glAttachShader(UIShaderProgram, vs);
+	glLinkProgram(UIShaderProgram);
 
 
 	compileResult = GL_FALSE;
-	glGetProgramiv(mainMenuShaderProgram, GL_LINK_STATUS, &compileResult);
+	glGetProgramiv(UIShaderProgram, GL_LINK_STATUS, &compileResult);
 	if (compileResult == GL_FALSE)
 	{
 		memset(buff, 0, 1024);
-		glGetProgramInfoLog(mainMenuShaderProgram, 1024, nullptr, buff);
+		glGetProgramInfoLog(UIShaderProgram, 1024, nullptr, buff);
 		OutputDebugStringA(buff);
 	}
 
-	glDetachShader(mainMenuShaderProgram, vs);
-	glDetachShader(mainMenuShaderProgram, fs);
+	glDetachShader(UIShaderProgram, vs);
+	glDetachShader(UIShaderProgram, fs);
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 }

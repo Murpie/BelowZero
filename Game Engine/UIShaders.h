@@ -1,5 +1,4 @@
-#ifndef MAINMENUSCENE_H
-#define MAINMENUSCENE_H
+#pragma once
 #include <windows.h>
 #include <vector>
 #include <string>
@@ -11,18 +10,16 @@
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glew32.lib")
 
-class MainMenu : public ShaderBase
+class UIShaders : public ShaderBase
 {
 public:
-	MainMenu();
-	MainMenu(int otherAssetID);
-	~MainMenu();
+	UIShaders();
+	UIShaders(int otherAssetID);
+	~UIShaders();
 
 	void CreateShaderData();
 
 	
-	GLuint mainMenuShaderProgram;
+	GLuint UIShaderProgram;
 	int assetID;
-
 };
-#endif // !MAINMENUSCENE_H

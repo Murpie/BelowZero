@@ -13,7 +13,6 @@ Player::Player()
 	this->waterTick = 20;
 	this->foodTick = 20;
 	this->damage = 0;
-	this->equiped = 0;
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
 	this->inventoryCount = 0;
@@ -99,13 +98,14 @@ void Player::addToInventory(int item)
 		inventoryCount++;
 }
 
-void Player::equip(int item)
+void Player::equip(std::string item)
 {
-	this->equiped = item;
-
-	// ----------========== Main Menu Scene FrameBuffer ==========----------
+	std::string texturePNG = "Texture.png";
+	std::string filePath = item + texturePNG;
 	int width, height, nrOfChannels;
-	unsigned char * data = stbi_load("axeTexture.png", &width, &height, &nrOfChannels, 0);
+
+	// ----------========== Equipment FrameBuffer ==========----------
+	unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
 
 	glGenFramebuffers(1, &equipedFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, equipedFBO);
@@ -123,12 +123,12 @@ void Player::equip(int item)
 	}
 	else
 	{
-		std::cout << "Failed to load MainMenu Texture from path" << std::endl;
+		std::cout << "Failed to load Equiped Texture from path" << std::endl;
 	}
 
 	stbi_image_free(data);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, equipedTexture, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "Main Menu Framebuffer not complete!" << std::endl;
+		std::cout << "Equiped Framebuffer not complete!" << std::endl;
 }

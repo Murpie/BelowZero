@@ -168,11 +168,11 @@
     <ClCompile Include="ShadowMapShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="MainMenuScene.cpp">
-      <Filter>Source Files\Data Types</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Source Files\GameObject &amp; Components</Filter>
+    </ClCompile>
+    <ClCompile Include="UIShaders.cpp">
+      <Filter>Source Files\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -296,11 +296,11 @@
     <ClInclude Include="ShadowMapShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="MainMenuScene.h">
-      <Filter>Header Files\Data Types</Filter>
-    </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>
+    </ClInclude>
+    <ClInclude Include="UIShaders.h">
+      <Filter>Header Files\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -372,10 +372,10 @@
     <None Include="PointLightShadowMapVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
-    <None Include="MainMenuSceneFS.glsl">
+    <None Include="UIFS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
-    <None Include="MainMenuSceneVS.glsl">
+    <None Include="UIVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>

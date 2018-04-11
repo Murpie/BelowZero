@@ -22,7 +22,6 @@ public:
 	float foodTick;
 	float damage;
 
-	int equiped;
 	int inventory[5];
 	int inventoryCount;
 
@@ -35,7 +34,7 @@ public:
 	void setFood(float value);
 
 	void addToInventory(int item);
-	void equip(int item);
+	void equip(std::string item);
 
 private:
 };

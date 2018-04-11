@@ -88,8 +88,8 @@ void ShaderProgramLib::addAnimationShaders()
 	shaders.push_back(newShaderProgram);
 }
 
-void ShaderProgramLib::addMainMenuShaders()
+void ShaderProgramLib::addUIShaders()
 {
-	MainMenu* newShaderProgram = new MainMenu();
+	UIShaders* newShaderProgram = new UIShaders();
 	shaders.push_back(newShaderProgram);
 }

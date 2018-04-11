@@ -40,7 +40,7 @@ public:
 	void FindObjectsToRender();
 	void Render(int ssaoOnorOFF);
 	void createBuffers();
-	void renderQuad(int index);
+	void renderQuad();
 	void renderSkyQuad();
 	void Update();
 	void getDeltaTime(float deltaTime);
@@ -64,11 +64,8 @@ private:
 	float seconds;
 	int count;
 
-	unsigned int mainMenuFBO;
-	unsigned int mainMenuTexture;
-	unsigned int mainMenuVao;
-	unsigned int mainMenuVbo;
-	unsigned int mainMenuEbo;
+	unsigned int UIFBO;
+	unsigned int UITexture;
 	unsigned int shadowMap;
 	unsigned int shadowFBO;
 	unsigned int cubeMapShadowMap;
@@ -96,6 +93,8 @@ private:
 	unsigned int finalDepthStensil;
 	unsigned int fxaaFBO;
 	unsigned int fxaaColorBuffer;
+	unsigned int equipedFBO;
+	unsigned int equipedTexture;
 
 	unsigned int noiseTexture;
 	unsigned int cubemapTexture;
@@ -129,7 +128,6 @@ private:
 
 	GLuint shadowMapShaderProgram;
 	GLuint pointLightShaderProgram;
-	GLuint mainMenuShaderProgram;
 	GLuint geometryShaderProgram;
 	GLuint cubeMapShaderProgram;
 	GLuint lightpassShaderProgram;
@@ -139,6 +137,7 @@ private:
 	GLuint skyboxShaderProgram;
 	GLuint fxaaShaderProgram;
 	GLuint animationShaderProgram;
+	GLuint UIShaderProgram;
 	int display_w, display_h;
 	unsigned int cubeMapSize = 64;
 

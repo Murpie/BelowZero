@@ -86,7 +86,7 @@ int main(int, char**)
 		shaderProgramLibrary.addShadowMapShaders();
 		shaderProgramLibrary.addPointLightShadowMapShaders();
 		//shaderProgramLibrary.addAnimationShaders();
-		shaderProgramLibrary.addMainMenuShaders();
+		shaderProgramLibrary.addUIShaders();
 
 		RenderManager renderManager = RenderManager(&gameScene, window, &shaderProgramLibrary);
 
@@ -359,7 +359,7 @@ int main(int, char**)
 
 		//////////////
 		int gameObject_clicked = -1;                // Temporary storage of what node we have clicked to process selection at the end of the loop. May be a pointer to your own node type, etc.
-
+		/*glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);*/
 													// Main loop
 		while (!glfwWindowShouldClose(window))
 		{
