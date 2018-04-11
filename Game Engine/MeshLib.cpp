@@ -29,3 +29,8 @@ AnimatedMesh & MeshLib::getAnimatedMesh(int key)
 {
 	return animatedMeshes.at(key);
 }
+
+int MeshLib::getNumberOfMeshes()
+{
+	return meshes.size();
+}

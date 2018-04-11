@@ -7,8 +7,6 @@ GameObject::GameObject()
     isActive = true;
     isRenderable = false;
     hasLight = false;
-
-	lightComponent = new Light();
 }
 
 GameObject::~GameObject()

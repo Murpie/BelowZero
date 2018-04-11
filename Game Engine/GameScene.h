@@ -4,27 +4,33 @@
 #include "EnumID.h"
 #include "GameObject.h"
 #include "CharacterMovement.h"
+#include "MeshLib.h"
+#include "MaterialLib.h"
 
 class GameScene
 {
 public:
-	GameScene(Scene::ID sceneID);
+	GameScene(const GameScene&) = delete;
+	GameScene& operator=(const GameScene&) = delete;
+	GameScene();
 	~GameScene();
 
-	std::vector<GameObject> gameObjects;
-	std::vector<Light> lights;
-	std::vector<CharacterMovement> moveScript;
+	// change these to pointers and delete them when we want to create a new scene. 
+	// ... or just use the add component function?
+	std::vector<GameObject> gameObjects; 
 
 	void addEmptyGameObject();
 	void clearGameObjects();
 
-	void addLight();
+	void addLight(glm::vec3 transform, int lightType);
 	void addCharacterMovement(GLFWwindow* window);
+	void addMeshFilter(MeshLib& meshLibrary, MaterialLib& matertialLibrary);
 
 	void update(float deltaTime);
 
-	Scene::ID sceneID;
-
 private:
+
+	int camerasInScene;
+	int lightsInScene;
 
 };

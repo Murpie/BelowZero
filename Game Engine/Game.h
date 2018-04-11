@@ -6,10 +6,9 @@
 #include <time.h>
 
 /////////////
-#include "MaterialLib.h"
+
 #include "TextureLib.h"
 #include "ShaderProgramLib.h"
-#include "MeshLib.h"
 #include "GameScene.h"
 #include "RenderManager.h"
 #include "Transform.h"
@@ -42,24 +41,17 @@ public:
 
 private:
 	GLFWwindow * window;
-	//GameScene gameScene; // maybe  vector<GameScene> and switch between gameScene[i].update() or just clear the gamescene and reuse
-	//GameScene menuScene; // temporary GameScene
-	vector<GameScene> gameScenes; // test
+	GameScene gameScene;
 	ShaderProgramLib shaderProgramLibrary;
 	MaterialLib materialLibrary;
 	TextureLib textureLibrary;
 	MeshLib meshLibrary;
 	
 	//
-	//vector<Light> lights; // rework this solution or figure out how to keep track on lights for multiple scenes. 
-	//vector<CharacterMovement> moveScript; // same as for lights, mabe create this local in the initScene() and pass it to the functions
-	vector<RenderManager> renderManager;
-	vector<string> meshName;
-	vector<MeshFilter> meshFilter;
+	vector<RenderManager> renderManager; // use 1 render manager and 
+	vector<string> meshName; // Filepaths for the importer?
 
 	Gamestate::ID stateOfGame; // EnumID.h
-	GameScene& getGameScene(Scene::ID sceneID);
-	void deleteGameScene(Scene::ID sceneID);
 
 	void printCurrentState(Gamestate::ID stateOfGame);
 	void runState();
@@ -74,7 +66,6 @@ private:
 	void useShaderProgram();
 
 	void addMeshName();
-	void addGameScene(Scene::ID sceneID);
 
 	//...
 	void addLights(GameScene &scene);
@@ -82,7 +73,6 @@ private:
 	void addCharacterMovement(GameScene &scene);
 	void addMeshFilter(GameScene &scene);
 	void readMeshName(GameScene &scene);
-	void setGameObjects(GameScene &scene);
 
 	//...
 	void processInput(GLFWwindow *window, float deltaTime); //GameScene &scene

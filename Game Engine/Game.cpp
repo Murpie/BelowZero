@@ -83,7 +83,7 @@ void Game::processInput(GLFWwindow *window, float deltaTime) //GameScene& scene
 
 Game::Game() :
 	shaderProgramLibrary(),
-	//gameScene(), menuScene(),
+	gameScene(), // menuScene(),
 	windowName("Game Engine"),
 	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
@@ -110,49 +110,13 @@ void Game::run()
 	int final_time;
 	int frameCount = 0;
 	
-	// Initialize scene;
-	/* Try to hold the scene in a vector<GameScene> and pop the index of the scene and rendermanager*/
-	/* Needs a new function addGameScene() for this, maybe use a enum to ID the scene when creating it */
-	
-	std::cout << "GAMESCENE::SIZE::" << gameScenes.size() << std::endl;
-	addGameScene(Scene::ID::MENU);
-	//addGameScene(Scene::ID::LEVEL_1);
-	initScene(getGameScene(Scene::ID::MENU));
-
-	// Test code to see if we are clearing the memory correctly
-	for (int i = 0; i < 2; i++)
-	{
-		//
-		deleteGameScene(Scene::ID::MENU);
-		addGameScene(Scene::ID::MENU);
-		initScene(getGameScene(Scene::ID::MENU));
-		std::cout << i << " GAMESCENE::SIZE::" << gameScenes.size() << std::endl;
-	}
-	/*
-		Manually call delete on all the pointers inside of GameScene->GameObject->Component...
-		Data is stacking up atm even if we delete the container for GameScene.
-		Component is base class to gameobject, we  cant call on the destructor in component without
-		killing the gameobject holding the component. This ends up in a error atm. 
-
-		Figure out if it is possible to uncouple gameobject and components. 
-		
-		YEEYEYEYEYEY!
-	*/
-
-	//initScene(getGameScene(Scene::ID::LEVEL_1));
-    /*
-		Find out why we cant init two scenes at the same time.
-	*/
-
+	initScene(gameScene);
 
 	useShaderProgram();
-	//////////////
-	//int gameObject_clicked = -1; // Temporary storage of what node we have clicked to process selection at the end of the loop. May be a pointer to your own node type, etc.
 
-	// Should start with menu or some kind of startup screen
-	//stateOfGame = Gamestate::ID::RUN_LEVEL;
 	stateOfGame = Gamestate::ID::SHOW_MENU;
 	printCurrentState(stateOfGame);
+
 	// Main loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -189,42 +153,6 @@ void Game::run()
 	glfwTerminate();
 }
 
-GameScene & Game::getGameScene(Scene::ID sceneID)
-{
-	for (int i = 0; i < gameScenes.size(); i++)
-	{
-		if (gameScenes[i].sceneID == sceneID)
-		{
-			return gameScenes[i];
-		}
-	}
-	// Always returns the first object in the array if none is found. 
-	return gameScenes[0];
-}
-
-void Game::deleteGameScene(Scene::ID sceneID)
-{
-	int toRemove = -1;
-	int size = gameScenes.size();
-
-	for (int i = 0; i < gameScenes.size(); i++)
-	{
-		if (gameScenes[i].sceneID == sceneID)
-		{
-			toRemove = i;
-			break;
-		}
-	}
-	//manually remove data inside the classes as well... 
-	if (toRemove != -1)
-	{
-		gameScenes[toRemove].clearGameObjects();
-		gameScenes.erase(gameScenes.begin() + toRemove);
-		//gameScenes.resize(size - 1);
-		//gameScenes.shrink_to_fit();
-	}
-	//vector<GameScene>().swap(gameScenes);
-}
 
 void Game::printCurrentState(Gamestate::ID stateOfGame)
 {
@@ -241,26 +169,15 @@ void Game::runState()
 	*/
 	if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
-		gameScenes[0].update(deltaTime);
+		gameScene.update(deltaTime);
 		renderManager[0].setDeltaTime(deltaTime);
 		renderManager[0].setSeconds(seconds);
 		renderManager[0].Render(ssao);
-
-		//printCurrentState(stateOfGame);
-		//deleteGameScene(Scene::ID::MENU);
-		//stateOfGame = Gamestate::ID::RUN_LEVEL;
-		//printCurrentState(stateOfGame);
-
-		//if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-		//{
-		//	deleteGameScene(Scene::ID::MENU);
-		//	stateOfGame = Gamestate::ID::RUN_LEVEL;
-		//	printCurrentState(stateOfGame);
-		//}
 	}
 	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
-		gameScenes[1].update(deltaTime);
+		//gameScenes[1].update(deltaTime);
+		gameScene.update(deltaTime);
 		renderManager[1].setDeltaTime(deltaTime);
 		renderManager[1].setSeconds(seconds);
 		renderManager[1].Render(ssao);
@@ -302,8 +219,6 @@ void Game::initWindow()
 
 void Game::initScene(GameScene & scene)
 {
-	/**/
-
 	addRenderManager(scene);
 	//... Create Camera and add empty game object
 	addCharacterMovement(scene);
@@ -311,12 +226,9 @@ void Game::initScene(GameScene & scene)
 	addLights(scene);
 	//... Read OBJ and MTL File
 	readMeshName(scene);
-	//... Set Game Objects, this should be automated by a function when reading from level file
-	setGameObjects(scene);
 	//...
 	addMeshFilter(scene);
 
-	/*Delete the vectors used*/
 }
 
 void Game::initShaderProgramLib()
@@ -371,19 +283,12 @@ void Game::addMeshName()
 	meshName.push_back(tempMeshName);
 }
 
-void Game::addGameScene(Scene::ID sceneID)
-{
-	GameScene tempGameScene = GameScene(sceneID);
-	gameScenes.push_back(tempGameScene);
-}
 
 void Game::addLights(GameScene &scene)
 {
-	int numberOfLights = 2;
-	for (int i = 0; i < numberOfLights; i++)
-	{
-		scene.addLight();
-	}
+	// add for loop and use array for transforms;
+	scene.addLight(glm::vec3(7, 9, -4), 0);
+	scene.addLight(glm::vec3(4, 0.4, -2), 1);
 }
 
 void Game::addRenderManager(GameScene &scene)
@@ -399,17 +304,19 @@ void Game::addCharacterMovement(GameScene &scene)
 
 void Game::addMeshFilter(GameScene &scene)
 {
-	for (int i = 0; i < meshName.size(); i++)
-	{
-		MeshFilter meshFilterTemp = MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).gElementBuffer, meshLibrary.getMesh(i).vertexCount);
-		meshFilter.push_back(meshFilterTemp);
-	}
-	for (int i = 0; i < meshName.size(); i++)
-	{
-		scene.gameObjects[i + 3].name = meshName[i];
-		scene.gameObjects[i + 3].addComponent(&meshFilter[i]);
-		scene.gameObjects[i + 3].addComponent(materialLibrary.getMaterial(i));
-	}
+	scene.addMeshFilter(meshLibrary, materialLibrary);
+	//move this function to gamescene and use addcomponent
+	//for (int i = 0; i < meshName.size(); i++)
+	//{
+	//	MeshFilter meshFilterTemp = MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).gElementBuffer, meshLibrary.getMesh(i).vertexCount);
+	//	meshFilter.push_back(meshFilterTemp);
+	//}
+	//for (int i = 0; i < meshName.size(); i++)
+	//{
+	//	scene.gameObjects[i + 3].name = meshName[i];
+	//	scene.gameObjects[i + 3].addComponent(&meshFilter[i]);
+	//	scene.gameObjects[i + 3].addComponent(materialLibrary.getMaterial(i));
+	//}
 }
 
 void Game::readMeshName(GameScene &scene)
@@ -600,22 +507,7 @@ void Game::readMeshName(GameScene &scene)
 	}
 }
 
-void Game::setGameObjects(GameScene &scene)
-{
-	// This function should be automated and get data from the level file
-	scene.gameObjects[0].name = "Camera";
-	scene.gameObjects[0].addComponent(&scene.moveScript[0]);
 
-	scene.gameObjects[1].name = "Light 1";
-	scene.gameObjects[1].addComponent(&scene.lights[0]);
-	scene.gameObjects[1].transform = glm::vec3(7, 9, -4);
-	scene.gameObjects[1].lightComponent->lightType = 0;
-
-	scene.gameObjects[2].name = "Light 2";
-	scene.gameObjects[2].addComponent(&scene.lights[1]);
-	scene.gameObjects[2].transform = glm::vec3(4, 0.4, -2);
-	scene.gameObjects[2].lightComponent->lightType = 1;
-}
 
 
 

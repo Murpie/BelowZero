@@ -38,7 +38,7 @@ public:
     void updateMaterialAndMeshFilterPointers();
     void updateHasLight();
 	void addComponent(Component* otherComponent);
-	//void addComponent(Component* otherComponent);
+	//void addComponent(Component* otherComponent); // Maybe use this one when everthing works as intended
 	void deleteComponent(Component* otherComponent);
 	void deleteAllComponents();
 
