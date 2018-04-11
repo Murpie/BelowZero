@@ -41,23 +41,22 @@ vec3 gridSamplingDisk[20] = vec3[]
 // ----------========== DIRECTIONAL LIGHT SHADOW CALCULATION ==========----------
 float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 {
-	vec3 lightDirForShadow = normalize(vec3(lightPos) - FragPos);
-	vec4 shadowCoordinates = LightSpaceMatrix * vec4(FragPos, 1.0);
+	
+	//vec4 pos = FragPos1 + (Normal1 * 0.4f);
+	vec3 lightDirForShadow = normalize(lightPos - FragPos);
+	//vec4 shadowCoordinates = LightSpaceMatrix * vec4(FragPos, 1.0);
+	vec4 shadowCoordinates = LightSpaceMatrix * ((vec4(FragPos, 1.0) + (vec4(Normal, 1.0) * 0.01))); // Normal Bias Offset
 	vec3 projectionCoordinates = shadowCoordinates.xyz / shadowCoordinates.w;
 	projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
 
 	float closestDepth = texture(depthMap, projectionCoordinates.xy).r;
-	float bias = max(0.00005 * (1.0 - dot(Normal, lightDirForShadow)), 0.005);
+	
+	//float bias = max(0.00005 * (1.0 - dot(Normal, lightDirForShadow)), 0.005);
+	float bias = max(0.0005 * (1.0 - dot(Normal, lightDirForShadow)), 0.005);
+	//float bias = 0.05;
+
 	float directionalLightshadowFactor = 0.0f;
-
-	//Test
-	/*vec3 pos = FragPos + (Normal * 0.4f);
-	vec2 pos2 = (0.5f * pos.xy) / (pos.w + vec2(0.5f, 0.5f));
-	pos2.y = 1.0f - pos2.y;
-	float b = 1.0f - texture(pos2, (1.0f - (pos.z / pos.w)) + 0.005f);*/
-	//Test
-
-
+	
 	vec2 texelSize = 1.0 / textureSize(depthMap, 0);
 	for (int x = -1; x <= 1; ++x)
 	{
