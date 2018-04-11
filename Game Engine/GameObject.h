@@ -26,12 +26,24 @@ public:
 	std::string name;
 	Transform transform;
 	std::vector<Component*> components;
-    Material *materialComponent;
-    MeshFilter *meshFilterComponent;
-	Light *lightComponent;
 
 	/*
-		Naterial, MeshFilter and Light are components. 
+		rework functions so we can put Material, MeshFilter and Light
+		directly into the component vector.
+
+		We need to this to be able to effectivly delete the components
+		in the components vector. This will be used every time we change scene
+		so we don't have to store the data in memory all the time. 
+
+		We will refill the component vector when we load a scene. 
+	*/
+
+    Material *materialComponent; // we want this one in components
+    MeshFilter *meshFilterComponent; // we want this one in components
+	Light *lightComponent; // we want this one in components
+
+	/*
+		Material, MeshFilter and Light are components. 
 		Why are they not stored in componets?
 	*/
 

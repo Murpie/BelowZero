@@ -15,8 +15,6 @@ public:
 	GameScene();
 	~GameScene();
 
-	// change these to pointers and delete them when we want to create a new scene. 
-	// ... or just use the add component function?
 	std::vector<GameObject> gameObjects; 
 
 	void addEmptyGameObject();

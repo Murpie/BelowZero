@@ -35,7 +35,8 @@ void RenderManager::FindObjectsToRender() {
 			gameObjectsToRender.push_back(&gameScene->gameObjects[i]);
 		}
 		if (gameScene->gameObjects[i].hasLight == true) {
-			lightsToRender.push_back(gameScene->gameObjects[i].lightComponent);
+			//lightsToRender.push_back(gameScene->gameObjects[i].lightComponent);
+			//rework this
 		}
 	}
 }

@@ -20,11 +20,11 @@ void GameScene::clearGameObjects()
 {
 	while(!gameObjects.empty())
 	{
-		//for (unsigned int i = 0; i < gameObjects.size(); i++)
-		//{
-		//	for(int j = 0; i < gameObjects[i].components.size(); i++)
-		//		gameObjects[i].deleteComponent(gameObjects[i].components[j]);
-		//}
+		for (unsigned int i = 0; i < gameObjects.size(); i++)
+		{
+			for(int j = 0; i < gameObjects[i].components.size(); i++)
+				gameObjects[i].deleteComponent(gameObjects[i].components[j]);
+		}
 		gameObjects.pop_back();
 	}
 }
@@ -33,11 +33,12 @@ void GameScene::addLight(glm::vec3 transform, int lightType)
 {
 	lightsInScene++;
 	Light* light = new Light();
+	light->lightType = lightType;
 	addEmptyGameObject();
 	gameObjects[gameObjects.size() - 1].addComponent(light);
 	gameObjects[gameObjects.size() - 1].name = "Light " + lightsInScene;
 	gameObjects[gameObjects.size() - 1].transform = transform;
-	gameObjects[gameObjects.size() - 1].lightComponent->lightType = lightType; //? Not sure what this does
+	//gameObjects[gameObjects.size() - 1].lightComponent->lightType = lightType; //? Not sure what this does
 }
 
 void GameScene::addCharacterMovement(GLFWwindow * window)

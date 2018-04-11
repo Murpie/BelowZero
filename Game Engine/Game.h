@@ -54,22 +54,26 @@ private:
 	vector<RenderManager> renderManager; // use 1 render manager? delete and init new one
 	vector<string> meshName; // Filepaths for the importer?
 
-	Gamestate::ID stateOfGame; // EnumID.h
+	Gamestate::ID stateOfGame; // EnumID.h, makes this one global?
 
 	void printCurrentState(Gamestate::ID stateOfGame);
+
+	// state functions
 	void runState();
+	void menuState();
+	void levelState();
 
 	char windowName[20];
 
 	void initWindow();
 	void initScene(GameScene &scene);
+	void clearScene(GameScene &scene);
 	void initShaderProgramLib();
 	void initInputOptions();
 
 	void useShaderProgram();
 
 	void addMeshName();
-
 	//...
 	void addLights(GameScene &scene);
 	void addRenderManager(GameScene &scene);

@@ -45,7 +45,12 @@ void GameObject::updateMaterialAndMeshFilterPointers() {
     for (int i = 0; i < components.size(); i++) {
         MeshFilter* temp = getComponent<MeshFilter>();
         if (temp != nullptr) {
-            meshFilterComponent = temp;
+            //rework this, we want our meshFilter inside components
+			/*
+				Save the ID of the meshFIlter when Creating it our think of
+				a better solution. 
+			*/
+			meshFilterComponent = temp;
             meshTest = true;
 
         }
@@ -68,6 +73,7 @@ void GameObject::updateHasLight() {
             foundLight = true;
 
 			lightComponent = temp;
+			//rework this if needed
 
         }
     }

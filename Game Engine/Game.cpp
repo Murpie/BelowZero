@@ -165,7 +165,6 @@ void Game::run()
 	glfwTerminate();
 }
 
-
 void Game::printCurrentState(Gamestate::ID stateOfGame)
 {
 	std::cout << "CURRENT_GAMESTATE:: " << stateOfGame << std::endl;
@@ -173,31 +172,62 @@ void Game::printCurrentState(Gamestate::ID stateOfGame)
 
 void Game::runState()
 {
-	//Add a main state and seperate the function in substates or keep it as it is?
-	/*
-		main-state:		sub-states :
-		MENU_STATE	->	CLEAR, LOAD, RUN 
-		LEVEL_STATE ->	CLEAR, LOAD, RUN
-	*/
-	if (stateOfGame == Gamestate::ID::SHOW_MENU)
+	//... Menu
+	if (stateOfGame == Gamestate::ID::LOAD_MENU || stateOfGame == Gamestate::ID::SHOW_MENU || stateOfGame == Gamestate::ID::CLEAR_MENU )
+	{
+		menuState();
+	}
+	//... Level
+	else if(stateOfGame == Gamestate::ID::LOAD_LEVEL || stateOfGame == Gamestate::ID::RUN_LEVEL || stateOfGame == Gamestate::ID::CLEAR_LEVEL)
+	{
+		levelState();
+	}
+	//... 
+	else 
+	{
+		return;
+	}
+}
+
+void Game::menuState()
+{
+	if (stateOfGame == Gamestate::ID::LOAD_MENU)
+	{
+		//initScene(menuScene);
+		stateOfGame = Gamestate::ID::SHOW_MENU;
+	}
+	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
 		menuScene.update(deltaTime);
-		//processInput(window, deltaTime);
 		renderManager[0].setDeltaTime(deltaTime);
 		renderManager[0].setSeconds(seconds);
 		renderManager[0].Render(ssao);
 	}
+	else if (stateOfGame == Gamestate::ID::CLEAR_MENU)
+	{
+		clearScene(menuScene);
+		stateOfGame = Gamestate::ID::LOAD_LEVEL;
+	}
+}
+
+void Game::levelState()
+{
+	if (stateOfGame == Gamestate::ID::LOAD_LEVEL)
+	{
+		//initScene(gameScene);
+		stateOfGame = Gamestate::ID::RUN_LEVEL;
+	}
 	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
-		//gameScenes[1].update(deltaTime);
 		gameScene.update(deltaTime);
-		//processInput(window, deltaTime);
 		renderManager[1].setDeltaTime(deltaTime);
 		renderManager[1].setSeconds(seconds);
 		renderManager[1].Render(ssao);
 	}
-	else {
-		return;
+	else if (stateOfGame == Gamestate::ID::CLEAR_LEVEL)
+	{
+		clearScene(gameScene);
+		stateOfGame = Gamestate::ID::LOAD_MENU;
 	}
 }
 
@@ -236,6 +266,13 @@ void Game::initScene(GameScene & scene)
 	//...
 	/*Add meshes to mesh filter with level file ?*/
 	addMeshFilter(scene);
+}
+
+void Game::clearScene(GameScene & scene)
+{
+	//scene.clearGameObjects();
+
+	/* Add function to also clear the renderManager*/
 }
 
 void Game::initShaderProgramLib()
