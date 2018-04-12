@@ -20,6 +20,10 @@ void Material::update(float deltaTime)
 {
 }
 
+void Material::processEvents(GLFWwindow * window, float deltaTime)
+{
+}
+
 void Material::bindTextures()
 {
 

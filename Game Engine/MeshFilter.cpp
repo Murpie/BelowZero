@@ -23,6 +23,11 @@ void MeshFilter::update(float deltaTime)
 {
 }
 
+void MeshFilter::processEvents(GLFWwindow * window, float deltaTime)
+{
+
+}
+
 void MeshFilter::bindVertexArray()
 {
 	glBindVertexArray(gVertexAttribute);

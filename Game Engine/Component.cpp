@@ -1,9 +1,7 @@
 #include "Component.h"
-#include "GameObject.h"
 
 Component::Component()
 {
-
 }
 
 Component::~Component()
@@ -26,8 +24,4 @@ void Component::setInformation(float time)
 
 }
 
-void Component::update(float deltaTime)
-{
-
-}
 

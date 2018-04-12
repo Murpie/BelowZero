@@ -21,10 +21,11 @@ public:
 	void clearGameObjects(); // delete all pointers in each gameobject and reload on scene swap
 
 	void addLight(glm::vec3 transform, int lightType);
-	void addCharacterMovement(GLFWwindow* window); //player
+	void addCharacterMovement(); //player
 	void addMeshFilter(MeshLib& meshLibrary, MaterialLib& matertialLibrary, int meshNameSize);
 
 	void update(float deltaTime);
+	void processEvents(GLFWwindow *window, float deltaTime);
 
 private:
 

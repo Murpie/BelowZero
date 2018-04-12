@@ -2,11 +2,15 @@
 
 GameObject::GameObject()
 {
+	transform = new Transform();
 	name = "EmptyGameObject";
-	transform=Transform();
     isActive = true;
     isRenderable = false;
     hasLight = false;
+
+	//transform.forward = glm::vec3(1, 0, 0);
+	//transform.up = glm::vec3(0, 1, 0);
+	//transform.right = glm::vec3(0, 0, 1);
 }
 
 GameObject::~GameObject()
@@ -26,6 +30,16 @@ void GameObject::update(float deltaTime)
 	{
 		Component& component = *components_ptr;
 		component.update(deltaTime);
+	}
+}
+
+void GameObject::processEvents(GLFWwindow * window, float deltaTime)
+{
+	for (int i = 0; i < components.size(); i++)
+	{
+		// store a reference for the correct type
+		auto& component = components[i];
+		component->processEvents(window, deltaTime);
 	}
 }
 
@@ -97,7 +111,7 @@ void GameObject::addComponent(Component* otherComponent)
 	}
 	//add if not
 	if (index == -1) {
-        otherComponent->gameObject = this;
+        //otherComponent->gameObject = this;
 		components.push_back(otherComponent);
 	}
     updateMaterialAndMeshFilterPointers();

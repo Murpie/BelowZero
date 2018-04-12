@@ -32,20 +32,22 @@ void GameScene::clearGameObjects()
 void GameScene::addLight(glm::vec3 transform, int lightType)
 {
 	lightsInScene++;
-	Light* light = new Light();
+	addEmptyGameObject();
+	Light* light = new Light(*gameObjects[gameObjects.size() - 1].transform);
 	light->lightType = lightType;
 	addEmptyGameObject();
 	gameObjects[gameObjects.size() - 1].addComponent(light);
 	gameObjects[gameObjects.size() - 1].name = "Light " + lightsInScene;
-	gameObjects[gameObjects.size() - 1].transform = transform;
+	gameObjects[gameObjects.size() - 1].transform->position = transform;
 	//gameObjects[gameObjects.size() - 1].lightComponent->lightType = lightType; //? Not sure what this does
 }
 
-void GameScene::addCharacterMovement(GLFWwindow * window)
+void GameScene::addCharacterMovement()
 {
 	camerasInScene++;
-	CharacterMovement* moveScript = new CharacterMovement(window);
 	addEmptyGameObject();
+	std::cout << "PLAYER INDEX:: " << gameObjects.size() - 1 << std::endl;
+	CharacterMovement* moveScript = new CharacterMovement(*gameObjects[gameObjects.size()-1].transform);
 	gameObjects[gameObjects.size()-1].name = "Camera " + camerasInScene;
 	gameObjects[gameObjects.size()-1].addComponent(moveScript);
 }
@@ -69,4 +71,12 @@ void GameScene::update(float deltaTime)
 		gameObjects[i].update(deltaTime);
 	}
 
+}
+
+void GameScene::processEvents(GLFWwindow * window, float deltaTime)
+{
+	for (int i = 0; i < gameObjects.size(); i++)
+	{
+		gameObjects[i].processEvents(window, deltaTime);
+	}
 }

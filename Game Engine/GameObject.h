@@ -2,7 +2,6 @@
 #include <vector>
 #include "Component.h"
 #include <string>
-#include "Transform.h"
 #include "MeshFilter.h"
 #include "Material.h"
 #include "Light.h"
@@ -20,11 +19,12 @@ public:
 	~GameObject();
 
 	void update(float deltaTime);
+	void processEvents(GLFWwindow *window, float deltaTime);
 
     bool isActive;
     bool hasLight;
 	std::string name;
-	Transform transform;
+	Transform *transform;
 	std::vector<Component*> components;
 
 	/*

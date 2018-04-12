@@ -84,9 +84,6 @@
     <ClCompile Include="MeshFilter.cpp">
       <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Source Files\GameObject &amp; Components</Filter>
-    </ClCompile>
     <ClCompile Include="MaterialLib.cpp">
       <Filter>Source Files\Engine Core</Filter>
     </ClCompile>
@@ -174,7 +171,7 @@
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="deleteThis.cpp">
+    <ClCompile Include="Transformable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -225,9 +222,6 @@
       <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
     <ClInclude Include="MeshFilter.h">
-      <Filter>Header Files\GameObject &amp; Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
@@ -309,6 +303,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EnumID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Transformable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

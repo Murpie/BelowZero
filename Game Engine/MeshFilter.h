@@ -15,6 +15,8 @@ public:
 	int vertexCount;
 
 	void update(float deltaTime);
+	void processEvents(GLFWwindow *window, float deltaTime);
+
 	void bindVertexArray();
 private:
 

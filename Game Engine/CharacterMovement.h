@@ -1,27 +1,27 @@
 #pragma once
 #include <GL/gl3w.h>  
-#include"Component.h"
+//#include"Component.h"
+#include "Transformable.h"
 #include "Physics.h"
 #include<iostream>
 #include <Windows.h>
-#include "glfw/include/GLFW/glfw3.h"
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtc/type_ptr.hpp"
 #include "glm/glm/glm.hpp"
 
-class CharacterMovement :public Component
+class CharacterMovement : public Transformable
 {
 public:
-	CharacterMovement();
-	CharacterMovement(GLFWwindow* window);
+	CharacterMovement(Transform& transform);
 	~CharacterMovement();
 
 	void getInformation(float time);
 
 	Physics physics;
-	GLFWwindow* window;
 
 	void update(float deltaTime);
+	void processEvents(GLFWwindow *window, float deltaTime);
+
 private:
 	bool frontCollision = false;
 	bool bottomCollision = false;

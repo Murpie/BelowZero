@@ -17,7 +17,7 @@ public:
 		float xPos = x;
 		float yPos = y;
 
-		//? Transform our mouse position into normalized device coordinates
+		//? Transform our x and y position into normalized device coordinates
 		xPos = (2.f * xPos) / sceenWidth - 1.f;
 		yPos = 1.f - (2.f * yPos) / screenHeight; // Reverse the direction of Y
 		glm::vec2 normalizedCoords(xPos, yPos);
@@ -32,7 +32,6 @@ public:
 		eyeCoords = glm::vec4(eyeCoords.x, eyeCoords.y, -1.f, 0.f);
 		
 		//? Transform to world space
-		//glm::vec3 worldRay = toWorldCoords(eyeCoords);
 		glm::vec4 rayWorld = (glm::inverse(viewMatrix) * eyeCoords);
 		glm::vec3 mouseRay = glm::vec3(rayWorld.x, rayWorld.y, rayWorld.z);
 		mouseRay = glm::normalize(mouseRay);

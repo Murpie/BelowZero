@@ -69,27 +69,26 @@ void Game::processInput(GLFWwindow *window, float deltaTime) //GameScene& scene
 
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
-		stateOfGame = Gamestate::ID::RUN_LEVEL;
-		printCurrentState(stateOfGame);
+		gameScene.processEvents(window, deltaTime);
+
+		if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+		{
+			stateOfGame = Gamestate::ID::SHOW_MENU;
+			printCurrentState(stateOfGame);
+		}
 	}
-	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
-		stateOfGame = Gamestate::ID::SHOW_MENU;
-		printCurrentState(stateOfGame);
+		menuScene.processEvents(window, deltaTime);
+
+		if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+		{
+			stateOfGame = Gamestate::ID::RUN_LEVEL;
+			printCurrentState(stateOfGame);
+		}
 	}
-	// Add this inside the player class, processEvents() function for movement etc. 
-	/*
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-	{}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-	{}
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-	{}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-	{}
-	*/
 }
 
 Game::Game() :
@@ -338,7 +337,7 @@ void Game::addLights(GameScene &scene)
 	}
 	else
 	{
-		scene.gameObjects[0].transform = glm::vec3(4, 0.4, -2);
+		scene.gameObjects[0].transform->position = glm::vec3(4, 0.4, -2);
 	}	
 }
 
@@ -350,7 +349,7 @@ void Game::addRenderManager(GameScene &scene)
 
 void Game::addCharacterMovement(GameScene &scene)
 {
-	scene.addCharacterMovement(window);
+	scene.addCharacterMovement();
 }
 
 void Game::addMeshFilter(GameScene &scene)

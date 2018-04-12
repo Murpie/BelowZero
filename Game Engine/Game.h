@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <GL/gl3w.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
 #include "glfw\include\GLFW\glfw3.h"
 #include <stdio.h>
@@ -11,7 +12,7 @@
 #include "ShaderProgramLib.h"
 #include "GameScene.h"
 #include "RenderManager.h"
-#include "Transform.h"
+//#include "Transform.h"
 #include "MeshFilter.h"
 //#include "CharacterMovement.h"
 #include <string>
@@ -42,7 +43,7 @@ public:
 private:
 	GLFWwindow * window;
 
-	GameScene gameScene; // Keep scene object and only clear the data inside!
+	GameScene gameScene; // Keep scene object and only clear the data inside the game objects?
 	GameScene menuScene;
 
 	ShaderProgramLib shaderProgramLibrary;
