@@ -38,7 +38,7 @@ public:
 	GameScene *gameScene;
 	Player player;
 	void FindObjectsToRender();
-	void Render(int ssaoOnorOFF);
+	void Render();
 	void createBuffers();
 	void renderQuad();
 	void renderSkyQuad();
@@ -131,13 +131,10 @@ private:
 	GLuint geometryShaderProgram;
 	GLuint cubeMapShaderProgram;
 	GLuint lightpassShaderProgram;
-	GLuint ssaoShaderProgram;
-	GLuint ssaoBlurShaderProgram;
-	GLuint gaussianBlurShaderProgram;
 	GLuint skyboxShaderProgram;
-	GLuint fxaaShaderProgram;
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
+
 	int display_w, display_h;
 	unsigned int cubeMapSize = 64;
 

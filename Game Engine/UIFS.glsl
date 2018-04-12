@@ -14,24 +14,35 @@ uniform float food;
 
 void main()
 {
-
-	if (texture(theTexture, texCoords).w < 0.01 || texture(equipedTexture, texCoords).w < 0.01)
+	if (texture(equipedTexture, texCoords).w >= 0.01)
+	{
+		color.xyz = texture(SceneTexture, texCoords).xyz * abs(texture(equipedTexture, texCoords).w - 1);
+		color.w = texture(SceneTexture, texCoords).w;
+	}
+	else if (texture(theTexture, texCoords).w >= 0.01)
+	{
+		color.xyz = texture(SceneTexture, texCoords).xyz * abs(texture(theTexture, texCoords).w - 1);
+		color.w = texture(SceneTexture, texCoords).w;
+	}
+	else
 	{
 		color = texture(SceneTexture, texCoords);
 	}
 
-	if ( texCoords.x > 0.04 && texCoords.x < 0.04 + (0.16 * (hp / 100.0)) && texCoords.y > 0.028 && texCoords.y < 0.039)
+
+
+	if ( texCoords.x > 0.0439 && texCoords.x < 0.04 + (0.1585 * (hp / 100.0)) && texCoords.y > 0.028 && texCoords.y < 0.039)
     		color = vec4(0.0, 1.0, 0.0, 1.0);
-	else if ( texCoords.x > 0.04 && texCoords.x < 0.04 + (0.16 * (food / 100.0)) && texCoords.y > 0.072 && texCoords.y < 0.088)
+	else if ( texCoords.x > 0.0433 && texCoords.x < 0.04 + (0.1585 * (food / 100.0)) && texCoords.y > 0.074 && texCoords.y < 0.085)
     		color = vec4(1.0, 0.0, 0.0, 1.0);
-	else if ( texCoords.x > 0.04 && texCoords.x < 0.04 + (0.16 * (water / 100.0)) && texCoords.y > 0.12 && texCoords.y < 0.132)
+	else if ( texCoords.x > 0.0433 && texCoords.x < 0.04 + (0.1585 * (water / 100.0)) && texCoords.y > 0.12 && texCoords.y < 0.132)
     		color = vec4(0.0, 0.0, 1.0, 1.0);
-	else if ( texCoords.x > 0.04 && texCoords.x < 0.04 + (0.16 * (cold / 100.0)) && texCoords.y > 0.161 && texCoords.y < 0.178)
+	else if ( texCoords.x > 0.0433 && texCoords.x < 0.04 + (0.1585 * (cold / 100.0)) && texCoords.y > 0.167 && texCoords.y < 0.178)
     		color = vec4(0.0, (cold / 100), 0.0, 1.0);
 
 	if (texture(theTexture, texCoords).w >= 0.01)
-		color = texture(theTexture, texCoords);
+		color.xyz += texture(theTexture, texCoords).xyz;
 	
 	if (texture(equipedTexture, texCoords).w >= 0.01)
-		color = texture(equipedTexture, texCoords);
+		color.xyz += texture(equipedTexture, texCoords).xyz;
 }
