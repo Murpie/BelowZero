@@ -1,5 +1,6 @@
 #pragma once
 
+// random comment
 
 #include <GL/gl3w.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
 #include "glfw\include\GLFW\glfw3.h"
