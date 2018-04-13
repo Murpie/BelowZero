@@ -13,9 +13,10 @@ Player::Player()
 	this->waterTick = 20;
 	this->foodTick = 20;
 	this->damage = 0;
+	this->initializer = 0;
+	this->inventoryCount = 0;
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
-	this->inventoryCount = 0;
 }
 
 Player::~Player()
@@ -90,6 +91,43 @@ void Player::setFood(float value)
 		this->food = 100;
 }
 
+void Player::initiateInventoryTextures(std::string item)
+{
+	std::string texturePNG = "Texture.png";
+	std::string filePath = item + texturePNG;
+	int width, height, nrOfChannels;
+
+	// ----------========== Equipment FrameBuffer ==========----------
+	unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
+
+	glGenFramebuffers(1, &inventoryFBO[inventoryCount]);
+	glBindFramebuffer(GL_FRAMEBUFFER, inventoryFBO[inventoryCount]);
+
+	glGenTextures(1, &inventoryTexture[inventoryCount]);
+	glBindTexture(GL_TEXTURE_2D, inventoryTexture[inventoryCount]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+	else
+	{
+		std::cout << "Failed to load Inventory Texture from path" << std::endl;
+	}
+
+	stbi_image_free(data);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, inventoryTexture[inventoryCount], 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Inventory Framebuffer not complete!" << std::endl;
+	inventoryCount++;
+	if (inventoryCount == 5)
+		inventoryCount = 0;
+}
+
 void Player::addToInventory(int item)
 {
 	this->inventory[this->inventoryCount] = item;
@@ -107,28 +145,62 @@ void Player::equip(std::string item)
 	// ----------========== Equipment FrameBuffer ==========----------
 	unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
 
-	glGenFramebuffers(1, &equipedFBO);
+	if (this->initializer == 0)
+		glGenFramebuffers(1, &equipedFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, equipedFBO);
-
-	glGenTextures(1, &equipedTexture);
+	
+	if (this->initializer == 0)
+	{
+		glGenTextures(1, &equipedTexture);
+		this->initializer = 1;
+	}
 	glBindTexture(GL_TEXTURE_2D, equipedTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	if (data)
-	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
 	else
-	{
 		std::cout << "Failed to load Equiped Texture from path" << std::endl;
-	}
 
 	stbi_image_free(data);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, equipedTexture, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Equiped Framebuffer not complete!" << std::endl;
+
+}
+
+void Player::addImageToInventory(std::string item, int inventorySlot)
+{
+		std::string texturePNG = "Texture.png";
+		std::string filePath = item + texturePNG;
+		int width, height, nrOfChannels;
+
+		// ----------========== Equipment FrameBuffer ==========----------
+		unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, inventoryFBO[inventorySlot]);
+
+		glBindTexture(GL_TEXTURE_2D, inventoryTexture[inventorySlot]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		}
+		else
+		{
+			std::cout << "Failed to load Inventory Texture from path" << std::endl;
+		}
+
+		stbi_image_free(data);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, inventoryTexture[inventorySlot], 0);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			std::cout << "Inventory Framebuffer not complete!" << std::endl;
+
 }

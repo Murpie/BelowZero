@@ -9,7 +9,10 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 {
 	gameScene = otherGameScene;
 	window = otherWindow;
-	player.equip("Axe");
+	player.equip("EmptyImage");
+	for(int i= 0; i < 5; i++)
+		player.initiateInventoryTextures("EmptyImage");
+
 	this->geometryShaderProgram = shaderProgram->getShader<GeometryShaders>()->geometryShaderProgram;
 	this->cubeMapShaderProgram = shaderProgram->getShader<CubeMapShaders>()->cubeMapShaderProgram;
 	this->lightpassShaderProgram = shaderProgram->getShader<LightpassShaders>()->lightpassShaderProgram;
@@ -244,10 +247,32 @@ void RenderManager::Render() {
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		player.setFood(10);
 
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+	{
+		player.equip("EmptyImage");
+		for(int i = 0; i < 5; i++)
+			player.addImageToInventory("EmptyImage", i);
+	}
+		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	{
 		player.equip("Axe");
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+		player.addImageToInventory("InventoryAxe", 0);
+	}
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	{
 		player.equip("Wood");
+		player.addImageToInventory("InventoryLog", 2);
+	}
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	{
+		player.equip("Food");
+		player.addImageToInventory("InventoryFood", 3);
+	}
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+	{
+		player.equip("Bucket");
+		player.addImageToInventory("InventoryBucket", 4);
+	}
 
 
 	//... Set view and projection matrix
@@ -473,8 +498,25 @@ void RenderManager::Render() {
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "equipedTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, player.equipedTexture);
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 2);
+
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture1"), 2);
 	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[0]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture2"), 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[1]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture3"), 4);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[2]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture4"), 5);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[3]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[4]);
+	
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 7);
+	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), player.hp);
