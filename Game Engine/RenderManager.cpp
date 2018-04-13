@@ -255,13 +255,18 @@ void RenderManager::Render() {
 	}
 		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 	{
-		player.equip("Axe");
+		player.equip("AxeIcon");
 		player.addImageToInventory("InventoryAxe", 0);
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	{
+		player.equip("LighterIcon");
+		player.addImageToInventory("InventoryLighterIcon", 1);
 	}
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 	{
-		player.equip("Wood");
-		player.addImageToInventory("InventoryLog", 2);
+		player.equip("WoodIcon");
+		player.addImageToInventory("InventoryWoodIcon", 2);
 	}
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 	{
