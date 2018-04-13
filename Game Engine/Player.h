@@ -22,6 +22,9 @@ public:
 	float waterTick;
 	float foodTick;
 	float damage;
+	float fade;
+
+	bool startGame;
 
 	int inventory[5];
 	int inventoryCount;

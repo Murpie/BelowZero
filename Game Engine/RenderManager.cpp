@@ -469,6 +469,7 @@ void RenderManager::Render() {
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0].getPlayer()->cold);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0].getPlayer()->water);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0].getPlayer()->food);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0].getPlayer()->fade);
 
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
@@ -649,8 +650,6 @@ unsigned int RenderManager::loadCubemap(std::vector<std::string> faces)
 
 void RenderManager::Update()
 {
-	
-
 }
 
 void RenderManager::setDeltaTime(float deltaTime)

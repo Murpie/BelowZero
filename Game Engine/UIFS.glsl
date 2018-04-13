@@ -11,6 +11,7 @@ uniform float hp;
 uniform float cold;
 uniform float water;
 uniform float food;
+uniform float fade;
 
 void main()
 {
@@ -31,18 +32,21 @@ void main()
 
 
 
-	if ( texCoords.x > 0.0439 && texCoords.x < 0.04 + (0.1585 * (hp / 100.0)) && texCoords.y > 0.028 && texCoords.y < 0.039)
-    		color = vec4(0.0, 1.0, 0.0, 1.0);
+	if ( texCoords.x > 0.0433 && texCoords.x < 0.04 + (0.1585 * (hp / 100.0)) && texCoords.y > 0.028 && texCoords.y < 0.039)
+    		color.xyz = vec3(abs((hp / 100.0) - 1), hp / 100.0, 0.0);
 	else if ( texCoords.x > 0.0433 && texCoords.x < 0.04 + (0.1585 * (food / 100.0)) && texCoords.y > 0.074 && texCoords.y < 0.085)
-    		color = vec4(1.0, 0.0, 0.0, 1.0);
+    		color.xzy = vec3(food / 100.0, 0.0, 0.0);
 	else if ( texCoords.x > 0.0433 && texCoords.x < 0.04 + (0.1585 * (water / 100.0)) && texCoords.y > 0.12 && texCoords.y < 0.132)
-    		color = vec4(0.0, 0.0, 1.0, 1.0);
+    		color.xyz = vec3(0.0, 0.0, water / 100.0);
 	else if ( texCoords.x > 0.0433 && texCoords.x < 0.04 + (0.1585 * (cold / 100.0)) && texCoords.y > 0.167 && texCoords.y < 0.178)
-    		color = vec4(0.0, (cold / 100), 0.0, 1.0);
+    		color.xyz = vec3(cold / 100, cold / 100, cold / 100);
 
 	if (texture(theTexture, texCoords).w >= 0.01)
 		color.xyz += texture(theTexture, texCoords).xyz;
 	
 	if (texture(equipedTexture, texCoords).w >= 0.01)
 		color.xyz += texture(equipedTexture, texCoords).xyz;
+
+	if (fade < 1 && fade > 0)
+		color.xyz = color.xyz + fade;
 }
