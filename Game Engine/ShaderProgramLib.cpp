@@ -26,20 +26,6 @@ void ShaderProgramLib::addCubeMapShaders()
 	shaders.push_back(newShaderProgram);
 }
 
-void ShaderProgramLib::addSSAOShaders()
-{
-	//add your shader here
-	SSAOShaders* newShaderProgram = new SSAOShaders();
-	shaders.push_back(newShaderProgram);
-}
-
-void ShaderProgramLib::addBlurShaders()
-{
-	//add your shader here
-	SSAOBlurShaders* newShaderProgram = new SSAOBlurShaders();
-	shaders.push_back(newShaderProgram);
-}
-
 void ShaderProgramLib::addLightpassShaders()
 {
 	//add your shader here
@@ -47,24 +33,10 @@ void ShaderProgramLib::addLightpassShaders()
 	shaders.push_back(newShaderProgram);
 }
 
-void ShaderProgramLib::addGaussianBlurShaders()
-{
-	//add your shader here
-	GaussianBlurShaders* newShaderProgram = new GaussianBlurShaders();
-	shaders.push_back(newShaderProgram);
-}
-
 void ShaderProgramLib::addSkyboxShaders()
 {
 	//add your shader here
 	SkyboxShaders* newShaderProgram = new SkyboxShaders();
-	shaders.push_back(newShaderProgram);
-}
-
-void ShaderProgramLib::addFXAAShaders()
-{
-	//add your shader here
-	FXAAShaders* newShaderProgram = new FXAAShaders();
 	shaders.push_back(newShaderProgram);
 }
 
@@ -88,8 +60,8 @@ void ShaderProgramLib::addAnimationShaders()
 	shaders.push_back(newShaderProgram);
 }
 
-void ShaderProgramLib::addMainMenuShaders()
+void ShaderProgramLib::addUIShaders()
 {
-	MainMenu* newShaderProgram = new MainMenu();
+	UIShaders* newShaderProgram = new UIShaders();
 	shaders.push_back(newShaderProgram);
 }

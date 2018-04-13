@@ -3,39 +3,30 @@
 #include "Shader.h"
 #include "GeometryShaders.h"
 #include "CubeMapShaders.h"
-#include "SSAOShaders.h"
-#include "SSAOBlurShaders.h"
 #include "LightpassShaders.h"
 #include "SkyboxShaders.h"
-#include "GaussianBlurShaders.h"
-#include "FXAAShaders.h"
 #include "AnimationShaders.h"
 #include <string>
 #include "Mesh.h"
 #include "ShaderBase.h"
 #include "ShadowMapShaders.h"
 #include "PointLightShadowMapShaders.h"
-#include "MainMenuScene.h"
+#include "UIShaders.h"
 
 class ShaderProgramLib
 {
 public:
 	ShaderProgramLib();
-
 	~ShaderProgramLib();
 
 	void addGeometryPassShaders();
 	void addCubeMapShaders();
-	void addSSAOShaders();
-	void addBlurShaders();
 	void addLightpassShaders();
-	void addGaussianBlurShaders();
 	void addSkyboxShaders();
-	void addFXAAShaders();
 	void addShadowMapShaders();
 	void addPointLightShadowMapShaders();
 	void addAnimationShaders();
-	void addMainMenuShaders();
+	void addUIShaders();
 
 	template <class T>
 	T* getShader() {

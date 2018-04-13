@@ -12,8 +12,8 @@ struct Light {
     float Quadratic;
 };
 
-	vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
-	vec3 drPosition = vec3(0.0f, 200.0f, 400.0f);
+vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
+vec3 drPosition = vec3(0.0f, 200.0f, 400.0f);
 
 const int NR_LIGHTS = 32;
 uniform Light lights[NR_LIGHTS];
@@ -24,7 +24,6 @@ uniform sampler2D gAlbedo;
 uniform sampler2D gSpecular;
 uniform sampler2D gMetallic;
 uniform sampler2D gAO;
-uniform sampler2D ssao;
 uniform sampler2D depthMap;
 uniform samplerCube cubeMapdepthMap;
 uniform mat4 LightSpaceMatrix;
@@ -112,10 +111,9 @@ void main()
     vec3 Specular = texture(gSpecular, TexCoords).rgb;
 	vec3 Metallic = texture(gMetallic, TexCoords).rgb;
 	vec3 AO = texture(gAO, TexCoords).rgb;
-	float AmbientOcclusion = texture(ssao, TexCoords).r;
     
     // then calculate lighting as usual
-    vec3 lighting = vec3(0.0 * Albedo * AmbientOcclusion * AO);
+    vec3 lighting = vec3(0.0 * Albedo * AO);
     vec3 viewDir = normalize(view_position + 1 - FragPos);
 
 	float shadowFactor = 0.0f;
@@ -124,7 +122,7 @@ void main()
     {
         // diffuse
         vec3 lightDir = normalize(lights[i].Position - FragPos);
-        vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color * AmbientOcclusion;
+        vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color;
 
 		vec3 halfwayDir = normalize(lightDir + viewDir);  
         float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
@@ -140,7 +138,7 @@ void main()
 
 	//Test Directional Light
 	    vec3 lightDir = normalize(drPosition - FragPos);
-        vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * drColor * AmbientOcclusion;
+        vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * drColor;
 
 		vec3 halfwayDir = normalize(lightDir + viewDir);  
         float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
@@ -155,8 +153,8 @@ void main()
 
 
 
-	float density = 0.12;
-	float gradient = 1.5;
+	float density = 0.05;
+	float gradient = 3.0;
 	float distanceToPos = length(view_position - FragPos);
     float visibility = exp(-pow((distanceToPos * density), gradient));
 	visibility = clamp(visibility, 0.0, 1.0);

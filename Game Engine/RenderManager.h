@@ -38,9 +38,9 @@ public:
 	GameScene *gameScene;
 	Player player;
 	void FindObjectsToRender();
-	void Render(int ssaoOnorOFF);
+	void Render();
 	void createBuffers();
-	void renderQuad(int index);
+	void renderQuad();
 	void renderSkyQuad();
 	void Update();
 	void getDeltaTime(float deltaTime);
@@ -64,11 +64,8 @@ private:
 	float seconds;
 	int count;
 
-	unsigned int mainMenuFBO;
-	unsigned int mainMenuTexture;
-	unsigned int mainMenuVao;
-	unsigned int mainMenuVbo;
-	unsigned int mainMenuEbo;
+	unsigned int UIFBO;
+	unsigned int UITexture;
 	unsigned int shadowMap;
 	unsigned int shadowFBO;
 	unsigned int cubeMapShadowMap;
@@ -87,17 +84,13 @@ private:
 	unsigned int gbo;
 	unsigned int skyFBO;
 	unsigned int rboDepth;
-	unsigned int ssaoFBO;
-	unsigned int ssaoColorBuffer;
-	unsigned int ssaoBlurFBO;
-	unsigned int ssaoColorBufferBlur;
 	unsigned int finalFBO;
 	unsigned int finalColorBuffer;
 	unsigned int finalDepthStensil;
-	unsigned int fxaaFBO;
-	unsigned int fxaaColorBuffer;
 
-	unsigned int noiseTexture;
+	unsigned int equipedFBO;
+	unsigned int equipedTexture;
+
 	unsigned int cubemapTexture;
 	unsigned int gAlbedo;
 	unsigned int gNormal;
@@ -129,16 +122,13 @@ private:
 
 	GLuint shadowMapShaderProgram;
 	GLuint pointLightShaderProgram;
-	GLuint mainMenuShaderProgram;
 	GLuint geometryShaderProgram;
 	GLuint cubeMapShaderProgram;
 	GLuint lightpassShaderProgram;
-	GLuint ssaoShaderProgram;
-	GLuint ssaoBlurShaderProgram;
-	GLuint gaussianBlurShaderProgram;
 	GLuint skyboxShaderProgram;
-	GLuint fxaaShaderProgram;
 	GLuint animationShaderProgram;
+	GLuint UIShaderProgram;
+
 	int display_w, display_h;
 	unsigned int cubeMapSize = 64;
 

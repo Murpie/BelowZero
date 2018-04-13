@@ -21,10 +21,7 @@
 #include "Light.h"
 #include <ctime>
 #include "GeometryShaders.h"
-#include "SSAOShaders.h"
-#include "SSAOBlurShaders.h"
 #include "LightpassShaders.h"
-#include "FXAAShaders.h"
 #include "CubeMapShaders.h"
 
 #include <chrono>
@@ -60,13 +57,10 @@ int main(int, char**)
 		const GLFWvidmode* mode = glfwGetVideoMode(primary[0]);
 		GLFWwindow* window = glfwCreateWindow(1280, 720, "Game Engine", NULL, NULL);
 		glfwMakeContextCurrent(window);
-		glfwSwapInterval(1);
+		glfwSwapInterval(0);
 		gl3wInit();
 
 		bool fullscreen = false;
-		bool gaussianblur = false;
-		bool fxaa = false;
-		bool ssao = true;
 
 		int initial_time = time(NULL);
 		int final_time;
@@ -77,16 +71,12 @@ int main(int, char**)
 		//shader måste skapas innan mesh och material
 		shaderProgramLibrary.addGeometryPassShaders();
 		shaderProgramLibrary.addCubeMapShaders();
-		shaderProgramLibrary.addSSAOShaders();
-		shaderProgramLibrary.addBlurShaders();
 		shaderProgramLibrary.addLightpassShaders();
 		shaderProgramLibrary.addSkyboxShaders();
-		shaderProgramLibrary.addGaussianBlurShaders();
-		shaderProgramLibrary.addFXAAShaders();
 		shaderProgramLibrary.addShadowMapShaders();
 		shaderProgramLibrary.addPointLightShadowMapShaders();
 		//shaderProgramLibrary.addAnimationShaders();
-		shaderProgramLibrary.addMainMenuShaders();
+		shaderProgramLibrary.addUIShaders();
 
 		RenderManager renderManager = RenderManager(&gameScene, window, &shaderProgramLibrary);
 
@@ -305,8 +295,6 @@ int main(int, char**)
 			}
 		}
 
-
-
 		//... Set Game Objects
 		gameScene.gameObjects[0].name = "Camera";
 		gameScene.gameObjects[0].addComponent(&moveScript);
@@ -346,20 +334,13 @@ int main(int, char**)
 			gameScene.gameObjects[i + 3].addComponent(materialLibrary.getMaterial(i));
 		}
 
-		//... Uniform in int that tells gaussian to be turned off
-		glUseProgram(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram);
-		glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram, "onOrOff"), gaussianblur);
-
-		glUseProgram(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram);
-		glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram, "swap"), fxaa);
-
 		glEnable(GL_DEPTH_TEST);
 
 		glDepthFunc(GL_LESS);
 
 		//////////////
 		int gameObject_clicked = -1;                // Temporary storage of what node we have clicked to process selection at the end of the loop. May be a pointer to your own node type, etc.
-
+		/*glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);*/
 													// Main loop
 		while (!glfwWindowShouldClose(window))
 		{
@@ -389,11 +370,6 @@ int main(int, char**)
 			float seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
 			nowSeconds = startSeconds;
 
-
-			// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-			// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
-			// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
-			// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 			glfwPollEvents();
 
 			for (unsigned int b = 0; b < gameScene.gameObjects.size(); b++)
@@ -407,7 +383,7 @@ int main(int, char**)
 
 			renderManager.getDeltaTime(deltaTime);
 			renderManager.getSeconds(seconds);
-			renderManager.Render(ssao);
+			renderManager.Render();
 
 			glfwSwapBuffers(window);
 

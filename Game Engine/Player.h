@@ -1,5 +1,8 @@
 #pragma once
 #include<string>
+#include <iostream>
+#include "stb_image.h"
+#include <GL/gl3w.h>
 
 class Player
 {
@@ -19,9 +22,11 @@ public:
 	float foodTick;
 	float damage;
 
-	int equiped;
 	int inventory[5];
 	int inventoryCount;
+
+	unsigned int equipedFBO;
+	unsigned int equipedTexture;
 
 	void updateStats(float deltaTime);
 	void setCold(float value);
@@ -29,7 +34,7 @@ public:
 	void setFood(float value);
 
 	void addToInventory(int item);
-	void equip(int item);
+	void equip(std::string item);
 
 private:
 };

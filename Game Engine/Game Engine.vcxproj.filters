@@ -120,25 +120,13 @@
     <ClCompile Include="LightpassShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="SSAOBlurShaders.cpp">
-      <Filter>Source Files\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="SSAOShaders.cpp">
-      <Filter>Source Files\Shaders</Filter>
-    </ClCompile>
     <ClCompile Include="GeometryShaders.cpp">
-      <Filter>Source Files\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="GaussianBlurShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="SkyboxShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="CubeMapShaders.cpp">
-      <Filter>Source Files\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="FXAAShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="stb.cpp">
@@ -168,11 +156,11 @@
     <ClCompile Include="ShadowMapShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="MainMenuScene.cpp">
-      <Filter>Source Files\Data Types</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Source Files\GameObject &amp; Components</Filter>
+    </ClCompile>
+    <ClCompile Include="UIShaders.cpp">
+      <Filter>Source Files\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -248,25 +236,10 @@
     <ClInclude Include="LightpassShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="SSAOShaders.h">
-      <Filter>Header Files\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="SSAOBlurShaders.h">
-      <Filter>Header Files\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="GeometryShaders.h">
-      <Filter>Header Files\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="GaussianBlurShaders.h">
-      <Filter>Header Files\Shaders</Filter>
-    </ClInclude>
     <ClInclude Include="SkyboxShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="CubeMapShaders.h">
-      <Filter>Header Files\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="FXAAShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="stb_image.h">
@@ -296,11 +269,14 @@
     <ClInclude Include="ShadowMapShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="MainMenuScene.h">
-      <Filter>Header Files\Data Types</Filter>
-    </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>
+    </ClInclude>
+    <ClInclude Include="UIShaders.h">
+      <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Desktop\Game Engine - 2.0\Game Engine\GeometryShaders.h">
+      <Filter>Header Files\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -313,25 +289,7 @@
     <None Include="GeometryVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
-    <None Include="ssaoBlurFS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="ssaoBlurVS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="ssaoFS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="ssaoVS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
     <None Include="GeometryGS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="gaussianBlurFS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="gaussianBlurVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="GeometryFS.glsl">
@@ -341,12 +299,6 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="CubeMapVS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="FXAA_FS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="FXAA_VS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="SkyboxFS.glsl">
@@ -372,10 +324,10 @@
     <None Include="PointLightShadowMapVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
-    <None Include="MainMenuSceneFS.glsl">
+    <None Include="UIFS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
-    <None Include="MainMenuSceneVS.glsl">
+    <None Include="UIVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>
