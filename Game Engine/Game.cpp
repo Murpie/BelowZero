@@ -5,7 +5,6 @@ static void error_callback(int error, const char* description)
 	fprintf(stderr, "Error %d: %s\n", error, description);
 }
 
-
 void mouse_enter_callback(GLFWwindow * window, int entered)
 {
 	if (entered)
@@ -32,6 +31,19 @@ void mouse_button_callback(GLFWwindow * window, int button, int action, int mods
 
 void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) //GameScene& scene
 {
+	if (glfwGetKey(window, GLFW_KEY_F5) && !fullscreen)
+	{
+		glfwSetWindowMonitor(window, primary[0], 0, 0, 1280, 720, mode->refreshRate);
+		fullscreen = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_F5) && fullscreen)
+	{
+		glfwSetWindowMonitor(window, 0, 100, 100, 1280, 720, mode->refreshRate);
+		fullscreen = false;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
+		glfwSetWindowShouldClose(window, GL_TRUE);
 	/* 
 		In this function we want to call on the sceneObjects.
 		
@@ -89,7 +101,8 @@ Game::Game() :
 	windowName("Game Engine"),
 	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
-	gaussianblur(false), fxaa(false), ssao(true), meshesLoaded(false), testBool(false)
+	meshesLoaded(false), testBool(false), fullscreen(false),
+	count(0)
 {
 	initWindow();
 	initShaderProgramLib();
@@ -106,7 +119,8 @@ void Game::run()
 	printCurrentState(stateOfGame);
 	//Render
 	auto startSeconds = chrono::high_resolution_clock::now();
-	auto startDeltaTime = chrono::high_resolution_clock::now();
+
+	clock_t begin = clock();
 
 	int initial_time = time(NULL);
 	int final_time;
@@ -123,10 +137,13 @@ void Game::run()
 	// Main loop
 	while (!glfwWindowShouldClose(window))
 	{
-		//float deltaTime;
-		auto nowDeltaTime = chrono::high_resolution_clock::now();
-		deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count();
-		nowDeltaTime = startDeltaTime;
+		clock_t end = clock();
+		deltaTime = float(end - begin) / CLOCKS_PER_SEC;
+		begin = end;
+
+	/*	auto nowDeltaTime = chrono::high_resolution_clock::now();
+		deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count() / 1000;
+		startDeltaTime = nowDeltaTime;*/
 
 		float secondsTime;
 		auto nowSeconds = chrono::high_resolution_clock::now();
@@ -193,7 +210,7 @@ void Game::menuState()
 		processInput(window, deltaTime, menuScene);
 		renderManager[0].setDeltaTime(deltaTime);
 		renderManager[0].setSeconds(seconds);
-		renderManager[0].Render(ssao);
+		renderManager[0].Render();
 	}
 	else if (stateOfGame == Gamestate::ID::CLEAR_MENU)
 	{
@@ -215,7 +232,7 @@ void Game::levelState()
 		processInput(window, deltaTime, gameScene);
 		renderManager[1].setDeltaTime(deltaTime);
 		renderManager[1].setSeconds(seconds);
-		renderManager[1].Render(ssao);
+		renderManager[1].Render();
 	}
 	else if (stateOfGame == Gamestate::ID::CLEAR_LEVEL)
 	{
@@ -236,9 +253,11 @@ void Game::initWindow()
 #if __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+	primary = glfwGetMonitors(&count);
+	mode = glfwGetVideoMode(primary[0]);
 	window = glfwCreateWindow(1280, 720, windowName, NULL, NULL);
 	glfwMakeContextCurrent(window);
-	//glfwSwapInterval(1); // Enable vsync
+	glfwSwapInterval(0);
 	gl3wInit();
 }
 
@@ -246,7 +265,7 @@ void Game::initScene(GameScene & scene)
 {
 	addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
 	//... Create Camera
-	addCharacterMovement(scene);
+	addPlayer(scene);
 	//... Create Lights
 	addLights(scene);
 	//... Read OBJ and MTL File
@@ -272,15 +291,12 @@ void Game::initShaderProgramLib()
 {
 	shaderProgramLibrary.addGeometryPassShaders();
 	shaderProgramLibrary.addCubeMapShaders();
-	shaderProgramLibrary.addSSAOShaders();
-	shaderProgramLibrary.addBlurShaders();
 	shaderProgramLibrary.addLightpassShaders();
 	shaderProgramLibrary.addSkyboxShaders();
-	shaderProgramLibrary.addGaussianBlurShaders();
-	shaderProgramLibrary.addFXAAShaders();
 	shaderProgramLibrary.addShadowMapShaders();
 	shaderProgramLibrary.addPointLightShadowMapShaders();
 	shaderProgramLibrary.addAnimationShaders();
+	shaderProgramLibrary.addUIShaders();
 }
 
 void Game::initInputOptions()
@@ -293,12 +309,6 @@ void Game::initInputOptions()
 
 void Game::useShaderProgram()
 {
-	glUseProgram(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram);
-	glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram, "onOrOff"), gaussianblur);
-
-	glUseProgram(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram);
-	glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram, "swap"), fxaa);
-
 	glEnable(GL_DEPTH_TEST);
 
 	glDepthFunc(GL_LESS);
@@ -307,17 +317,10 @@ void Game::useShaderProgram()
 void Game::addMeshName()
 {
 	//Add file names to vector to load when reading mesh data. 
+	std::string meshLoader[] = { "Floor.obj", "Tree.obj", "Bucket.obj", "TreeWithSnow.obj", "Stump.obj", "Stone.obj" };
 
-	std::string tempMeshName;
-
-	tempMeshName = "Floor.obj";
-	meshName.push_back(tempMeshName);
-
-	tempMeshName = "House2.obj";
-	meshName.push_back(tempMeshName);
-
-	tempMeshName = "House1.obj";
-	meshName.push_back(tempMeshName);
+	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
+		meshName.push_back(meshLoader[i]);
 }
 
 void Game::addLights(GameScene &scene)
@@ -341,9 +344,9 @@ void Game::addRenderManager(GameScene &scene)
 	renderManager.push_back(tempRender);
 }
 
-void Game::addCharacterMovement(GameScene &scene)
+void Game::addPlayer(GameScene &scene)
 {
-	scene.addCharacterMovement();
+	scene.addPlayer();
 }
 
 void Game::addMeshFilter(GameScene &scene)

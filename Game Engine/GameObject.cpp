@@ -160,3 +160,17 @@ void GameObject::deleteAllComponents()
 const bool GameObject::getIsRenderable() {
     return isRenderable;
 }
+
+Player * GameObject::getPlayer()
+{
+	for (int i = 0; i < components.size(); i++)
+	{
+
+		if (components[i]->id == ComponentType::ID::PLAYER)
+		{
+			Player* player = static_cast<Player*>(components[i]);
+			return player;
+		}
+	}
+	return nullptr;
+}

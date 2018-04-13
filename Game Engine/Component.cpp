@@ -2,6 +2,7 @@
 
 Component::Component()
 {
+	this->id = ComponentType::ID::COMPONENT;
 }
 
 Component::~Component()

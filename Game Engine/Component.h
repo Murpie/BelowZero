@@ -2,7 +2,7 @@
 #include <GL/gl3w.h>  
 #include "glfw\include\GLFW\glfw3.h"
 #include<string>
-
+#include"EnumID.h"
 //class GameObject;
 
 class Component
@@ -11,8 +11,9 @@ public:
 	Component();
 	virtual ~Component();
 
-    //GameObject* gameObject;
+	ComponentType::ID id;
 
+    //GameObject* gameObject;
 	std::string assetName;
 	bool operator==(const Component &rhs);
 	virtual void setInformation(float time);

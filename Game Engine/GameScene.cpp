@@ -43,13 +43,13 @@ void GameScene::addLight(glm::vec3 transform, int lightType)
 	//gameObjects[gameObjects.size() - 1].lightComponent->lightType = lightType; 
 }
 
-void GameScene::addCharacterMovement()
+void GameScene::addPlayer()
 {
 	camerasInScene++;
 	addEmptyGameObject();
 	std::cout << "PLAYER INDEX:: " << gameObjects.size() - 1 << std::endl;
-	CharacterMovement* moveScript = new CharacterMovement(*gameObjects[gameObjects.size()-1].transform);
-	gameObjects[gameObjects.size()-1].name = "Camera " + camerasInScene;
+	Player* moveScript = new Player(*gameObjects[gameObjects.size()-1].transform);
+	gameObjects[gameObjects.size()-1].name = "Player " + camerasInScene;
 	gameObjects[gameObjects.size()-1].addComponent(moveScript);
 }
 

@@ -69,9 +69,6 @@
     <ClCompile Include="ImGui\examples\libs\gl3w\GL\gl3w.c">
       <Filter>gl3w</Filter>
     </ClCompile>
-    <ClCompile Include="CharacterMovement.cpp">
-      <Filter>Source Files\GameObject &amp; Components</Filter>
-    </ClCompile>
     <ClCompile Include="Component.cpp">
       <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
@@ -202,9 +199,6 @@
     </ClInclude>
     <ClInclude Include="ShaderBase.h">
       <Filter>Header Files\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="CharacterMovement.h">
-      <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
     <ClInclude Include="Component.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>

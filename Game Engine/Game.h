@@ -6,6 +6,7 @@
 #include "glfw\include\GLFW\glfw3.h"
 #include <stdio.h>
 #include <time.h>
+#include <ctime>
 
 /////////////
 
@@ -23,10 +24,7 @@
 //#include "Light.h"
 #include <ctime>
 #include "GeometryShaders.h"
-#include "SSAOShaders.h"
-#include "SSAOBlurShaders.h"
 #include "LightpassShaders.h"
-#include "FXAAShaders.h"
 #include "CubeMapShaders.h"
 
 #include <chrono>
@@ -43,6 +41,8 @@ public:
 
 private:
 	GLFWwindow * window;
+	GLFWmonitor** primary;
+	const GLFWvidmode* mode;
 
 	GameScene gameScene;
 	GameScene menuScene;
@@ -79,7 +79,7 @@ private:
 	//...
 	void addLights(GameScene &scene);
 	void addRenderManager(GameScene &scene);
-	void addCharacterMovement(GameScene &scene);
+	void addPlayer(GameScene &scene);
 	void addMeshFilter(GameScene &scene);
 	void readMeshName();
 	//...
@@ -88,12 +88,11 @@ private:
 	//Time Variables
 	float deltaTime;
 	float seconds;
-	//Shader bools
-	bool gaussianblur;
-	bool fxaa;
-	bool ssao;
 	//
 	bool meshesLoaded;
 	bool testBool; // used in addLights atm to see difference in scenes.
+	bool fullscreen;
+
+	int count;
 };
 

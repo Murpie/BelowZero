@@ -3,7 +3,6 @@
 
 #include "EnumID.h"
 #include "GameObject.h"
-#include "CharacterMovement.h"
 #include "MeshLib.h"
 #include "MaterialLib.h"
 
@@ -22,7 +21,7 @@ public:
 	void clearGameObjects(); // delete all pointers in each gameobject and reload on scene swap
 
 	void addLight(glm::vec3 transform, int lightType);
-	void addCharacterMovement(); //player
+	void addPlayer(); //player
 	void addMeshFilter(MeshLib& meshLibrary, MaterialLib& matertialLibrary, int meshNameSize);
 
 	void update(float deltaTime); // Updates all the objects in the scene

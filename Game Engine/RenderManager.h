@@ -36,7 +36,6 @@ public:
 	~RenderManager();
 
 	GameScene *gameScene;
-	Player player;
 	void FindObjectsToRender();
 	void Render();
 	void createBuffers();

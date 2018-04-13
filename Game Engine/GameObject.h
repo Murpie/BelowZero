@@ -9,6 +9,7 @@
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtc/type_ptr.hpp"
 #include "glm/glm/glm.hpp"
+#include "Player.h"
 
 #include "Ray.h"
 #include "Intersection.h"
@@ -58,6 +59,8 @@ public:
 	void deleteAllComponents();
 
     const bool getIsRenderable();
+
+	Player* getPlayer();
 
 	template <class T>
 	T* getComponent() {

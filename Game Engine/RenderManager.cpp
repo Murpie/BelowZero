@@ -9,7 +9,6 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 {
 	gameScene = otherGameScene;
 	window = otherWindow;
-	player.equip("Axe");
 	this->geometryShaderProgram = shaderProgram->getShader<GeometryShaders>()->geometryShaderProgram;
 	this->cubeMapShaderProgram = shaderProgram->getShader<CubeMapShaders>()->cubeMapShaderProgram;
 	this->lightpassShaderProgram = shaderProgram->getShader<LightpassShaders>()->lightpassShaderProgram;
@@ -235,20 +234,6 @@ void RenderManager::createBuffers()
 
 void RenderManager::Render() {
 	FindObjectsToRender();
-	player.updateStats(deltaTime);
-
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
-		player.setCold(10);
-	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-		player.setWater(10);
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-		player.setFood(10);
-
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		player.equip("Axe");
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-		player.equip("Wood");
-
 
 	//... Set view and projection matrix
 	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
@@ -475,15 +460,15 @@ void RenderManager::Render() {
 	glBindTexture(GL_TEXTURE_2D, UITexture);
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "equipedTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, player.equipedTexture);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->equipedTexture);
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
-	glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), player.hp);
-	glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), player.cold);
-	glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), player.water);
-	glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), player.food);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0].getPlayer()->hp);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0].getPlayer()->cold);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0].getPlayer()->water);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0].getPlayer()->food);
 
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 

@@ -32,3 +32,14 @@ namespace Scene
 		LEVEL_1
 	};
 }
+
+namespace ComponentType
+{
+	enum ID
+	{
+		COMPONENT,
+		PLAYER,
+		LIGHT
+
+	};
+}
