@@ -20,7 +20,6 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
 	createBuffers();
 	vao = 0;
-	count = 0;
 	skyboxVAO = 0;
 }
 
@@ -40,6 +39,7 @@ void RenderManager::FindObjectsToRender() {
 
 		if (gameScene->gameObjects[i].hasLight == true) {
 			lightsToRender.push_back(gameScene->gameObjects[i].lightComponent);
+			//rework this
 		}
 	}
 }
@@ -251,7 +251,9 @@ void RenderManager::Render() {
 
 
 	//... Set view and projection matrix
-	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform.position, gameScene->gameObjects[0].transform.position + gameScene->gameObjects[0].transform.forward, gameScene->gameObjects[0].transform.up);
+	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
+		gameScene->gameObjects[0].transform->position + gameScene->gameObjects[0].transform->forward,
+		gameScene->gameObjects[0].transform->up);
 	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
@@ -273,7 +275,7 @@ void RenderManager::Render() {
 	glCullFace(GL_FRONT);
 
 	glUseProgram(shadowMapShaderProgram);
-	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[1].transform.position);
+	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[1].transform->position);
 	glViewport(0, 0, 1024, 1024);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -379,17 +381,17 @@ void RenderManager::Render() {
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glUseProgram(lightpassShaderProgram);
-	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[1].transform.position);
+	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[1].transform->position);
 
 	//CAM pos
-	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0].transform.position));
+	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0].transform->position));
 
 	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)
 	{
 		//position
 		std::string lightUniform = "lights[" + std::to_string(i) + "].Position";
-		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(lightsToRender.at(i)->gameObject->transform.position));
+		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(lightsToRender.at(i)->transform.position));
 
 		//Color
 		lightUniform = "lights[" + std::to_string(i) + "].Color";
@@ -666,12 +668,12 @@ void RenderManager::Update()
 
 }
 
-void RenderManager::getDeltaTime(float deltaTime)
+void RenderManager::setDeltaTime(float deltaTime)
 {
 	this->deltaTime = deltaTime;
 }
 
-void RenderManager::getSeconds(float seconds)
+void RenderManager::setSeconds(float seconds)
 {
 	this->seconds = seconds;
 }

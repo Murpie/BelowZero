@@ -43,8 +43,8 @@ public:
 	void renderQuad();
 	void renderSkyQuad();
 	void Update();
-	void getDeltaTime(float deltaTime);
-	void getSeconds(float seconds);
+	void setDeltaTime(float deltaTime);
+	void setSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
 	void setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition);
 

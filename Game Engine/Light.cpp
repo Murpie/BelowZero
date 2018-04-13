@@ -1,6 +1,6 @@
 #include "Light.h"
 
-Light::Light():Component()
+Light::Light(Transform& transform): Transformable(transform)
 {
 	assetName = "Light";
 
@@ -14,6 +14,10 @@ Light::~Light()
 {
 }
 
-void Light::update()
+void Light::update(float deltaTime)
+{
+}
+
+void Light::processEvents(GLFWwindow * window, float deltaTime)
 {
 }

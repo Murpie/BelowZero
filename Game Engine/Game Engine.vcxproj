@@ -168,6 +168,8 @@
     <ClCompile Include="CharacterMovement.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="CubeMapShaders.cpp" />
+
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="GeometryShaders.cpp" />
@@ -197,8 +199,8 @@
     <ClCompile Include="stb.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureLib.cpp" />
-    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Transformable.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -209,6 +211,8 @@
     <ClInclude Include="CharacterMovement.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="CubeMapShaders.h" />
+    <ClInclude Include="EnumID.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="ImGui\examples\libs\gl3w\GL\gl3w.h" />
@@ -218,6 +222,7 @@
     <ClInclude Include="ImGui\imgui_impl_glfw_gl3.h" />
     <ClInclude Include="ImGui\imgui_internal.h" />
     <ClInclude Include="Joint.h" />
+    <ClInclude Include="Intersection.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightpassShaders.h" />
     <ClInclude Include="UIShaders.h" />
@@ -228,6 +233,7 @@
     <ClInclude Include="MeshLib.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="PointLightShadowMapShaders.h" />
+    <ClInclude Include="Ray.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="ShaderProgramLib.h" />
@@ -237,8 +243,8 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureLib.h" />
-    <ClInclude Include="Transform.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Transformable.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

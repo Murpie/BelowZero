@@ -46,6 +46,9 @@
     <Filter Include="Header Files\GLSL">
       <UniqueIdentifier>{d8f50d1a-e7be-4514-8806-632b655c5511}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Intersection">
+      <UniqueIdentifier>{e29c1648-c099-4d72-9a90-21abf48eb638}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -79,9 +82,6 @@
       <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
     <ClCompile Include="MeshFilter.cpp">
-      <Filter>Source Files\GameObject &amp; Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
       <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
     <ClCompile Include="MaterialLib.cpp">
@@ -162,6 +162,12 @@
     <ClCompile Include="UIShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Transformable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imgui_impl_glfw_gl3.h">
@@ -212,9 +218,6 @@
     <ClInclude Include="MeshFilter.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Header Files\GameObject &amp; Components</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
@@ -244,6 +247,12 @@
     </ClInclude>
     <ClInclude Include="stb_image.h">
       <Filter>Header Files\Engine Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>Header Files\Intersection</Filter>
+    </ClInclude>
+    <ClInclude Include="Intersection.h">
+      <Filter>Header Files\Intersection</Filter>
     </ClInclude>
     <ClInclude Include="AnimatedMesh.h">
       <Filter>Header Files</Filter>
@@ -277,6 +286,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\Desktop\Game Engine - 2.0\Game Engine\GeometryShaders.h">
       <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Transformable.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

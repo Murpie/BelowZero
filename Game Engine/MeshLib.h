@@ -17,6 +17,7 @@ public:
 	Mesh& getMesh(int key);
 	AnimatedMesh& getAnimatedMesh(int key);
 
+	int getNumberOfMeshes();
 
 private:
 	std::vector<Mesh> meshes;
