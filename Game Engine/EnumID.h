@@ -15,11 +15,20 @@ namespace Gamestate
 	};
 }
 
-namespace Assets
+namespace Asset
 {
 	enum ID
 	{
 		Tree,
 		Bucket
+	};
+}
+
+namespace Scene
+{
+	enum ID
+	{
+		MENU,
+		LEVEL_1
 	};
 }

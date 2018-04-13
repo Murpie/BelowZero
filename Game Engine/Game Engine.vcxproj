@@ -201,7 +201,7 @@
     <ClCompile Include="stb.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureLib.cpp" />
-    <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Transformable.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -247,7 +247,7 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureLib.h" />
-    <ClInclude Include="Transform.h" />
+    <ClInclude Include="Transformable.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,25 +1,26 @@
 #pragma once
 
+// random comment
+
 #include <GL/gl3w.h>    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
 #include "glfw\include\GLFW\glfw3.h"
 #include <stdio.h>
 #include <time.h>
 
 /////////////
-#include "MaterialLib.h"
+
 #include "TextureLib.h"
 #include "ShaderProgramLib.h"
-#include "MeshLib.h"
 #include "GameScene.h"
 #include "RenderManager.h"
-#include "Transform.h"
+//#include "Transform.h"
 #include "MeshFilter.h"
-#include "CharacterMovement.h"
+//#include "CharacterMovement.h"
 #include <string>
 #include "glm\glm\gtc\matrix_transform.hpp"
 #include "glm\glm\gtc\type_ptr.hpp"
 #include "glm\glm\glm.hpp"
-#include "Light.h"
+//#include "Light.h"
 #include <ctime>
 #include "GeometryShaders.h"
 #include "SSAOShaders.h"
@@ -27,7 +28,6 @@
 #include "LightpassShaders.h"
 #include "FXAAShaders.h"
 #include "CubeMapShaders.h"
-#include "EnumID.h"
 
 #include <chrono>
 #include "PointLightShadowMapShaders.h"
@@ -39,42 +39,61 @@ public:
 	Game();
 	~Game();
 
-	void run();
+	void run(); // Main function that holds the main loop
 
 private:
 	GLFWwindow * window;
-	GameScene gameScene; // maybe  vector<GameScene> and switch between gameScene[i].update()
+
+	GameScene gameScene;
+	GameScene menuScene;
+
 	ShaderProgramLib shaderProgramLibrary;
 	MaterialLib materialLibrary;
 	TextureLib textureLibrary;
 	MeshLib meshLibrary;
 	
 	//
-	vector<Light> lights; // not sure if want to add this here
-	vector<CharacterMovement> moveScript;
-	vector<RenderManager> renderManager;
-	vector<string> meshName;
-	vector<MeshFilter> meshFilter;
+	vector<RenderManager> renderManager; // use 1 render manager? delete and init new one
+	vector<string> meshName; // Filepaths for the importer?
 
-	Gamestate::ID stateOfGame;
-	void printCurrentState(Gamestate::ID stateOfGame);
+	Gamestate::ID stateOfGame; // EnumID.h, make this one global(?) 
+
+	void printCurrentState(Gamestate::ID stateOfGame); // Prints to console
+
+	// state functions
 	void runState();
+	void menuState();
+	void levelState();
 
-	char windowName[];
+	char windowName[20];
 
 	void initWindow();
+	void initScene(GameScene &scene);
+	void clearScene(GameScene &scene); // Unused atm
 	void initShaderProgramLib();
+	void initInputOptions();
 
-	void addGameObjects();
-	void addCamera();
-	void addLights();
-	void addRenderManager();
-	void addCharacterMovement();
+	void useShaderProgram();
+
 	void addMeshName();
-	void addMeshFilter();
-
+	//...
+	void addLights(GameScene &scene);
+	void addRenderManager(GameScene &scene);
+	void addCharacterMovement(GameScene &scene);
+	void addMeshFilter(GameScene &scene);
 	void readMeshName();
+	//...
+	void processInput(GLFWwindow *window, float deltaTime, GameScene& scene);
 
-	void setGameObjects();
+	//Time Variables
+	float deltaTime;
+	float seconds;
+	//Shader bools
+	bool gaussianblur;
+	bool fxaa;
+	bool ssao;
+	//
+	bool meshesLoaded;
+	bool testBool; // used in addLights atm to see difference in scenes.
 };
 

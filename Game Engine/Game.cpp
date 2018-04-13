@@ -6,17 +6,95 @@ static void error_callback(int error, const char* description)
 }
 
 
+void mouse_enter_callback(GLFWwindow * window, int entered)
+{
+	if (entered)
+		std::cout << "CURSOR::ENTER::WINDOW" << std::endl;
+	else
+		std::cout << "CURSOR::EXIT::WINDOW" << std::endl;
+}
+
+void mouse_button_callback(GLFWwindow * window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	{
+		std::cout << "MOUSEBUTTON::LEFT::PRESS" << std::endl;
+	}
+
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+	{
+		std::cout << "MOUSEBUTTON::LEFT::RELEASE" << std::endl;
+	}
+
+	// entity.processMouseEvent(window, button, action);
+	//
+}
+
+void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) //GameScene& scene
+{
+	/* 
+		In this function we want to call on the sceneObjects.
+		
+		example : 
+			scene.pollEvent(window, deltaTime);
+
+		and check inside the classes if we want to make something 
+		happen depending on which button we press.
+
+		This function should be called on within the correct state in runState().
+	*/
+
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
+
+	//------------------------------------
+	//This statement should be used inside the GUI class
+	/*
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	{
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		std::cout << "CUROSR::X::POSITION::" << xpos << std::endl;
+		std::cout << "CUROSR::Y::POSITION::" << ypos << std::endl;
+
+		//
+		//glm::vec3 worldRay = Ray::getWorldRay(xpos, ypos, glm::mat4(), SCREEN_WIDTH, SCREEN_HEIGHT);
+		//std::cout << "CUROSR::WORLDRAY::" << worldRay.x << " " << worldRay.y << " " << worldRay.z << std::endl;
+
+	}
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+	{
+
+	}
+	*/
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	{
+		stateOfGame = Gamestate::ID::RUN_LEVEL;
+	}
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+	{
+		stateOfGame = Gamestate::ID::SHOW_MENU;
+	}
+
+	//...
+	scene.processEvents(window, deltaTime);
+}
+
 Game::Game() :
 	shaderProgramLibrary(),
-	gameScene(),
+	gameScene(), menuScene(),
 	windowName("Game Engine"),
-	stateOfGame(Gamestate::ID::INITIALIZE)
+	stateOfGame(Gamestate::ID::INITIALIZE),
+	deltaTime(0), seconds(0),
+	gaussianblur(false), fxaa(false), ssao(true), meshesLoaded(false), testBool(false)
 {
 	initWindow();
 	initShaderProgramLib();
 	addMeshName();
 }
-
 
 Game::~Game()
 {
@@ -30,67 +108,38 @@ void Game::run()
 	auto startSeconds = chrono::high_resolution_clock::now();
 	auto startDeltaTime = chrono::high_resolution_clock::now();
 
-	bool gaussianblur = false;
-	bool fxaa = false;
-	bool ssao = true;
-
 	int initial_time = time(NULL);
 	int final_time;
 	int frameCount = 0;
 	
-	addRenderManager();
-	//... Create Camera and add empty game object
-	addCharacterMovement();
-	//... Create Lights and add empty game object
-	addLights();
-	//... Read OBJ and MTL File
-	readMeshName();
-	//... Set Game Objects, this should be automated by a function when reading from level file
-	setGameObjects();
-	//...
-	addMeshFilter();
+	initScene(menuScene);
+	initScene(gameScene);
 
-	//... Uniform in int that tells gaussian to be turned off
-	glUseProgram(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram);
-	glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram, "onOrOff"), gaussianblur);
+	useShaderProgram();
 
-	glUseProgram(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram);
-	glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram, "swap"), fxaa);
-
-	glEnable(GL_DEPTH_TEST);
-
-	glDepthFunc(GL_LESS);
-
-	//////////////
-	int gameObject_clicked = -1;                // Temporary storage of what node we have clicked to process selection at the end of the loop. May be a pointer to your own node type, etc.
-
-	// Should start with menu or some kind of startup screen
 	stateOfGame = Gamestate::ID::RUN_LEVEL;
+	printCurrentState(stateOfGame);
 
 	// Main loop
 	while (!glfwWindowShouldClose(window))
 	{
-		float deltaTime;
+		//float deltaTime;
 		auto nowDeltaTime = chrono::high_resolution_clock::now();
 		deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count();
 		nowDeltaTime = startDeltaTime;
 
 		float secondsTime;
 		auto nowSeconds = chrono::high_resolution_clock::now();
-		float seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
-		nowSeconds = startSeconds;
+		seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
+		//nowSeconds = startSeconds;
 
 		// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
 		// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
 		// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 		glfwPollEvents();
-
-		//gameScene.update();
 		runState();
-		renderManager[0].getDeltaTime(deltaTime);
-		renderManager[0].getSeconds(seconds);
-		renderManager[0].Render(ssao);
+		//...
 
 		glfwSwapBuffers(window);
 
@@ -114,38 +163,64 @@ void Game::printCurrentState(Gamestate::ID stateOfGame)
 
 void Game::runState()
 {
-	//Add a main state and seperate the function in substates or keep it as it is?
-	/*
-		main-state: MENU_STATE -> sub-states : LOAD_MENU, SHOW_MENU etc;
-					LEVEL_STATE 
-	*/
+	//... Menu
+	if (stateOfGame == Gamestate::ID::LOAD_MENU || stateOfGame == Gamestate::ID::SHOW_MENU || stateOfGame == Gamestate::ID::CLEAR_MENU )
+	{
+		menuState();
+	}
+	//... Level
+	else if(stateOfGame == Gamestate::ID::LOAD_LEVEL || stateOfGame == Gamestate::ID::RUN_LEVEL || stateOfGame == Gamestate::ID::CLEAR_LEVEL)
+	{
+		levelState();
+	}
+	//... 
+	else 
+	{
+		return;
+	}
+}
 
+void Game::menuState()
+{
 	if (stateOfGame == Gamestate::ID::LOAD_MENU)
 	{
-		//initMenu()
-		//stateOfGame++
-		printCurrentState(stateOfGame);
+		//initScene(menuScene);
+		stateOfGame = Gamestate::ID::SHOW_MENU;
 	}
-	if (stateOfGame == Gamestate::ID::SHOW_MENU)
+	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
-		//gameScene[i].update()
-		/*
-		if(...)
-		{
-		stateOfGame++;
-		printCurrentState(stateOfGame);
-		}
-		*/
+		menuScene.update(deltaTime);
+		processInput(window, deltaTime, menuScene);
+		renderManager[0].setDeltaTime(deltaTime);
+		renderManager[0].setSeconds(seconds);
+		renderManager[0].Render(ssao);
 	}
+	else if (stateOfGame == Gamestate::ID::CLEAR_MENU)
+	{
+		clearScene(menuScene);
+		stateOfGame = Gamestate::ID::LOAD_LEVEL;
+	}
+}
 
-	if (stateOfGame == Gamestate::ID::RUN_LEVEL)
+void Game::levelState()
+{
+	if (stateOfGame == Gamestate::ID::LOAD_LEVEL)
 	{
-		gameScene.update();
+		//initScene(gameScene);
+		stateOfGame = Gamestate::ID::RUN_LEVEL;
 	}
-	if (stateOfGame == Gamestate::ID::CLOSE_GAME)
+	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
-		//close window
-		glfwTerminate();
+		gameScene.update(deltaTime);
+		processInput(window, deltaTime, gameScene);
+		renderManager[1].setDeltaTime(deltaTime);
+		renderManager[1].setSeconds(seconds);
+		renderManager[1].Render(ssao);
+	}
+	else if (stateOfGame == Gamestate::ID::CLEAR_LEVEL)
+	{
+		clearScene(gameScene);
+		stateOfGame = Gamestate::ID::LOAD_MENU;
 	}
 }
 
@@ -167,6 +242,32 @@ void Game::initWindow()
 	gl3wInit();
 }
 
+void Game::initScene(GameScene & scene)
+{
+	addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
+	//... Create Camera
+	addCharacterMovement(scene);
+	//... Create Lights
+	addLights(scene);
+	//... Read OBJ and MTL File
+	if(!meshesLoaded)
+	{ 
+		//Load the meshes once and store them.
+		readMeshName();	
+		meshesLoaded = true;
+	}
+	//...
+	/*Add meshes to mesh filter with level file ?*/
+	addMeshFilter(scene);
+}
+
+void Game::clearScene(GameScene & scene)
+{
+	//scene.clearGameObjects();
+
+	/* Add function to also clear the renderManager*/
+}
+
 void Game::initShaderProgramLib()
 {
 	shaderProgramLibrary.addGeometryPassShaders();
@@ -182,47 +283,31 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addAnimationShaders();
 }
 
-void Game::addGameObjects()
+void Game::initInputOptions()
 {
-	addCamera();
-	addLights();
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetCursorEnterCallback(window, mouse_enter_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, 1);
 }
 
-void Game::addCamera()
+void Game::useShaderProgram()
 {
-	//CharacterMovement moveScript = CharacterMovement(window);
-	//moveScript = moveScript(window);
-	//gameScene.addEmptyGameObject();
-	//gameScene.gameObjects[0].name = "Camera"; //+std::to_string(i);
-	//gameScene.gameObjects[0].addComponent(&moveScript);
-}
+	glUseProgram(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram);
+	glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<GaussianBlurShaders>()->gaussianBlurShaderProgram, "onOrOff"), gaussianblur);
 
-void Game::addLights()
-{
-	int numberOfLights = 2;
-	for (int i = 0; i < numberOfLights; i++)
-	{
-		gameScene.addEmptyGameObject();
-		Light light = Light();
-		lights.push_back(light);
-	}
-}
+	glUseProgram(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram);
+	glUniform1i(glGetUniformLocation(shaderProgramLibrary.getShader<FXAAShaders>()->fxaaShaderProgram, "swap"), fxaa);
 
-void Game::addRenderManager()
-{
-	RenderManager tempRender = RenderManager(&gameScene, window, &shaderProgramLibrary);
-	renderManager.push_back(tempRender);
-}
+	glEnable(GL_DEPTH_TEST);
 
-void Game::addCharacterMovement()
-{
-	gameScene.addEmptyGameObject();
-	CharacterMovement tempMoveScript = CharacterMovement(window);
-	moveScript.push_back(tempMoveScript);
+	glDepthFunc(GL_LESS);
 }
 
 void Game::addMeshName()
 {
+	//Add file names to vector to load when reading mesh data. 
+
 	std::string tempMeshName;
 
 	tempMeshName = "Floor.obj";
@@ -235,26 +320,42 @@ void Game::addMeshName()
 	meshName.push_back(tempMeshName);
 }
 
-void Game::addMeshFilter()
+void Game::addLights(GameScene &scene)
 {
-	for (int i = 0; i < meshName.size(); i++)
+	// add for loop and use array for transforms ?
+	if (!testBool)
 	{
-		MeshFilter meshFilterTemp = MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).gElementBuffer, meshLibrary.getMesh(i).vertexCount);
-		meshFilter.push_back(meshFilterTemp);
+		scene.addLight(glm::vec3(7, 9, -4), 0);
+		scene.addLight(glm::vec3(4, 0.4, -2), 1);
+		testBool = true;
 	}
-	for (int i = 0; i < meshName.size(); i++)
+	else
 	{
-		gameScene.gameObjects[i + 3].name = meshName[i];
-		gameScene.gameObjects[i + 3].addComponent(&meshFilter[i]);
-		gameScene.gameObjects[i + 3].addComponent(materialLibrary.getMaterial(i));
-	}
+		scene.gameObjects[0].transform->position = glm::vec3(4, 0.4, -2);
+	}	
+}
+
+void Game::addRenderManager(GameScene &scene)
+{
+	RenderManager tempRender = RenderManager(&scene, window, &shaderProgramLibrary);
+	renderManager.push_back(tempRender);
+}
+
+void Game::addCharacterMovement(GameScene &scene)
+{
+	scene.addCharacterMovement();
+}
+
+void Game::addMeshFilter(GameScene &scene)
+{
+	scene.addMeshFilter(meshLibrary, materialLibrary, meshName.size());
 }
 
 void Game::readMeshName()
 {
 	for (int i = 0; i < meshName.size(); i++)
 	{
-		gameScene.addEmptyGameObject();
+		//scene.addEmptyGameObject();
 		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
 		//Add material
 		materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
@@ -438,20 +539,7 @@ void Game::readMeshName()
 	}
 }
 
-void Game::setGameObjects()
-{
-	gameScene.gameObjects[0].name = "Camera";
-	gameScene.gameObjects[0].addComponent(&moveScript[0]);
 
-	gameScene.gameObjects[1].name = "Light 1";
-	gameScene.gameObjects[1].addComponent(&lights[0]);
-	gameScene.gameObjects[1].transform = glm::vec3(7, 9, -4);
-	gameScene.gameObjects[1].lightComponent->lightType = 0;
 
-	gameScene.gameObjects[2].name = "Light 2";
-	gameScene.gameObjects[2].addComponent(&lights[1]);
-	gameScene.gameObjects[2].transform = glm::vec3(4, 0.4, -2);
-	gameScene.gameObjects[2].lightComponent->lightType = 1;
-}
 
 

@@ -14,7 +14,9 @@ public:
 	GLuint gElementBuffer;
 	int vertexCount;
 
-	void update();
+	void update(float deltaTime);
+	void processEvents(GLFWwindow *window, float deltaTime);
+
 	void bindVertexArray();
 private:
 
