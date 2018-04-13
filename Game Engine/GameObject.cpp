@@ -59,7 +59,7 @@ void GameObject::updateMaterialAndMeshFilterPointers() {
     for (int i = 0; i < components.size(); i++) {
         MeshFilter* temp = getComponent<MeshFilter>();
         if (temp != nullptr) {
-            //rework this, we want our meshFilter inside components
+            //rework this, we want our meshFilter inside components, or do we need it to be a component?
 			/*
 				Save the ID of the meshFIlter when Creating it our think of
 				a better solution. 

@@ -38,12 +38,12 @@ public:
 	Game();
 	~Game();
 
-	void run();
+	void run(); // Main function that holds the main loop
 
 private:
 	GLFWwindow * window;
 
-	GameScene gameScene; // Keep scene object and only clear the data inside the game objects?
+	GameScene gameScene;
 	GameScene menuScene;
 
 	ShaderProgramLib shaderProgramLibrary;
@@ -55,9 +55,9 @@ private:
 	vector<RenderManager> renderManager; // use 1 render manager? delete and init new one
 	vector<string> meshName; // Filepaths for the importer?
 
-	Gamestate::ID stateOfGame; // EnumID.h, makes this one global?
+	Gamestate::ID stateOfGame; // EnumID.h, make this one global(?) 
 
-	void printCurrentState(Gamestate::ID stateOfGame);
+	void printCurrentState(Gamestate::ID stateOfGame); // Prints to console
 
 	// state functions
 	void runState();
@@ -68,7 +68,7 @@ private:
 
 	void initWindow();
 	void initScene(GameScene &scene);
-	void clearScene(GameScene &scene);
+	void clearScene(GameScene &scene); // Unused atm
 	void initShaderProgramLib();
 	void initInputOptions();
 
@@ -82,7 +82,7 @@ private:
 	void addMeshFilter(GameScene &scene);
 	void readMeshName();
 	//...
-	void processInput(GLFWwindow *window, float deltaTime); //GameScene &scene
+	void processInput(GLFWwindow *window, float deltaTime, GameScene& scene);
 
 	//Time Variables
 	float deltaTime;

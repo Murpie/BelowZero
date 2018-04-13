@@ -10,6 +10,9 @@
 #include "glm/glm/gtc/type_ptr.hpp"
 #include "glm/glm/glm.hpp"
 
+#include "Ray.h"
+#include "Intersection.h"
+
 class Component;
 
 class GameObject //: public Component 

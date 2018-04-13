@@ -32,7 +32,10 @@ void CharacterMovement::getInformation(float time)
 
 void CharacterMovement::update(float deltaTime)
 {
-	
+	/*
+		Make stuff happen. 
+		If player class: Update health, cold, hunger, thirst etc.
+	*/
 }
 
 void CharacterMovement::processEvents(GLFWwindow * window, float deltaTime)

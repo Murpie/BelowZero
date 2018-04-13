@@ -39,7 +39,8 @@ void GameScene::addLight(glm::vec3 transform, int lightType)
 	gameObjects[gameObjects.size() - 1].addComponent(light);
 	gameObjects[gameObjects.size() - 1].name = "Light " + lightsInScene;
 	gameObjects[gameObjects.size() - 1].transform->position = transform;
-	//gameObjects[gameObjects.size() - 1].lightComponent->lightType = lightType; //? Not sure what this does
+	//...
+	//gameObjects[gameObjects.size() - 1].lightComponent->lightType = lightType; 
 }
 
 void GameScene::addCharacterMovement()
@@ -54,6 +55,10 @@ void GameScene::addCharacterMovement()
 
 void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibrary, int meshNameSize)
 {
+	/*
+	This function should get data from the level file and create as many objects of each type that is needed
+	to build the scene. 
+	*/
 	for (int i = 0; i < meshNameSize; i++) // 3 - meshLibrary.getNumberOfMeshes(); meshName.size();
 	{
 		addEmptyGameObject();

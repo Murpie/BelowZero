@@ -5,6 +5,13 @@
 #include "glm/glm/gtc/type_ptr.hpp"
 #include "glm/glm/glm.hpp"
 
+/*
+This class gives the sub-Class the ability to manipulate the transform struct
+in the GameObject class. This is needed for objects that need to move around in the scene. 
+
+Transform& Transform can be called upon in the subclass by using Transformable::transform;
+*/
+
 struct Transform
 {
 	glm::vec3 position = glm::vec3(0, 0, 0);

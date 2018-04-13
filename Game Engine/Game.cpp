@@ -30,7 +30,7 @@ void mouse_button_callback(GLFWwindow * window, int button, int action, int mods
 	//
 }
 
-void Game::processInput(GLFWwindow *window, float deltaTime) //GameScene& scene
+void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) //GameScene& scene
 {
 	/* 
 		In this function we want to call on the sceneObjects.
@@ -51,6 +51,7 @@ void Game::processInput(GLFWwindow *window, float deltaTime) //GameScene& scene
 
 	//------------------------------------
 	//This statement should be used inside the GUI class
+	/*
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
 		double xpos, ypos;
@@ -68,27 +69,18 @@ void Game::processInput(GLFWwindow *window, float deltaTime) //GameScene& scene
 	{
 
 	}
-
-	if (stateOfGame == Gamestate::ID::RUN_LEVEL)
+	*/
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 	{
-		gameScene.processEvents(window, deltaTime);
-
-		if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-		{
-			stateOfGame = Gamestate::ID::SHOW_MENU;
-			printCurrentState(stateOfGame);
-		}
+		stateOfGame = Gamestate::ID::RUN_LEVEL;
 	}
-	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
 	{
-		menuScene.processEvents(window, deltaTime);
-
-		if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-		{
-			stateOfGame = Gamestate::ID::RUN_LEVEL;
-			printCurrentState(stateOfGame);
-		}
+		stateOfGame = Gamestate::ID::SHOW_MENU;
 	}
+
+	//...
+	scene.processEvents(window, deltaTime);
 }
 
 Game::Game() :
@@ -147,7 +139,7 @@ void Game::run()
 		// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 		glfwPollEvents();
 		runState();
-		processInput(window, deltaTime); //...
+		//...
 
 		glfwSwapBuffers(window);
 
@@ -198,6 +190,7 @@ void Game::menuState()
 	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
 		menuScene.update(deltaTime);
+		processInput(window, deltaTime, menuScene);
 		renderManager[0].setDeltaTime(deltaTime);
 		renderManager[0].setSeconds(seconds);
 		renderManager[0].Render(ssao);
@@ -219,6 +212,7 @@ void Game::levelState()
 	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
 		gameScene.update(deltaTime);
+		processInput(window, deltaTime, gameScene);
 		renderManager[1].setDeltaTime(deltaTime);
 		renderManager[1].setSeconds(seconds);
 		renderManager[1].Render(ssao);
@@ -292,7 +286,7 @@ void Game::initShaderProgramLib()
 void Game::initInputOptions()
 {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	glfwSetCursorEnterCallback(window, mouse_enter_callback);	//? Needed to check when inside and outside of window
+	glfwSetCursorEnterCallback(window, mouse_enter_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, 1);
 }
@@ -328,7 +322,7 @@ void Game::addMeshName()
 
 void Game::addLights(GameScene &scene)
 {
-	// add for loop and use array for transforms;
+	// add for loop and use array for transforms ?
 	if (!testBool)
 	{
 		scene.addLight(glm::vec3(7, 9, -4), 0);
