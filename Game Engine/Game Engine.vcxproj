@@ -76,8 +76,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>glew-1.11.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>glew-1.11.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>glfw\include\GLFW;glew-1.11.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Petter\source\repos\BelowZero\Game Engine\glfw\lib-vc2015-64;glew-1.11.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

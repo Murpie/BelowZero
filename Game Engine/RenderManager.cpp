@@ -277,7 +277,7 @@ void RenderManager::Render() {
 
 	//... Set view and projection matrix
 	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform.position, gameScene->gameObjects[0].transform.position + gameScene->gameObjects[0].transform.forward, gameScene->gameObjects[0].transform.up);
-	projection_matrix = glm::perspective(glm::radians(90.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
+	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
 	world_matrix = glm::translate(world_matrix, glm::vec3(10.0f, -5.0f, 0.0f));
@@ -286,7 +286,7 @@ void RenderManager::Render() {
 	//... Clear Back Buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, display_w, display_h);
-	glClearColor(1.0f, 0.843f, 0.823f, 1.0f);
+	glClearColor(0.749, 0.843, 0.823, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//... Clear finalFBO
@@ -355,10 +355,11 @@ void RenderManager::Render() {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilMask(0xFF); // enable writing to the stencil buffer
 
+	gameObjectsToRender[0]->materialComponent->bindTextures();
+	gameObjectsToRender[0]->materialComponent->bindFoundTextures();
+
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-		gameObjectsToRender[i]->materialComponent->bindTextures();
-		gameObjectsToRender[i]->materialComponent->bindFoundTextures();
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);

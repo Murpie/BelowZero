@@ -84,19 +84,13 @@ private:
 	unsigned int gbo;
 	unsigned int skyFBO;
 	unsigned int rboDepth;
-	unsigned int ssaoFBO;
-	unsigned int ssaoColorBuffer;
-	unsigned int ssaoBlurFBO;
-	unsigned int ssaoColorBufferBlur;
 	unsigned int finalFBO;
 	unsigned int finalColorBuffer;
 	unsigned int finalDepthStensil;
-	unsigned int fxaaFBO;
-	unsigned int fxaaColorBuffer;
+
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
 
-	unsigned int noiseTexture;
 	unsigned int cubemapTexture;
 	unsigned int gAlbedo;
 	unsigned int gNormal;

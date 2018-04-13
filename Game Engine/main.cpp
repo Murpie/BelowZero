@@ -295,8 +295,6 @@ int main(int, char**)
 			}
 		}
 
-
-
 		//... Set Game Objects
 		gameScene.gameObjects[0].name = "Camera";
 		gameScene.gameObjects[0].addComponent(&moveScript);
