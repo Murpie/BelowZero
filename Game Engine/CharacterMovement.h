@@ -21,10 +21,11 @@ public:
 	Physics physics;
 	GLFWwindow* window;
 
+	
 	void update();
 private:
 	bool frontCollision = false;
-	bool bottomCollision = false;
+	bool bottomCollision = true;
 	bool leftCollision = false;
 	bool rightCollision = false;
 	bool backCollision = false;
@@ -42,13 +43,14 @@ private:
 	float xoffset;
 	float yoffset;
 	float sensitivity;
+	
 
-	float time;
-
+	float time = 0.0f;
+	bool gravity = true;
 	//--------=====Jumping=====-----------
-	bool jump = false;
+	float jumpSpeed = 0.04;
+	bool jumpReady = true;
 	bool inAir = false;
-	float timeInAir = 1.1;
-
+	float timeInAir = 0.2;
 };
 

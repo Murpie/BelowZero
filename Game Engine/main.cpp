@@ -360,12 +360,12 @@ int main(int, char**)
 			float deltaTime;
 			auto nowDeltaTime = chrono::high_resolution_clock::now();
 			deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count();
-			nowDeltaTime = startDeltaTime;
+			startDeltaTime = nowDeltaTime;
 
 			float secondsTime;
 			auto nowSeconds = chrono::high_resolution_clock::now();
 			float seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
-			nowSeconds = startSeconds;
+			startSeconds = nowSeconds;
 
 
 			// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -378,6 +378,7 @@ int main(int, char**)
 			{
 				for (unsigned int i = 0; i < gameScene.gameObjects[b].components.size(); i++)
 				{
+					gameScene.gameObjects[b].components[i]->getInformation(seconds);
 					gameScene.gameObjects[b].components[i]->update();
 				}
 			}

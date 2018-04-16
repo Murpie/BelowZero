@@ -17,3 +17,7 @@ Light::~Light()
 void Light::update()
 {
 }
+
+void Light::getInformation(float time)
+{
+}

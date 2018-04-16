@@ -3,6 +3,7 @@
 #include "stb_image.h"
 #include <string>
 #include<iostream>
+#include "glm/glm/glm.hpp"
 
 class Texture
 {
@@ -13,8 +14,10 @@ public:
 
 	void CreateTextureData(std::string filePath);
 	GLuint gTexture;
-private:
+
 	int width, height, nrChannels = 0;
+private:
+	
 
 };
 

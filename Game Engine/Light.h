@@ -16,6 +16,7 @@ public:
 	float Linear;
 	float Quadratic;
 	void update();
+	void getInformation(float time);
 
 private:
 

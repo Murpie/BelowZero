@@ -32,7 +32,8 @@ CharacterMovement::~CharacterMovement()
 
 void CharacterMovement::getInformation(float time)
 {
-	this->time += time / 1000;
+	float temp = time * 0.001;
+	this->time += temp;
 }
 
 void CharacterMovement::update()
@@ -88,15 +89,59 @@ void CharacterMovement::update()
 
 	//... WASD Movement
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && frontCollision == false)
+	{
+		float tempY = gameObject->transform.position.y;
 		gameObject->transform.position += cameraSpeed * gameObject->transform.forward;
+		gameObject->transform.position.y = tempY;
+	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && backCollision == false)
-        gameObject->transform.position -= cameraSpeed * gameObject->transform.forward;
+	{
+		float tempY = gameObject->transform.position.y;
+		gameObject->transform.position -= cameraSpeed * gameObject->transform.forward;
+		gameObject->transform.position.y = tempY;
+	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && leftCollision == false)
-        gameObject->transform.position -= gameObject->transform.right * cameraSpeed;
+	{
+		float tempY = gameObject->transform.position.y;
+		gameObject->transform.position -= gameObject->transform.right * cameraSpeed;
+		gameObject->transform.position.y = tempY;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
-        gameObject->transform.position += gameObject->transform.right * cameraSpeed;
+	{
+		float tempY = gameObject->transform.position.y;
+		gameObject->transform.position += gameObject->transform.right * cameraSpeed;
+		gameObject->transform.position.y = tempY;
+	}
+
 
 	//... Jump mechanic
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false)
-		gameObject->transform.position += cameraSpeed * gameObject->transform.up;
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true)
+	{
+		inAir = true;
+		gravity = false;
+		time = 0.0f;
+		jumpReady = false;
+	}
+
+	if (time <= timeInAir && inAir == true)
+		gameObject->transform.position += jumpSpeed * gameObject->transform.up;
+	else
+		inAir = false;
+
+
+	if (inAir == false && gameObject->transform.position.y <= 0.0f)
+	{
+		gravity = false;
+		jumpReady = true;
+	}
+	else
+		gravity = true;
+
+
+	if (gravity == true && inAir == false)
+		gameObject->transform.position -= jumpSpeed * gameObject->transform.up;
+
+	if (gameObject->transform.position.y <= -0.1f)
+		gameObject->transform.position.y = 0.0f;
 }
