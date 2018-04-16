@@ -10,7 +10,7 @@ struct TerrainVertex
 {
 	glm::vec3 vertPos;
 	glm::vec3 vertNorm;
-	glm::ivec2 UVs;
+	glm::vec2 UVs;
 };
 
 class Terrain
@@ -48,6 +48,7 @@ public:
 	void setupBuffers(GLint gShaderProgram);
 	void calculateNormals(int triangleIndex);
 	float getHeight(int x, int z);
+	float getHeightRGB(int x, int y);
 
 	void loadHeighMap(const std::string & heightMap);
 

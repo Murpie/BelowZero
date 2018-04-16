@@ -199,6 +199,7 @@
     <ClCompile Include="SSAOShaders.cpp" />
     <ClCompile Include="stb.cpp" />
     <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="TerrainShader.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureLib.cpp" />
     <ClCompile Include="Transform.cpp" />
@@ -242,6 +243,7 @@
     <ClInclude Include="SSAOShaders.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="TerrainShaders.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureLib.h" />
     <ClInclude Include="Transform.h" />
@@ -272,6 +274,8 @@
     <None Include="ssaoBlurVS.glsl" />
     <None Include="ssaoFS.glsl" />
     <None Include="ssaoVS.glsl" />
+    <None Include="TerrainFS.glsl" />
+    <None Include="TerrainVS.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

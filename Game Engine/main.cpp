@@ -26,6 +26,7 @@
 #include "LightpassShaders.h"
 #include "FXAAShaders.h"
 #include "CubeMapShaders.h"
+#include "Terrain.h"
 
 #include <chrono>
 #include "PointLightShadowMapShaders.h"
@@ -93,6 +94,11 @@ int main(int, char**)
 		//... Create Camera and add empty game object
 		CharacterMovement moveScript = CharacterMovement(window);
 		gameScene.addEmptyGameObject();
+
+		Terrain terrain;
+		terrain.loadHeighMap("firstheightmap.jpg");
+		terrain.setupVertexData();
+		
 
 		//... Create Lights and add empty game object
 		Light light1 = Light();

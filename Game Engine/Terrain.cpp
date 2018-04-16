@@ -9,7 +9,6 @@ Terrain::Terrain(const std::string & height, const std::string & color)
 	HeightMap.CreateTextureData(height);
 	AlbedoMap.CreateTextureData(color);
 
-
 }
 
 Terrain::~Terrain()
@@ -47,24 +46,24 @@ void Terrain::setupVertexData()
 	}
 
 
-	//for (int i = 0; i < VertexPos.size() - HeightMap.width -1; i++)
-	//{
-	//	indices.push_back(glm::vec3(i, i+1, i+HeightMap.width));
-	//	indices.push_back(glm::vec3(i+1, i + HeightMap.width, i + HeightMap.width));
-	//}
-	//for (int i = 0; i < indices.size(); i++)
-	//{
-	//	glm::vec3 v1 = terrainVertices[indices[i].x].vertPos;
-	//	glm::vec3 v2 = terrainVertices[indices[i].y].vertPos;
-	//	glm::vec3 v3 = terrainVertices[indices[i].z].vertPos;
-	//
-	//	glm::vec3 ab = v2 - v1;
-	//	glm::vec3 ac = v3 - v1;
-	//	glm::vec3 normal = glm::normalize(glm::cross(ab, ac));
-	//	terrainVertices[indices[i].x].vertNorm = normal;
-	//	terrainVertices[indices[i].y].vertNorm = normal;
-	//	terrainVertices[indices[i].z].vertNorm = normal;
-	//}
+	for (int i = 0; i < terrainVertices.size() - HeightMap.width -1; i++)
+	{
+		indices.push_back(glm::vec3(i, i+1, i+HeightMap.width));
+		indices.push_back(glm::vec3(i+1, i + HeightMap.width, i + HeightMap.width + 1));
+	}
+	for (int i = 0; i < indices.size(); i++)
+	{
+		glm::vec3 v1 = terrainVertices[indices[i].x].vertPos;
+		glm::vec3 v2 = terrainVertices[indices[i].y].vertPos;
+		glm::vec3 v3 = terrainVertices[indices[i].z].vertPos;
+	
+		glm::vec3 ab = v2 - v1;
+		glm::vec3 ac = v3 - v1;
+		glm::vec3 normal = glm::normalize(glm::cross(ab, ac));
+		terrainVertices[indices[i].x].vertNorm = normal;
+		terrainVertices[indices[i].y].vertNorm = normal;
+		terrainVertices[indices[i].z].vertNorm = normal;
+	}
 
 }
 
@@ -102,28 +101,28 @@ void Terrain::setupBuffers(GLint gShaderProgram)
 		sizeof(terrainVertices), // distance between two vertices in memory (stride)
 		BUFFER_OFFSET(0)		// offset of FIRST vertex in the list.
 	);
-
-	// repeat the process for the second attribute.
-	// query which "slot" corresponds to the input vertex_color in the Vertex Shader 
-	GLuint vertexColor = glGetAttribLocation(gShaderProgram, "vertex_normal");
-	glVertexAttribPointer(
-		vertexColor,
-		3,
-		GL_FLOAT,
-		GL_FALSE, sizeof(terrainVertices), // distance between two vertexColor 
-		BUFFER_OFFSET(sizeof(float) * 3)	// note, the first color starts after the first vertex.
-	);
-
-	// repeat the process for the third attribute.
-	// query which "slot" corresponds to the input uv coord in the Vertex Shader 
-	GLuint uvPos = glGetAttribLocation(gShaderProgram, "uv_coord");
-	glVertexAttribPointer(
-		uvPos,
-		2,
-		GL_FLOAT,
-		GL_FALSE, sizeof(terrainVertices), // distance between two uv coord 
-		BUFFER_OFFSET(sizeof(float) * 6)	// note, the first uv starts after the first color.
-	);
+	//
+	//// repeat the process for the second attribute.
+	//// query which "slot" corresponds to the input vertex_color in the Vertex Shader 
+	//GLuint vertexColor = glGetAttribLocation(gShaderProgram, "vertex_normal");
+	//glVertexAttribPointer(
+	//	vertexColor,
+	//	3,
+	//	GL_FLOAT,
+	//	GL_FALSE, sizeof(terrainVertices), // distance between two vertexColor 
+	//	BUFFER_OFFSET(sizeof(float) * 3)	// note, the first color starts after the first vertex.
+	//);
+	//
+	//// repeat the process for the third attribute.
+	//// query which "slot" corresponds to the input uv coord in the Vertex Shader 
+	//GLuint uvPos = glGetAttribLocation(gShaderProgram, "uv_coord");
+	//glVertexAttribPointer(
+	//	uvPos,
+	//	2,
+	//	GL_FLOAT,
+	//	GL_FALSE, sizeof(terrainVertices), // distance between two uv coord 
+	//	BUFFER_OFFSET(sizeof(float) * 6)	// note, the first uv starts after the first color.
+	//);
 
 }
 
@@ -136,7 +135,13 @@ void Terrain::setupBuffers(GLint gShaderProgram)
 //	float done = glm::mix(height.x, height.y, height.z);
 //}
 
+float Terrain::getHeightRGB(int x, int y)
+{
+	return 0.0f;
+}
+
 void Terrain::loadHeighMap(const std::string & heightMap)
 {
 	HeightMap.CreateTextureData(heightMap);
 }
+

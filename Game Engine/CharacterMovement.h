@@ -24,13 +24,17 @@ public:
 	
 	void update();
 private:
+	float jumpSpeed = 0.04;
+	float cameraSpeed = 0.03;
+	float fallSpeed = 0.07;
+
 	bool frontCollision = false;
 	bool bottomCollision = true;
 	bool leftCollision = false;
 	bool rightCollision = false;
 	bool backCollision = false;
 	bool topCollision = false;
-	float cameraSpeed;
+
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
@@ -48,9 +52,9 @@ private:
 	float time = 0.0f;
 	bool gravity = true;
 	//--------=====Jumping=====-----------
-	float jumpSpeed = 0.04;
+
 	bool jumpReady = true;
 	bool inAir = false;
-	float timeInAir = 0.2;
+	float timeInAir = 0.4;
 };
 
