@@ -264,6 +264,19 @@
     <None Include="SkyboxFS.glsl" />
     <None Include="SkyboxVS.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="axeTexture.png" />
+    <Image Include="BucketTexture.png" />
+    <Image Include="FoodTexture.png" />
+    <Image Include="InventoryAxeTexture.png" />
+    <Image Include="InventoryBucketTexture.png" />
+    <Image Include="InventoryFoodTexture.png" />
+    <Image Include="InventoryLighterIconTexture.png" />
+    <Image Include="InventoryWoodIconTexture.png" />
+    <Image Include="LighterIconTexture.png" />
+    <Image Include="uiTexture.png" />
+    <Image Include="WoodIconTexture.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
