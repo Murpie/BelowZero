@@ -76,8 +76,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>glew-1.11.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>glew-1.11.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>glfw\include;glew-1.11.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>glfw\lib-vc2015-64;glew-1.11.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -165,13 +165,11 @@
     <ClCompile Include="AnimatedMesh.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimationShaders.cpp" />
-    <ClCompile Include="CharacterMovement.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="CubeMapShaders.cpp" />
-    <ClCompile Include="FXAAShaders.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
-    <ClCompile Include="GaussianBlurShaders.cpp" />
     <ClCompile Include="GeometryShaders.cpp" />
     <ClCompile Include="ImGui\examples\libs\gl3w\GL\gl3w.c" />
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -182,6 +180,7 @@
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightpassShaders.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="UIShaders.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialLib.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -195,28 +194,26 @@
     <ClCompile Include="ShadowMapShaders.cpp" />
     <ClCompile Include="SkelletonVertex.cpp" />
     <ClCompile Include="SkyboxShaders.cpp" />
-    <ClCompile Include="SSAOBlurShaders.cpp" />
-    <ClCompile Include="SSAOShaders.cpp" />
     <ClCompile Include="stb.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TerrainShader.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureLib.cpp" />
-    <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Transformable.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Desktop\Game Engine - 2.0\Game Engine\GeometryShaders.h" />
     <ClInclude Include="AnimatedMesh.h" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimationShaders.h" />
-    <ClInclude Include="CharacterMovement.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="CubeMapShaders.h" />
-    <ClInclude Include="FXAAShaders.h" />
+    <ClInclude Include="EnumID.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameScene.h" />
-    <ClInclude Include="GaussianBlurShaders.h" />
-    <ClInclude Include="GeometryShaders.h" />
     <ClInclude Include="ImGui\examples\libs\gl3w\GL\gl3w.h" />
     <ClInclude Include="ImGui\examples\libs\gl3w\GL\glcorearb.h" />
     <ClInclude Include="ImGui\imconfig.h" />
@@ -224,8 +221,10 @@
     <ClInclude Include="ImGui\imgui_impl_glfw_gl3.h" />
     <ClInclude Include="ImGui\imgui_internal.h" />
     <ClInclude Include="Joint.h" />
+    <ClInclude Include="Intersection.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightpassShaders.h" />
+    <ClInclude Include="UIShaders.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialLib.h" />
     <ClInclude Include="Mesh.h" />
@@ -233,20 +232,20 @@
     <ClInclude Include="MeshLib.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="PointLightShadowMapShaders.h" />
+    <ClInclude Include="Ray.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="ShaderProgramLib.h" />
     <ClInclude Include="ShadowMapShaders.h" />
     <ClInclude Include="SkelletonVertex.h" />
     <ClInclude Include="SkyboxShaders.h" />
-    <ClInclude Include="SSAOBlurShaders.h" />
-    <ClInclude Include="SSAOShaders.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainShaders.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureLib.h" />
-    <ClInclude Include="Transform.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Transformable.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
@@ -254,15 +253,13 @@
     <None Include="AnimationVS.glsl" />
     <None Include="CubeMapFS.glsl" />
     <None Include="CubeMapVS.glsl" />
-    <None Include="FXAA_FS.glsl" />
-    <None Include="FXAA_VS.glsl" />
-    <None Include="gaussianBlurFS.glsl" />
-    <None Include="gaussianBlurVS.glsl" />
     <None Include="GeometryFS.glsl" />
     <None Include="GeometryGS.glsl" />
     <None Include="GeometryVS.glsl" />
     <None Include="lightpassFS.glsl" />
     <None Include="lightpassVS.glsl" />
+    <None Include="UIFS.glsl" />
+    <None Include="UIVS.glsl" />
     <None Include="PointLightShadowMapFS.glsl" />
     <None Include="PointLightShadowMapGS.glsl" />
     <None Include="PointLightShadowMapVS.glsl" />
@@ -270,12 +267,19 @@
     <None Include="ShadowMapVS.glsl" />
     <None Include="SkyboxFS.glsl" />
     <None Include="SkyboxVS.glsl" />
-    <None Include="ssaoBlurFS.glsl" />
-    <None Include="ssaoBlurVS.glsl" />
-    <None Include="ssaoFS.glsl" />
-    <None Include="ssaoVS.glsl" />
-    <None Include="TerrainFS.glsl" />
-    <None Include="TerrainVS.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="axeTexture.png" />
+    <Image Include="BucketTexture.png" />
+    <Image Include="FoodTexture.png" />
+    <Image Include="InventoryAxeTexture.png" />
+    <Image Include="InventoryBucketTexture.png" />
+    <Image Include="InventoryFoodTexture.png" />
+    <Image Include="InventoryLighterIconTexture.png" />
+    <Image Include="InventoryWoodIconTexture.png" />
+    <Image Include="LighterIconTexture.png" />
+    <Image Include="uiTexture.png" />
+    <Image Include="WoodIconTexture.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

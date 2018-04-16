@@ -1,5 +1,4 @@
-#ifndef SHADOWMAPSHADERS_H
-#define SHADOWMAPSHADERS_H
+#pragma once
 
 #include <windows.h>
 #include <vector>
@@ -24,5 +23,3 @@ public:
 	GLuint ShadowMapShaderProgram;
 	int assetID;
 };
-
-#endif // !SHADOWMAPSHADERS_H

@@ -10,21 +10,16 @@
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glew32.lib")
 
-
-class SSAOShaders :public ShaderBase
+class UIShaders : public ShaderBase
 {
 public:
-	SSAOShaders();
-	SSAOShaders(int otherAssetID);
-	~SSAOShaders();
+	UIShaders();
+	UIShaders(int otherAssetID);
+	~UIShaders();
 
 	void CreateShaderData();
 
-	//GLuint gVertexBuffer;
-	//GLuint gVertexAttribute;
-	//GLuint gElementBuffer;
-	GLuint ssaoShaderProgram;
+	
+	GLuint UIShaderProgram;
 	int assetID;
-
 };
-

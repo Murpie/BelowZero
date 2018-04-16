@@ -9,8 +9,11 @@
 #include <streambuf>
 #include <iostream>
 #include <random>
+#include "stb_image.h"
 #include "GameScene.h"
+#include "Player.h"
 #include "ShaderProgramLib.h"
+#define STB_IMAGE_IMPLEMENTATION
 
 // Cube Map defines for its positions
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_X  0x8515 
@@ -34,13 +37,13 @@ public:
 
 	GameScene *gameScene;
 	void FindObjectsToRender();
-	void Render(int ssaoOnorOFF);
+	void Render();
 	void createBuffers();
 	void renderQuad();
 	void renderSkyQuad();
 	void Update();
-	void getDeltaTime(float deltaTime);
-	void getSeconds(float seconds);
+	void setDeltaTime(float deltaTime);
+	void setSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
 	void setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition);
 
@@ -58,7 +61,10 @@ private:
 
 	float deltaTime;
 	float seconds;
+	int count;
 
+	unsigned int UIFBO;
+	unsigned int UITexture;
 	unsigned int shadowMap;
 	unsigned int shadowFBO;
 	unsigned int cubeMapShadowMap;
@@ -77,17 +83,13 @@ private:
 	unsigned int gbo;
 	unsigned int skyFBO;
 	unsigned int rboDepth;
-	unsigned int ssaoFBO;
-	unsigned int ssaoColorBuffer;
-	unsigned int ssaoBlurFBO;
-	unsigned int ssaoColorBufferBlur;
 	unsigned int finalFBO;
 	unsigned int finalColorBuffer;
 	unsigned int finalDepthStensil;
-	unsigned int fxaaFBO;
-	unsigned int fxaaColorBuffer;
 
-	unsigned int noiseTexture;
+	unsigned int equipedFBO;
+	unsigned int equipedTexture;
+
 	unsigned int cubemapTexture;
 	unsigned int gAlbedo;
 	unsigned int gNormal;
@@ -122,12 +124,10 @@ private:
 	GLuint geometryShaderProgram;
 	GLuint cubeMapShaderProgram;
 	GLuint lightpassShaderProgram;
-	GLuint ssaoShaderProgram;
-	GLuint ssaoBlurShaderProgram;
-	GLuint gaussianBlurShaderProgram;
 	GLuint skyboxShaderProgram;
-	GLuint fxaaShaderProgram;
 	GLuint animationShaderProgram;
+	GLuint UIShaderProgram;
+
 	int display_w, display_h;
 	unsigned int cubeMapSize = 64;
 

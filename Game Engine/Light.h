@@ -1,23 +1,24 @@
 #pragma once
 #include <GL/gl3w.h>  
-#include"Component.h"
+//#include"Component.h"
+#include "Transformable.h"
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtc/type_ptr.hpp"
 #include "glm/glm/glm.hpp"
 
-class Light :public Component
+class Light :public Transformable
 {
 public:
-	Light();
+	Light(Transform& transform);
 	~Light();
 
 	glm::vec4 color;
 	int lightType;
 	float Linear;
 	float Quadratic;
-	void update();
-	void getInformation(float time);
 
+	void update(float deltaTime);
+	void processEvents(GLFWwindow *window, float deltaTime);
 private:
 
 };

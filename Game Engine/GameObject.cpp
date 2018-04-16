@@ -2,16 +2,45 @@
 
 GameObject::GameObject()
 {
+	transform = new Transform();
 	name = "EmptyGameObject";
-	transform=Transform();
     isActive = true;
     isRenderable = false;
     hasLight = false;
 
+	//transform.forward = glm::vec3(1, 0, 0);
+	//transform.up = glm::vec3(0, 1, 0);
+	//transform.right = glm::vec3(0, 0, 1);
 }
 
 GameObject::~GameObject()
 {
+	//deleteAllComponents();
+
+	//These will probably give memory leaks if not deleted.
+
+	//delete materialComponent;
+	//delete meshFilterComponent;
+	//delete lightComponent;
+}
+
+void GameObject::update(float deltaTime)
+{
+	for (Component* components_ptr : components)
+	{
+		Component& component = *components_ptr;
+		component.update(deltaTime);
+	}
+}
+
+void GameObject::processEvents(GLFWwindow * window, float deltaTime)
+{
+	for (int i = 0; i < components.size(); i++)
+	{
+		// store a reference for the correct type
+		auto& component = components[i];
+		component->processEvents(window, deltaTime);
+	}
 }
 
 void GameObject::updateMaterialAndMeshFilterPointers() {
@@ -30,7 +59,12 @@ void GameObject::updateMaterialAndMeshFilterPointers() {
     for (int i = 0; i < components.size(); i++) {
         MeshFilter* temp = getComponent<MeshFilter>();
         if (temp != nullptr) {
-            meshFilterComponent = temp;
+            //rework this, we want our meshFilter inside components, or do we need it to be a component?
+			/*
+				Save the ID of the meshFIlter when Creating it our think of
+				a better solution. 
+			*/
+			meshFilterComponent = temp;
             meshTest = true;
 
         }
@@ -53,11 +87,11 @@ void GameObject::updateHasLight() {
             foundLight = true;
 
 			lightComponent = temp;
+			//rework this if needed
 
         }
     }
 
-   
     if (foundLight == true) {
         hasLight = true;
     } else {
@@ -77,15 +111,24 @@ void GameObject::addComponent(Component* otherComponent)
 	}
 	//add if not
 	if (index == -1) {
-        otherComponent->gameObject = this;
+        //otherComponent->gameObject = this;
 		components.push_back(otherComponent);
 	}
     updateMaterialAndMeshFilterPointers();
     updateHasLight();
 }
 
+/*
+void GameObject::addComponent(Component* otherComponent)
+{
+	components.push_back(otherComponent);
+}
+*/
+
 void GameObject::deleteComponent(Component* otherComponent)
 {
+	//
+
 	//find component
 	int index = -1;
 	for (int i = 0; i < components.size(); i++)
@@ -95,11 +138,39 @@ void GameObject::deleteComponent(Component* otherComponent)
 		}
 	}
 	if (index != -1) {
+		//delete components[index];
 		components.erase(components.begin() + index);
 	}
     updateMaterialAndMeshFilterPointers();
 }
 
+void GameObject::deleteAllComponents()
+{
+	for (Component* component : components)
+	{
+		delete component;
+	}
+	components.clear();
+
+	//delete materialComponent;
+	//delete meshFilterComponent;
+	//delete lightComponent;
+}
+
 const bool GameObject::getIsRenderable() {
     return isRenderable;
+}
+
+Player * GameObject::getPlayer()
+{
+	for (int i = 0; i < components.size(); i++)
+	{
+
+		if (components[i]->id == ComponentType::ID::PLAYER)
+		{
+			Player* player = static_cast<Player*>(components[i]);
+			return player;
+		}
+	}
+	return nullptr;
 }

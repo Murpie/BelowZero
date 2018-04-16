@@ -1,5 +1,4 @@
-#ifndef POINTLIGHTSHADOWMAPSHADERS_H
-#define POINTLIGHTSHADOWMAPSHADERS_H
+#pragma once
 #include <windows.h>
 #include <vector>
 #include <string>
@@ -24,5 +23,3 @@ public:
 	int assetID;
 
 };
-
-#endif // !POINTLIGHTSHADOWMAPSHADERS_H
