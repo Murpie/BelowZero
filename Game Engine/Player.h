@@ -26,7 +26,7 @@ public:
 	int inventory[5];
 	int inventoryCount;
 
-	std::string imageNames[5] = {"InventoryAxe", "InventoryLighter", "InventoryLog", "InventoryFood", "InventoryBucket"};
+	std::string imageNames[5] = {"InventoryAxe", "InventoryLighter", "InventoryLog", "InventoryFood", "InventoryBucketIcon"};
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;

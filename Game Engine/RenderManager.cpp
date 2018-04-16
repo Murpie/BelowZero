@@ -256,7 +256,7 @@ void RenderManager::Render() {
 		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 	{
 		player.equip("AxeIcon");
-		player.addImageToInventory("InventoryAxe", 0);
+		player.addImageToInventory("InventoryAxeIcon", 0);
 	}
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 	{
@@ -270,13 +270,13 @@ void RenderManager::Render() {
 	}
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 	{
-		player.equip("Food");
-		player.addImageToInventory("InventoryFood", 3);
+		player.equip("FoodIcon");
+		player.addImageToInventory("InventoryFoodIcon", 3);
 	}
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
 	{
-		player.equip("Bucket");
-		player.addImageToInventory("InventoryBucket", 4);
+		player.equip("BucketIcon");
+		player.addImageToInventory("InventoryBucketIcon", 4);
 	}
 
 
@@ -641,7 +641,7 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 {
 	glUseProgram(shaderToUse);
 
-	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 12.0f);
+	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 25.0f);
 	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0));
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 

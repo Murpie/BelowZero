@@ -301,7 +301,7 @@ int main(int, char**)
 
 		gameScene.gameObjects[1].name = "Light 1";
 		gameScene.gameObjects[1].addComponent(&light1);
-		gameScene.gameObjects[1].transform = glm::vec3(0, 9, 0);
+		gameScene.gameObjects[1].transform = glm::vec3(-4, 8, 0);
 		gameScene.gameObjects[1].lightComponent->lightType = 0;
 
 		gameScene.gameObjects[2].name = "Light 2";
