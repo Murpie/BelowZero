@@ -56,6 +56,7 @@ private:
 	std::vector<glm::vec3> kernel;
 
 	glm::mat4x4 view_matrix;
+	glm::mat4x4 fpsView_matrix;
 	glm::mat4x4 projection_matrix;
 	glm::mat4x4 currentCubeMapView;
 

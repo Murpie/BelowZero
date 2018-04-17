@@ -4,9 +4,10 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(std::string filePath, GLuint gShaderProgram)
+Mesh::Mesh(std::string filePath, GLuint gShaderProgram, GLuint meshType)
 {
 	vertexCount = 0;
+	this->meshType = meshType;
 	CreateMeshData(filePath, gShaderProgram);
 }
 

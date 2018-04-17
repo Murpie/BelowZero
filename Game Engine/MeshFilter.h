@@ -6,14 +6,14 @@ class MeshFilter :public Component
 {
 public:
 	MeshFilter();
-	MeshFilter(GLuint gVertexBuffer, GLuint gVertexAttribute, GLuint gElementBuffer, int otherVertexCount);
+	MeshFilter(GLuint gVertexBuffer, GLuint gVertexAttribute, GLuint gElementBuffer, int otherVertexCount, int meshType);
 	~MeshFilter();
 
 	GLuint gVertexBuffer;
 	GLuint gVertexAttribute;
 	GLuint gElementBuffer;
 	int vertexCount;
-
+	int meshType;
 	void update(float deltaTime);
 	void processEvents(GLFWwindow *window, float deltaTime);
 
