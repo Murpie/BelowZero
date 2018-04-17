@@ -175,8 +175,8 @@ void Player::equip(std::string item)
 
 void Player::addImageToInventory(std::string item, int inventorySlot)
 {
-	if (checkInventory(item))
-		std::cout << "Item already exists in players inventory" << std::endl;
+	if (checkInventory(item) && item != "EmptyImage")
+		this->inventoryCount = inventoryCount;
 	else
 	{
 		std::string texturePNG = "Texture.png";

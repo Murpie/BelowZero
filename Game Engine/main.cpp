@@ -93,14 +93,8 @@ int main(int, char**)
 		//... Create Lights and add empty game object
 		Light light1 = Light();
 		Light light2 = Light();
-		/*Light light3 = Light();
-		Light light4 = Light();
-		Light light5 = Light();*/
 		gameScene.addEmptyGameObject();
 		gameScene.addEmptyGameObject();
-		/*gameScene.addEmptyGameObject();
-		gameScene.addEmptyGameObject();
-		gameScene.addEmptyGameObject();*/
 
 		int nrOfObjects = gameScene.gameObjects.size();
 
@@ -301,28 +295,13 @@ int main(int, char**)
 
 		gameScene.gameObjects[1].name = "Light 1";
 		gameScene.gameObjects[1].addComponent(&light1);
-		gameScene.gameObjects[1].transform = glm::vec3(-4, 8, 0);
+		gameScene.gameObjects[1].transform = glm::vec3(-4, 2, 0);
 		gameScene.gameObjects[1].lightComponent->lightType = 0;
 
 		gameScene.gameObjects[2].name = "Light 2";
 		gameScene.gameObjects[2].addComponent(&light2);
 		gameScene.gameObjects[2].transform = glm::vec3(4, 0.4, -2);
 		gameScene.gameObjects[2].lightComponent->lightType = 1;
-
-		/*gameScene.gameObjects[3].name = "Light 3";
-		gameScene.gameObjects[3].addComponent(&light3);
-		gameScene.gameObjects[3].transform = glm::vec3(1, 0.4, -3);
-		gameScene.gameObjects[3].lightComponent->lightType = 1;
-
-		gameScene.gameObjects[4].name = "Light 4";
-		gameScene.gameObjects[4].addComponent(&light4);
-		gameScene.gameObjects[4].transform = glm::vec3(-5, 0.4, -4);
-		gameScene.gameObjects[4].lightComponent->lightType = 1;
-
-		gameScene.gameObjects[5].name = "Light 5";
-		gameScene.gameObjects[5].addComponent(&light5);
-		gameScene.gameObjects[5].transform = glm::vec3(-5, 0.4, 3);
-		gameScene.gameObjects[5].lightComponent->lightType = 1;*/
 
 		MeshFilter meshFilter[sizeof(meshName) / sizeof(meshName[0])];
 

@@ -23,6 +23,10 @@
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_Z  0x8519 
 #define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z  0x851A
 
+#define LOW_SHADOW 1024
+#define MEDIUM_SHADOW 2048
+#define HIGH_SHADOW 4096
+
 struct QuadVertex
 {
 	float x, y, u, v;

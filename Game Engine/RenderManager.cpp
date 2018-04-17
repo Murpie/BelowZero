@@ -56,7 +56,7 @@ void RenderManager::createBuffers()
 	glGenFramebuffers(1, &shadowFBO);
 	glGenTextures(1, &shadowMap);
 	glBindTexture(GL_TEXTURE_2D, shadowMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, HIGH_SHADOW, HIGH_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -304,7 +304,7 @@ void RenderManager::Render() {
 
 	glUseProgram(shadowMapShaderProgram);
 	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[1].transform.position);
-	glViewport(0, 0, 1024, 1024);
+	glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -641,7 +641,7 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 {
 	glUseProgram(shaderToUse);
 
-	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 25.0f);
+	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 45.0f);
 	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0));
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
