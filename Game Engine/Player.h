@@ -37,7 +37,7 @@ public:
 	void equip(std::string item);
 
 	//Physics
-	void update(float deltaTime);
+	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
 private:
 
@@ -47,7 +47,7 @@ private:
 	bool rightCollision = false;
 	bool backCollision = false;
 	bool topCollision = false;
-	float cameraSpeed;
+
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
@@ -61,10 +61,15 @@ private:
 	float yoffset;
 	float sensitivity;
 
-	float time;
+	float time = 0.0;
 
+	float jumpSpeed = 7.64;
+	float cameraSpeed = 7.06;
+	float fallSpeed = 9.82;
 	//--------=====Jumping=====-----------
-	bool jump = false;
+
+	bool jumpReady = true;
 	bool inAir = false;
-	float timeInAir = 1.1;
+	float timeInAir = 0.3;
+	bool gravity = false;
 };

@@ -14,14 +14,10 @@ Light::~Light()
 {
 }
 
-void Light::update(float deltaTime)
+void Light::update(float deltaTime, float seconds)
 {
 }
 
 void Light::processEvents(GLFWwindow * window, float deltaTime)
-{
-}
-
-void Light::getInformation(float time)
 {
 }

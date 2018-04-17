@@ -1,7 +1,7 @@
 #include "GameScene.h"
 
 GameScene::GameScene() :
-	camerasInScene(0), lightsInScene(0)
+	camerasInScene(0), lightsInScene(0), terrainsInScene(0)
 {
 
 }
@@ -27,6 +27,15 @@ void GameScene::clearGameObjects()
 		}
 		gameObjects.pop_back();
 	}
+}
+
+void GameScene::addTerrain(const std::string & heightmapName, const std::string & albedomapName, GLuint Shader)
+{
+	terrainsInScene++;
+	addEmptyGameObject();
+	Terrain* terrain = new Terrain(heightmapName, albedomapName, Shader);
+	gameObjects[gameObjects.size() - 1].addComponent(terrain);
+	gameObjects[gameObjects.size() - 1].name = "Terrain " + terrainsInScene;
 }
 
 void GameScene::addLight(glm::vec3 transform, int lightType)
@@ -69,11 +78,11 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 	}
 }
 
-void GameScene::update(float deltaTime)
+void GameScene::update(float deltaTime, float seconds)
 {
 	for (unsigned int i = 0; i < gameObjects.size(); i++)
 	{
-		gameObjects[i].update(deltaTime);
+		gameObjects[i].update(deltaTime, seconds);
 	}
 
 }

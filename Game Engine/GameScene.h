@@ -20,11 +20,12 @@ public:
 	// clearGameObjects is unused atm. 
 	void clearGameObjects(); // delete all pointers in each gameobject and reload on scene swap
 
+	void addTerrain(const std::string & heightmapName, const std::string & albedomapName, GLuint Shader);
 	void addLight(glm::vec3 transform, int lightType);
 	void addPlayer(); //player
 	void addMeshFilter(MeshLib& meshLibrary, MaterialLib& matertialLibrary, int meshNameSize);
 
-	void update(float deltaTime); // Updates all the objects in the scene
+	void update(float deltaTime, float seconds); // Updates all the objects in the scene
 	void processEvents(GLFWwindow *window, float deltaTime); // Updates objects if a evenet occurs, mouse press, button press etc. 
 
 private:
@@ -32,5 +33,6 @@ private:
 	//...
 	int camerasInScene; //player atm
 	int lightsInScene; //
+	int terrainsInScene;
 
 };

@@ -12,6 +12,7 @@
 #include "ShadowMapShaders.h"
 #include "PointLightShadowMapShaders.h"
 #include "UIShaders.h"
+#include "TerrainShaders.h"
 
 class ShaderProgramLib
 {
@@ -27,6 +28,7 @@ public:
 	void addPointLightShadowMapShaders();
 	void addAnimationShaders();
 	void addUIShaders();
+	void addTerrainShaders();
 
 	template <class T>
 	T* getShader() {

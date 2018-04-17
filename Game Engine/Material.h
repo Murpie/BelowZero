@@ -30,7 +30,7 @@ public:
 
 	GLuint geometryShaderProgram;
 
-	void update(float deltaTime);
+	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
 	
 	void bindTextures();

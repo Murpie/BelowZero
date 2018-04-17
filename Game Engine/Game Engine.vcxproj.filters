@@ -358,6 +358,12 @@
     <None Include="AnimationVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
+    <None Include="TerrainFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="TerrainVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="axeTexture.png">
@@ -397,12 +403,6 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="AnimationVS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="TerrainFS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="TerrainVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>

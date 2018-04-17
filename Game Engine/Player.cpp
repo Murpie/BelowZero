@@ -20,7 +20,6 @@ Player::Player(Transform& transform) : Transformable(transform)
 
 	/**/
 	assetName = "CharacterMovement";
-	cameraSpeed = 5.0f;
 	cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -110,8 +109,11 @@ void Player::equip(std::string item)
 		std::cout << "Equiped Framebuffer not complete!" << std::endl;
 }
 
-void Player::update(float deltaTime)
+void Player::update(float deltaTime, float seconds)
 {
+	float tempSeconds = seconds / 1000;
+	time += tempSeconds;
+
 	// LOOSING HP
 	if (this->cold < 20)
 		this->coldMeter = 0.5;
@@ -220,16 +222,82 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	lastY = (float)ypos;
 
 	//... WASD Movement
+	glm::vec3 direction = glm::vec3(0);
+	bool shift = false;
+
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		shift = true;
+
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && frontCollision == false)
-		Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
+	{
+		float tempY = Transformable::transform.position.y;
+		direction += Transformable::transform.forward;
+		if(shift == true)
+			Transformable::transform.position += cameraSpeed * (Transformable::transform.forward * 1.5f) * deltaTime;
+		else
+			Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
+		Transformable::transform.position.y = tempY;
+	}
+		
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && backCollision == false)
+	{
+		float tempY = Transformable::transform.position.y;
+		direction -= Transformable::transform.forward;
 		Transformable::transform.position -= cameraSpeed * Transformable::transform.forward * deltaTime;
+		Transformable::transform.position.y = tempY;
+	}
+	
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && leftCollision == false)
+	{
+		float tempY = Transformable::transform.position.y;
+		direction -= Transformable::transform.right;
 		Transformable::transform.position -= Transformable::transform.right * cameraSpeed * deltaTime;
+		Transformable::transform.position.y = tempY;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
+	{
+		float tempY = Transformable::transform.position.y;
+		direction += Transformable::transform.right;
 		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
+		Transformable::transform.position.y = tempY;
+	}
 
 	//... Jump mechanic
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false)
-		transform.position += cameraSpeed * transform.up;
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true)
+	{
+		inAir = true;
+		gravity = false;
+		time = 0.0f;
+		jumpReady = false;
+	}
+
+	if (time <= timeInAir && inAir == true)
+	{
+		glm::vec3 jumpdir = Transformable::transform.up;
+		//if(jumpReady = true)
+		//	jumpdir = glm::normalize(direction + Transformable::transform.up);
+		//	if (shift == true)
+		//		jumpdir *= 1.5;
+
+		Transformable::transform.position += jumpSpeed * jumpdir * deltaTime;
+	}
+	else
+		inAir = false;
+
+
+	if (inAir == false && Transformable::transform.position.y <= 0.0f)
+	{
+		gravity = false;
+		jumpReady = true;
+	}
+	else
+		gravity = true;
+
+
+	if (gravity == true && inAir == false)
+		Transformable::transform.position -= fallSpeed * Transformable::transform.up  * deltaTime;
+
+	if (Transformable::transform.position.y <= -0.1f)
+		Transformable::transform.position.y = 0.0f;
 }

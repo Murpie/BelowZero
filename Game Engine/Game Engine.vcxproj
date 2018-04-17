@@ -258,6 +258,8 @@
     <None Include="GeometryVS.glsl" />
     <None Include="lightpassFS.glsl" />
     <None Include="lightpassVS.glsl" />
+    <None Include="TerrainFS.glsl" />
+    <None Include="TerrainVS.glsl" />
     <None Include="UIFS.glsl" />
     <None Include="UIVS.glsl" />
     <None Include="PointLightShadowMapFS.glsl" />

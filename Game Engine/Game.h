@@ -77,6 +77,7 @@ private:
 
 	void addMeshName();
 	//...
+	void addTerrain(GameScene &scene);
 	void addLights(GameScene &scene);
 	void addRenderManager(GameScene &scene);
 	void addPlayer(GameScene &scene);

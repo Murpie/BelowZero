@@ -6,6 +6,11 @@ layout (location = 3) out vec3 gSpecular;
 layout (location = 4) out vec3 gMetallic;
 layout (location = 5) out vec3 gAO;
 
+
+in vec3 normal;
+in vec2 uv;
+in vec3 fragpos;
+
 uniform sampler2D gAlbedoIn;
 uniform sampler2D gNormalIn;
 uniform sampler2D gSpecularIn;
@@ -18,19 +23,16 @@ uniform int foundSpecular;
 uniform int foundMetallic;
 uniform int foundAO;
 
+vec3 norm;
 void main () 
 {
 	//Normal
-	gPosition = fs_in.FragPos.xyz;
+	gPosition = fragpos.xyz;
 
 	//Albedo
 	if (foundAlbedo == 1)
 	{
-		gAlbedo = texture(gAlbedoIn, fs_in.TexCoords).xyz;
-	}
-	else if (foundAlbedo == 2)
-	{
-		gAlbedo = vec3(mtlInfo[0].x, mtlInfo[0].y, mtlInfo[0].z);
+		gAlbedo = texture(gAlbedoIn, uv).xyz;
 	}
 	else
 	{
@@ -40,24 +42,21 @@ void main ()
 	//Normal
 	if (foundNormal == 1)
 	{
-		norm = texture(gNormalIn, fs_in.TexCoords).rgb;
+		norm = texture(gNormalIn, uv).rgb;
 	}
 	else
 	{
 		norm = vec3(0.5, 0.5, 1);
+		norm = normal;
 	}
 
 	norm = normalize(norm * 2.0 - 1.0);
-	gNormal = fs_in.TBN*norm;
+	gNormal = norm;
 
 	//Specular
 	if (foundSpecular == 1)
 	{
-		gSpecular = texture(gSpecularIn, fs_in.TexCoords).xyz;
-	}
-	else if (foundSpecular == 2)
-	{
-		gSpecular = vec3(mtlInfo[1].x, mtlInfo[1].y, mtlInfo[1].z);
+		gSpecular = texture(gSpecularIn, uv).xyz;
 	}
 	else
 	{
@@ -67,7 +66,7 @@ void main ()
 	//Metallic
 	if (foundMetallic == 1)
 	{
-		gMetallic = texture(gMetallicIn, fs_in.TexCoords).rgb;
+		gMetallic = texture(gMetallicIn, uv).rgb;
 	}
 	else
 	{
@@ -77,7 +76,7 @@ void main ()
 	//AO
 	if (foundAO == 1)
 	{
-		gAO = texture(gAOIn, fs_in.TexCoords).rgb;
+		gAO = texture(gAOIn, uv).rgb;
 	}
 	else
 	{

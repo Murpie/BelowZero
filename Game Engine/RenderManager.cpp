@@ -17,6 +17,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
 	this->pointLightShaderProgram = shaderProgram->getShader<PointLightShadowMapShaders>()->PointLightShaderProgram;
 	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
+	this->terrainShaderProgram = shaderProgram->getShader<TerrainShaders>()->terrainShaderProgram;
 	createBuffers();
 	vao = 0;
 	skyboxVAO = 0;
@@ -40,6 +41,7 @@ void RenderManager::FindObjectsToRender() {
 			lightsToRender.push_back(gameScene->gameObjects[i].lightComponent);
 			//rework this
 		}
+
 	}
 }
 
@@ -265,7 +267,9 @@ void RenderManager::Render() {
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
@@ -301,12 +305,11 @@ void RenderManager::Render() {
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
-	
-	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
+
+	//----===Terrain Pass===----
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glUseProgram(geometryShaderProgram);
-
+	glUseProgram(terrainShaderProgram);
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
@@ -317,13 +320,41 @@ void RenderManager::Render() {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilMask(0xFF); // enable writing to the stencil buffer
 
+	for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	{
+		if (gameScene->gameObjects[i].getTerrain() != nullptr)
+		{
+			gameScene->gameObjects[i].getTerrain()->bindVertexArray();
+			gameScene->gameObjects[i].getTerrain()->bindTextures(terrainShaderProgram);
+
+			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i].getTerrain()->indices.size(), GL_UNSIGNED_SHORT, 0);
+		}
+	}
+	
+
+	
+	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
+	//glBindFramebuffer(GL_FRAMEBUFFER, gbo);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glUseProgram(geometryShaderProgram);
+	
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+	
+	//glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_STENCIL_TEST);
+	//glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	//glStencilMask(0xFF); // enable writing to the stencil buffer
+	
 	gameObjectsToRender[0]->materialComponent->bindTextures();
 	gameObjectsToRender[0]->materialComponent->bindFoundTextures();
-
+	
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
-
+	
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
 	}
 
