@@ -9,6 +9,10 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 {
 	gameScene = otherGameScene;
 	window = otherWindow;
+	player.equip("EmptyImage");
+	for(int i= 0; i < 5; i++)
+		player.initiateInventoryTextures("EmptyImage");
+
 	this->geometryShaderProgram = shaderProgram->getShader<GeometryShaders>()->geometryShaderProgram;
 	this->cubeMapShaderProgram = shaderProgram->getShader<CubeMapShaders>()->cubeMapShaderProgram;
 	this->lightpassShaderProgram = shaderProgram->getShader<LightpassShaders>()->lightpassShaderProgram;
@@ -234,6 +238,38 @@ void RenderManager::createBuffers()
 
 void RenderManager::Render() {
 	FindObjectsToRender();
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+	{
+		player.equip("EmptyImage");
+		for(int i = 0; i < 5; i++)
+			player.addImageToInventory("EmptyImage", i);
+	}
+	
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS )
+	{
+		player.equip("AxeIcon");
+		player.addImageToInventory("InventoryAxeIcon", 0);
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS )
+	{
+		player.equip("LighterIcon");
+		player.addImageToInventory("InventoryLighterIcon", 1);
+	}
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS )
+	{
+		player.equip("WoodIcon");
+		player.addImageToInventory("InventoryWoodIcon", 2);
+	}
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS )
+	{
+		player.equip("FoodIcon");
+		player.addImageToInventory("InventoryFoodIcon", 3);
+	}
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS )
+	{
+		player.equip("BucketIcon");
+		player.addImageToInventory("InventoryBucketIcon", 4);
+	}
 
 	//... Set view and projection matrix
 	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
@@ -460,9 +496,26 @@ void RenderManager::Render() {
 	glBindTexture(GL_TEXTURE_2D, UITexture);
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "equipedTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->equipedTexture);
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 2);
+	glBindTexture(GL_TEXTURE_2D, player.equipedTexture);
+
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture1"), 2);
 	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[0]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture2"), 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[1]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture3"), 4);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[2]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture4"), 5);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[3]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[4]);
+	
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 7);
+	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0].getPlayer()->hp);
@@ -581,7 +634,7 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 {
 	glUseProgram(shaderToUse);
 
-	glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 12.0f);
+	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 25.0f);
 	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0));
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 

@@ -105,6 +105,7 @@ private:
 		GL_COLOR_ATTACHMENT4,
 		GL_COLOR_ATTACHMENT5 };
 
+
 	std::vector<std::string> faces
 	{
 		"right.jpg",
