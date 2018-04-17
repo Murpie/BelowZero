@@ -21,7 +21,3 @@ void Light::update(float deltaTime)
 void Light::processEvents(GLFWwindow * window, float deltaTime)
 {
 }
-
-void Light::getInformation(float time)
-{
-}
