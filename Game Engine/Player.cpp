@@ -15,6 +15,7 @@ Player::Player()
 	this->damage = 0;
 	this->initializer = 0;
 	this->inventoryCount = 0;
+	this->maxAmountOfItems = 5;
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
 }
@@ -174,6 +175,10 @@ void Player::equip(std::string item)
 
 void Player::addImageToInventory(std::string item, int inventorySlot)
 {
+	if (checkInventory(item))
+		std::cout << "Item already exists in players inventory" << std::endl;
+	else
+	{
 		std::string texturePNG = "Texture.png";
 		std::string filePath = item + texturePNG;
 		int width, height, nrOfChannels;
@@ -202,5 +207,21 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, inventoryTexture[inventorySlot], 0);
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			std::cout << "Inventory Framebuffer not complete!" << std::endl;
+		
+		this->imagesCurrentlyInInventory[inventorySlot] = item;
+		inventoryCount++;
+	}
+}
 
+bool Player::checkInventory(std::string item)
+{
+	bool check = false; // Item does not already exist in inventory
+	
+	for (int i = 0; i < maxAmountOfItems && check == false; i++)
+	{
+		if (item.c_str() == imagesCurrentlyInInventory[i])
+			check = true; // Item already exists in players inventory
+	}
+	
+	return check;
 }

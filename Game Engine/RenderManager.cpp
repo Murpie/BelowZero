@@ -253,32 +253,32 @@ void RenderManager::Render() {
 		for(int i = 0; i < 5; i++)
 			player.addImageToInventory("EmptyImage", i);
 	}
-		if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS )
 	{
 		player.equip("AxeIcon");
 		player.addImageToInventory("InventoryAxeIcon", 0);
 	}
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS )
 	{
 		player.equip("LighterIcon");
 		player.addImageToInventory("InventoryLighterIcon", 1);
 	}
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS )
 	{
 		player.equip("WoodIcon");
 		player.addImageToInventory("InventoryWoodIcon", 2);
 	}
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS )
 	{
 		player.equip("FoodIcon");
 		player.addImageToInventory("InventoryFoodIcon", 3);
 	}
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS )
 	{
 		player.equip("BucketIcon");
 		player.addImageToInventory("InventoryBucketIcon", 4);
 	}
-
 
 	//... Set view and projection matrix
 	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform.position, gameScene->gameObjects[0].transform.position + gameScene->gameObjects[0].transform.forward, gameScene->gameObjects[0].transform.up);

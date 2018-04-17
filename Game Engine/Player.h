@@ -24,9 +24,11 @@ public:
 
 	int initializer;
 	int inventory[5];
+	int maxAmountOfItems;
 	int inventoryCount;
 
-	std::string imageNames[5] = {"InventoryAxe", "InventoryLighter", "InventoryLog", "InventoryFood", "InventoryBucketIcon"};
+	std::string imageNames[5] = {"InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "InventoryBucketIcon"};
+	std::string imagesCurrentlyInInventory[5] = { "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage" };
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
@@ -42,6 +44,7 @@ public:
 	void addToInventory(int item);
 	void equip(std::string item);
 	void addImageToInventory(std::string item, int inventorySlot);
+	bool checkInventory(std::string item);
 
 private:
 };
