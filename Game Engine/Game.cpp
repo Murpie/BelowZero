@@ -148,7 +148,7 @@ void Game::run()
 		float secondsTime;
 		auto nowSeconds = chrono::high_resolution_clock::now();
 		seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
-		startSeconds = nowSeconds;
+		//nowSeconds = startSeconds;
 
 		// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -206,7 +206,7 @@ void Game::menuState()
 	}
 	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
-		menuScene.update(deltaTime, seconds);
+		menuScene.update(deltaTime);
 		processInput(window, deltaTime, menuScene);
 		renderManager[0].setDeltaTime(deltaTime);
 		renderManager[0].setSeconds(seconds);
@@ -228,7 +228,7 @@ void Game::levelState()
 	}
 	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
-		gameScene.update(deltaTime, seconds);
+		gameScene.update(deltaTime);
 		processInput(window, deltaTime, gameScene);
 		renderManager[1].setDeltaTime(deltaTime);
 		renderManager[1].setSeconds(seconds);
@@ -268,8 +268,6 @@ void Game::initScene(GameScene & scene)
 	addPlayer(scene);
 	//... Create Lights
 	addLights(scene);
-	//... Create Terrain
-	addTerrain(scene);
 	//... Read OBJ and MTL File
 	if(!meshesLoaded)
 	{ 
@@ -299,7 +297,6 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addPointLightShadowMapShaders();
 	shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
-	shaderProgramLibrary.addTerrainShaders();
 }
 
 void Game::initInputOptions()
@@ -324,13 +321,6 @@ void Game::addMeshName()
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 		meshName.push_back(meshLoader[i]);
-}
-
-
-
-void Game::addTerrain(GameScene & scene)
-{
-	scene.addTerrain("firstheightmap.jpg", "white.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->terrainShaderProgram);
 }
 
 void Game::addLights(GameScene &scene)

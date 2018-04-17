@@ -19,7 +19,7 @@ MeshFilter::~MeshFilter()
 {
 }
 
-void MeshFilter::update(float deltaTime, float seconds)
+void MeshFilter::update(float deltaTime)
 {
 }
 

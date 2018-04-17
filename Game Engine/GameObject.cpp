@@ -1,7 +1,6 @@
 #include "GameObject.h"
 
-GameObject::GameObject() :
-	isTerrain(false)
+GameObject::GameObject()
 {
 	transform = new Transform();
 	name = "EmptyGameObject";
@@ -25,12 +24,12 @@ GameObject::~GameObject()
 	//delete lightComponent;
 }
 
-void GameObject::update(float deltaTime, float seconds)
+void GameObject::update(float deltaTime)
 {
 	for (Component* components_ptr : components)
 	{
 		Component& component = *components_ptr;
-		component.update(deltaTime, seconds);
+		component.update(deltaTime);
 	}
 }
 
@@ -100,30 +99,6 @@ void GameObject::updateHasLight() {
     }
 }
 
-//void GameObject::updateIsTerrain()
-//{
-//	bool foundTerrain = false;
-//
-//	for (int i = 0; i < components.size(); i++) {
-//
-//		Terrain* temp = getComponent<Terrain>();
-//		if (temp != nullptr) {
-//			foundTerrain = true;
-//
-//			terrainComponent = temp;
-//			//rework this if needed
-//
-//		}
-//	}
-//
-//	if (foundTerrain == true) {
-//		isTerrain = true;
-//	}
-//	else {
-//		isTerrain = false;
-//	}
-//}
-
 void GameObject::addComponent(Component* otherComponent)
 {
 	//check if component exist
@@ -141,7 +116,6 @@ void GameObject::addComponent(Component* otherComponent)
 	}
     updateMaterialAndMeshFilterPointers();
     updateHasLight();
-	//updateIsTerrain();
 }
 
 /*
@@ -187,11 +161,6 @@ const bool GameObject::getIsRenderable() {
     return isRenderable;
 }
 
-const bool GameObject::getIsTerrain()
-{
-	return isTerrain;
-}
-
 Player * GameObject::getPlayer()
 {
 	for (int i = 0; i < components.size(); i++)
@@ -201,20 +170,6 @@ Player * GameObject::getPlayer()
 		{
 			Player* player = static_cast<Player*>(components[i]);
 			return player;
-		}
-	}
-	return nullptr;
-}
-
-Terrain* GameObject::getTerrain()
-{
-	for (int i = 0; i < components.size(); i++)
-	{
-
-		if (components[i]->id == ComponentType::ID::TERRAIN)
-		{
-			Terrain* terrain = static_cast<Terrain*>(components[i]);
-			return terrain;
 		}
 	}
 	return nullptr;

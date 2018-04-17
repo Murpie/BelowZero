@@ -13,7 +13,6 @@
 #include "GameScene.h"
 #include "Player.h"
 #include "ShaderProgramLib.h"
-#include "Terrain.h"
 #define STB_IMAGE_IMPLEMENTATION
 
 // Cube Map defines for its positions
@@ -52,7 +51,6 @@ private:
 	unsigned int loadCubemap(std::vector<std::string> faces);
 
 	std::vector<GameObject*> gameObjectsToRender;
-	std::vector<GameObject*> terrainToRender;
 	
 	std::vector<Light*> lightsToRender;
 	std::vector<glm::vec3> kernel;
@@ -79,9 +77,6 @@ private:
 	unsigned int animationVAO;
 	unsigned int animationVBO;
 	unsigned int animationEBO;
-	unsigned int terrainVAO;
-	unsigned int terrainVBO;
-	unsigned int terrainEBO;
 	unsigned int ebo;
 	unsigned int vbo;
 	unsigned int vao;
@@ -132,7 +127,6 @@ private:
 	GLuint skyboxShaderProgram;
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
-	GLuint terrainShaderProgram;
 
 	int display_w, display_h;
 	unsigned int cubeMapSize = 64;
