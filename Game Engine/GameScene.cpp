@@ -69,11 +69,11 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 	}
 }
 
-void GameScene::update(float deltaTime)
+void GameScene::update(float deltaTime, float seconds)
 {
 	for (unsigned int i = 0; i < gameObjects.size(); i++)
 	{
-		gameObjects[i].update(deltaTime);
+		gameObjects[i].update(deltaTime, seconds);
 	}
 
 }

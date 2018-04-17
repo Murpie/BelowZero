@@ -148,7 +148,7 @@ void Game::run()
 		float secondsTime;
 		auto nowSeconds = chrono::high_resolution_clock::now();
 		seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
-		//nowSeconds = startSeconds;
+		startSeconds = nowSeconds;
 
 		// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -206,7 +206,7 @@ void Game::menuState()
 	}
 	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
-		menuScene.update(deltaTime);
+		menuScene.update(deltaTime, seconds);
 		processInput(window, deltaTime, menuScene);
 		renderManager[0].setDeltaTime(deltaTime);
 		renderManager[0].setSeconds(seconds);
@@ -228,7 +228,7 @@ void Game::levelState()
 	}
 	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
-		gameScene.update(deltaTime);
+		gameScene.update(deltaTime, seconds);
 		processInput(window, deltaTime, gameScene);
 		renderManager[1].setDeltaTime(deltaTime);
 		renderManager[1].setSeconds(seconds);

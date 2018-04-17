@@ -24,12 +24,12 @@ GameObject::~GameObject()
 	//delete lightComponent;
 }
 
-void GameObject::update(float deltaTime)
+void GameObject::update(float deltaTime, float seconds)
 {
 	for (Component* components_ptr : components)
 	{
 		Component& component = *components_ptr;
-		component.update(deltaTime);
+		component.update(deltaTime, seconds);
 	}
 }
 
