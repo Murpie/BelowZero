@@ -8,9 +8,9 @@ MeshLib::~MeshLib()
 {
 }
 
-void MeshLib::addMesh(std::string filePath, GLuint gShaderProgram)
+void MeshLib::addMesh(std::string filePath, GLuint gShaderProgram, GLuint meshType)
 {
-	Mesh newMesh = Mesh(filePath, gShaderProgram);
+	Mesh newMesh = Mesh(filePath, gShaderProgram, meshType);
 	meshes.push_back(newMesh);
 }
 
@@ -28,4 +28,9 @@ Mesh & MeshLib::getMesh(int key)
 AnimatedMesh & MeshLib::getAnimatedMesh(int key)
 {
 	return animatedMeshes.at(key);
+}
+
+int MeshLib::getNumberOfMeshes()
+{
+	return meshes.size();
 }

@@ -3,11 +3,12 @@
 #include <iostream>
 #include "stb_image.h"
 #include <GL/gl3w.h>
+#include "Transformable.h"
 
-class Player
+class Player : public Transformable
 {
 public:
-	Player();
+	Player(Transform& transform);
 	~Player();
 
 	float hp;
@@ -21,6 +22,9 @@ public:
 	float waterTick;
 	float foodTick;
 	float damage;
+	float fade;
+
+	bool startGame;
 
 	int initializer;
 	int inventory[5];
@@ -35,7 +39,6 @@ public:
 	unsigned int inventoryFBO[5];
 	unsigned int inventoryTexture[5];
 
-	void updateStats(float deltaTime);
 	void setCold(float value);
 	void setWater(float value);
 	void setFood(float value);
@@ -46,5 +49,40 @@ public:
 	void addImageToInventory(std::string item, int inventorySlot);
 	bool checkInventory(std::string item);
 
+	//Physics
+	void update(float deltaTime, float seconds);
+	void processEvents(GLFWwindow *window, float deltaTime);
 private:
+
+	bool frontCollision = false;
+	bool bottomCollision = false;
+	bool leftCollision = false;
+	bool rightCollision = false;
+	bool backCollision = false;
+	bool topCollision = false;
+
+	glm::vec3 cameraPos;
+	glm::vec3 cameraFront;
+	glm::vec3 cameraUp;
+	float pitch;
+	float yaw;
+	bool firstMouse;
+	float lastX, lastY;
+	double xpos, ypos;
+	int mouseDisable;
+	float xoffset;
+	float yoffset;
+	float sensitivity;
+
+	float time = 0.0;
+
+	float jumpSpeed = 7.64;
+	float cameraSpeed = 7.06;
+	float fallSpeed = 9.82;
+	//--------=====Jumping=====-----------
+
+	bool jumpReady = true;
+	bool inAir = false;
+	float timeInAir = 0.3;
+	bool gravity = false;
 };

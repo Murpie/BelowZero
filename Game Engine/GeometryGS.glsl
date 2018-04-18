@@ -10,6 +10,7 @@ in VS_OUT{
 	mat4 world_matrix;
 	mat4 view_matrix;
 	mat4 projection_matrix;
+	int followCamera;
 } gs_in[];
 
 out GS_OUT{
@@ -31,12 +32,16 @@ void main() {
 	vec4 camRay = (inverse(gs_in[0].view_matrix) * vec4(0.0, 0.0, 0.0, 1.0)) - pointA;
 
 	float d = dot(-normal, camRay.xyz);
-	if (d > 0.0)
+	if (d > 0.0 || gs_in[0].followCamera == 1)
 	{
 		for (int i = 0; i < gl_in.length(); i++)
 		{
-			gl_Position = gs_in[i].projection_matrix * gs_in[i].view_matrix * gs_in[i].world_matrix * gl_in[i].gl_Position;
+			if (gs_in[0].followCamera == 1)
+				gl_Position = gs_in[i].projection_matrix * gl_in[i].gl_Position;
+			else
+				gl_Position = gs_in[i].projection_matrix * gs_in[i].view_matrix * gs_in[i].world_matrix * gl_in[i].gl_Position;
 			gs_out.FragPos = gs_in[i].world_matrix * gl_in[i].gl_Position;
+				
 			gs_out.TexCoords = gs_in[i].uv_coord;
 
 			mat3 worldSpace = mat3(gs_in[i].world_matrix);

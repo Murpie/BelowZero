@@ -16,7 +16,11 @@ Material::~Material()
 {
 }
 
-void Material::update()
+void Material::update(float deltaTime, float seconds)
+{
+}
+
+void Material::processEvents(GLFWwindow * window, float deltaTime)
 {
 }
 
