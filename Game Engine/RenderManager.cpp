@@ -271,7 +271,6 @@ void RenderManager::Render() {
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
-		cout << gameObjectsToRender[i]->meshFilterComponent->meshType << endl;
 
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
 	}
