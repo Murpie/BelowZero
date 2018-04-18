@@ -96,4 +96,6 @@ void main()
 
 	if (fade < 1 && fade > 0)
 		color.xyz = color.xyz + fade;
+	else if (fade >= 1)
+		color.xyz = vec3(1.0, 1.0, 1.0);
 }
