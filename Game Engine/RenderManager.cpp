@@ -11,16 +11,12 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	window = otherWindow;
 
 	this->geometryShaderProgram = shaderProgram->getShader<GeometryShaders>()->geometryShaderProgram;
-	this->cubeMapShaderProgram = shaderProgram->getShader<CubeMapShaders>()->cubeMapShaderProgram;
 	this->lightpassShaderProgram = shaderProgram->getShader<LightpassShaders>()->lightpassShaderProgram;
-	this->skyboxShaderProgram = shaderProgram->getShader<SkyboxShaders>()->skyboxShaderProgram;
 	//this->animationShaderProgram = shaderProgram->getShader<AnimationShaders>()->animationShaderProgram;
 	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
-	//this->pointLightShaderProgram = shaderProgram->getShader<PointLightShadowMapShaders>()->PointLightShaderProgram;
 	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
 	createBuffers();
 	vao = 0;
-	skyboxVAO = 0;
 }
 
 RenderManager::~RenderManager()
@@ -66,41 +62,6 @@ void RenderManager::createBuffers()
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	//----------========== ShadowMap FBO POINT LIGHTS (CUBE MAP) ==========----------
-	/*glGenFramebuffers(1, &cubeMapShadowFBO);
-	glGenTextures(1, &cubeMapShadowMap);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapShadowMap);
-	for (int i = 0; i < 6; i++)
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, cubeMapShadowFBO);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubeMapShadowMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
-
-	// cube VAO
-	glGenVertexArrays(1, &cubeVAO);
-	glGenBuffers(1, &cubeVBO);
-	glBindVertexArray(cubeVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-
-	//... Create textures for Skybox Cube Map
-	glGenFramebuffers(1, &skyFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, skyFBO);
-	cubemapTexture = loadCubemap(faces);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, cubemapTexture, 0);
 
 	//... Create G-buffers
 	//framebufferobject
@@ -280,27 +241,6 @@ void RenderManager::Render() {
 
 	glViewport(0, 0, display_w, display_h);
 
-	////POINT LIGHT SHADOWMAP PASS----------------------------------------------------------------------------------------------------------------------------------------
-	//glUseProgram(pointLightShaderProgram);
-	//setupMatricesForCubeMapShadowMap(pointLightShaderProgram, gameScene->gameObjects[1].transform.position);
-	//glViewport(0, 0, 1024, 1024);
-	//glBindFramebuffer(GL_FRAMEBUFFER, cubeMapShadowFBO);
-	//glClear(GL_DEPTH_BUFFER_BIT);
-
-	//glUniformMatrix4fv(glGetUniformLocation(pointLightShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
-	//glUniform3fv(glGetUniformLocation(pointLightShaderProgram, "lightPos"), 1, glm::value_ptr(gameScene->gameObjects[1].transform.position));
-
-
-	//for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
-	//{
-	//	gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
-	//	glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
-	//}
-
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//glViewport(0, 0, display_w, display_h);
-
-	
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
@@ -337,34 +277,6 @@ void RenderManager::Render() {
 
 	//------=====================Animation Pass=======================-------
 	//glUseProgram(animationShaderProgram);
-
-	////... CUBE MAP GEOMETREY PASS------------------------------------------------------------------------------------------------------------------------------
-	//glBindVertexArray(cubeVAO);
-	//glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-	//glUseProgram(cubeMapShaderProgram);
-
-	//// Reflective Cube Map World Matrix
-	//glm::mat4 cube_world_matrix = glm::mat4(1);
-	//cube_world_matrix = glm::translate(cube_world_matrix, glm::vec3(2, 0.5, 0));
-	//cube_world_matrix = glm::rotate(cube_world_matrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-	//glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
-	//glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
-	//glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(cube_world_matrix));
-	//glUniform3fv(glGetUniformLocation(cubeMapShaderProgram, "cameraPos"), 1, glm::value_ptr(gameScene->gameObjects[0].transform.position));
-
-	//glStencilFunc(GL_ALWAYS, 2, 0xFF);
-	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_FRONT);
-
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
-
-	////... CUBE MAP REFLECTION PASS TO FINAL IMAGE--------------------------------------------------------------------------------------------------------------
-	//glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
-
-	//glDrawArrays(GL_TRIANGLES, 0, 36);
-	//glDisable(GL_CULL_FACE);
 
 	//... Copy Stencil Buffer from gbo to finalFBO
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gbo);
@@ -426,34 +338,12 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, shadowMap);
 
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "cubeMapdepthMap"), 7);
-	glActiveTexture(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapShadowMap);
-
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_EQUAL, 1, 0xFF);
 	glStencilMask(0x00); // disable writing to the stencil buffer
 
 	renderQuad();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-	//... SKYBOX PASS--------------------------------------------------------------------------------------------------------------------------------------------
-	//glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
-	//glUseProgram(skyboxShaderProgram);
-
-	//view_matrix = glm::mat4(glm::mat3(view_matrix));
-	//glUniformMatrix4fv(glGetUniformLocation(skyboxShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
-	//glUniformMatrix4fv(glGetUniformLocation(skyboxShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
-	//glUniform1i(glGetUniformLocation(skyboxShaderProgram, "skybox"), 0);
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-
-	//glEnable(GL_STENCIL_TEST);
-	//glStencilFunc(GL_EQUAL, 0, 0xFF);
-	//glStencilMask(0x00); // disable writing to the stencil buffer
-
-	//renderSkyQuad();
-	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 	glStencilMask(0xFF);
 	glClear(GL_STENCIL_BUFFER_BIT);
@@ -580,29 +470,6 @@ void RenderManager::renderQuad()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 }
 
-void RenderManager::renderSkyQuad()
-{
-	if (skyboxVAO == 0)
-	{
-		glGenVertexArrays(1, &skyboxVAO);
-		glBindVertexArray(skyboxVAO);
-		glGenBuffers(1, &skyboxVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxArray), skyboxArray, GL_STATIC_DRAW);
-
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-		//ebo
-		glGenBuffers(1, &skyboxEBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(skyboxIndices), skyboxIndices, GL_STATIC_DRAW);
-	}
-	glBindVertexArray(skyboxVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEBO);
-}
-
 void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 {
 	glUseProgram(shaderToUse);
@@ -612,65 +479,6 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-}
-
-void RenderManager::setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition)
-{
-	glUseProgram(pointLightShaderProgram);
-
-	float aspectRatio = 1024.0f / 1024.0f;
-	float nearPlane = 1.0f;
-	float farPlane = 25.0f;
-	glm::mat4 cubeMapShadowProjection = glm::perspective(glm::radians(90.0f), aspectRatio, nearPlane, farPlane);
-
-	std::vector<glm::mat4> shadowTransforms;
-	shadowTransforms.push_back(cubeMapShadowProjection * glm::lookAt(lightPosition, lightPosition + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0))); //RIght
-	shadowTransforms.push_back(cubeMapShadowProjection * glm::lookAt(lightPosition, lightPosition + glm::vec3(-1.0, 0.0, 0.0),glm::vec3(0.0, -1.0, 0.0))); //Left
-	shadowTransforms.push_back(cubeMapShadowProjection * glm::lookAt(lightPosition, lightPosition + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0))); //Top
-	shadowTransforms.push_back(cubeMapShadowProjection * glm::lookAt(lightPosition, lightPosition + glm::vec3(0.0, -1.0, 0.0),glm::vec3(0.0, 0.0, -1.0))); //Bottom
-	shadowTransforms.push_back(cubeMapShadowProjection * glm::lookAt(lightPosition, lightPosition + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0))); //Near
-	shadowTransforms.push_back(cubeMapShadowProjection * glm::lookAt(lightPosition, lightPosition + glm::vec3(0.0, 0.0, -1.0),glm::vec3(0.0, -1.0, 0.0))); //Far
-	
-	std::string test = "";
-	
-	for (int i = 0; i < 6; i++)
-	{
-		test = "shadowMatrices[" + std::to_string(i) + "]";
-		GLint shadowMatrices = glGetUniformLocation(shaderToUse, test.c_str());
-		glUniformMatrix4fv(shadowMatrices, 1, GL_FALSE, glm::value_ptr(shadowTransforms[i]));
-	}
-		glUniform1f(glGetUniformLocation(pointLightShaderProgram, "far_plane"), farPlane);
-}
-
-unsigned int RenderManager::loadCubemap(std::vector<std::string> faces)
-{
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
-	int width, height, nrChannels;
-	for (unsigned int i = 0; i < faces.size(); i++)
-	{
-		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
-		if (data)
-		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-			);
-			stbi_image_free(data);
-		}
-		else
-		{
-			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-			stbi_image_free(data);
-		}
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	return textureID;
 }
 
 void RenderManager::Update()

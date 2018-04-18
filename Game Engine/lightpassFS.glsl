@@ -22,7 +22,6 @@ uniform sampler2D gSpecular;
 uniform sampler2D gMetallic;
 uniform sampler2D gAO;
 uniform sampler2D depthMap;
-uniform samplerCube cubeMapdepthMap;
 uniform mat4 LightSpaceMatrix;
 
 vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
@@ -67,31 +66,6 @@ float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 		directionalLightshadowFactor = 0.0;
 
 	return directionalLightshadowFactor;
-}
-
-// ----------========== POINT LIGHT SHADOW CALCULATION ==========----------
-float PointLightShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPosition)
-{
-	
-	float far_plane = 25.0;
-	vec3 fragPositionToLightPosition = FragPos - lightPosition;
-	float cubeMapCurrentDepth = length(fragPositionToLightPosition);
-	float cubeMapBias = 0.15;
-	float cubeMapShadowFactor = 0.0f;
-	float cubeMapSamples = 20;
-
-	float viewDistance = length(view_position - FragPos);
-	float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
-	for (int i = 0; i < cubeMapSamples; ++i)
-	{
-		float closestDepth = texture(cubeMapdepthMap, fragPositionToLightPosition + gridSamplingDisk[i] * diskRadius).r;
-		closestDepth *= far_plane;   // undo mapping [0;1]
-		if (cubeMapCurrentDepth - cubeMapBias > closestDepth)
-			cubeMapShadowFactor += 0.5;
-	}
-	cubeMapShadowFactor /= float(cubeMapSamples);
-
-	return cubeMapShadowFactor;
 }
 
 void main()
@@ -143,20 +117,14 @@ void main()
         specular *= attenuation;
         lighting += diffuse + specular + metallic;
 
-
-
 	float density = 0.05;
 	float gradient = 3.0;
 	float distanceToPos = length(view_position - FragPos);
     float visibility = exp(-pow((distanceToPos * density), gradient));
 	visibility = clamp(visibility, 0.0, 1.0);
 
-	
 	if (lights[1].lightType == 0)
 		shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal, lights[1].Position);
-	//if (lights[2].lightType == 1)
-	//	shadowFactor = PointLightShadowMapCalculation(FragPos, Normal, lights[2].Position);
-	
 
 	FragColor = lighting * (1.0f - shadowFactor);
 	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor, visibility);

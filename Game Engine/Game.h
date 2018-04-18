@@ -25,10 +25,8 @@
 #include <ctime>
 #include "GeometryShaders.h"
 #include "LightpassShaders.h"
-#include "CubeMapShaders.h"
 
 #include <chrono>
-#include "PointLightShadowMapShaders.h"
 ////////////
 
 class Game

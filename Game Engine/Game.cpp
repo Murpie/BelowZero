@@ -291,11 +291,8 @@ void Game::clearScene(GameScene & scene)
 void Game::initShaderProgramLib()
 {
 	shaderProgramLibrary.addGeometryPassShaders();
-	shaderProgramLibrary.addCubeMapShaders();
 	shaderProgramLibrary.addLightpassShaders();
-	shaderProgramLibrary.addSkyboxShaders();
 	shaderProgramLibrary.addShadowMapShaders();
-	//shaderProgramLibrary.addPointLightShadowMapShaders();
 	shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
 }
