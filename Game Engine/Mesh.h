@@ -8,8 +8,10 @@
 #include <string>
 #include <GL/gl3w.h>  
 #include "Vertex.h"
+#include "Converter.h"
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include "glm/glm/glm.hpp"
 #include <algorithm>    // std::unique, std::distance
 

@@ -17,6 +17,9 @@ Mesh::~Mesh()
 
 void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram)
 {
+	std::ifstream infile.read((char*))
+
+
 	std::vector<int> finalIndex;
 	int uniqueFoundIndices = 0;
 	Vertex newMesh;
