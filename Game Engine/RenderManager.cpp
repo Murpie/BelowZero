@@ -9,9 +9,6 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 {
 	gameScene = otherGameScene;
 	window = otherWindow;
-	player.equip("EmptyImage");
-	for(int i= 0; i < 5; i++)
-		player.initiateInventoryTextures("EmptyImage");
 
 	this->geometryShaderProgram = shaderProgram->getShader<GeometryShaders>()->geometryShaderProgram;
 	this->cubeMapShaderProgram = shaderProgram->getShader<CubeMapShaders>()->cubeMapShaderProgram;
@@ -19,7 +16,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->skyboxShaderProgram = shaderProgram->getShader<SkyboxShaders>()->skyboxShaderProgram;
 	//this->animationShaderProgram = shaderProgram->getShader<AnimationShaders>()->animationShaderProgram;
 	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
-	this->pointLightShaderProgram = shaderProgram->getShader<PointLightShadowMapShaders>()->PointLightShaderProgram;
+	//this->pointLightShaderProgram = shaderProgram->getShader<PointLightShadowMapShaders>()->PointLightShaderProgram;
 	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
 	createBuffers();
 	vao = 0;
@@ -56,7 +53,7 @@ void RenderManager::createBuffers()
 	glGenFramebuffers(1, &shadowFBO);
 	glGenTextures(1, &shadowMap);
 	glBindTexture(GL_TEXTURE_2D, shadowMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, HIGH_SHADOW, HIGH_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -71,7 +68,7 @@ void RenderManager::createBuffers()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//----------========== ShadowMap FBO POINT LIGHTS (CUBE MAP) ==========----------
-	glGenFramebuffers(1, &cubeMapShadowFBO);
+	/*glGenFramebuffers(1, &cubeMapShadowFBO);
 	glGenTextures(1, &cubeMapShadowMap);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapShadowMap);
 	for (int i = 0; i < 6; i++)
@@ -86,7 +83,7 @@ void RenderManager::createBuffers()
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubeMapShadowMap, 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
 
 	// cube VAO
 	glGenVertexArrays(1, &cubeVAO);
@@ -238,38 +235,6 @@ void RenderManager::createBuffers()
 
 void RenderManager::Render() {
 	FindObjectsToRender();
-	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
-	{
-		player.equip("EmptyImage");
-		for(int i = 0; i < 5; i++)
-			player.addImageToInventory("EmptyImage", i);
-	}
-	
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS )
-	{
-		player.equip("AxeIcon");
-		player.addImageToInventory("InventoryAxeIcon", 0);
-	}
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS )
-	{
-		player.equip("LighterIcon");
-		player.addImageToInventory("InventoryLighterIcon", 1);
-	}
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS )
-	{
-		player.equip("WoodIcon");
-		player.addImageToInventory("InventoryWoodIcon", 2);
-	}
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS )
-	{
-		player.equip("FoodIcon");
-		player.addImageToInventory("InventoryFoodIcon", 3);
-	}
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS )
-	{
-		player.equip("BucketIcon");
-		player.addImageToInventory("InventoryBucketIcon", 4);
-	}
 
 	//... Set view and projection matrix
 	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
@@ -296,8 +261,8 @@ void RenderManager::Render() {
 	glCullFace(GL_FRONT);
 
 	glUseProgram(shadowMapShaderProgram);
-	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[1].transform->position);
-	glViewport(0, 0, 1024, 1024);
+	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[2].transform->position);
+	glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -496,23 +461,23 @@ void RenderManager::Render() {
 	glBindTexture(GL_TEXTURE_2D, UITexture);
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "equipedTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, player.equipedTexture);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->equipedTexture);
 
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture1"), 2);
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[0]);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[0]);
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture2"), 3);
 	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[1]);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[1]);
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture3"), 4);
 	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[2]);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[2]);
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture4"), 5);
 	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[3]);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[3]);
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
 	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, player.inventoryTexture[4]);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[4]);
 	
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 7);
 	glActiveTexture(GL_TEXTURE7);
@@ -634,7 +599,7 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 {
 	glUseProgram(shaderToUse);
 
-	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 25.0f);
+	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 40.0f);
 	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0));
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 

@@ -38,7 +38,9 @@ Player::Player(Transform& transform) : Transformable(transform)
 	yoffset = 0;
 	sensitivity = 0.002f;
 
-	equip("Axe");
+	equip("EmptyImage");
+	for (int i = 0; i < 5; i++)
+		initiateInventoryTextures("EmptyImage");
 }
 
 Player::~Player()
@@ -152,7 +154,7 @@ void Player::equip(std::string item)
 
 void Player::addImageToInventory(std::string item, int inventorySlot)
 {
-	if (checkInventory(item))
+	if (checkInventory(item) && item != "EmptyImage")
 		std::cout << "Item already exists in players inventory" << std::endl;
 	else
 	{
@@ -260,10 +262,38 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		setFood(10);
 
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+	{
+		equip("EmptyImage");
+		for (int i = 0; i < 5; i++)
+			addImageToInventory("EmptyImage", i);
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		equip("Axe");
+	{
+		equip("AxeIcon");
+		addImageToInventory("InventoryAxeIcon", 0);
+	}
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-		equip("Wood");
+	{
+		equip("LighterIcon");
+		addImageToInventory("InventoryLighterIcon", 1);
+	}
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	{
+		equip("WoodIcon");
+		addImageToInventory("InventoryWoodIcon", 2);
+	}
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	{
+		equip("FoodIcon");
+		addImageToInventory("InventoryFoodIcon", 3);
+	}
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+	{
+		equip("BucketIcon");
+		addImageToInventory("InventoryBucketIcon", 4);
+	}
 
 
 	//... Mouse Movement

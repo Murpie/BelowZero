@@ -294,7 +294,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addLightpassShaders();
 	shaderProgramLibrary.addSkyboxShaders();
 	shaderProgramLibrary.addShadowMapShaders();
-	shaderProgramLibrary.addPointLightShadowMapShaders();
+	//shaderProgramLibrary.addPointLightShadowMapShaders();
 	shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
 }
@@ -328,8 +328,8 @@ void Game::addLights(GameScene &scene)
 	// add for loop and use array for transforms ?
 	if (!testBool)
 	{
-		scene.addLight(glm::vec3(7, 9, -4), 0);
-		scene.addLight(glm::vec3(4, 0.4, -2), 1);
+		scene.addLight(glm::vec3(-4, 2, 0), 0);
+		scene.addLight(glm::vec3(-80, 6, 0), 0);
 		testBool = true;
 	}
 	else

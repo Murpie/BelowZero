@@ -47,11 +47,11 @@ float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 	projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
 
 	float closestDepth = texture(depthMap, projectionCoordinates.xy).r;
-	float bias = max(0.05 * (1.0 - dot(Normal, lightDirForShadow)), 0.09);
-	
-	
 	float directionalLightshadowFactor = 0.0f;
-	vec2 texelSize = 1.0 / textureSize(depthMap, 0);
+	float bias = 0.005;
+	directionalLightshadowFactor += projectionCoordinates.z - bias > closestDepth ? 0.7 : 0.0;
+	
+	/*vec2 texelSize = 1.0 / textureSize(depthMap, 0);
 	for (int x = -1; x <= 1; ++x)
 	{
 		for (int y = -1; y <= 1; ++y)
@@ -60,7 +60,7 @@ float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 			directionalLightshadowFactor += projectionCoordinates.z - bias > pcfDepth ? 0.7 : 0.0;
 		}
 	}
-	directionalLightshadowFactor /= 9.0;
+	directionalLightshadowFactor /= 9.0;*/
 
 	if (projectionCoordinates.z > 1.0)
 		directionalLightshadowFactor = 0.0;
@@ -71,10 +71,7 @@ float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 // ----------========== POINT LIGHT SHADOW CALCULATION ==========----------
 float PointLightShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPosition)
 {
-	//float cubeMapClosestDepth = texture(cubeMapdepthMap, fragPositionToLightPosition).r;
-	//cubeMapClosestDepth *= 25.0f; //Far Plane
-	//float cubeMapBias = max(0.005 * (1.0 - dot(Normal, lightDirForShadow)), 0.005);
-	//float CubeMapShadowFactor = cubeMapCurrentDepth - cubeMapBias > cubeMapClosestDepth ? 0.5 : 0.0;
+	
 	float far_plane = 25.0;
 	vec3 fragPositionToLightPosition = FragPos - lightPosition;
 	float cubeMapCurrentDepth = length(fragPositionToLightPosition);
