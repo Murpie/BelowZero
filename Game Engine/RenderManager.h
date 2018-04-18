@@ -48,13 +48,10 @@ public:
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
-	/*void setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition);*/
 
 private:
-	/*unsigned int loadCubemap(std::vector<std::string> faces);*/
 
 	std::vector<GameObject*> gameObjectsToRender;
-	
 	std::vector<Light*> lightsToRender;
 	std::vector<glm::vec3> kernel;
 
@@ -71,8 +68,6 @@ private:
 	unsigned int UITexture;
 	unsigned int shadowMap;
 	unsigned int shadowFBO;
-	//unsigned int cubeMapShadowMap;
-	//unsigned int cubeMapShadowFBO;
 	unsigned int animationVAO;
 	unsigned int animationVBO;
 	unsigned int animationEBO;
@@ -88,7 +83,6 @@ private:
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
 
-	//unsigned int cubemapTexture;
 	unsigned int gAlbedo;
 	unsigned int gNormal;
 	unsigned int gPosition;
@@ -108,9 +102,7 @@ private:
 
 	GLuint shadowMapShaderProgram;
 	GLuint geometryShaderProgram;
-	GLuint cubeMapShaderProgram;
 	GLuint lightpassShaderProgram;
-	GLuint skyboxShaderProgram;
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
 

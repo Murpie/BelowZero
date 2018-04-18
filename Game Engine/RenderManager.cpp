@@ -218,7 +218,7 @@ void RenderManager::Render() {
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	//DIRECTIONAL LIGHT SHADOWMAP PASS----------------------------------------------------------------------------------------------------------------------------------------
+	//DIRECTIONAL LIGHT SHADOWMAP PASS-----------------------------------------------------------------------------------------------------------------------
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 
@@ -390,7 +390,6 @@ void RenderManager::Render() {
 
 	renderQuad();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
 
 	gameObjectsToRender.clear();
 	lightsToRender.clear();
