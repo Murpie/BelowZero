@@ -55,6 +55,7 @@ private:
 	//
 	vector<RenderManager> renderManager; // use 1 render manager? delete and init new one
 	vector<string> meshName; // Filepaths for the importer?
+	vector<GLuint> meshType;
 
 	Gamestate::ID stateOfGame; // EnumID.h, make this one global(?) 
 

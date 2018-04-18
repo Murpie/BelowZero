@@ -165,11 +165,8 @@
     <ClCompile Include="Transformable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Terrain.cpp">
-      <Filter>Source Files\Data Types</Filter>
-    </ClCompile>
-    <ClCompile Include="TerrainShader.cpp">
-      <Filter>Source Files\Shaders</Filter>
+    <ClCompile Include="Attributes.cpp">
+      <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -301,6 +298,9 @@
     </ClInclude>
     <ClInclude Include="Transformable.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Attributes.h">
+      <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

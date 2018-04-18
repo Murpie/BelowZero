@@ -17,6 +17,8 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->initializer = 0;
 	this->inventoryCount = 0;
 	this->maxAmountOfItems = 5;
+	this->fade = 1;
+	this->startGame = true;
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
 	this->inventoryCount = 0;
@@ -250,6 +252,17 @@ void Player::update(float deltaTime, float seconds)
 	// HP DMG / REG
 	if (this->hp < 100 && this->hp > 0)
 		this->hp = this->hp - (this->damage * deltaTime);
+
+	// SPAWN & GAME OVER FADE
+	if (this->startGame && this->fade > 0)
+	{
+		this->fade -= 0.005;
+		if ( this->fade <= 0)
+			this->startGame = false;
+	}
+
+	if (this->hp <= 0 && this->fade < 1)
+		this->fade += deltaTime;
 }
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)

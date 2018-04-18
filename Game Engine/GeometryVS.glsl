@@ -8,6 +8,7 @@ layout(location = 4) in vec3 bitangent;
 uniform mat4 world_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
+uniform int followCamera;
 
 out VS_OUT {
 	vec3 vertex_normal;
@@ -17,6 +18,7 @@ out VS_OUT {
 	mat4 world_matrix;
 	mat4 view_matrix;
 	mat4 projection_matrix;
+	int followCamera;
 } vs_out;
 
 void main() {
@@ -28,4 +30,5 @@ void main() {
 	vs_out.world_matrix = world_matrix;
 	vs_out.view_matrix = view_matrix;
 	vs_out.projection_matrix = projection_matrix;
+	vs_out.followCamera = followCamera;
 }

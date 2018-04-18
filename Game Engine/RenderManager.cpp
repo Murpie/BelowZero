@@ -240,6 +240,7 @@ void RenderManager::Render() {
 	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
 		gameScene->gameObjects[0].transform->position + gameScene->gameObjects[0].transform->forward,
 		gameScene->gameObjects[0].transform->up);
+
 	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
@@ -271,6 +272,7 @@ void RenderManager::Render() {
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
+
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
 	}
 
@@ -308,8 +310,8 @@ void RenderManager::Render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glUseProgram(geometryShaderProgram);
 
-	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
 
 	glEnable(GL_DEPTH_TEST);
@@ -323,6 +325,11 @@ void RenderManager::Render() {
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
+		if (i < 2)
+			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 1);
+		else
+			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 0);
+
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
@@ -487,6 +494,7 @@ void RenderManager::Render() {
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0].getPlayer()->cold);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0].getPlayer()->water);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0].getPlayer()->food);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0].getPlayer()->fade);
 
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
@@ -667,8 +675,6 @@ unsigned int RenderManager::loadCubemap(std::vector<std::string> faces)
 
 void RenderManager::Update()
 {
-	
-
 }
 
 void RenderManager::setDeltaTime(float deltaTime)
