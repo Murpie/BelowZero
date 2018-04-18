@@ -12,9 +12,6 @@ struct Light {
     float Quadratic;
 };
 
-vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
-vec3 drPosition = vec3(0.0f, 200.0f, 400.0f);
-
 const int NR_LIGHTS = 32;
 uniform Light lights[NR_LIGHTS];
 
@@ -27,6 +24,9 @@ uniform sampler2D gAO;
 uniform sampler2D depthMap;
 uniform samplerCube cubeMapdepthMap;
 uniform mat4 LightSpaceMatrix;
+
+vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
+vec3 drPosition = vec3(lights[0].Position);
 
 vec3 gridSamplingDisk[20] = vec3[]
 (
@@ -48,8 +48,9 @@ float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 
 	float closestDepth = texture(depthMap, projectionCoordinates.xy).r;
 	float directionalLightshadowFactor = 0.0f;
+	//float bias = max(0.0005 * (1.0 - dot(Normal, lightDirForShadow)), 0.05);
 	float bias = 0.005;
-	directionalLightshadowFactor += projectionCoordinates.z - bias > closestDepth ? 0.7 : 0.0;
+	directionalLightshadowFactor += projectionCoordinates.z - bias > closestDepth ? 0.35 : 0.0;
 	
 	/*vec2 texelSize = 1.0 / textureSize(depthMap, 0);
 	for (int x = -1; x <= 1; ++x)
@@ -105,7 +106,7 @@ void main()
     
     // then calculate lighting as usual
     vec3 lighting = vec3(0.0 * Albedo * AO);
-    vec3 viewDir = normalize(view_position + 1 - FragPos);
+    vec3 viewDir = normalize(view_position - FragPos);
 
 	float shadowFactor = 0.0f;
 
@@ -128,7 +129,7 @@ void main()
     }
 
 	//Test Directional Light
-	    vec3 lightDir = normalize(drPosition - FragPos);
+	    vec3 lightDir = normalize(drPosition - vec3(0.0, 0.0, 0.0));
         vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * drColor;
 
 		vec3 halfwayDir = normalize(lightDir + viewDir);  
@@ -136,7 +137,7 @@ void main()
         vec3 specular = drColor * spec * Specular;
 		vec3 metallic = drColor * spec * Metallic;
         // attenuation
-        float distance = length(drPosition - FragPos);
+        float distance = length(drPosition - vec3(0.0, 0.0, 0.0));
         float attenuation = 1.0;
         diffuse *= attenuation;
         specular *= attenuation;

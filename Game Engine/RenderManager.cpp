@@ -261,7 +261,7 @@ void RenderManager::Render() {
 	glCullFace(GL_FRONT);
 
 	glUseProgram(shadowMapShaderProgram);
-	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[2].transform->position);
+	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[1].transform->position);
 	glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);

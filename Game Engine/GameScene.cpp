@@ -35,9 +35,8 @@ void GameScene::addLight(glm::vec3 transform, int lightType)
 	addEmptyGameObject();
 	Light* light = new Light(*gameObjects[gameObjects.size() - 1].transform);
 	light->lightType = lightType;
-	addEmptyGameObject();
 	gameObjects[gameObjects.size() - 1].addComponent(light);
-	gameObjects[gameObjects.size() - 1].name = "Light " + lightsInScene;
+	gameObjects[gameObjects.size() - 1].name = "Light " + std::to_string(lightsInScene);
 	gameObjects[gameObjects.size() - 1].transform->position = transform;
 	//...
 	//gameObjects[gameObjects.size() - 1].lightComponent->lightType = lightType; 
@@ -49,7 +48,7 @@ void GameScene::addPlayer()
 	addEmptyGameObject();
 	std::cout << "PLAYER INDEX:: " << gameObjects.size() - 1 << std::endl;
 	Player* moveScript = new Player(*gameObjects[gameObjects.size()-1].transform);
-	gameObjects[gameObjects.size()-1].name = "Player " + camerasInScene;
+	gameObjects[gameObjects.size()-1].name = "Player " + std::to_string(camerasInScene);
 	gameObjects[gameObjects.size()-1].addComponent(moveScript);
 }
 
@@ -63,7 +62,7 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 	{
 		addEmptyGameObject();
 		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).gElementBuffer, meshLibrary.getMesh(i).vertexCount);
-		gameObjects[gameObjects.size() - 1].name = "Mesh " + i; // Maybe pass the name of the object?
+		gameObjects[gameObjects.size() - 1].name = "Mesh " + std::to_string(i); // Maybe pass the name of the object?
 		gameObjects[gameObjects.size() - 1].addComponent(meshFilter);
 		gameObjects[gameObjects.size() - 1].addComponent(matertialLibrary.getMaterial(i));
 	}
