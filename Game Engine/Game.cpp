@@ -44,16 +44,16 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	/* 
-		In this function we want to call on the sceneObjects.
-		
-		example : 
-			scene.pollEvent(window, deltaTime);
+	/*
+	In this function we want to call on the sceneObjects.
 
-		and check inside the classes if we want to make something 
-		happen depending on which button we press.
+	example :
+	scene.pollEvent(window, deltaTime);
 
-		This function should be called on within the correct state in runState().
+	and check inside the classes if we want to make something
+	happen depending on which button we press.
+
+	This function should be called on within the correct state in runState().
 	*/
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -66,14 +66,14 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 	/*
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
-		double xpos, ypos;
-		glfwGetCursorPos(window, &xpos, &ypos);
-		std::cout << "CUROSR::X::POSITION::" << xpos << std::endl;
-		std::cout << "CUROSR::Y::POSITION::" << ypos << std::endl;
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+	std::cout << "CUROSR::X::POSITION::" << xpos << std::endl;
+	std::cout << "CUROSR::Y::POSITION::" << ypos << std::endl;
 
-		//
-		//glm::vec3 worldRay = Ray::getWorldRay(xpos, ypos, glm::mat4(), SCREEN_WIDTH, SCREEN_HEIGHT);
-		//std::cout << "CUROSR::WORLDRAY::" << worldRay.x << " " << worldRay.y << " " << worldRay.z << std::endl;
+	//
+	//glm::vec3 worldRay = Ray::getWorldRay(xpos, ypos, glm::mat4(), SCREEN_WIDTH, SCREEN_HEIGHT);
+	//std::cout << "CUROSR::WORLDRAY::" << worldRay.x << " " << worldRay.y << " " << worldRay.z << std::endl;
 
 	}
 
@@ -125,7 +125,7 @@ void Game::run()
 	int initial_time = time(NULL);
 	int final_time;
 	int frameCount = 0;
-	
+
 	initScene(menuScene);
 	initScene(gameScene);
 
@@ -141,7 +141,7 @@ void Game::run()
 		deltaTime = float(end - begin) / CLOCKS_PER_SEC;
 		begin = end;
 
-	/*	auto nowDeltaTime = chrono::high_resolution_clock::now();
+		/*	auto nowDeltaTime = chrono::high_resolution_clock::now();
 		deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count() / 1000;
 		startDeltaTime = nowDeltaTime;*/
 
@@ -181,17 +181,17 @@ void Game::printCurrentState(Gamestate::ID stateOfGame)
 void Game::runState()
 {
 	//... Menu
-	if (stateOfGame == Gamestate::ID::LOAD_MENU || stateOfGame == Gamestate::ID::SHOW_MENU || stateOfGame == Gamestate::ID::CLEAR_MENU )
+	if (stateOfGame == Gamestate::ID::LOAD_MENU || stateOfGame == Gamestate::ID::SHOW_MENU || stateOfGame == Gamestate::ID::CLEAR_MENU)
 	{
 		menuState();
 	}
 	//... Level
-	else if(stateOfGame == Gamestate::ID::LOAD_LEVEL || stateOfGame == Gamestate::ID::RUN_LEVEL || stateOfGame == Gamestate::ID::CLEAR_LEVEL)
+	else if (stateOfGame == Gamestate::ID::LOAD_LEVEL || stateOfGame == Gamestate::ID::RUN_LEVEL || stateOfGame == Gamestate::ID::CLEAR_LEVEL)
 	{
 		levelState();
 	}
 	//... 
-	else 
+	else
 	{
 		return;
 	}
@@ -264,16 +264,16 @@ void Game::initWindow()
 void Game::initScene(GameScene & scene)
 {
 	addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
-	//... Create Camera
+							 //... Create Camera
 	addPlayer(scene);
 	//... Create Lights
 	testBool = false;
 	addLights(scene);
 	//... Read OBJ and MTL File
-	if(!meshesLoaded)
-	{ 
+	if (!meshesLoaded)
+	{
 		//Load the meshes once and store them.
-		readMeshName();	
+		readMeshName();
 		meshesLoaded = true;
 	}
 	//...
@@ -315,10 +315,10 @@ void Game::useShaderProgram()
 void Game::addMeshName()
 {
 	//Add file names to vector to load when reading mesh data. 
-	std::string meshLoader[] = {"Stone.leap"};
+	std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap" };
 	//meshType: 0 = Static  2 = Interactive  3 = Equiped
-	GLuint meshTypes[] = { 0 };
-	
+	GLuint meshTypes[] = { 0, 0, 0, 0, 0 };
+
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 	{
 		meshName.push_back(meshLoader[i]);
@@ -338,7 +338,7 @@ void Game::addLights(GameScene &scene)
 	else
 	{
 		scene.gameObjects[0].transform->position = glm::vec3(4, 0.4, -2);
-	}	
+	}
 }
 
 void Game::addRenderManager(GameScene &scene)
@@ -368,8 +368,3 @@ void Game::readMeshName()
 	textureLibrary.addAlbedo("Colors.png");
 	materialLibrary.getMaterial(0)->addAlbedo(textureLibrary.getAlbedo(0)->gTexture);
 }
-
-
-
-
-
