@@ -84,6 +84,9 @@ private:
 	unsigned int finalFBO;
 	unsigned int finalColorBuffer;
 	unsigned int finalDepthStensil;
+	unsigned int billboardVAO;
+	unsigned int particlePositionBuffer;
+	unsigned int particleColorBuffer;
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;

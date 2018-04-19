@@ -63,6 +63,26 @@ void RenderManager::createBuffers()
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	//... VFX
+	static const GLfloat g_vertex_buffer_data[] = {
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		-0.5f, 0.5f, 0.0f,
+		0.5f, 0.5f, 0.0f,
+	};
+	glGenBuffers(1, &billboardVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, billboardVAO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &particlePositionBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
+	glBufferData(GL_ARRAY_BUFFER, 5 * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // 5 = MaxParticles
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(GLfloat) * 4, particlePositionBuffer);
+
+	glGenBuffers(1, &particleColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, 5 * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+
 	//... Create G-buffers
 	//framebufferobject
 	glGenFramebuffers(1, &gbo);
