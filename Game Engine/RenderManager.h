@@ -88,6 +88,9 @@ private:
 	unsigned int particlePositionBuffer;
 	unsigned int particleColorBuffer;
 
+	GLvoid* particlePositionData = NULL;
+	GLvoid* particleColorData = NULL;
+
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
 

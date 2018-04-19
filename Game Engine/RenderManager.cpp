@@ -76,12 +76,13 @@ void RenderManager::createBuffers()
 
 	glGenBuffers(1, &particlePositionBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
-	glBufferData(GL_ARRAY_BUFFER, 5 * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // 5 = MaxParticles
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(GLfloat) * 4, particlePositionBuffer);
+	glBufferData(GL_ARRAY_BUFFER, 5 * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);						// 5 = MaxParticles
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 3 * sizeof(GLfloat) * 4, particlePositionData);					// 3 = ParticleCount
 
 	glGenBuffers(1, &particleColorBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, 5 * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 5 * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); 
+	glBufferSubData(GL_ARRAY_BUFFER, 0, 3 * sizeof(GLfloat) * 4, particleColorData);
 
 	//... Create G-buffers
 	//framebufferobject
@@ -294,6 +295,9 @@ void RenderManager::Render() {
 
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
 	}
+
+	//... VFX
+	//glenable
 
 	//------=====================Animation Pass=======================-------
 	//glUseProgram(animationShaderProgram);
