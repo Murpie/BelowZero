@@ -28,7 +28,7 @@ void main ()
 	//}
 	//else
 	//{
-		gAlbedo = fragpos.xyz;//vec3(0.0, 1.0, 0.0);
+		gAlbedo = vec3(0.86, 0.94, 0.92);
 	//}
 
 	//Normal

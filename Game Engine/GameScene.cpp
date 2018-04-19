@@ -82,6 +82,22 @@ void GameScene::update(float deltaTime, float seconds)
 {
 	for (unsigned int i = 0; i < gameObjects.size(); i++)
 	{
+
+		if (gameObjects[i].getPlayer() != nullptr)
+		{
+			for (int j = 0; j < gameObjects.size(); j++)
+			{
+				if(gameObjects[j].getTerrain() != nullptr)
+					gameObjects[i].getPlayer()->recieveTerrainInformation(
+						gameObjects[j].getTerrain()->getHeight(23, 42), 
+						gameObjects[j].getTerrain()->frontVertex(23, 42),
+						gameObjects[j].getTerrain()->behindVertex(23, 42),
+						gameObjects[j].getTerrain()->leftVertex(23, 42),
+						gameObjects[j].getTerrain()->rightVertex(23, 42), 
+						gameObjects[j].getTerrain()->distanceBetweenVertices());
+			}
+
+		}
 		gameObjects[i].update(deltaTime, seconds);
 	}
 

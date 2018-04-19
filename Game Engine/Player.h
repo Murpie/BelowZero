@@ -23,6 +23,8 @@ public:
 	float foodTick;
 	float damage;
 
+
+
 	int inventory[5];
 	int inventoryCount;
 
@@ -36,10 +38,13 @@ public:
 	void addToInventory(int item);
 	void equip(std::string item);
 
+	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance);
+
 	//Physics
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
 private:
+
 
 	bool frontCollision = false;
 	bool bottomCollision = false;
@@ -72,4 +77,12 @@ private:
 	bool inAir = false;
 	float timeInAir = 0.3;
 	bool gravity = false;
+
+	//Terrain
+	float currentY;
+	float frontVertexHeight;
+	float backVertexHeight;
+	float leftVertexHeight;
+	float rightVertexHeight;
+	float distanceToNextVertex;
 };

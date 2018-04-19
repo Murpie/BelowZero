@@ -76,7 +76,8 @@ void Terrain::setupVertexData()
 	glm::vec3 test;
 	float test2;
 
-	
+	int heightTemp = (int)(HeightMap.height / Height);
+	int lengthTemp = (int)(HeightMap.width / Length);
 
 	for (int i = 0; i < this->Height; i++)
 	{
@@ -84,14 +85,14 @@ void Terrain::setupVertexData()
 		{
 			TerrainVertex temp;
 
-			glReadPixels(i, j, this->Length, this->Height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+			glReadPixels((i*lengthTemp), (j*heightTemp), this->HeightMap.width, this->HeightMap.height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 		
 
-			temp.x = (float)j * offset;//(float)(j - (Height / 2));
-			float tempY = ((float)(int)pixels[0] / 255) * 50;
+			temp.x = (float)(j - (Height / 2)) * offset;
+			float tempY = ((float)(int)pixels[0] / 255) * 7;
 			temp.y = -tempY;
-			temp.z = (float)i * offset;//(float)(i - (Height / 2));
+			temp.z = (float)(i - (Height / 2)) * offset;
 			
 			temp.r = 0.0f;
 			temp.g = 0.0f;
@@ -102,7 +103,6 @@ void Terrain::setupVertexData()
 
 			this->terrainVertices.push_back(temp);
 
-			
 		}
 	}
 	
@@ -269,8 +269,10 @@ void Terrain::setupBuffers(GLint gShaderProgram)
 
 float Terrain::getHeight(int x, int z)
 {
-	if (x < 0 || x >= Height || z<0 || Length)
+	if (x < 0 || x >= Height || z<0 || z >= Length)
 		return 0.0;
+
+	return terrainVertices[x * z].y;
 
 	//glm::vec3 height = HeightMap.getRGB(x, z);
 	
@@ -330,4 +332,43 @@ void Terrain::bindTextures(GLuint shader)
 
 	
 }
+
+float Terrain::leftVertex(int x, int z)
+{
+	if ((x - 1) * z < 0 || (x - 1) * z > terrainVertices.size())
+		return 0.0;
+
+	return this->terrainVertices[(x - 1) * z].y;
+
+}
+
+float Terrain::rightVertex(int x, int z)
+{
+	if ((x + 1) * z < 0 || (x + 1) * z > terrainVertices.size())
+		return 0.0;
+
+	return this->terrainVertices[(x + 1) * z].y;
+}
+
+float Terrain::frontVertex(int x, int z)
+{
+	if (x * (z + 1) < 0 || x * (z + 1) > terrainVertices.size())
+		return 0.0;
+
+	return this->terrainVertices[x * (z +1)].y;
+}
+
+float Terrain::behindVertex(int x, int z)
+{
+	if (x * (z - 1) < 0 || x * (z - 1) > terrainVertices.size())
+		return 0.0;
+
+	return this->terrainVertices[x * (z -1)].y;
+}
+
+float Terrain::distanceBetweenVertices()
+{
+	return offset;
+}
+
 

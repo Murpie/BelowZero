@@ -17,7 +17,8 @@ void main()
 	fragpos = world_matrix * vec4(vertex_position, 1.0);
 
 
-	normal = normalize(vertex_normal);
+	normal = normalize(vec4(world_matrix * vec4(vertex_normal, 1.0))).xyz;
+	normal = normalize(-vertex_normal);
 	uv = uv_coord;
 
 	

@@ -109,10 +109,24 @@ void Player::equip(std::string item)
 		std::cout << "Equiped Framebuffer not complete!" << std::endl;
 }
 
+void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance)
+{
+	this->currentY = currentHeight;
+	this->frontVertexHeight = frontV;
+	this->backVertexHeight = backV;
+	this->leftVertexHeight = leftV;
+	this->rightVertexHeight = rightV;
+	this->distanceToNextVertex = distance;
+
+}
+
 void Player::update(float deltaTime, float seconds)
 {
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
+
+
+
 
 	// LOOSING HP
 	if (this->cold < 20)
@@ -286,7 +300,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		inAir = false;
 
 
-	if (inAir == false && Transformable::transform.position.y <= 0.0f)
+	if (inAir == false && Transformable::transform.position.y <= currentY)
 	{
 		gravity = false;
 		jumpReady = true;
@@ -298,6 +312,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (gravity == true && inAir == false)
 		Transformable::transform.position -= fallSpeed * Transformable::transform.up  * deltaTime;
 
-	if (Transformable::transform.position.y <= -0.1f)
-		Transformable::transform.position.y = 0.0f;
+	if (Transformable::transform.position.y <= currentY -0.1f)
+		Transformable::transform.position.y = currentY;
 }

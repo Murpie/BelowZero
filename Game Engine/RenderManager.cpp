@@ -327,12 +327,6 @@ void RenderManager::Render() {
 			gameScene->gameObjects[i].getTerrain()->bindTextures(terrainShaderProgram);
 			gameScene->gameObjects[i].getTerrain()->bindVertexArray();
 	
-			//glBindBuffer(GL_ARRAY_BUFFER, gameScene->gameObjects[i].getTerrain()->getVBO());
-			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gameScene->gameObjects[i].getTerrain()->getEBO());
-			std::vector<TerrainVertex> tempVector = gameScene->gameObjects[i].getTerrain()->terrainVertices;
-			std::vector<unsigned int> tempIndices = gameScene->gameObjects[i].getTerrain()->indices;
-
-
 			glDrawElements(GL_TRIANGLES, gameScene->gameObjects[i].getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
 			
 			
