@@ -320,7 +320,7 @@ void Game::useShaderProgram()
 void Game::addMeshName()
 {
 	//Add file names to vector to load when reading mesh data. 
-	std::string meshLoader[] = { "Floor.obj", "Tree.obj", "Bucket.obj", "TreeWithSnow.obj", "Stump.obj", "Stone.obj" };
+	std::string meshLoader[] = {/* "Floor.obj", */"Tree.obj", "Bucket.obj", "TreeWithSnow.obj", "Stump.obj"/*, "Stone.obj"*/ };
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 		meshName.push_back(meshLoader[i]);

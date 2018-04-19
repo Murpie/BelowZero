@@ -2,21 +2,18 @@
 
 #include <vector>
 #include <string>
-
+#include "glm/glm/gtc/matrix_transform.hpp"
+#include "glm/glm/gtc/type_ptr.hpp"
+#include "glm/glm/glm.hpp"
 #include "Component.h"
 #include "Texture.h"
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
 struct TerrainVertex
 {
-	float x;
-	float y; 
-	float z;
-	float r;
-	float g;
-	float b;
-	float u;
-	float v;
+	float x, y, z;
+	float r, g, b;
+	float u, v;
 	//glm::vec3 vertPos;
 	//glm::vec3 vertNorm;
 	//glm::vec2 UVs;
@@ -32,10 +29,10 @@ private:
 	Texture HeightMap;
 	Texture AlbedoMap;
 
+	int offset = 8;
 
-	int xLength;
-	int xHeight;
-	int offset = 0;
+	int Length = 40;
+	int Height = 40;
 	
 
 	GLuint VAO;
@@ -61,7 +58,7 @@ public:
 	std::vector<TerrainVertex> terrainVertices;
 
 	std::vector<float> heights;
-	std::vector<unsigned short> indices;
+	std::vector<unsigned int> indices;
 
 	short *heightMapIndexData;
 
@@ -70,7 +67,7 @@ public:
 	void setupVertexData();
 	void setupBuffers(GLint gShaderProgram);
 	//void calculateNormals(int triangleIndex);
-	//float getHeight(int x, int z);
+	float getHeight(int x, int z);
 	float getHeightRGB(int x, int y);
 
 	void loadHeighMap(const std::string & heightMap);
