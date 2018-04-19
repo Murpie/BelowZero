@@ -90,18 +90,13 @@ private:
 
 	//unsigned int cubemapTexture;
 	unsigned int gAlbedo;
-	unsigned int gNormal;
 	unsigned int gPosition;
-	unsigned int gSpecular;
-	unsigned int gMetallic;
-	unsigned int gAO;
-	unsigned int attachments[6] = {
+	unsigned int gNormal;
+	unsigned int attachments[3] = {
 		GL_COLOR_ATTACHMENT0,
 		GL_COLOR_ATTACHMENT1,
 		GL_COLOR_ATTACHMENT2,
-		GL_COLOR_ATTACHMENT3,
-		GL_COLOR_ATTACHMENT4,
-		GL_COLOR_ATTACHMENT5 };
+	};
 
 	QuadVertex vertices;
 	GLFWwindow* window;

@@ -16,11 +16,8 @@ const int NR_LIGHTS = 32;
 uniform Light lights[NR_LIGHTS];
 
 uniform sampler2D gPosition;
-uniform sampler2D gNormal;
 uniform sampler2D gAlbedo;
-uniform sampler2D gSpecular;
-uniform sampler2D gMetallic;
-uniform sampler2D gAO;
+uniform sampler2D gNormal;
 uniform sampler2D depthMap;
 uniform mat4 LightSpaceMatrix;
 
@@ -72,14 +69,11 @@ void main()
 { 
 	// retrieve data from G-buffer
     vec3 FragPos = texture(gPosition, TexCoords).rgb;
-    vec3 Normal = texture(gNormal, TexCoords).rgb;
     vec3 Albedo = texture(gAlbedo, TexCoords).rgb;
-    vec3 Specular = texture(gSpecular, TexCoords).rgb;
-	vec3 Metallic = texture(gMetallic, TexCoords).rgb;
-	vec3 AO = texture(gAO, TexCoords).rgb;
+    vec3 Normal = texture(gNormal, TexCoords).rgb;
     
     // then calculate lighting as usual
-    vec3 lighting = vec3(0.0 * Albedo * AO);
+    vec3 lighting = vec3(0.0 * Albedo);
     vec3 viewDir = normalize(view_position - FragPos);
 
 	float shadowFactor = 0.0f;
@@ -92,30 +86,23 @@ void main()
 
 		vec3 halfwayDir = normalize(lightDir + viewDir);  
         float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-        vec3 specular = lights[i].Color * spec * Specular;
-		vec3 metallic = lights[i].Color * spec * Metallic;
+
         // attenuation
         float distance = length(lights[i].Position - FragPos);
         float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
-        diffuse *= attenuation;
-        specular *= attenuation;
-        lighting += diffuse + specular + metallic;
+        lighting += diffuse;
     }
 
 	//Test Directional Light
-	    vec3 lightDir = normalize(drPosition - vec3(0.0, 0.0, 0.0));
-        vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * drColor;
+	vec3 lightDir = normalize(drPosition - vec3(0.0, 0.0, 0.0));
+    vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * drColor;
 
-		vec3 halfwayDir = normalize(lightDir + viewDir);  
-        float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-        vec3 specular = drColor * spec * Specular;
-		vec3 metallic = drColor * spec * Metallic;
-        // attenuation
-        float distance = length(drPosition - vec3(0.0, 0.0, 0.0));
-        float attenuation = 1.0;
-        diffuse *= attenuation;
-        specular *= attenuation;
-        lighting += diffuse + specular + metallic;
+	vec3 halfwayDir = normalize(lightDir + viewDir);  
+    float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
+    // attenuation
+    float distance = length(drPosition - vec3(0.0, 0.0, 0.0));
+    float attenuation = 1.0;
+    lighting += diffuse;
 
 	float density = 0.05;
 	float gradient = 3.0;

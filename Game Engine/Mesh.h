@@ -8,7 +8,7 @@
 #include <string>
 #include <GL/gl3w.h>  
 #include "Vertex.h"
-#include "Converter.h"
+#include "LeapImporter.h"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -30,6 +30,5 @@ public:
 	GLuint meshType;
 	GLuint gVertexBuffer;
 	GLuint gVertexAttribute;
-	GLuint gElementBuffer;
 };
 

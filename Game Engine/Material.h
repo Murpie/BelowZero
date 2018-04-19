@@ -17,16 +17,6 @@ public:
 	~Material();
 
 	std::vector<GLuint> albedo;
-	std::vector<GLuint> normal;
-	std::vector<GLuint> specular;
-	std::vector<GLuint> metallic;
-	std::vector<GLuint> ao;
-	std::vector<GLuint> foundAlbedo;
-	std::vector<GLuint> foundNormal;
-	std::vector<GLuint> foundSpecular;
-	std::vector<GLuint> foundMetallic;
-	std::vector<GLuint> foundAO;
-	glm::mat3 mtlInfo;
 
 	GLuint geometryShaderProgram;
 
@@ -34,18 +24,7 @@ public:
 	void processEvents(GLFWwindow *window, float deltaTime);
 	
 	void bindTextures();
-	void bindFoundTextures();
 	void addAlbedo(int otherTexture);
-	void addNormal(int otherTexture);
-	void addSpecular(int otherTexture);
-	void addMetallic(int otherTexture);
-	void addAO(int otherTexture);
-	void addFoundAlbedo(int foundTexture);
-	void addFoundNormal(int foundTexture);
-	void addFoundSpecular(int foundTexture);
-	void addFoundMetallic(int foundTexture);
-	void addFoundAO(int foundTexture);
-	void addMtlInfo(glm::mat3 mtlInfo);
 
 private:
 	int width, height, nrChannels = 0;

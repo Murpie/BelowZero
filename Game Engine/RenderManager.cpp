@@ -78,15 +78,7 @@ void RenderManager::createBuffers()
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//attach texture to current framebuffer
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
-	//g-buffer normal
-	glGenTextures(1, &gNormal);
-	glBindTexture(GL_TEXTURE_2D, gNormal);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	//attach texture to current framebuffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+
 	//g-buffer albedo
 	glGenTextures(1, &gAlbedo);
 	glBindTexture(GL_TEXTURE_2D, gAlbedo);
@@ -95,39 +87,19 @@ void RenderManager::createBuffers()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//attach texture to current framebuffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedo, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gAlbedo, 0);
 
-	//g-buffer specular
-	glGenTextures(1, &gSpecular);
-	glBindTexture(GL_TEXTURE_2D, gSpecular);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	//g-buffer normal
+	glGenTextures(1, &gNormal);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//attach texture to current framebuffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gSpecular, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gNormal, 0);
 
-	//g-buffer metallic
-	glGenTextures(1, &gMetallic);
-	glBindTexture(GL_TEXTURE_2D, gMetallic);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	//attach texture to current framebuffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, gMetallic, 0);
-
-	//g-buffer AO
-	glGenTextures(1, &gAO);
-	glBindTexture(GL_TEXTURE_2D, gAO);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	//attach texture to current framebuffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, gAO, 0);
-
-	glDrawBuffers(6, attachments);
+	glDrawBuffers(3, attachments);
 
 	//... Create and attach depth buffer
 	glGenRenderbuffers(1, &rboDepth);
@@ -261,18 +233,17 @@ void RenderManager::Render() {
 	glStencilMask(0xFF); // enable writing to the stencil buffer
 
 	gameObjectsToRender[0]->materialComponent->bindTextures();
-	gameObjectsToRender[0]->materialComponent->bindFoundTextures();
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-		if (i < 2)
+		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 3)
 			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 1);
 		else
 			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 0);
 
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
 
 	//------=====================Animation Pass=======================-------
@@ -314,28 +285,16 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
 
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gNormal"), 1);
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gAlbedo"), 1);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, gNormal);
-
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gAlbedo"), 2);
-	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, gAlbedo);
 
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gSpecular"), 3);
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gNormal"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "depthMap"), 3);
 	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, gSpecular);
-
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gMetallic"), 4);
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, gMetallic);
-
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gAO"), 5);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, gAO);
-
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "depthMap"), 6);
-	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, shadowMap);
 
 	glEnable(GL_STENCIL_TEST);

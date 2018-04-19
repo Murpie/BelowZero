@@ -5,8 +5,6 @@ layout(triangle_strip, max_vertices = 6) out;
 in VS_OUT{
 	vec3 vertex_normal;
 	vec2 uv_coord;
-	vec3 tangent;
-	vec3 bitangent;
 	mat4 world_matrix;
 	mat4 view_matrix;
 	mat4 projection_matrix;
@@ -14,9 +12,9 @@ in VS_OUT{
 } gs_in[];
 
 out GS_OUT{
+	vec4 vertex_normal;
 	vec4 FragPos;
 	vec2 TexCoords;
-	mat3 TBN;
 } gs_out;
 
 void main() {
@@ -30,6 +28,7 @@ void main() {
 	vec3 normal = normalize(cross(ab.xyz, ac.xyz));
 
 	vec4 camRay = (inverse(gs_in[0].view_matrix) * vec4(0.0, 0.0, 0.0, 1.0)) - pointA;
+	gs_out.vertex_normal = gs_in[0].projection_matrix * gs_in[0].view_matrix * gs_in[0].world_matrix * vec4(gs_in[0].vertex_normal, 0);
 
 	float d = dot(-normal, camRay.xyz);
 	if (d > 0.0 || gs_in[0].followCamera == 1)
@@ -43,13 +42,6 @@ void main() {
 			gs_out.FragPos = gs_in[i].world_matrix * gl_in[i].gl_Position;
 				
 			gs_out.TexCoords = gs_in[i].uv_coord;
-
-			mat3 worldSpace = mat3(gs_in[i].world_matrix);
-			vec3 B = cross(gs_in[i].vertex_normal, gs_in[i].tangent);
-			vec3 T = gs_in[i].tangent;
-			if (dot(cross(gs_in[i].vertex_normal, T), B) < 0.0)
-				T = T * -1.0;
-			gs_out.TBN = worldSpace* mat3(T, B, gs_in[i].vertex_normal);
 
 			EmitVertex();
 		}
