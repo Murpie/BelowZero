@@ -56,7 +56,6 @@ private:
 	std::vector<GameObject*> gameObjectsToRender;
 	
 	std::vector<Light*> lightsToRender;
-	std::vector<glm::vec3> kernel;
 
 	glm::mat4x4 view_matrix;
 	glm::mat4x4 fpsView_matrix;
@@ -71,8 +70,6 @@ private:
 	unsigned int UITexture;
 	unsigned int shadowMap;
 	unsigned int shadowFBO;
-	//unsigned int cubeMapShadowMap;
-	//unsigned int cubeMapShadowFBO;
 	unsigned int animationVAO;
 	unsigned int animationVBO;
 	unsigned int animationEBO;

@@ -26,12 +26,9 @@ void Material::processEvents(GLFWwindow * window, float deltaTime)
 
 void Material::bindTextures()
 {
-	if (albedo.size() > 0)
-	{
-		glUniform1i(glGetUniformLocation(geometryShaderProgram, "gAlbedoIn"), 0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, albedo[0]);
-	}
+	glUniform1i(glGetUniformLocation(geometryShaderProgram, "gAlbedoIn"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, albedo[0]);
 }
 
 void Material::addAlbedo(int otherTexture)
