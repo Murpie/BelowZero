@@ -95,7 +95,7 @@ void Terrain::setupVertexData()
 			temp.x = (float)j * offset;//(float)(j - (Height / 2)) * offset;
 			float tempY = ((float)(int)pixels[0] / 255) * offset;
 			temp.y = tempY;
-			temp.z = (float)i * offset; //(float)(i - (Height / 2)) * offset;
+			temp.z = ((float)i * offset); //(float)(i - (Height / 2)) * offset;
 			
 			temp.r = 0.0f;
 			temp.g = 0.0f;
@@ -345,18 +345,18 @@ float Terrain::calculateY(float x, float z)
 
 
 
-	float gridSquareSize = offset / ((float)terrainVertices.size() - 1);
+	float gridSquareSize = offset * ((Length - 1) * (Height - 1));//((float)terrainVertices.size() - 1);
 
-	int gridX = (int)glm::floor(terrainX / offset);
-	int gridZ = (int)glm::floor(terrainZ / offset);
+	int gridX = (int)glm::floor(terrainX / gridSquareSize);
+	int gridZ = (int)glm::floor(terrainZ / gridSquareSize);
 
 	if (gridX >= terrainVertices.size() - 1 || gridZ >= terrainVertices.size() - 1 || gridX < 0 || gridZ < 0)
 		return 0;
 
-	float xCoord = ((int)terrainX % (int)offset) / offset;
-	float zCoord = ((int)terrainZ % (int)offset) / offset;
+	float xCoord = ((int)terrainX % (int)gridSquareSize) / gridSquareSize;
+	float zCoord = ((int)terrainZ % (int)gridSquareSize) / gridSquareSize;
 	float answer;
-	if (xCoord <= (1 - zCoord))
+	if (xCoord >= (1 - zCoord))
 	{
 		answer = barryCentric(
 			glm::vec3(0, this->getHeight(gridX, gridZ), 0),

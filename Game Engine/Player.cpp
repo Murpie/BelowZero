@@ -314,7 +314,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		inAir = false;
 
 
-	if (inAir == false && Transformable::transform.position.y <= currentY)
+	if (inAir == false && Transformable::transform.position.y <= currentY + 0.01)
 	{
 		gravity = false;
 		jumpReady = true;
@@ -328,6 +328,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	//if (Transformable::transform.position.y <= currentY -0.1f)
 	//	Transformable::transform.position.y = currentY;
+	if (gravity == false && inAir == false && jumpReady == true)
+		Transformable::transform.position.y = currentY;
 }
 
 void Player::findY()
