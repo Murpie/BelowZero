@@ -347,4 +347,39 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="axeTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="BucketTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="FoodTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="InventoryAxeTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="InventoryBucketTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="InventoryFoodTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="InventoryLighterIconTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="InventoryWoodIconTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="LighterIconTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="uiTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="WoodIconTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
