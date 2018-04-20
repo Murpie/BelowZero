@@ -1,4 +1,5 @@
 #include "RenderManager.h"
+#include "VFX.h"
 
 RenderManager::RenderManager()
 {
@@ -65,10 +66,10 @@ void RenderManager::createBuffers()
 
 	//... VFX
 	static const GLfloat g_vertex_buffer_data[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		-0.5f, 0.5f, 0.0f,
-		0.5f, 0.5f, 0.0f,
+		5.0f, 5.5f, 5.5f,
+		5.0f, 5.5f, -5.5f,
+		5.0f, -0.5f, 5.5f,
+		5.0f, -0.5f, -5.5f,
 	};
 	glGenBuffers(1, &billboardVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, billboardVAO);
@@ -76,8 +77,8 @@ void RenderManager::createBuffers()
 
 	glGenBuffers(1, &particlePositionBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
-	glBufferData(GL_ARRAY_BUFFER, 5 * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);						// 5 = MaxParticles
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 3 * sizeof(GLfloat) * 4, particlePositionData);					// 3 = ParticleCount
+	glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * sizeof(GLfloat) * 4, particlePositionData);
 
 	glGenBuffers(1, &particleColorBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
@@ -297,7 +298,74 @@ void RenderManager::Render() {
 	}
 
 	//... VFX
-	//glenable
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, billboardVAO);
+	glVertexAttribPointer(
+		0,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
+	glVertexAttribPointer(
+		1,
+		4,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
+	glVertexAttribPointer(
+		2,
+		4,
+		GL_UNSIGNED_BYTE,
+		GL_TRUE,
+		0,
+		(void*)0
+	);
+
+	glVertexAttribDivisor(0, 0);
+	glVertexAttribDivisor(1, 1);
+	glVertexAttribDivisor(2, 1);
+
+	particleContainer = new VFX::Particle[maxParticles];
+
+	lastUsedParticle = 0;
+
+	FindUnusedParticle();
+
+	if (newParticles > (int)(0.016 * 100))
+	{
+		newParticles = (int)(0.016 * 100);
+	}
+
+	particleCount = 0;
+	for (int i = 0; i < maxParticles; i++)
+	{
+		VFX::Particle& p = particleContainer[i];
+
+		if (p.life > 0.0f)
+		{
+			p.life -= deltaTime;
+			if (p.life > 0.0f)
+			{
+				particleContainer[i].speed += glm::vec3(0.0f, -9.82f, 0.0f) * (float)deltaTime * 0.5f;
+				particleContainer[i].pos += p.speed * (float)deltaTime;
+			}
+		}
+	}
+
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
+
+	delete particleContainer;
 
 	//------=====================Animation Pass=======================-------
 	//glUseProgram(animationShaderProgram);
@@ -503,6 +571,29 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+}
+
+int RenderManager::FindUnusedParticle()
+{
+	for (int i = 0; i < maxParticles; i++)
+	{
+		if (particleContainer[i].life < 0)
+		{
+			lastUsedParticle = i;
+			return i;
+		}
+	}
+
+	for (int i = 0; i < lastUsedParticle; i++)
+	{
+		if (particleContainer[i].life < 0)
+		{
+			lastUsedParticle = i;
+			return i;
+		}
+	}
+
+	return 0;
 }
 
 void RenderManager::Update()

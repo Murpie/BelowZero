@@ -200,6 +200,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Transformable.cpp" />
     <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="VFX.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Desktop\Game Engine - 2.0\Game Engine\GeometryShaders.h" />
@@ -243,6 +244,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Transformable.h" />
     <ClInclude Include="Vertex.h" />
+    <ClInclude Include="VFX.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AnimationFS.glsl" />

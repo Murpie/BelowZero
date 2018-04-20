@@ -13,6 +13,7 @@
 #include "GameScene.h"
 #include "Player.h"
 #include "ShaderProgramLib.h"
+#include "VFX.h"
 #define STB_IMAGE_IMPLEMENTATION
 
 // Cube Map defines for its positions
@@ -48,6 +49,7 @@ public:
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
+	int FindUnusedParticle();
 	/*void setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition);*/
 
 private:
@@ -87,6 +89,12 @@ private:
 	unsigned int billboardVAO;
 	unsigned int particlePositionBuffer;
 	unsigned int particleColorBuffer;
+
+	unsigned int lastUsedParticle;
+	unsigned int particleCount = 100;
+	unsigned int newParticles = (int)(deltaTime * 100);
+	const int maxParticles = 10000;
+	VFX::Particle* particleContainer;
 
 	GLvoid* particlePositionData = NULL;
 	GLvoid* particleColorData = NULL;
