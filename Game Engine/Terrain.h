@@ -48,12 +48,16 @@ private:
 	bool foundMetallic = false;
 	bool foundAO = false;
 
+	float xOffset;
+	float zOffset;
 
 
 public:
 	Terrain();
 	Terrain(const std::string & height, const std::string & color, GLuint shader);
 	~Terrain();
+
+
 
 	std::vector<TerrainVertex> terrainVertices;
 

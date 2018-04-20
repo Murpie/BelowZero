@@ -79,6 +79,9 @@ void Terrain::setupVertexData()
 	int heightTemp = (int)(HeightMap.height / Height);
 	int lengthTemp = (int)(HeightMap.width / Length);
 
+	this->zOffset = Height * offset;
+	this->xOffset = Length * offset;
+
 	for (int i = 0; i < this->Height; i++)
 	{
 		for (int j = 0; j < this->Length; j++)
@@ -91,17 +94,18 @@ void Terrain::setupVertexData()
 
 			temp.x = (float)j * offset;//(float)(j - (Height / 2)) * offset;
 			float tempY = ((float)(int)pixels[0] / 255) * offset;
-			temp.y = -tempY;
+			temp.y = tempY;
 			temp.z = (float)i * offset; //(float)(i - (Height / 2)) * offset;
 			
 			temp.r = 0.0f;
 			temp.g = 0.0f;
 			temp.b = 0.0f;
 
-			temp.u = (float)j / (float)this->Length;
-			temp.v = (float)i / (float)this->Height;
+			temp.u = (float)j / (float)(this->Length -1);
+			temp.v = -(float)i / (float)(this->Height -1);
 
 			this->terrainVertices.push_back(temp);
+
 
 		}
 	}
@@ -131,64 +135,64 @@ void Terrain::setupVertexData()
 	//}
 
 
-	//for (int y = 0; y < this->Height - 1; y++)
-	//{
-	//	if (y > 0)
-	//	indices.push_back((short)(y * Height));
-	//
-	//	for (int x = 0; x < this->Length; x++)
-	//	{
-	//		indices.push_back((short)((y * Height) + x));
-	//		indices.push_back((short)((y + 1) * Height) + x);
-	//	}
-	//	if (y < HeightMap.width - 2)
-	//	{
-	//		indices.push_back((short)((y + 1) * Height) + Length -1);
-	//	}
-	//
-	//
-	//
-	//}
-	//indexCount = indices.size();
-
-	for (unsigned int i = 0; i < this->terrainVertices.size() - this->Length -1; i++)
+	for (int y = 0; y < this->Height - 1; y++)
 	{
-		this->indices.push_back((unsigned int)i);
-		this->indices.push_back((unsigned int)i + 1);
-		this->indices.push_back((unsigned int)i + Length);
-		this->indices.push_back((unsigned int)i + 1);
-		this->indices.push_back((unsigned int)i + Length);
-		this->indices.push_back((unsigned int)i + Length + 1);
+		if (y > 0)
+		indices.push_back((short)(y * Height));
+	
+		for (int x = 0; x < this->Length; x++)
+		{
+			indices.push_back((short)((y * Height) + x));
+			indices.push_back((short)((y + 1) * Height) + x);
+		}
+		if (y < HeightMap.width - 2)
+		{
+			indices.push_back((short)((y + 1) * Height) + Length -1);
+		}
+	
+	
+	
 	}
+	indexCount = indices.size();
 
-	for (int i = 0; i < this->indices.size(); i += 3)
-	{
-		if (i >= 4500)
-			int temp = 0;
-	
-		glm::vec3 v1 = glm::vec3(this->terrainVertices[indices[i]].x, this->terrainVertices[indices[i]].y, this->terrainVertices[indices[i]].z);
-		glm::vec3 v2 = glm::vec3(this->terrainVertices[indices[i+1]].x, this->terrainVertices[indices[i + 1]].y, this->terrainVertices[indices[i + 1]].z);
-		glm::vec3 v3 = glm::vec3(this->terrainVertices[indices[i+2]].x, this->terrainVertices[indices[i + 2]].y, this->terrainVertices[indices[i + 2]].z);
-	
-		glm::vec3 ab = v1 - v2;
-		glm::vec3 ac = v1 - v3;
-	
-		glm::vec3 normal = glm::normalize(glm::cross(ac, ab));
-	
-	
-		this->terrainVertices[(int)this->indices[i]].r += normal.x;
-		this->terrainVertices[(int)this->indices[i]].g += normal.y;
-		this->terrainVertices[(int)this->indices[i]].b += normal.z;
-	
-		this->terrainVertices[(int)this->indices[i + 1]].r += normal.x;
-		this->terrainVertices[(int)this->indices[i + 1]].g += normal.y;
-		this->terrainVertices[(int)this->indices[i + 1]].b += normal.z;
-	
-		this->terrainVertices[(int)this->indices[i + 2]].r += normal.x;
-		this->terrainVertices[(int)this->indices[i + 2]].g += normal.y;
-		this->terrainVertices[(int)this->indices[i + 2]].b += normal.z;
-	
-	} 
+	//for (unsigned int i = 0; i < this->terrainVertices.size() - this->Length -1; i++)
+	//{
+	//	this->indices.push_back((unsigned int)i);
+	//	this->indices.push_back((unsigned int)i + 1);
+	//	this->indices.push_back((unsigned int)i + Length);
+	//	this->indices.push_back((unsigned int)i + 1);
+	//	this->indices.push_back((unsigned int)i + Length);
+	//	this->indices.push_back((unsigned int)i + Length + 1);
+	//}
+	//
+	//for (int i = 0; i < this->indices.size(); i += 3)
+	//{
+	//	if (i >= 4500)
+	//		int temp = 0;
+	//
+	//	glm::vec3 v1 = glm::vec3(this->terrainVertices[indices[i]].x, this->terrainVertices[indices[i]].y, this->terrainVertices[indices[i]].z);
+	//	glm::vec3 v2 = glm::vec3(this->terrainVertices[indices[i+1]].x, this->terrainVertices[indices[i + 1]].y, this->terrainVertices[indices[i + 1]].z);
+	//	glm::vec3 v3 = glm::vec3(this->terrainVertices[indices[i+2]].x, this->terrainVertices[indices[i + 2]].y, this->terrainVertices[indices[i + 2]].z);
+	//
+	//	glm::vec3 ab = v1 - v2;
+	//	glm::vec3 ac = v1 - v3;
+	//
+	//	glm::vec3 normal = glm::normalize(glm::cross(ac, ab));
+	//
+	//
+	//	this->terrainVertices[(int)this->indices[i]].r += normal.x;
+	//	this->terrainVertices[(int)this->indices[i]].g += normal.y;
+	//	this->terrainVertices[(int)this->indices[i]].b += normal.z;
+	//
+	//	this->terrainVertices[(int)this->indices[i + 1]].r += normal.x;
+	//	this->terrainVertices[(int)this->indices[i + 1]].g += normal.y;
+	//	this->terrainVertices[(int)this->indices[i + 1]].b += normal.z;
+	//
+	//	this->terrainVertices[(int)this->indices[i + 2]].r += normal.x;
+	//	this->terrainVertices[(int)this->indices[i + 2]].g += normal.y;
+	//	this->terrainVertices[(int)this->indices[i + 2]].b += normal.z;
+	//
+	//} 
 
 }
 
@@ -272,7 +276,7 @@ float Terrain::getHeight(int x, int z)
 	if (x < 0 || x >= Height || z<0 || z >= Length)
 		return 0.0;
 
-	return terrainVertices[x * z].y;
+	return terrainVertices[((x+1) * (z+1)) - 1].y;
 
 	//glm::vec3 height = HeightMap.getRGB(x, z);
 	
@@ -335,18 +339,22 @@ void Terrain::bindTextures(GLuint shader)
 
 float Terrain::calculateY(float x, float z)
 {
-	//float frontTemp = glm::mix(currentY, frontVertexHeight);
-	int gridX = (int)glm::floor(x / offset);
-	int gridZ = (int)glm::floor(z / offset);
+	float terrainX = x;
+	float terrainZ = z;
+
+
+
+
+	float gridSquareSize = offset / ((float)terrainVertices.size() - 1);
+
+	int gridX = (int)glm::floor(terrainX / offset);
+	int gridZ = (int)glm::floor(terrainZ / offset);
+
 	if (gridX >= terrainVertices.size() - 1 || gridZ >= terrainVertices.size() - 1 || gridX < 0 || gridZ < 0)
 		return 0;
 
-	float gridSquareSize(offset / ((float)Height - 1));
-
-
-
-	float xCoord = (float)((int)x % (int)offset) / offset;
-	float zCoord = (float)((int)z % (int)offset) / offset;
+	float xCoord = ((int)terrainX % (int)offset) / offset;
+	float zCoord = ((int)terrainZ % (int)offset) / offset;
 	float answer;
 	if (xCoord <= (1 - zCoord))
 	{
@@ -364,7 +372,8 @@ float Terrain::calculateY(float x, float z)
 			glm::vec3(0, this->getHeight(gridX, gridZ + 1), 1),
 			glm::vec2(xCoord, zCoord));
 	}
-	return answer + 2;
+	answer += 2;
+	return answer;
 
 }
 

@@ -285,7 +285,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
 	{
-		float tempY = Transformable::transform.position.y;
+ 		float tempY = Transformable::transform.position.y;
 		direction += Transformable::transform.right;
 		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
@@ -326,8 +326,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (gravity == true && inAir == false)
 		Transformable::transform.position -= fallSpeed * Transformable::transform.up  * deltaTime;
 
-	if (Transformable::transform.position.y <= currentY -0.1f)
-		Transformable::transform.position.y = currentY;
+	//if (Transformable::transform.position.y <= currentY -0.1f)
+	//	Transformable::transform.position.y = currentY;
 }
 
 void Player::findY()
