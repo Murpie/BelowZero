@@ -234,9 +234,9 @@ void Game::levelState()
 	{
 		gameScene.update(deltaTime);
 		processInput(window, deltaTime, gameScene);
-		renderManager[0].setDeltaTime(deltaTime);
-		renderManager[0].setSeconds(seconds);
-		renderManager[0].Render();
+		renderManager[1].setDeltaTime(deltaTime);
+		renderManager[1].setSeconds(seconds);
+		renderManager[1].Render();
 	}
 	else if (stateOfGame == Gamestate::ID::CLEAR_LEVEL)
 	{
@@ -269,7 +269,8 @@ void Game::initWindow()
 
 void Game::initScene(GameScene & scene)
 {
-	addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
+	if(renderManager.size() < 2)
+		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
 	//... Create Camera
 	addPlayer(scene);
 	//... Create Lights
@@ -289,7 +290,7 @@ void Game::initScene(GameScene & scene)
 void Game::clearScene(GameScene & scene)
 {
 	scene.clearGameObjects();
-	renderManager.clear();
+	//renderManager.clear();
 	/* Add function to also clear the renderManager*/
 }
 
