@@ -82,15 +82,18 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 
 	}
 	*/
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && stateBool != true)
 	{
-		stateOfGame = Gamestate::ID::RUN_LEVEL;
+		stateBool = true;
+		if(stateOfGame == Gamestate::ID::RUN_LEVEL)
+			stateOfGame = Gamestate::ID::CLEAR_LEVEL;
+		else if (stateOfGame == Gamestate::ID::SHOW_MENU)
+			stateOfGame = Gamestate::ID::CLEAR_MENU;
 	}
-	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_RELEASE && stateBool != false)
 	{
-		stateOfGame = Gamestate::ID::SHOW_MENU;
+		stateBool = false;
 	}
-
 	//...
 	scene.processEvents(window, deltaTime);
 }
@@ -101,7 +104,7 @@ Game::Game() :
 	windowName("Game Engine"),
 	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
-	meshesLoaded(false), testBool(false), fullscreen(false),
+	meshesLoaded(false), fullscreen(false), stateBool(false),
 	count(0)
 {
 	initWindow();
@@ -125,13 +128,10 @@ void Game::run()
 	int initial_time = time(NULL);
 	int final_time;
 	int frameCount = 0;
-	
-	initScene(menuScene);
-	initScene(gameScene);
 
 	useShaderProgram();
 
-	stateOfGame = Gamestate::ID::RUN_LEVEL;
+	stateOfGame = Gamestate::ID::LOAD_MENU;
 	printCurrentState(stateOfGame);
 
 	// Main loop
@@ -201,8 +201,10 @@ void Game::menuState()
 {
 	if (stateOfGame == Gamestate::ID::LOAD_MENU)
 	{
-		//initScene(menuScene);
+		printCurrentState(stateOfGame);
+		initScene(menuScene);
 		stateOfGame = Gamestate::ID::SHOW_MENU;
+		printCurrentState(stateOfGame);
 	}
 	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
@@ -223,20 +225,24 @@ void Game::levelState()
 {
 	if (stateOfGame == Gamestate::ID::LOAD_LEVEL)
 	{
-		//initScene(gameScene);
+		printCurrentState(stateOfGame);
+		initScene(gameScene);
 		stateOfGame = Gamestate::ID::RUN_LEVEL;
+		printCurrentState(stateOfGame);
 	}
 	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
 		gameScene.update(deltaTime);
 		processInput(window, deltaTime, gameScene);
-		renderManager[1].setDeltaTime(deltaTime);
-		renderManager[1].setSeconds(seconds);
-		renderManager[1].Render();
+		renderManager[0].setDeltaTime(deltaTime);
+		renderManager[0].setSeconds(seconds);
+		renderManager[0].Render();
 	}
 	else if (stateOfGame == Gamestate::ID::CLEAR_LEVEL)
 	{
+		printCurrentState(stateOfGame);
 		clearScene(gameScene);
+		//stateOfGame = Gamestate::ID::LOAD_MENU;
 		stateOfGame = Gamestate::ID::LOAD_MENU;
 	}
 }
@@ -282,8 +288,8 @@ void Game::initScene(GameScene & scene)
 
 void Game::clearScene(GameScene & scene)
 {
-	//scene.clearGameObjects();
-
+	scene.clearGameObjects();
+	renderManager.clear();
 	/* Add function to also clear the renderManager*/
 }
 
@@ -326,16 +332,8 @@ void Game::addMeshName()
 void Game::addLights(GameScene &scene)
 {
 	// add for loop and use array for transforms ?
-	if (!testBool)
-	{
-		scene.addLight(glm::vec3(7, 9, -4), 0);
-		scene.addLight(glm::vec3(4, 0.4, -2), 1);
-		testBool = true;
-	}
-	else
-	{
-		scene.gameObjects[0].transform->position = glm::vec3(4, 0.4, -2);
-	}	
+	//scene.addLight(glm::vec3(7, 9, -4), 0);
+	//scene.addLight(glm::vec3(4, 0.4, -2), 1);
 }
 
 void Game::addRenderManager(GameScene &scene)

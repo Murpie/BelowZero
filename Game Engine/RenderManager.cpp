@@ -43,6 +43,21 @@ void RenderManager::FindObjectsToRender() {
 	}
 }
 
+void RenderManager::clearObjectsToRender()
+{
+	while (!gameObjectsToRender.empty())
+	{
+		gameObjectsToRender.pop_back();
+	}
+	gameObjectsToRender.clear();
+	
+	while (!lightsToRender.empty())
+	{
+		lightsToRender.pop_back();
+	}
+	lightsToRender.clear();
+}
+
 void RenderManager::createBuffers()
 {
 	//screen size
@@ -234,15 +249,17 @@ void RenderManager::createBuffers()
 
 void RenderManager::Render() {
 	FindObjectsToRender();
-
 	//... Set view and projection matrix
-	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
-		gameScene->gameObjects[0].transform->position + gameScene->gameObjects[0].transform->forward,
-		gameScene->gameObjects[0].transform->up);
+	//view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
+	//	gameScene->gameObjects[0].transform->position + gameScene->gameObjects[0].transform->forward,
+	//	gameScene->gameObjects[0].transform->up);
+	
+	view_matrix = gameScene->gameObjects[0].getViewMatrix();
+
 	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
-	world_matrix = glm::translate(world_matrix, glm::vec3(10.0f, -5.0f, 0.0f));
+	world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
 	world_matrix = glm::rotate(world_matrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	//... Clear Back Buffer
@@ -476,8 +493,7 @@ void RenderManager::Render() {
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
-	gameObjectsToRender.clear();
-	lightsToRender.clear();
+	clearObjectsToRender();
 	Update();
 }
 

@@ -163,7 +163,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Transformable.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -288,7 +288,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Transformable.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

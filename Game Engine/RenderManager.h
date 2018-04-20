@@ -36,7 +36,10 @@ public:
 	~RenderManager();
 
 	GameScene *gameScene;
+	
 	void FindObjectsToRender();
+	void clearObjectsToRender();
+
 	void Render();
 	void createBuffers();
 	void renderQuad();
@@ -48,6 +51,7 @@ public:
 	void setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition);
 
 private:
+
 	unsigned int loadCubemap(std::vector<std::string> faces);
 
 	std::vector<GameObject*> gameObjectsToRender;

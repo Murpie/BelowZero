@@ -3,6 +3,9 @@
 Player::Player(Transform& transform) : Transformable(transform)
 {
 	Component::id = ComponentType::ID::PLAYER;
+
+	click = false;
+
 	this->hp = 50;
 	this->cold = 100;
 	this->coldMeter = 0;
@@ -233,3 +236,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false)
 		transform.position += cameraSpeed * transform.up;
 }
+
+//glm::mat4 Player::getViewMatrix() const
+//{
+//	return glm::lookAt(Transformable::transform.position, Transformable::transform.position + Transformable::transform.forward, Transformable::transform.up);
+//}
