@@ -192,7 +192,7 @@ void RenderManager::Render() {
 
 	//DIRECTIONAL LIGHT SHADOWMAP PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 
 	glUseProgram(shadowMapShaderProgram);
 	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[1].transform->position);
@@ -206,7 +206,7 @@ void RenderManager::Render() {
 	{
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
