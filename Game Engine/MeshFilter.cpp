@@ -6,12 +6,11 @@ MeshFilter::MeshFilter():Component()
 
 }
 
-MeshFilter::MeshFilter(GLuint otherVertexBuffer, GLuint otherVertexAttribute, GLuint otherElementBuffer, int otherVertexCount, int meshType )
+MeshFilter::MeshFilter(GLuint otherVertexBuffer, GLuint otherVertexAttribute, int otherVertexCount, int meshType )
 {
 	assetName = "MeshFilter";
 	gVertexBuffer = otherVertexBuffer;
 	gVertexAttribute=otherVertexAttribute;
-	gElementBuffer=otherElementBuffer;
 	vertexCount = otherVertexCount;
 	this->meshType = meshType;
 }

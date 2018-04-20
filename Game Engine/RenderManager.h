@@ -53,7 +53,6 @@ private:
 
 	std::vector<GameObject*> gameObjectsToRender;
 	std::vector<Light*> lightsToRender;
-	std::vector<glm::vec3> kernel;
 
 	glm::mat4x4 view_matrix;
 	glm::mat4x4 fpsView_matrix;
@@ -84,18 +83,13 @@ private:
 	unsigned int equipedTexture;
 
 	unsigned int gAlbedo;
-	unsigned int gNormal;
 	unsigned int gPosition;
-	unsigned int gSpecular;
-	unsigned int gMetallic;
-	unsigned int gAO;
-	unsigned int attachments[6] = {
+	unsigned int gNormal;
+	unsigned int attachments[3] = {
 		GL_COLOR_ATTACHMENT0,
 		GL_COLOR_ATTACHMENT1,
 		GL_COLOR_ATTACHMENT2,
-		GL_COLOR_ATTACHMENT3,
-		GL_COLOR_ATTACHMENT4,
-		GL_COLOR_ATTACHMENT5 };
+	};
 
 	QuadVertex vertices;
 	GLFWwindow* window;
