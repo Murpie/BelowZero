@@ -76,8 +76,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>glfw\lib-vc2015-64;LeapImporter\x64;glew-1.11.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
-    <IncludePath>LeapImporter\LeapImporter;glfw\include;glew-1.11.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>glfw\lib-vc2015-64;$(SolutionDir)Game Engine\LeapImporter\x64\Debug;glew-1.11.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Game Engine\LeapImporter\LeapImporter;glfw\include;glew-1.11.0\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -113,13 +113,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)glfw\include;$(SolutionDir)glm;C:\Users\Petter\source\repos\BelowZero\Game Engine\LeapImporter\LeapImporter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)glfw\include;$(SolutionDir)glm;$(SolutionDir)Game Engine\LeapImporter\LeapImporter;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)glfw\lib-vc2010-64;$(SolutionDir)glew-1.11.0\lib\Release\x64;C:\Users\Petter\source\repos\BelowZero\Game Engine\LeapImporter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)glfw\lib-vc2010-64;$(SolutionDir)glew-1.11.0\lib\Release\x64;$(SolutionDir)Game Engine\LeapImporter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;LeapImporter.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
