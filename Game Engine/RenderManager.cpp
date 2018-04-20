@@ -626,7 +626,7 @@ void RenderManager::setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, g
 	glUseProgram(pointLightShaderProgram);
 
 	float aspectRatio = 1024.0f / 1024.0f;
-	float nearPlane = 1.0f;
+	float nearPlane = 0.001f;
 	float farPlane = 25.0f;
 	glm::mat4 cubeMapShadowProjection = glm::perspective(glm::radians(90.0f), aspectRatio, nearPlane, farPlane);
 

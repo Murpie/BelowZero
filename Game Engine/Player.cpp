@@ -109,7 +109,7 @@ void Player::equip(std::string item)
 		std::cout << "Equiped Framebuffer not complete!" << std::endl;
 }
 
-void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance)
+void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
 {
 	this->currentY = currentHeight;
 	this->frontVertexHeight = frontV;
@@ -117,14 +117,28 @@ void Player::recieveTerrainInformation(float currentHeight, float frontV, float 
 	this->leftVertexHeight = leftV;
 	this->rightVertexHeight = rightV;
 	this->distanceToNextVertex = distance;
+	this->vertexLength = nrof;
 
+}
+
+void Player::setCurrentHeight(float height)
+{
+	this->currentY = height;
+}
+
+glm::vec2 Player::setXZ()
+{
+	float u = Transformable::transform.position.x;
+	float v = Transformable::transform.position.z;
+
+
+	return glm::vec2(u, v);
 }
 
 void Player::update(float deltaTime, float seconds)
 {
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
-
 
 
 
@@ -314,4 +328,19 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (Transformable::transform.position.y <= currentY -0.1f)
 		Transformable::transform.position.y = currentY;
+}
+
+void Player::findY()
+{
+	//float frontTemp = glm::mix(currentY, frontVertexHeight);
+	int gridX = (int)glm::floor(cameraPos.x / distanceToNextVertex);
+	int gridZ = (int)glm::floor(cameraPos.z / distanceToNextVertex);
+	float gridSquareSize(distanceToNextVertex / ((float)vertexLength - 1));
+	float xpos = cameraPos.x;
+
+
+
+	float xCoord = ((int)cameraPos.x % (int)distanceToNextVertex) / distanceToNextVertex;
+	float zCoord = ((int)cameraPos.z % (int)distanceToNextVertex) / distanceToNextVertex;
+
 }

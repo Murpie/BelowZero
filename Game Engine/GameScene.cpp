@@ -87,14 +87,23 @@ void GameScene::update(float deltaTime, float seconds)
 		{
 			for (int j = 0; j < gameObjects.size(); j++)
 			{
-				if(gameObjects[j].getTerrain() != nullptr)
-					gameObjects[i].getPlayer()->recieveTerrainInformation(
-						gameObjects[j].getTerrain()->getHeight(23, 42), 
-						gameObjects[j].getTerrain()->frontVertex(23, 42),
-						gameObjects[j].getTerrain()->behindVertex(23, 42),
-						gameObjects[j].getTerrain()->leftVertex(23, 42),
-						gameObjects[j].getTerrain()->rightVertex(23, 42), 
-						gameObjects[j].getTerrain()->distanceBetweenVertices());
+				glm::vec2 UVS = gameObjects[i].getPlayer()->setXZ();
+				float u = UVS.x;
+				float v = UVS.y;
+				if (gameObjects[j].getTerrain() != nullptr)
+				{
+					gameObjects[i].getPlayer()->setCurrentHeight(gameObjects[j].getTerrain()->calculateY(u, v));
+
+					//gameObjects[i].getPlayer()->recieveTerrainInformation(
+					//	gameObjects[j].getTerrain()->getHeight(u, v),
+					//	gameObjects[j].getTerrain()->frontVertex(u, v),
+					//	gameObjects[j].getTerrain()->behindVertex(u, v),
+					//	gameObjects[j].getTerrain()->leftVertex(u, v),
+					//	gameObjects[j].getTerrain()->rightVertex(u, v),
+					//	gameObjects[j].getTerrain()->distanceBetweenVertices(),
+					//	gameObjects[j].getTerrain()->vertexCount);
+				}
+
 			}
 
 		}

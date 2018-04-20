@@ -38,8 +38,9 @@ public:
 	void addToInventory(int item);
 	void equip(std::string item);
 
-	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance);
-
+	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
+	void setCurrentHeight(float height);
+	glm::vec2 setXZ();
 	//Physics
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
@@ -85,4 +86,8 @@ private:
 	float leftVertexHeight;
 	float rightVertexHeight;
 	float distanceToNextVertex;
+
+	int vertexLength;
+
+	void findY();
 };

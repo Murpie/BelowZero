@@ -24,7 +24,7 @@ class Terrain : public Component
 private:
 	float MAX_HEIGHT = 40;
 	float MIN_HEIGHT = -40;
-	int sizePerSide = 8;
+	int sizePerSide = 32;
 	float MAX_PIXEL_COLOR = 256 * 256 * 256;
 	Texture HeightMap;
 	Texture AlbedoMap;
@@ -80,6 +80,9 @@ public:
 	void bindVertexArray();
 	void bindTextures(GLuint shader);
 
+	float calculateY(float x, float z);
+
+
 	float leftVertex(int x, int z);
 	float rightVertex(int x, int z);
 	float frontVertex(int x, int z);
@@ -88,4 +91,5 @@ public:
 	float frontRightVertex(int x, int z);
 
 	float distanceBetweenVertices();
+	float barryCentric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos);
 };

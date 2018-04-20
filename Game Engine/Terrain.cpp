@@ -89,10 +89,10 @@ void Terrain::setupVertexData()
 
 		
 
-			temp.x = (float)(j - (Height / 2)) * offset;
-			float tempY = ((float)(int)pixels[0] / 255) * 7;
+			temp.x = (float)j * offset;//(float)(j - (Height / 2)) * offset;
+			float tempY = ((float)(int)pixels[0] / 255) * offset;
 			temp.y = -tempY;
-			temp.z = (float)(i - (Height / 2)) * offset;
+			temp.z = (float)i * offset; //(float)(i - (Height / 2)) * offset;
 			
 			temp.r = 0.0f;
 			temp.g = 0.0f;
@@ -333,6 +333,41 @@ void Terrain::bindTextures(GLuint shader)
 	
 }
 
+float Terrain::calculateY(float x, float z)
+{
+	//float frontTemp = glm::mix(currentY, frontVertexHeight);
+	int gridX = (int)glm::floor(x / offset);
+	int gridZ = (int)glm::floor(z / offset);
+	if (gridX >= terrainVertices.size() - 1 || gridZ >= terrainVertices.size() - 1 || gridX < 0 || gridZ < 0)
+		return 0;
+
+	float gridSquareSize(offset / ((float)Height - 1));
+
+
+
+	float xCoord = (float)((int)x % (int)offset) / offset;
+	float zCoord = (float)((int)z % (int)offset) / offset;
+	float answer;
+	if (xCoord <= (1 - zCoord))
+	{
+		answer = barryCentric(
+			glm::vec3(0, this->getHeight(gridX, gridZ), 0),
+			glm::vec3(1, this->getHeight(gridX+1, gridZ), 0),
+			glm::vec3(0, this->getHeight(gridX, gridZ+1), 1),
+			glm::vec2(xCoord, zCoord));
+	}
+	else
+	{
+		answer = barryCentric(
+			glm::vec3(1, this->getHeight(gridX + 1, gridZ), 0),
+			glm::vec3(1, this->getHeight(gridX + 1, gridZ + 1), 1),
+			glm::vec3(0, this->getHeight(gridX, gridZ + 1), 1),
+			glm::vec2(xCoord, zCoord));
+	}
+	return answer + 2;
+
+}
+
 float Terrain::leftVertex(int x, int z)
 {
 	if ((x - 1) * z < 0 || (x - 1) * z > terrainVertices.size())
@@ -371,4 +406,11 @@ float Terrain::distanceBetweenVertices()
 	return offset;
 }
 
-
+float Terrain::barryCentric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos)
+{
+	float det = (p2.z - p3.z) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.z - p3.z);
+	float l1 = ((p2.z - p3.z) * (pos.x - p3.x) + (p3.x - p2.x) * (pos.y - p3.z)) / det;
+	float l2 = ((p3.z - p1.z) * (pos.x - p3.x) + (p1.x - p3.x) * (pos.y - p3.z)) / det;
+	float l3 = 1.0f - l1 - l2;
+	return l1 * p1.y + l2 * p2.y + l3 * p3.y;
+}
