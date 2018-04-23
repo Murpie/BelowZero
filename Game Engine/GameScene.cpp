@@ -93,15 +93,6 @@ void GameScene::update(float deltaTime, float seconds)
 				if (gameObjects[j].getTerrain() != nullptr)
 				{
 					gameObjects[i].getPlayer()->setCurrentHeight(gameObjects[j].getTerrain()->calculateY(u, v));
-
-					//gameObjects[i].getPlayer()->recieveTerrainInformation(
-					//	gameObjects[j].getTerrain()->getHeight(u, v),
-					//	gameObjects[j].getTerrain()->frontVertex(u, v),
-					//	gameObjects[j].getTerrain()->behindVertex(u, v),
-					//	gameObjects[j].getTerrain()->leftVertex(u, v),
-					//	gameObjects[j].getTerrain()->rightVertex(u, v),
-					//	gameObjects[j].getTerrain()->distanceBetweenVertices(),
-					//	gameObjects[j].getTerrain()->vertexCount);
 				}
 
 			}

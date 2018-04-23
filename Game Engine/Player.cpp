@@ -261,7 +261,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		float tempY = Transformable::transform.position.y;
 		direction += Transformable::transform.forward;
 		if(shift == true)
-			Transformable::transform.position += cameraSpeed * (Transformable::transform.forward * 1.5f) * deltaTime;
+			Transformable::transform.position += cameraSpeed * (Transformable::transform.forward * 1.8f) * deltaTime;
 		else
 			Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
 		Transformable::transform.position.y = tempY;
@@ -295,7 +295,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true)
 	{
 		inAir = true;
-		gravity = false;
 		time = 0.0f;
 		jumpReady = false;
 	}
@@ -303,10 +302,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (time <= timeInAir && inAir == true)
 	{
 		glm::vec3 jumpdir = Transformable::transform.up;
-		//if(jumpReady = true)
-		//	jumpdir = glm::normalize(direction + Transformable::transform.up);
-		//	if (shift == true)
-		//		jumpdir *= 1.5;
 
 		Transformable::transform.position += jumpSpeed * jumpdir * deltaTime;
 	}
@@ -314,7 +309,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		inAir = false;
 
 
-	if (inAir == false && Transformable::transform.position.y <= currentY + 0.01)
+	if (inAir == false && Transformable::transform.position.y <= currentY)
 	{
 		gravity = false;
 		jumpReady = true;
@@ -328,7 +323,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	//if (Transformable::transform.position.y <= currentY -0.1f)
 	//	Transformable::transform.position.y = currentY;
-	if (gravity == false && inAir == false && jumpReady == true)
+	if (Transformable::transform.position.y <= currentY - 0.0001)
 		Transformable::transform.position.y = currentY;
 }
 

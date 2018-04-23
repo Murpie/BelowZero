@@ -153,7 +153,7 @@ void main()
 
 
 
-	float density = 0.0000005;
+	float density = 0.01;
 	float gradient = 3.0;
 	float distanceToPos = length(view_position - FragPos);
     float visibility = exp(-pow((distanceToPos * density), gradient));

@@ -71,10 +71,8 @@ void Terrain::setupVertexData()
 	glBindFramebuffer(GL_FRAMEBUFFER, this->PBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->HeightMap.gTexture, 0);
 
-	//this->vertexCount = this->HeightMap.width * this->HeightMap.height;
-	this->vertexCount = Length * Height;
 
-	GLubyte* pixels = (GLubyte*)malloc(this->HeightMap.width * this->HeightMap.height * sizeof(GLubyte) * 4);
+	GLubyte pixels[4];// = (GLubyte*)malloc(this->HeightMap.width * this->HeightMap.height * sizeof(GLubyte) * 4);
 
 	glm::vec3 test;
 	float test2;
@@ -94,13 +92,13 @@ void Terrain::setupVertexData()
 		{
 			TerrainVertex temp;
 
-			glReadPixels((i*lengthTemp), (j*heightTemp), this->HeightMap.width, this->HeightMap.height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+			glReadPixels((i*lengthTemp), (j*heightTemp), /*this->HeightMap.width*/1, /*this->HeightMap.height*/1, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 
 
 			temp.x = (float)j * offset;//(float)(j - (Height / 2)) * offset;
 
-			float tempY = ((float)(int)pixels[0] / 255) * offset;
+			float tempY = ((float)(int)pixels[0] / 256) * offset;
 			tempY -= offset;
 
 			temp.y = tempY;
@@ -119,7 +117,6 @@ void Terrain::setupVertexData()
 		}
 	}
 
-	free(pixels);
 
 	//for (int i = 0; i < this->HeightMap.height; i++)
 	//{
@@ -162,7 +159,6 @@ void Terrain::setupVertexData()
 
 
 	}
-	indexCount = indices.size();
 
 	//for (unsigned int i = 0; i < this->terrainVertices.size() - this->Length -1; i++)
 	//{
@@ -202,7 +198,7 @@ void Terrain::setupVertexData()
 	//	this->terrainVertices[(int)this->indices[i + 2]].b += normal.z;
 	//
 	//} 
-	for (int i = 0; i < this->indices.size()-2; i += 2)
+	for (int i = 0; i < this->indices.size()-3; i += 2)
 	{
 
 		glm::vec3 v1 = glm::vec3(this->terrainVertices[indices[i]].x, this->terrainVertices[indices[i]].y, this->terrainVertices[indices[i]].z);
@@ -320,10 +316,6 @@ float Terrain::getHeight(int x, int z)
 
 }
 
-float Terrain::getHeightRGB(int x, int y)
-{
-	return 0.0f;
-}
 
 void Terrain::loadHeighMap(const std::string & heightMap)
 {
@@ -377,22 +369,15 @@ void Terrain::bindTextures(GLuint shader)
 
 float Terrain::calculateY(float x, float z)
 {
-	float terrainX = x;
-	float terrainZ = z;
-
-
-
-
-	float gridSquareSize = offset/* * ((Length * Height) - 1)*/;//((float)terrainVertices.size() - 1);
-
-	int gridX = (int)glm::floor(terrainX / gridSquareSize);
-	int gridZ = (int)glm::floor(terrainZ / gridSquareSize);
+	
+	int gridX = (int)glm::floor(x / offset);
+	int gridZ = (int)glm::floor(z / offset);
 
 	if (gridX >= terrainVertices.size() - 1 || gridZ >= terrainVertices.size() - 1 || gridX < 0 || gridZ < 0)
-		return 0;
+		return -10000;
 
-	float xCoord = ((int)terrainX % (int)gridSquareSize) / gridSquareSize;
-	float zCoord = ((int)terrainZ % (int)gridSquareSize) / gridSquareSize;
+	float xCoord = ((int)x % (int)offset) / (float)offset;
+	float zCoord = ((int)z % (int)offset) / (float)offset;
 	float answer;
 	if (xCoord <= (1 - zCoord))
 	{
@@ -415,38 +400,6 @@ float Terrain::calculateY(float x, float z)
 
 }
 
-float Terrain::leftVertex(int x, int z)
-{
-	if ((x - 1) * z < 0 || (x - 1) * z > terrainVertices.size())
-		return 0.0;
-
-	return this->terrainVertices[(x - 1) * z].y;
-
-}
-
-float Terrain::rightVertex(int x, int z)
-{
-	if ((x + 1) * z < 0 || (x + 1) * z > terrainVertices.size())
-		return 0.0;
-
-	return this->terrainVertices[(x + 1) * z].y;
-}
-
-float Terrain::frontVertex(int x, int z)
-{
-	if (x * (z + 1) < 0 || x * (z + 1) > terrainVertices.size())
-		return 0.0;
-
-	return this->terrainVertices[x * (z + 1)].y;
-}
-
-float Terrain::behindVertex(int x, int z)
-{
-	if (x * (z - 1) < 0 || x * (z - 1) > terrainVertices.size())
-		return 0.0;
-
-	return this->terrainVertices[x * (z - 1)].y;
-}
 
 float Terrain::distanceBetweenVertices()
 {

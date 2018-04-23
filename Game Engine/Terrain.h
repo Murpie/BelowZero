@@ -66,13 +66,10 @@ public:
 
 	short *heightMapIndexData;
 
-	int vertexCount;
-	int indexCount;
 	void setupVertexData();
 	void setupBuffers(GLint gShaderProgram);
 	//void calculateNormals(int triangleIndex);
 	float getHeight(int x, int z);
-	float getHeightRGB(int x, int y);
 
 	void loadHeighMap(const std::string & heightMap);
 
@@ -85,14 +82,6 @@ public:
 	void bindTextures(GLuint shader);
 
 	float calculateY(float x, float z);
-
-
-	float leftVertex(int x, int z);
-	float rightVertex(int x, int z);
-	float frontVertex(int x, int z);
-	float behindVertex(int x, int z);
-	float frontLeftVertex(int x, int z);
-	float frontRightVertex(int x, int z);
 
 	float distanceBetweenVertices();
 	float barryCentric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos);
