@@ -160,7 +160,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 {
 	if (checkInventory(item) && item != "EmptyImage")
 	{
-		if (this->textTimer >= 1.0f)
+		if (this->textTimer >= 1.0f ||this->textOnScreen == false)
 		{
 			std::cout << "Item already exists in players inventory" << std::endl;
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -325,9 +325,9 @@ void Player::update(float deltaTime, float seconds)
 
 	// Text Fade
 	if (this->textOnScreen == true)
-		this->textFade -= 0.005;
-	else if (this->textOnScreen == false)
-		this->textFade = 1.0;
+		this->textFade -= 0.05;
+	//else if (this->textOnScreen == false)
+		//this->textFade = 1.0;
 }
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
