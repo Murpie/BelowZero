@@ -383,7 +383,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	}
 	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
 	{
-		equip("MainMenuConcept");
+		equip("MainMenuConcept1");
 	}
 
 

@@ -114,5 +114,5 @@ void main()
 		shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal, lights[1].Position);
 
 	FragColor = lighting * (1.0f - shadowFactor);
-	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 3, visibility);
+	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5, visibility);
 }
