@@ -13,7 +13,8 @@ uniform float lifeLevel;
 void main(){
 	// Output color = color of the texture at the specified UV
 	//color = texture( myTextureSampler, uv );
-	color = vec4(0.0, lifeLevel, 0.0, 1.0);
+	//color = vec4(0.0, lifeLevel, 0.0, 1.0);
+	color = vec4(1, 0, 0, 1);
 	
 	// Hardcoded life level, should be in a separate texture.
 	//if (uv.x < lifeLevel && uv.y > 0.3 && uv.y < 0.7 && uv.x > 0.04 )

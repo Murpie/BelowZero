@@ -117,7 +117,7 @@ void main()
         specular *= attenuation;
         lighting += diffuse + specular + metallic;
 
-	float density = 0.05;
+	float density = 0.02;
 	float gradient = 3.0;
 	float distanceToPos = length(view_position - FragPos);
     float visibility = exp(-pow((distanceToPos * density), gradient));

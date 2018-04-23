@@ -45,6 +45,7 @@ public:
 	void Render();
 	void createBuffers();
 	void renderQuad();
+	void renderVFX();
 	void Update();
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
@@ -86,6 +87,8 @@ private:
 	unsigned int finalFBO;
 	unsigned int finalColorBuffer;
 	unsigned int finalDepthStensil;
+	unsigned int billboardFBO;
+	unsigned int billboardTexture;
 	unsigned int billboardVAO;
 	unsigned int billboardVBO;
 	unsigned int particlePositionBuffer;

@@ -17,15 +17,11 @@ void main()
 {
 	vec3 particleCenter_wordspace = billboardPos;
 	
-	vec3 vertexPosition_worldspace = 
-		particleCenter_wordspace
-		+ (cameraRight_worldspace * squareVertices.x * billboardSize.x)
-		+ (cameraUp_worldspace * squareVertices.y * billboardSize.y);
+	vec3 vertexPosition_worldspace = particleCenter_wordspace + (cameraRight_worldspace * squareVertices.x * billboardSize.x) + (cameraUp_worldspace * squareVertices.y * billboardSize.y);
 
 
 	// Output position of the vertex
 	gl_Position = vp * vec4(vertexPosition_worldspace, 1.0f);
-
 
 
 	// Or, if BillboardSize is in percentage of the screen size (1,1 for fullscreen) :

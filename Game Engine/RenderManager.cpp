@@ -65,28 +65,18 @@ void RenderManager::createBuffers()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//... VFX
-
-	static const GLfloat g_vertex_buffer_data[] = {
-		0.0f, 4.5f, 0.5f,
-		0.0f, 4.5f, -0.5f,
-		0.0f,  5.5f, 0.5f,
-		0.0f,  5.5f, -0.5f,
-	};
-	glGenVertexArrays(1, &billboardVAO);
-	glBindVertexArray(billboardVAO);
-	glGenBuffers(1, &billboardVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, billboardVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
-
-	glGenBuffers(1, &particlePositionBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
-	glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * sizeof(GLfloat) * 4, particlePositionData);
-
-	glGenBuffers(1, &particleColorBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, 5 * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 3 * sizeof(GLfloat) * 4, particleColorData);
+	glGenFramebuffers(1, &billboardFBO);
+	glGenTextures(1, &billboardTexture);
+	glBindTexture(GL_TEXTURE_2D, billboardTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, billboardTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "VFX Framebuffer not complete!" << std::endl;
 
 	//... Create G-buffers
 	//framebufferobject
@@ -300,30 +290,35 @@ void RenderManager::Render() {
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
 	}
 
-	//... VFX
 
+	//... VFX
+	glm::vec3 cameraPosition(glm::inverse(view_matrix)[3]);
+	glm::mat4 viewProjectionMatrix = projection_matrix * view_matrix;
+
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, billboardFBO);
 	glUseProgram(VFXShaderProgram);
 
+	glUniform1i(glGetUniformLocation(VFXShaderProgram, "myTextureSampler"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
-	glUniform1i(glGetUniformLocation(VFXShaderProgram, "myTextureSampler"), 0);
 
 	glUniform3f(glGetUniformLocation(VFXShaderProgram, "cameraRight_worldspace"), view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
 	glUniform3f(glGetUniformLocation(VFXShaderProgram, "cameraUp_worldspace"), view_matrix[0][1], view_matrix[1][1], view_matrix[2][1]);
 
-	glUniform3f(glGetUniformLocation(VFXShaderProgram, "billboardPos"), 0.0f, 5.5f, 0.0f);
+	glUniform3f(glGetUniformLocation(VFXShaderProgram, "billboardPos"), 0.0f, 5.0f, 0.0f);
 	glUniform2f(glGetUniformLocation(VFXShaderProgram, "billboardSize"), 1.0f, 0.125f);
+
+	glUniformMatrix4fv(glGetUniformLocation(VFXShaderProgram, "vp"), 1, GL_FALSE, &viewProjectionMatrix[0][0]);
 
 	float lifeLevel = sin(deltaTime)* 0.1f + 0.7f;
 
 	glUniform1f(glGetUniformLocation(VFXShaderProgram, "lifeLevel"), lifeLevel);
-	glUniformMatrix4fv(glGetUniformLocation(VFXShaderProgram, "vp"), 1, GL_FALSE, &projection_matrix[0][0]);
-
-	glBindVertexArray(billboardVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, billboardVBO);
 
 	//renderQuad();
+	renderVFX();
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//------=====================Animation Pass=======================-------
 	//glUseProgram(animationShaderProgram);
@@ -518,6 +513,58 @@ void RenderManager::renderQuad()
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+}
+
+void RenderManager::renderVFX()
+{
+	if (billboardVAO == 0)
+	{
+		unsigned int squareVTX;
+
+		squareVTX = glGetAttribLocation(VFXShaderProgram, "squareVertices");
+
+		GLfloat g_vertex_buffer_data[] = {
+			0.0f, 4.5f, 0.5f,
+			0.0f, 4.5f, -0.5f,
+			0.0f,  5.5f, 0.5f,
+			0.0f,  5.5f, -0.5f,
+		};
+
+		glGenVertexArrays(1, &billboardVAO);
+		glBindVertexArray(billboardVAO);
+		glGenBuffers(1, &billboardVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, billboardVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+
+		if (squareVTX == -1) {
+			OutputDebugStringA("Error, can't find squareVertices attribute in vertex shader\n");
+			return;
+		}
+
+		glVertexAttribPointer(
+			0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			sizeof(g_vertex_buffer_data),                  // stride
+			BUFFER_OFFSET(0)         // array buffer offset
+		);
+
+		/*glGenBuffers(1, &particlePositionBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
+		glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * sizeof(GLfloat) * 4, particlePositionData);
+
+		glGenBuffers(1, &particleColorBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
+		glBufferData(GL_ARRAY_BUFFER, 5 * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 3 * sizeof(GLfloat) * 4, particleColorData);*/
+	}
+
+	glBindVertexArray(billboardVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, billboardVBO);
 }
 
 void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
