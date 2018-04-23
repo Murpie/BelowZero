@@ -334,9 +334,12 @@ void RenderManager::Render() {
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[4]);
-	
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 7);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "textTexture"), 7);
 	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->textTexture);
+	
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 8);
+	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0].getPlayer()->hp);
@@ -344,6 +347,7 @@ void RenderManager::Render() {
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0].getPlayer()->water);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0].getPlayer()->food);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0].getPlayer()->fade);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0].getPlayer()->textFade);
 
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 

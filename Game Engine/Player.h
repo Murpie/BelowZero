@@ -23,8 +23,10 @@ public:
 	float foodTick;
 	float damage;
 	float fade;
+	float textFade;
 
 	bool startGame;
+	bool textOnScreen;
 
 	int initializer;
 	int inventory[5];
@@ -38,6 +40,8 @@ public:
 	unsigned int equipedTexture;
 	unsigned int inventoryFBO[5];
 	unsigned int inventoryTexture[5];
+	unsigned int textFBO;
+	unsigned int textTexture;
 
 	void setCold(float value);
 	void setWater(float value);
@@ -48,6 +52,7 @@ public:
 	void equip(std::string item);
 	void addImageToInventory(std::string item, int inventorySlot);
 	bool checkInventory(std::string item);
+	void addTextToScreen(std::string item);
 
 	//Physics
 	void update(float deltaTime, float seconds);
@@ -75,6 +80,7 @@ private:
 	float sensitivity;
 
 	float time = 0.0;
+	float textTimer = 0.0;
 
 	float jumpSpeed = 7.64;
 	float cameraSpeed = 7.06;

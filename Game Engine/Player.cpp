@@ -18,6 +18,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->inventoryCount = 0;
 	this->maxAmountOfItems = 5;
 	this->fade = 1;
+	this->textFade = 1;
 	this->startGame = true;
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
@@ -43,6 +44,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	equip("EmptyImage");
 	for (int i = 0; i < 5; i++)
 		initiateInventoryTextures("EmptyImage");
+	addTextToScreen("EmptyImageTexture");
 }
 
 Player::~Player()
@@ -157,7 +159,13 @@ void Player::equip(std::string item)
 void Player::addImageToInventory(std::string item, int inventorySlot)
 {
 	if (checkInventory(item) && item != "EmptyImage")
-		std::cout << "Item already exists in players inventory" << std::endl;
+	{
+		if (this->textTimer >= 1.0f)
+		{
+			std::cout << "Item already exists in players inventory" << std::endl;
+			addTextToScreen("Text-ItemAlreadyEquipped");
+		}
+	}
 	else
 	{
 		std::string texturePNG = "Texture.png";
@@ -207,11 +215,62 @@ bool Player::checkInventory(std::string item)
 	return check;
 }
 
+void Player::addTextToScreen(std::string item)
+{
+	std::string texturePNG = ".png";
+	std::string filePath = item + texturePNG;
+	int width, height, nrOfChannels;
+
+	// ----------========== Equipment FrameBuffer ==========----------
+	unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
+
+	glGenFramebuffers(1, &textFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, textFBO);
+
+	glGenTextures(1, &textTexture);
+	glBindTexture(GL_TEXTURE_2D, textTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+	else
+	{
+		std::cout << "Failed to load Text Texture from path" << std::endl;
+	}
+
+	stbi_image_free(data);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Text Framebuffer not complete!" << std::endl;
+	
+	if (item == "EmptyImageTexture")
+		this->textOnScreen = false;
+	else
+	{
+		this->textOnScreen = true;
+		this->textFade = 1.0;
+	}
+
+	this->textTimer = 0.0;
+	
+}
+
 void Player::update(float deltaTime, float seconds)
 {
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
-
+	
+	this->textTimer += tempSeconds;
+	if (this->textTimer >= 1.0f && this->textOnScreen == true)
+	{
+		addTextToScreen("EmptyImageTexture");
+	}
+	
 	// LOOSING HP
 	if (this->cold < 20)
 		this->coldMeter = 0.5;
@@ -263,10 +322,18 @@ void Player::update(float deltaTime, float seconds)
 
 	if (this->hp <= 0 && this->fade < 1)
 		this->fade += deltaTime;
+
+	// Text Fade
+	if (this->textOnScreen == true)
+		this->textFade -= 0.005;
+	else if (this->textOnScreen == false)
+		this->textFade = 1.0;
 }
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
 {
+	
+
 	//Equipment and Stats
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 		setCold(10);
