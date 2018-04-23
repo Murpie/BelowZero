@@ -202,6 +202,32 @@ void Terrain::setupVertexData()
 	//	this->terrainVertices[(int)this->indices[i + 2]].b += normal.z;
 	//
 	//} 
+	for (int i = 0; i < this->indices.size()-2; i += 2)
+	{
+
+		glm::vec3 v1 = glm::vec3(this->terrainVertices[indices[i]].x, this->terrainVertices[indices[i]].y, this->terrainVertices[indices[i]].z);
+		glm::vec3 v2 = glm::vec3(this->terrainVertices[indices[i + 1]].x, this->terrainVertices[indices[i + 1]].y, this->terrainVertices[indices[i + 1]].z);
+		glm::vec3 v3 = glm::vec3(this->terrainVertices[indices[i + 2]].x, this->terrainVertices[indices[i + 2]].y, this->terrainVertices[indices[i + 2]].z);
+
+		glm::vec3 ab = v1 - v2;
+		glm::vec3 ac = v1 - v3;
+
+		glm::vec3 normal = glm::normalize(glm::cross(ac, ab));
+
+
+		this->terrainVertices[(int)this->indices[i]].r += normal.x;
+		this->terrainVertices[(int)this->indices[i]].g += normal.y;
+		this->terrainVertices[(int)this->indices[i]].b += normal.z;
+
+		this->terrainVertices[(int)this->indices[i + 1]].r += normal.x;
+		this->terrainVertices[(int)this->indices[i + 1]].g += normal.y;
+		this->terrainVertices[(int)this->indices[i + 1]].b += normal.z;
+
+		this->terrainVertices[(int)this->indices[i + 2]].r += normal.x;
+		this->terrainVertices[(int)this->indices[i + 2]].g += normal.y;
+		this->terrainVertices[(int)this->indices[i + 2]].b += normal.z;
+
+	}
 
 }
 
