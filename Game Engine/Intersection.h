@@ -195,6 +195,12 @@ public:
 
 	static bool collisionTest(const bBox& bBox1, const bBox& bBox2)
 	{
-
+		return(
+			bBox1.vMax.x > bBox2.vMin.x &&
+			bBox1.vMin.x < bBox2.vMax.x &&
+			bBox1.vMax.y > bBox2.vMin.y &&
+			bBox1.vMin.y < bBox2.vMax.y &&
+			bBox1.vMax.z > bBox2.vMin.z &&
+			bBox1.vMin.z < bBox2.vMax.z);
 	}
 };
