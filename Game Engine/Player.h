@@ -29,11 +29,12 @@ public:
 	bool textOnScreen;
 
 	int initializer;
+	int textInitializer;
 	int inventory[5];
 	int maxAmountOfItems;
 	int inventoryCount;
 
-	std::string imageNames[5] = {"InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "InventoryBucketIcon"};
+	std::string imageNames[5] = {"InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "MainMenuConcept"};
 	std::string imagesCurrentlyInInventory[5] = { "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage" };
 
 	unsigned int equipedFBO;
