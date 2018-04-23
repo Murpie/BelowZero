@@ -16,49 +16,52 @@ Terrain::Terrain(const std::string & height, const std::string & color, GLuint s
 	this->setupVertexData();
 
 
-//for (int i = 0; i < 4; i++)
-//{
-//	for (int j = 0; j < 4; j++)
-//	{
-//		TerrainVertex temp;
-//		temp.x = (float)i * 400;
-//		temp.y = 1.2f;
-//		temp.z = (float)j * 400;
-//		temp.r = 0.0;
-//		temp.g = 0.0;
-//		temp.b = 0.0;
-//		temp.u = 0.0;
-//		temp.v = 0.0;
-//
-//		terrainVertices.push_back(temp);
-//	}
-//}
-//
-//for (int y = 0; y < 4 - 1; y++)
-//{
-//	if (y > 0)
-//		indices.push_back((short)(y * 4));
-//
-//	for (int x = 0; x < 4; x++)
-//	{
-//		indices.push_back((short)((y * 4) + x));
-//		indices.push_back((short)((y + 1) * 4) + x);
-//	}
-//	if (y < 4 - 2)
-//	{
-//		indices.push_back((short)((y + 1) * 4) + 4 -1);
-//	}
-//
-//
-//
-//}
+	//for (int i = 0; i < 4; i++)
+	//{
+	//	for (int j = 0; j < 4; j++)
+	//	{
+	//		TerrainVertex temp;
+	//		temp.x = (float)i * 400;
+	//		temp.y = 1.2f;
+	//		temp.z = (float)j * 400;
+	//		temp.r = 0.0;
+	//		temp.g = 0.0;
+	//		temp.b = 0.0;
+	//		temp.u = 0.0;
+	//		temp.v = 0.0;
+	//
+	//		terrainVertices.push_back(temp);
+	//	}
+	//}
+	//
+	//for (int y = 0; y < 4 - 1; y++)
+	//{
+	//	if (y > 0)
+	//		indices.push_back((short)(y * 4));
+	//
+	//	for (int x = 0; x < 4; x++)
+	//	{
+	//		indices.push_back((short)((y * 4) + x));
+	//		indices.push_back((short)((y + 1) * 4) + x);
+	//	}
+	//	if (y < 4 - 2)
+	//	{
+	//		indices.push_back((short)((y + 1) * 4) + 4 -1);
+	//	}
+	//
+	//
+	//
+	//}
 
 	this->setupBuffers(shader);
 }
 
 Terrain::~Terrain()
 {
-	
+	for (int i = 0; i < this->Length; i++)
+		delete Heights[i];
+
+	delete[] Heights;
 }
 
 void Terrain::setupVertexData()
@@ -82,34 +85,40 @@ void Terrain::setupVertexData()
 	this->zOffset = Height * offset;
 	this->xOffset = Length * offset;
 
+	Heights = new float*[Height];
+
 	for (int i = 0; i < this->Height; i++)
 	{
+		Heights[i] = new float[Length];
 		for (int j = 0; j < this->Length; j++)
 		{
 			TerrainVertex temp;
 
 			glReadPixels((i*lengthTemp), (j*heightTemp), this->HeightMap.width, this->HeightMap.height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
-		
+
 
 			temp.x = (float)j * offset;//(float)(j - (Height / 2)) * offset;
+
 			float tempY = ((float)(int)pixels[0] / 255) * offset;
+			tempY -= offset;
+
 			temp.y = tempY;
 			temp.z = ((float)i * offset); //(float)(i - (Height / 2)) * offset;
-			
+
 			temp.r = 0.0f;
 			temp.g = 0.0f;
 			temp.b = 0.0f;
 
-			temp.u = (float)j / (float)(this->Length -1);
-			temp.v = -(float)i / (float)(this->Height -1);
+			temp.u = (float)j / (float)(this->Length - 1);
+			temp.v = -(float)i / (float)(this->Height - 1);
 
 			this->terrainVertices.push_back(temp);
 
-
+			Heights[i][j] = tempY;
 		}
 	}
-	
+
 	free(pixels);
 
 	//for (int i = 0; i < this->HeightMap.height; i++)
@@ -138,8 +147,8 @@ void Terrain::setupVertexData()
 	for (int y = 0; y < this->Height - 1; y++)
 	{
 		if (y > 0)
-		indices.push_back((short)(y * Height));
-	
+			indices.push_back((short)(y * Height));
+
 		for (int x = 0; x < this->Length; x++)
 		{
 			indices.push_back((short)((y * Height) + x));
@@ -147,11 +156,11 @@ void Terrain::setupVertexData()
 		}
 		if (y < HeightMap.width - 2)
 		{
-			indices.push_back((short)((y + 1) * Height) + Length -1);
+			indices.push_back((short)((y + 1) * Height) + Length - 1);
 		}
-	
-	
-	
+
+
+
 	}
 	indexCount = indices.size();
 
@@ -251,7 +260,7 @@ void Terrain::setupBuffers(GLint gShaderProgram)
 		GL_FALSE, sizeof(TerrainVertex), // distance between two vertexColor 
 		BUFFER_OFFSET(sizeof(float) * 3)	// note, the first color starts after the first vertex.
 	);
-	
+
 	// repeat the process for the third attribute.
 	// query which "slot" corresponds to the input uv coord in the Vertex Shader 
 	GLuint uvPos = glGetAttribLocation(gShaderProgram, "uv_coord");
@@ -273,13 +282,16 @@ void Terrain::setupBuffers(GLint gShaderProgram)
 
 float Terrain::getHeight(int x, int z)
 {
-	if (x < 0 || x >= Height || z<0 || z >= Length)
+	if (x < 0 || x >= Height - 1 || z<0 || z >= Length - 1)
 		return 0.0;
 
-	return terrainVertices[((x+1) * (z+1)) - 1].y;
+	return Heights[x][z];
+
+
+	//return terrainVertices[((x+1) * (z+1)) - 1].y;
 
 	//glm::vec3 height = HeightMap.getRGB(x, z);
-	
+
 }
 
 float Terrain::getHeightRGB(int x, int y)
@@ -318,8 +330,8 @@ GLuint Terrain::getVAO()
 void Terrain::bindVertexArray()
 {
 	//glBindBuffer(GL_ARRAY_BUFFER, this->VAO);
-	
-	
+
+
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
 	glBindVertexArray(this->VAO);
 
@@ -334,7 +346,7 @@ void Terrain::bindTextures(GLuint shader)
 
 	glUniform1i(glGetUniformLocation(shader, "foundAlbedo"), this->foundAlbedo);
 
-	
+
 }
 
 float Terrain::calculateY(float x, float z)
@@ -345,7 +357,7 @@ float Terrain::calculateY(float x, float z)
 
 
 
-	float gridSquareSize = offset * ((Length - 1) * (Height - 1));//((float)terrainVertices.size() - 1);
+	float gridSquareSize = offset/* * ((Length * Height) - 1)*/;//((float)terrainVertices.size() - 1);
 
 	int gridX = (int)glm::floor(terrainX / gridSquareSize);
 	int gridZ = (int)glm::floor(terrainZ / gridSquareSize);
@@ -356,20 +368,20 @@ float Terrain::calculateY(float x, float z)
 	float xCoord = ((int)terrainX % (int)gridSquareSize) / gridSquareSize;
 	float zCoord = ((int)terrainZ % (int)gridSquareSize) / gridSquareSize;
 	float answer;
-	if (xCoord >= (1 - zCoord))
+	if (xCoord <= (1 - zCoord))
 	{
 		answer = barryCentric(
-			glm::vec3(0, this->getHeight(gridX, gridZ), 0),
-			glm::vec3(1, this->getHeight(gridX+1, gridZ), 0),
-			glm::vec3(0, this->getHeight(gridX, gridZ+1), 1),
+			glm::vec3(0, Heights[gridZ][gridX], 0),
+			glm::vec3(1, Heights[gridZ + 1][gridX], 0),
+			glm::vec3(0, Heights[gridZ][gridX + 1], 1),
 			glm::vec2(xCoord, zCoord));
 	}
 	else
 	{
 		answer = barryCentric(
-			glm::vec3(1, this->getHeight(gridX + 1, gridZ), 0),
-			glm::vec3(1, this->getHeight(gridX + 1, gridZ + 1), 1),
-			glm::vec3(0, this->getHeight(gridX, gridZ + 1), 1),
+			glm::vec3(1, Heights[gridZ + 1][gridX], 0),
+			glm::vec3(1, Heights[gridZ + 1][gridX + 1], 1),
+			glm::vec3(0, Heights[gridZ][gridX + 1], 1),
 			glm::vec2(xCoord, zCoord));
 	}
 	answer += 2;
@@ -399,7 +411,7 @@ float Terrain::frontVertex(int x, int z)
 	if (x * (z + 1) < 0 || x * (z + 1) > terrainVertices.size())
 		return 0.0;
 
-	return this->terrainVertices[x * (z +1)].y;
+	return this->terrainVertices[x * (z + 1)].y;
 }
 
 float Terrain::behindVertex(int x, int z)
@@ -407,7 +419,7 @@ float Terrain::behindVertex(int x, int z)
 	if (x * (z - 1) < 0 || x * (z - 1) > terrainVertices.size())
 		return 0.0;
 
-	return this->terrainVertices[x * (z -1)].y;
+	return this->terrainVertices[x * (z - 1)].y;
 }
 
 float Terrain::distanceBetweenVertices()

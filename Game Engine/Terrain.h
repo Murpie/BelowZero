@@ -22,8 +22,8 @@ struct TerrainVertex
 class Terrain : public Component
 {
 private:
-	float MAX_HEIGHT = 40;
-	float MIN_HEIGHT = -40;
+	float MAX_HEIGHT = 10;
+	float MIN_HEIGHT = -3;
 	int sizePerSide = 32;
 	float MAX_PIXEL_COLOR = 256 * 256 * 256;
 	Texture HeightMap;
@@ -33,7 +33,8 @@ private:
 
 	int Length = 40;
 	int Height = 40;
-	
+
+	float **Heights;
 
 	GLuint VAO;
 	GLuint VBO;
@@ -61,7 +62,6 @@ public:
 
 	std::vector<TerrainVertex> terrainVertices;
 
-	std::vector<float> heights;
 	std::vector<unsigned int> indices;
 
 	short *heightMapIndexData;
