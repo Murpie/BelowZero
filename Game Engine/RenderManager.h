@@ -87,6 +87,7 @@ private:
 	unsigned int finalColorBuffer;
 	unsigned int finalDepthStensil;
 	unsigned int billboardVAO;
+	unsigned int billboardVBO;
 	unsigned int particlePositionBuffer;
 	unsigned int particleColorBuffer;
 
@@ -127,6 +128,7 @@ private:
 	GLuint skyboxShaderProgram;
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
+	GLuint VFXShaderProgram;
 
 	int display_w, display_h;
 };

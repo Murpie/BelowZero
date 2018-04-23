@@ -295,6 +295,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addShadowMapShaders();
 	shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
+	shaderProgramLibrary.addVFXShaders();
 }
 
 void Game::initInputOptions()

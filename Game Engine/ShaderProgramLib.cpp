@@ -44,3 +44,9 @@ void ShaderProgramLib::addUIShaders()
 	UIShaders* newShaderProgram = new UIShaders();
 	shaders.push_back(newShaderProgram);
 }
+
+void ShaderProgramLib::addVFXShaders()
+{
+	VFXShaders* newShaderProgram = new VFXShaders();
+	shaders.push_back(newShaderProgram);
+}

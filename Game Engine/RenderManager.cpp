@@ -65,15 +65,18 @@ void RenderManager::createBuffers()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//... VFX
+
 	static const GLfloat g_vertex_buffer_data[] = {
-		5.0f, 5.5f, 5.5f,
-		5.0f, 5.5f, -5.5f,
-		5.0f, -0.5f, 5.5f,
-		5.0f, -0.5f, -5.5f,
+		0.0f, 4.5f, 0.5f,
+		0.0f, 4.5f, -0.5f,
+		0.0f,  5.5f, 0.5f,
+		0.0f,  5.5f, -0.5f,
 	};
-	glGenBuffers(1, &billboardVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, billboardVAO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	glGenVertexArrays(1, &billboardVAO);
+	glBindVertexArray(billboardVAO);
+	glGenBuffers(1, &billboardVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, billboardVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_DYNAMIC_DRAW);
 
 	glGenBuffers(1, &particlePositionBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
@@ -220,7 +223,7 @@ void RenderManager::Render() {
 	FindObjectsToRender();
 
 	//... Set view and projection matrix
-	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
+	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position,
 		gameScene->gameObjects[0].transform->position + gameScene->gameObjects[0].transform->forward,
 		gameScene->gameObjects[0].transform->up);
 
@@ -266,7 +269,7 @@ void RenderManager::Render() {
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
-	
+
 	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -299,73 +302,28 @@ void RenderManager::Render() {
 
 	//... VFX
 
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, billboardVAO);
-	glVertexAttribPointer(
-		0,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0
-	);
+	glUseProgram(VFXShaderProgram);
 
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
-	glVertexAttribPointer(
-		1,
-		4,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0
-	);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+	glUniform1i(glGetUniformLocation(VFXShaderProgram, "myTextureSampler"), 0);
 
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
-	glVertexAttribPointer(
-		2,
-		4,
-		GL_UNSIGNED_BYTE,
-		GL_TRUE,
-		0,
-		(void*)0
-	);
+	glUniform3f(glGetUniformLocation(VFXShaderProgram, "cameraRight_worldspace"), view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
+	glUniform3f(glGetUniformLocation(VFXShaderProgram, "cameraUp_worldspace"), view_matrix[0][1], view_matrix[1][1], view_matrix[2][1]);
 
-	glVertexAttribDivisor(0, 0);
-	glVertexAttribDivisor(1, 1);
-	glVertexAttribDivisor(2, 1);
+	glUniform3f(glGetUniformLocation(VFXShaderProgram, "billboardPos"), 0.0f, 5.5f, 0.0f);
+	glUniform2f(glGetUniformLocation(VFXShaderProgram, "billboardSize"), 1.0f, 0.125f);
 
-	particleContainer = new VFX::Particle[maxParticles];
+	float lifeLevel = sin(deltaTime)* 0.1f + 0.7f;
 
-	lastUsedParticle = 0;
+	glUniform1f(glGetUniformLocation(VFXShaderProgram, "lifeLevel"), lifeLevel);
+	glUniformMatrix4fv(glGetUniformLocation(VFXShaderProgram, "vp"), 1, GL_FALSE, &projection_matrix[0][0]);
 
-	FindUnusedParticle();
+	glBindVertexArray(billboardVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, billboardVBO);
 
-	if (newParticles > (int)(0.016 * 100))
-	{
-		newParticles = (int)(0.016 * 100);
-	}
-
-	particleCount = 0;
-	for (int i = 0; i < maxParticles; i++)
-	{
-		VFX::Particle& p = particleContainer[i];
-
-		if (p.life > 0.0f)
-		{
-			p.life -= deltaTime;
-			if (p.life > 0.0f)
-			{
-				particleContainer[i].speed += glm::vec3(0.0f, -9.82f, 0.0f) * (float)deltaTime * 0.5f;
-				particleContainer[i].pos += p.speed * (float)deltaTime;
-			}
-		}
-	}
-
-	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
-
-	delete particleContainer;
+	//renderQuad();
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	//------=====================Animation Pass=======================-------
 	//glUseProgram(animationShaderProgram);
