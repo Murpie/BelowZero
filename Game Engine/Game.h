@@ -25,10 +25,8 @@
 #include <ctime>
 #include "GeometryShaders.h"
 #include "LightpassShaders.h"
-#include "CubeMapShaders.h"
 
 #include <chrono>
-#include "PointLightShadowMapShaders.h"
 ////////////
 
 class Game
@@ -55,6 +53,7 @@ private:
 	//
 	vector<RenderManager> renderManager; // use 1 render manager? delete and init new one
 	vector<string> meshName; // Filepaths for the importer?
+	vector<GLuint> meshType;
 
 	Gamestate::ID stateOfGame; // EnumID.h, make this one global(?) 
 
@@ -77,7 +76,6 @@ private:
 
 	void addMeshName();
 	//...
-	void addTerrain(GameScene &scene);
 	void addLights(GameScene &scene);
 	void addRenderManager(GameScene &scene);
 	void addPlayer(GameScene &scene);

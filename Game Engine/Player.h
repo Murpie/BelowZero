@@ -22,21 +22,37 @@ public:
 	float waterTick;
 	float foodTick;
 	float damage;
+	float fade;
+	float textFade;
 
+	bool startGame;
+	bool textOnScreen;
 
-
+	int initializer;
 	int inventory[5];
+	int maxAmountOfItems;
 	int inventoryCount;
+
+	std::string imageNames[5] = {"InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "InventoryBucketIcon"};
+	std::string imagesCurrentlyInInventory[5] = { "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage" };
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
+	unsigned int inventoryFBO[5];
+	unsigned int inventoryTexture[5];
+	unsigned int textFBO;
+	unsigned int textTexture;
 
 	void setCold(float value);
 	void setWater(float value);
 	void setFood(float value);
 
+	void initiateInventoryTextures(std::string item);
 	void addToInventory(int item);
 	void equip(std::string item);
+	void addImageToInventory(std::string item, int inventorySlot);
+	bool checkInventory(std::string item);
+	void addTextToScreen(std::string item);
 
 	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
 	void setCurrentHeight(float height);
@@ -68,6 +84,7 @@ private:
 	float sensitivity;
 
 	float time = 0.0;
+	float textTimer = 0.0;
 
 	float jumpSpeed = 7.64;
 	float cameraSpeed = 7.06;

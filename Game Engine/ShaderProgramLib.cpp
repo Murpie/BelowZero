@@ -19,13 +19,6 @@ void ShaderProgramLib::addGeometryPassShaders()
 	shaders.push_back(newShaderProgram);
 }
 
-void ShaderProgramLib::addCubeMapShaders()
-{
-	//add your shader here
-	CubeMapShaders* newShaderProgram = new CubeMapShaders();
-	shaders.push_back(newShaderProgram);
-}
-
 void ShaderProgramLib::addLightpassShaders()
 {
 	//add your shader here
@@ -33,24 +26,10 @@ void ShaderProgramLib::addLightpassShaders()
 	shaders.push_back(newShaderProgram);
 }
 
-void ShaderProgramLib::addSkyboxShaders()
-{
-	//add your shader here
-	SkyboxShaders* newShaderProgram = new SkyboxShaders();
-	shaders.push_back(newShaderProgram);
-}
-
 void ShaderProgramLib::addShadowMapShaders()
 {
 	//add your shader here
 	ShadowMapShader* newShaderProgram = new ShadowMapShader();
-	shaders.push_back(newShaderProgram);
-}
-
-void ShaderProgramLib::addPointLightShadowMapShaders()
-{
-	//add your shader here
-	PointLightShadowMapShaders* newShaderProgram = new PointLightShadowMapShaders();
 	shaders.push_back(newShaderProgram);
 }
 
@@ -63,11 +42,5 @@ void ShaderProgramLib::addAnimationShaders()
 void ShaderProgramLib::addUIShaders()
 {
 	UIShaders* newShaderProgram = new UIShaders();
-	shaders.push_back(newShaderProgram);
-}
-
-void ShaderProgramLib::addTerrainShaders()
-{
-	TerrainShaders* newShaderProgram = new TerrainShaders();
 	shaders.push_back(newShaderProgram);
 }

@@ -4,7 +4,7 @@ Terrain::Terrain()
 {
 }
 
-Terrain::Terrain(const std::string & height, const std::string & color, GLuint shader)
+Terrain::Terrain(const std::string & height, const std::string & color)
 {
 	Component::id = ComponentType::TERRAIN;
 	this->HeightMap.CreateTextureData(height);
@@ -66,10 +66,10 @@ Terrain::~Terrain()
 
 void Terrain::setupVertexData()
 {
-	glBindTexture(GL_TEXTURE_2D, this->HeightMap.gTexture);
-	glGenFramebuffers(1, &this->PBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, this->PBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->HeightMap.gTexture, 0);
+	glBindTexture(GL_TEXTURE_2D, HeightMap.gTexture);
+	glGenFramebuffers(1, &PBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, PBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, HeightMap.gTexture, 0);
 
 
 	GLubyte pixels[4];// = (GLubyte*)malloc(this->HeightMap.width * this->HeightMap.height * sizeof(GLubyte) * 4);
@@ -238,6 +238,8 @@ void Terrain::setupBuffers(GLint gShaderProgram)
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
+	glEnableVertexAttribArray(4);
 
 	//vbo
 	glGenBuffers(1, &VBO);

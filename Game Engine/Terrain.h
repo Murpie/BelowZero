@@ -19,7 +19,7 @@ struct TerrainVertex
 	//glm::vec2 UVs;
 };
 
-class Terrain : public Component
+class Terrain
 {
 private:
 	float MAX_HEIGHT = 10;
@@ -40,8 +40,9 @@ private:
 	GLuint VBO;
 	GLuint IBO;
 	GLuint EBO;
-	GLuint FBO;
 	GLuint PBO;
+	GLuint FBO;
+	std::vector<TerrainVertex> terrainVertices;
 
 	bool foundAlbedo = true;
 	bool foundNormal = false;
@@ -52,10 +53,11 @@ private:
 	float xOffset;
 	float zOffset;
 
+	int vertexCount;
 
 public:
 	Terrain();
-	Terrain(const std::string & height, const std::string & color, GLuint shader);
+	Terrain(const std::string & height, const std::string & color);
 	~Terrain();
 
 

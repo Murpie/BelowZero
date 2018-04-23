@@ -10,7 +10,7 @@
 #include "glm/glm/gtc/type_ptr.hpp"
 #include "glm/glm/glm.hpp"
 #include "Player.h"
-#include "Terrain.h"
+
 #include "Ray.h"
 #include "Intersection.h"
 
@@ -24,7 +24,6 @@ public:
 
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
-
 
     bool isActive;
     bool hasLight;
@@ -46,7 +45,6 @@ public:
     Material *materialComponent; // we want this one in components
     MeshFilter *meshFilterComponent; // we want this one in components
 	Light *lightComponent; // we want this one in components
-	//Terrain *terrainComponent;
 
 	/*
 		Material, MeshFilter and Light are components. 
@@ -55,17 +53,14 @@ public:
 
     void updateMaterialAndMeshFilterPointers();
     void updateHasLight();
-	//void updateIsTerrain();
 	void addComponent(Component* otherComponent);
 	//void addComponent(Component* otherComponent); // Maybe use this one when everthing works as intended
 	void deleteComponent(Component* otherComponent);
 	void deleteAllComponents();
 
     const bool getIsRenderable();
-	const bool getIsTerrain();
 
 	Player* getPlayer();
-	Terrain* getTerrain();
 
 	template <class T>
 	T* getComponent() {
@@ -82,5 +77,4 @@ public:
 	}
 private:
     bool isRenderable;
-	bool isTerrain;
 };

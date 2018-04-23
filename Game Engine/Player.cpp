@@ -14,6 +14,12 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->waterTick = 2;
 	this->foodTick = 2;
 	this->damage = 0;
+	this->initializer = 0;
+	this->inventoryCount = 0;
+	this->maxAmountOfItems = 5;
+	this->fade = 1;
+	this->textFade = 1;
+	this->startGame = true;
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
 	this->inventoryCount = 0;
@@ -35,7 +41,10 @@ Player::Player(Transform& transform) : Transformable(transform)
 	yoffset = 0;
 	sensitivity = 0.002f;
 
-	equip("Axe");
+	equip("EmptyImage");
+	for (int i = 0; i < 5; i++)
+		initiateInventoryTextures("EmptyImage");
+	addTextToScreen("EmptyImageTexture");
 }
 
 Player::~Player()
@@ -66,10 +75,47 @@ void Player::setFood(float value)
 		this->food = 100;
 }
 
+void Player::initiateInventoryTextures(std::string item)
+{
+	std::string texturePNG = "Texture.png";
+	std::string filePath = item + texturePNG;
+	int width, height, nrOfChannels;
+
+	// ----------========== Equipment FrameBuffer ==========----------
+	unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
+
+	glGenFramebuffers(1, &inventoryFBO[inventoryCount]);
+	glBindFramebuffer(GL_FRAMEBUFFER, inventoryFBO[inventoryCount]);
+
+	glGenTextures(1, &inventoryTexture[inventoryCount]);
+	glBindTexture(GL_TEXTURE_2D, inventoryTexture[inventoryCount]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+	else
+	{
+		std::cout << "Failed to load Inventory Texture from path" << std::endl;
+	}
+
+	stbi_image_free(data);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, inventoryTexture[inventoryCount], 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Inventory Framebuffer not complete!" << std::endl;
+	inventoryCount++;
+	if (inventoryCount == 5)
+		inventoryCount = 0;
+}
+
 void Player::addToInventory(int item)
 {
 	this->inventory[this->inventoryCount] = item;
-	
+
 	if (inventoryCount < 5)
 		inventoryCount++;
 }
@@ -83,11 +129,106 @@ void Player::equip(std::string item)
 	// ----------========== Equipment FrameBuffer ==========----------
 	unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
 
-	glGenFramebuffers(1, &equipedFBO);
+	if (this->initializer == 0)
+		glGenFramebuffers(1, &equipedFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, equipedFBO);
-
-	glGenTextures(1, &equipedTexture);
+	
+	if (this->initializer == 0)
+	{
+		glGenTextures(1, &equipedTexture);
+		this->initializer = 1;
+	}
 	glBindTexture(GL_TEXTURE_2D, equipedTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	else
+		std::cout << "Failed to load Equiped Texture from path" << std::endl;
+
+	stbi_image_free(data);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, equipedTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Equiped Framebuffer not complete!" << std::endl;
+
+}
+
+void Player::addImageToInventory(std::string item, int inventorySlot)
+{
+	if (checkInventory(item) && item != "EmptyImage")
+	{
+		if (this->textTimer >= 1.0f)
+		{
+			std::cout << "Item already exists in players inventory" << std::endl;
+			addTextToScreen("Text-ItemAlreadyEquipped");
+		}
+	}
+	else
+	{
+		std::string texturePNG = "Texture.png";
+		std::string filePath = item + texturePNG;
+		int width, height, nrOfChannels;
+
+		// ----------========== Equipment FrameBuffer ==========----------
+		unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, inventoryFBO[inventorySlot]);
+
+		glBindTexture(GL_TEXTURE_2D, inventoryTexture[inventorySlot]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		}
+		else
+		{
+			std::cout << "Failed to load Inventory Texture from path" << std::endl;
+		}
+
+		stbi_image_free(data);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, inventoryTexture[inventorySlot], 0);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			std::cout << "Inventory Framebuffer not complete!" << std::endl;
+		
+		this->imagesCurrentlyInInventory[inventorySlot] = item;
+		inventoryCount++;
+	}
+}
+
+bool Player::checkInventory(std::string item)
+{
+	bool check = false; // Item does not already exist in inventory
+	
+	for (int i = 0; i < maxAmountOfItems && check == false; i++)
+	{
+		if (item.c_str() == imagesCurrentlyInInventory[i])
+			check = true; // Item already exists in players inventory
+	}
+	
+	return check;
+}
+
+void Player::addTextToScreen(std::string item)
+{
+	std::string texturePNG = ".png";
+	std::string filePath = item + texturePNG;
+	int width, height, nrOfChannels;
+
+	// ----------========== Equipment FrameBuffer ==========----------
+	unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
+
+	glGenFramebuffers(1, &textFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, textFBO);
+
+	glGenTextures(1, &textTexture);
+	glBindTexture(GL_TEXTURE_2D, textTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -95,18 +236,28 @@ void Player::equip(std::string item)
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 	{
-		std::cout << "Failed to load Equiped Texture from path" << std::endl;
+		std::cout << "Failed to load Text Texture from path" << std::endl;
 	}
 
 	stbi_image_free(data);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, equipedTexture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textTexture, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "Equiped Framebuffer not complete!" << std::endl;
+		std::cout << "Text Framebuffer not complete!" << std::endl;
+	
+	if (item == "EmptyImageTexture")
+		this->textOnScreen = false;
+	else
+	{
+		this->textOnScreen = true;
+		this->textFade = 1.0;
+	}
+
+	this->textTimer = 0.0;
+	
 }
 
 void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
@@ -139,9 +290,13 @@ void Player::update(float deltaTime, float seconds)
 {
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
-
-
-
+	
+	this->textTimer += tempSeconds;
+	if (this->textTimer >= 1.0f && this->textOnScreen == true)
+	{
+		addTextToScreen("EmptyImageTexture");
+	}
+	
 	// LOOSING HP
 	if (this->cold < 20)
 		this->coldMeter = 0.5;
@@ -182,10 +337,29 @@ void Player::update(float deltaTime, float seconds)
 	// HP DMG / REG
 	if (this->hp < 100 && this->hp > 0)
 		this->hp = this->hp - (this->damage * deltaTime);
+
+	// SPAWN & GAME OVER FADE
+	if (this->startGame && this->fade > 0)
+	{
+		this->fade -= 0.005;
+		if ( this->fade <= 0)
+			this->startGame = false;
+	}
+
+	if (this->hp <= 0 && this->fade < 1)
+		this->fade += deltaTime;
+
+	// Text Fade
+	if (this->textOnScreen == true)
+		this->textFade -= 0.005;
+	else if (this->textOnScreen == false)
+		this->textFade = 1.0;
 }
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
 {
+	
+
 	//Equipment and Stats
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 		setCold(10);
@@ -194,10 +368,38 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		setFood(10);
 
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+	{
+		equip("EmptyImage");
+		for (int i = 0; i < 5; i++)
+			addImageToInventory("EmptyImage", i);
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		equip("Axe");
+	{
+		equip("AxeIcon");
+		addImageToInventory("InventoryAxeIcon", 0);
+	}
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-		equip("Wood");
+	{
+		equip("LighterIcon");
+		addImageToInventory("InventoryLighterIcon", 1);
+	}
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	{
+		equip("WoodIcon");
+		addImageToInventory("InventoryWoodIcon", 2);
+	}
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	{
+		equip("FoodIcon");
+		addImageToInventory("InventoryFoodIcon", 3);
+	}
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+	{
+		equip("BucketIcon");
+		addImageToInventory("InventoryBucketIcon", 4);
+	}
 
 
 	//... Mouse Movement
@@ -266,7 +468,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
 		Transformable::transform.position.y = tempY;
 	}
-		
+
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && backCollision == false)
 	{
 		float tempY = Transformable::transform.position.y;
@@ -274,7 +476,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		Transformable::transform.position -= cameraSpeed * Transformable::transform.forward * deltaTime;
 		Transformable::transform.position.y = tempY;
 	}
-	
+
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && leftCollision == false)
 	{
 		float tempY = Transformable::transform.position.y;

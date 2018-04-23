@@ -15,11 +15,10 @@ uniform sampler2D gAlbedoIn;
 
 uniform int foundAlbedo;
 
-vec3 norm;
 void main () 
 {
 	//Normal
-	gPosition = fragpos.xyz;
+	gPosition = fs_in.FragPos.xyz;
 
 	//Albedo
 	//if (foundAlbedo == 1)
@@ -36,7 +35,7 @@ void main ()
 		norm = normal;
 
 	norm = normalize(norm * 2.0 - 1.0);
-	gNormal = norm;
+	gNormal = fs_in.TBN*norm;
 
 	//Specular
 		gSpecular = vec3(0, 0, 0);
