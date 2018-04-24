@@ -24,7 +24,11 @@ public:
 
 	void loadMainMenu();
 	void loadBackgroundTexture(std::string backgroundTextureName);
+	void loadBuffers();
+	void createShaders();
 	void renderButtons();
+
+	void deleteObjects();
 
 private:
 	GLuint backgroundTexture;
@@ -32,8 +36,12 @@ private:
 	GLuint settingsButtonTexture;
 	GLuint quitButtonTexture;
 	
-	unsigned int backgroundFbo;
 	unsigned int whichButtonIsSelected;
+	unsigned int mainMenuShaderProgram;
+	unsigned int backgroundFbo;
+	unsigned int VBO;
+	unsigned int VAO;
+	unsigned int EBO;
 
 	glm::vec2 startButtonMinMax[2];
 	glm::vec2 settingsButtonMinMax[2];
@@ -45,7 +53,6 @@ private:
 
 	double xPos;
 	double yPos;
-
 
 	GLFWwindow * testWindow;
 };

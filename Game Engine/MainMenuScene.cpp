@@ -101,25 +101,123 @@ void MainMenuScene::loadBackgroundTexture(std::string backgroundTextureName)
 	glBindFramebuffer(GL_FRAMEBUFFER, backgroundFbo);
 
 	glGenTextures(1, &backgroundTexture);
-	
 	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
+	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	if (data)
-	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	}
 	else
-	{
 		std::cout << "Failed to load Background Texture from path" << std::endl;
-	}
 
 	stbi_image_free(data);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, backgroundTexture, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Background Framebuffer not complete!" << std::endl;
+}
+
+void MainMenuScene::loadBuffers()
+{
+	float vertices[] = {
+		0.5f,  0.5f, 0.0f,  
+		0.5f, -0.5f, 0.0f, 
+		-0.5f, -0.5f, 0.0f,
+		-0.5f,  0.5f, 0.0f 
+	};
+	unsigned int indices[] = { 
+		0, 1, 3,   // first triangle
+		1, 2, 3    // second triangle
+	};
+
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void MainMenuScene::createShaders()
+{
+	char buff[1024];
+	memset(buff, 0, 1024);
+	GLint compileResult = 0;
+
+	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+	std::ifstream shaderFile("ShadowMapVS.glsl");
+	std::string shaderText((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
+	shaderFile.close();
+
+	const char* shaderTextPtr = shaderText.c_str();
+	glShaderSource(vs, 1, &shaderTextPtr, nullptr);
+	glCompileShader(vs);
+	glGetShaderiv(vs, GL_COMPILE_STATUS, &compileResult);
+	if (compileResult == GL_FALSE)
+	{
+		glGetShaderInfoLog(vs, 1024, nullptr, buff);
+		OutputDebugStringA(buff);
+	}
+
+	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+	shaderFile.open("ShadowMapFS.glsl");
+	shaderText.assign((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
+	shaderFile.close();
+	shaderTextPtr = shaderText.c_str();
+	glShaderSource(fs, 1, &shaderTextPtr, nullptr);
+	glCompileShader(fs);
+	compileResult = GL_FALSE;
+	glGetShaderiv(fs, GL_COMPILE_STATUS, &compileResult);
+	if (compileResult == GL_FALSE)
+	{
+		memset(buff, 0, 1024);
+		glGetShaderInfoLog(fs, 1024, nullptr, buff);
+		OutputDebugStringA(buff);
+	}
+
+	mainMenuShaderProgram = glCreateProgram();
+	glAttachShader(mainMenuShaderProgram, fs);
+	glAttachShader(mainMenuShaderProgram, vs);
+	glLinkProgram(mainMenuShaderProgram);
+
+
+	compileResult = GL_FALSE;
+	glGetProgramiv(mainMenuShaderProgram, GL_LINK_STATUS, &compileResult);
+	if (compileResult == GL_FALSE)
+	{
+		memset(buff, 0, 1024);
+		glGetProgramInfoLog(mainMenuShaderProgram, 1024, nullptr, buff);
+		OutputDebugStringA(buff);
+	}
+
+	glDetachShader(mainMenuShaderProgram, vs);
+	glDetachShader(mainMenuShaderProgram, fs);
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+}
+
+void MainMenuScene::renderButtons()
+{
+	glUseProgram(mainMenuShaderProgram);
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void MainMenuScene::deleteObjects()
+{
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 }
 
