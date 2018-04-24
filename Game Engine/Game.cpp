@@ -98,7 +98,7 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 	scene.processEvents(window, deltaTime);
 }
 
-}
+
 
 Game::Game() :
 	shaderProgramLibrary(),
@@ -276,7 +276,6 @@ void Game::initScene(GameScene & scene)
 	//... Create Camera
 	addPlayer(scene);
 	//... Create Lights
-	testBool = false;
 	addLights(scene);
 	//... Read OBJ and MTL File
 	if (!meshesLoaded)
@@ -338,16 +337,8 @@ void Game::addMeshName()
 void Game::addLights(GameScene &scene)
 {
 	// add for loop and use array for transforms ?
-	if (!testBool)
-	{
-		scene.addLight(glm::vec3(-4, 2, 2), 0);
-		scene.addLight(glm::vec3(-4, 2, 0), 0);
-		testBool = true;
-	}
-	else
-	{
-		scene.gameObjects[0].transform->position = glm::vec3(4, 0.4, -2);
-	}
+	scene.addLight(glm::vec3(-4, 2, 2), 0);
+	scene.addLight(glm::vec3(-4, 2, 0), 0);
 }
 
 void Game::addRenderManager(GameScene &scene)
