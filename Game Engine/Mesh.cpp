@@ -6,7 +6,7 @@ Mesh::Mesh()
 
 Mesh::Mesh(std::string filePath, GLuint gShaderProgram, GLuint meshType, Terrain* terrain)
 {
-	vertexCount = 0;
+	//vertexCount = 0;
 	this->meshType = meshType;
 	CreateMeshData(filePath, gShaderProgram, terrain);
 }
@@ -19,10 +19,9 @@ void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram, Terrain *
 {
 	LeapImporter importer;
 
-	LeapMesh* mesh = importer.getMesh(filePath.c_str());
+	leapMesh = importer.getMesh(filePath.c_str());
 
-	
-	vertexCount = mesh->getVertexCount();
+	//vertexCount = leapMesh->getVertexCount();
 
 	float tempY;
 	/*for (int i = 0; i < vertexCount; i++)
@@ -41,7 +40,7 @@ void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram, Terrain *
 	//vbo
 	glGenBuffers(1, &gVertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, gVertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, mesh->getVertexCount() * sizeof(VertexInformation), &mesh->vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, leapMesh->getVertexCount() * sizeof(VertexInformation), &leapMesh->vertices[0], GL_STATIC_DRAW);
 
 	GLuint vertexPos = glGetAttribLocation(gShaderProgram, "vertex_position");
 
@@ -77,5 +76,5 @@ void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram, Terrain *
 		BUFFER_OFFSET(sizeof(float) * 6)
 	);
 
-	importer.deleteObject(mesh);
+	//importer.deleteObject(leapMesh);
 }

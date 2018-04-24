@@ -203,9 +203,9 @@ void RenderManager::Render() {
 	}
 
 	//... Set view and projection matrix
-	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
-		gameScene->gameObjects[0].transform->position + gameScene->gameObjects[0].transform->forward,
-		gameScene->gameObjects[0].transform->up);
+	
+	
+	view_matrix = gameScene->gameObjects[0].getViewMatrix();
 
 	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 

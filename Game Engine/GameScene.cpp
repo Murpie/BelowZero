@@ -63,7 +63,7 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 	for (int i = 0; i < meshNameSize; i++) // 3 - meshLibrary.getNumberOfMeshes(); meshName.size();
 	{
 		addEmptyGameObject();
-		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).vertexCount, meshLibrary.getMesh(i).meshType);
+		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).leapMesh->getVertexCount(), meshLibrary.getMesh(i).meshType);
 		gameObjects[gameObjects.size() - 1].name = "Mesh " + std::to_string(i); // Maybe pass the name of the object?
 		gameObjects[gameObjects.size() - 1].addComponent(meshFilter);
 		gameObjects[gameObjects.size() - 1].addComponent(matertialLibrary.getMaterial(0));
