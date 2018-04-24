@@ -18,11 +18,11 @@ void GameScene::addEmptyGameObject()
 
 void GameScene::clearGameObjects()
 {
-	while(!gameObjects.empty())
+	while (!gameObjects.empty())
 	{
 		for (unsigned int i = 0; i < gameObjects.size(); i++)
 		{
-			for(int j = 0; i < gameObjects[i].components.size(); i++)
+			for (int j = 0; i < gameObjects[i].components.size(); i++)
 				gameObjects[i].deleteComponent(gameObjects[i].components[j]);
 		}
 		gameObjects.pop_back();
@@ -36,9 +36,8 @@ void GameScene::addLight(glm::vec3 transform, int lightType)
 	addEmptyGameObject();
 	Light* light = new Light(*gameObjects[gameObjects.size() - 1].transform);
 	light->lightType = lightType;
-	addEmptyGameObject();
 	gameObjects[gameObjects.size() - 1].addComponent(light);
-	gameObjects[gameObjects.size() - 1].name = "Light " + lightsInScene;
+	gameObjects[gameObjects.size() - 1].name = "Light " + std::to_string(lightsInScene);
 	gameObjects[gameObjects.size() - 1].transform->position = transform;
 	//...
 	//gameObjects[gameObjects.size() - 1].lightComponent->lightType = lightType; 
@@ -55,17 +54,17 @@ void GameScene::addPlayer()
 	gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(0.f, 0.f, 0.f);
 	}
 
-void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibrary, int meshNameSize)
+void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibrary, GLuint meshNameSize)
 {
 	/*
 	This function should get data from the level file and create as many objects of each type that is needed
-	to build the scene. 
+	to build the scene.
 	*/
 	for (int i = 0; i < meshNameSize; i++) // 3 - meshLibrary.getNumberOfMeshes(); meshName.size();
 	{
 		addEmptyGameObject();
-		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).gElementBuffer, meshLibrary.getMesh(i).vertexCount);
-		gameObjects[gameObjects.size() - 1].name = "Mesh " + i; // Maybe pass the name of the object?
+		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).vertexCount, meshLibrary.getMesh(i).meshType);
+		gameObjects[gameObjects.size() - 1].name = "Mesh " + std::to_string(i); // Maybe pass the name of the object?
 		gameObjects[gameObjects.size() - 1].addComponent(meshFilter);
 		gameObjects[gameObjects.size() - 1].addComponent(matertialLibrary.getMaterial(i));
 		//... set interactable
@@ -73,11 +72,11 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 	}
 }
 
-void GameScene::update(float deltaTime)
+void GameScene::update(float deltaTime, float seconds)
 {
 	for (unsigned int i = 0; i < gameObjects.size(); i++)
 	{
-		gameObjects[i].update(deltaTime);
+		gameObjects[i].update(deltaTime, seconds);
 	}
 
 }

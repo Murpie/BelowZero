@@ -14,7 +14,7 @@ Light::~Light()
 {
 }
 
-void Light::update(float deltaTime)
+void Light::update(float deltaTime, float seconds)
 {
 }
 

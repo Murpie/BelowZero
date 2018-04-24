@@ -2,7 +2,9 @@
 #include <GL/gl3w.h>  
 #include "stb_image.h"
 #include <string>
-#include<iostream>
+#include <iostream>
+#include <vector>
+#include "glm/glm/glm.hpp"
 
 class Texture
 {
@@ -11,10 +13,14 @@ public:
 	Texture(std::string filePath);
 	~Texture();
 
+
+
 	void CreateTextureData(std::string filePath);
+	glm::vec3 getRGB(int x, int y);
 	GLuint gTexture;
-private:
 	int width, height, nrChannels = 0;
+private:
+
 
 };
 

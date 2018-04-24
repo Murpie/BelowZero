@@ -24,22 +24,35 @@ public:
 	float waterTick;
 	float foodTick;
 	float damage;
+	float fade;
 
+	bool startGame;
+
+	int initializer;
 	int inventory[5];
+	int maxAmountOfItems;
 	int inventoryCount;
+
+	std::string imageNames[5] = {"InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "InventoryBucketIcon"};
+	std::string imagesCurrentlyInInventory[5] = { "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage" };
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
+	unsigned int inventoryFBO[5];
+	unsigned int inventoryTexture[5];
 
 	void setCold(float value);
 	void setWater(float value);
 	void setFood(float value);
 
+	void initiateInventoryTextures(std::string item);
 	void addToInventory(int item);
 	void equip(std::string item);
+	void addImageToInventory(std::string item, int inventorySlot);
+	bool checkInventory(std::string item);
 
 	//Physics
-	void update(float deltaTime);
+	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
 
 	//glm::mat4 getViewMatrix()const;
@@ -52,7 +65,7 @@ private:
 	bool rightCollision = false;
 	bool backCollision = false;
 	bool topCollision = false;
-	float cameraSpeed;
+
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
@@ -66,10 +79,15 @@ private:
 	float yoffset;
 	float sensitivity;
 
-	float time;
+	float time = 0.0;
 
+	float jumpSpeed = 7.64;
+	float cameraSpeed = 7.06;
+	float fallSpeed = 9.82;
 	//--------=====Jumping=====-----------
-	bool jump = false;
+
+	bool jumpReady = true;
 	bool inAir = false;
-	float timeInAir = 1.1;
+	float timeInAir = 0.3;
+	bool gravity = false;
 };
