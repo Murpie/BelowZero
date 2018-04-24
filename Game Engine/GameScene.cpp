@@ -128,7 +128,7 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 		//for (int i = 3; i < 4; i++)
 		//for (int i = 1; i < gameObjects.size(); ++i)
 		std::cout << "GameObjects.size() :: "<< gameObjects.size() << std::endl;
-		for (int i = 3; i < 4; i++)
+		for (int i = 7; i < 8; i++)
 		{
 			if (gameObjects[i].isInteractable)
 			{

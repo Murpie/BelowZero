@@ -25,11 +25,11 @@ void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram, Terrain *
 	vertexCount = mesh->getVertexCount();
 
 	float tempY;
-	for (int i = 0; i < vertexCount; i++)
+	/*for (int i = 0; i < vertexCount; i++)
 	{
 		tempY = terrain->calculateY(mesh->vertices[i].x, mesh->vertices[i].z);
 		mesh->vertices[i].y += tempY -2;
-	}
+	}*/
 
 	//vao
 	glGenVertexArrays(1, &gVertexAttribute);

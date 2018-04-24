@@ -340,7 +340,7 @@ void Game::addMeshName()
 void Game::addLights(GameScene &scene)
 {
 	// add for loop and use array for transforms ?
-	scene.addLight(glm::vec3(-4, 2, 2), 0);
+	scene.addLight(glm::vec3(-4, 2, 0), 0);
 	scene.addLight(glm::vec3(-4, 2, 0), 0);
 }
 
