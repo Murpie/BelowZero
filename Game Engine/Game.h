@@ -68,7 +68,7 @@ private:
 
 	void initWindow();
 	void initScene(GameScene &scene);
-	void clearScene(GameScene &scene); // Unused atm
+	void clearScene(GameScene &scene);
 	void initShaderProgramLib();
 	void initInputOptions();
 
@@ -89,9 +89,12 @@ private:
 	float seconds;
 	//
 	bool meshesLoaded;
-	bool testBool; // used in addLights atm to see difference in scenes.
 	bool fullscreen;
 
 	int count;
+
+	// bool in processInput for state swapping
+	bool stateBool;
+
 };
 

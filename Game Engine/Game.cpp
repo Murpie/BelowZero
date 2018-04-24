@@ -66,14 +66,14 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 	/*
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
-	double xpos, ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
-	std::cout << "CUROSR::X::POSITION::" << xpos << std::endl;
-	std::cout << "CUROSR::Y::POSITION::" << ypos << std::endl;
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		std::cout << "CUROSR::X::POSITION::" << xpos << std::endl;
+		std::cout << "CUROSR::Y::POSITION::" << ypos << std::endl;
 
-	//
-	//glm::vec3 worldRay = Ray::getWorldRay(xpos, ypos, glm::mat4(), SCREEN_WIDTH, SCREEN_HEIGHT);
-	//std::cout << "CUROSR::WORLDRAY::" << worldRay.x << " " << worldRay.y << " " << worldRay.z << std::endl;
+		//
+		//glm::vec3 worldRay = Ray::getWorldRay(xpos, ypos, glm::mat4(), SCREEN_WIDTH, SCREEN_HEIGHT);
+		//std::cout << "CUROSR::WORLDRAY::" << worldRay.x << " " << worldRay.y << " " << worldRay.z << std::endl;
 
 	}
 
@@ -82,36 +82,21 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 
 	}
 	*/
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && stateBool != true)
 	{
-		stateOfGame = Gamestate::ID::RUN_LEVEL;
+		stateBool = true;
+		if(stateOfGame == Gamestate::ID::RUN_LEVEL)
+			stateOfGame = Gamestate::ID::CLEAR_LEVEL;
+		else if (stateOfGame == Gamestate::ID::SHOW_MENU)
+			stateOfGame = Gamestate::ID::CLEAR_MENU;
 	}
-	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_RELEASE && stateBool != false)
 	{
-		stateOfGame = Gamestate::ID::SHOW_MENU;
+		stateBool = false;
 	}
-
 	//...
 	scene.processEvents(window, deltaTime);
-
-
-
-	double xPos = 0;
-	double yPos = 0;
-	glfwGetCursorPos(window, &xPos, &yPos);
-	glm::vec2 startButtonMinMax[2];
-
-	startButtonMinMax[0].x = 100;
-	startButtonMinMax[0].y = 50;
-	startButtonMinMax[1].x = 300;
-	startButtonMinMax[1].y = 100;
-
-	if (startButtonMinMax[0].x > xPos && xPos < startButtonMinMax[1].x
-		&& startButtonMinMax[0].y > yPos && yPos < startButtonMinMax[1].y)
-	{
-		std::cout << "------------------- CURSOR IS INSIDE STARTBUTTONBOX -------------------" << std::endl;
-
-	}
+}
 
 }
 
@@ -121,7 +106,7 @@ Game::Game() :
 	windowName("Game Engine"),
 	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
-	meshesLoaded(false), testBool(false), fullscreen(false),
+	meshesLoaded(false), fullscreen(false), stateBool(false),
 	count(0)
 {
 	initWindow();
@@ -146,12 +131,9 @@ void Game::run()
 	int final_time;
 	int frameCount = 0;
 
-	initScene(menuScene);
-	initScene(gameScene);
-
 	useShaderProgram();
 
-	stateOfGame = Gamestate::ID::RUN_LEVEL;
+	stateOfGame = Gamestate::ID::LOAD_MENU;
 	printCurrentState(stateOfGame);
 
 	// Main loop
@@ -221,8 +203,10 @@ void Game::menuState()
 {
 	if (stateOfGame == Gamestate::ID::LOAD_MENU)
 	{
-		//initScene(menuScene);
+		printCurrentState(stateOfGame);
+		initScene(menuScene);
 		stateOfGame = Gamestate::ID::SHOW_MENU;
+		printCurrentState(stateOfGame);
 	}
 	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
@@ -243,8 +227,10 @@ void Game::levelState()
 {
 	if (stateOfGame == Gamestate::ID::LOAD_LEVEL)
 	{
-		//initScene(gameScene);
+		printCurrentState(stateOfGame);
+		initScene(gameScene);
 		stateOfGame = Gamestate::ID::RUN_LEVEL;
+		printCurrentState(stateOfGame);
 	}
 	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
@@ -256,7 +242,9 @@ void Game::levelState()
 	}
 	else if (stateOfGame == Gamestate::ID::CLEAR_LEVEL)
 	{
+		printCurrentState(stateOfGame);
 		clearScene(gameScene);
+		//stateOfGame = Gamestate::ID::LOAD_MENU;
 		stateOfGame = Gamestate::ID::LOAD_MENU;
 	}
 }
@@ -283,8 +271,9 @@ void Game::initWindow()
 
 void Game::initScene(GameScene & scene)
 {
-	addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
-							 //... Create Camera
+	if(renderManager.size() < 2)
+		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
+	//... Create Camera
 	addPlayer(scene);
 	//... Create Lights
 	testBool = false;
@@ -303,8 +292,8 @@ void Game::initScene(GameScene & scene)
 
 void Game::clearScene(GameScene & scene)
 {
-	//scene.clearGameObjects();
-
+	scene.clearGameObjects();
+	//renderManager.clear();
 	/* Add function to also clear the renderManager*/
 }
 

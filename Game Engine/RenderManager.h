@@ -40,7 +40,10 @@ public:
 	~RenderManager();
 
 	GameScene *gameScene;
+	
 	void FindObjectsToRender();
+	void clearObjectsToRender();
+
 	void Render();
 	void createBuffers();
 	void renderQuad();

@@ -33,5 +33,4 @@ private:
 	//...
 	int camerasInScene; //player atm
 	int lightsInScene; //
-
 };

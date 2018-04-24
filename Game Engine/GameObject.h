@@ -27,10 +27,13 @@ public:
 
     bool isActive;
     bool hasLight;
+	bool isInteractable;
+
 	std::string name;
 	Transform *transform;
 	std::vector<Component*> components;
 
+	bBox bbox;
 	/*
 		rework functions so we can put Material, MeshFilter and Light
 		directly into the component vector.
@@ -59,8 +62,11 @@ public:
 	void deleteAllComponents();
 
     const bool getIsRenderable();
+	void setIsRenderable(bool isRenderable);
 
 	Player* getPlayer();
+	glm::mat4 getModelMatrix();
+	glm::mat4 getViewMatrix();
 
 	template <class T>
 	T* getComponent() {
@@ -72,9 +78,10 @@ public:
 				return test;
 			}
 		}
-
 		return nullptr;
 	}
+
 private:
     bool isRenderable;
+	glm::mat4 modelMatrix;
 };

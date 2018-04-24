@@ -2,12 +2,15 @@
 
 GameObject::GameObject()
 {
+	std::cout << "GameObject() called" << std::endl;
+
 	transform = new Transform();
 	name = "EmptyGameObject";
     isActive = true;
     isRenderable = false;
     hasLight = false;
-
+	isInteractable = false;
+	modelMatrix = glm::mat4();
 	//transform.forward = glm::vec3(1, 0, 0);
 	//transform.up = glm::vec3(0, 1, 0);
 	//transform.right = glm::vec3(0, 0, 1);
@@ -15,6 +18,8 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
+	std::cout << "~GameObject() called" << std::endl;
+
 	//deleteAllComponents();
 
 	//These will probably give memory leaks if not deleted.
@@ -146,9 +151,9 @@ void GameObject::deleteComponent(Component* otherComponent)
 
 void GameObject::deleteAllComponents()
 {
-	for (Component* component : components)
+	for (Component* component_ptr : components)
 	{
-		delete component;
+		delete component_ptr;
 	}
 	components.clear();
 
@@ -159,6 +164,11 @@ void GameObject::deleteAllComponents()
 
 const bool GameObject::getIsRenderable() {
     return isRenderable;
+}
+
+void GameObject::setIsRenderable(bool isRenderable)
+{
+	this->isRenderable = isRenderable;
 }
 
 Player * GameObject::getPlayer()
@@ -173,4 +183,18 @@ Player * GameObject::getPlayer()
 		}
 	}
 	return nullptr;
+}
+
+glm::mat4 GameObject::getModelMatrix()
+{
+	modelMatrix = glm::translate(glm::mat4(1), transform->position);
+	//... 
+	//modelMatrix = glm::rotate(modelMatrix, glm::radians(0.0f), transform->rotation);
+	return this->modelMatrix;
+}
+
+glm::mat4 GameObject::getViewMatrix()
+{
+	return glm::lookAt(transform->position, transform->position + transform->forward, transform->up);
+
 }
