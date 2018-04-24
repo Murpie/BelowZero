@@ -13,8 +13,8 @@ Terrain::Terrain(const std::string & height, GLuint shader)
 
 
 	this->setupVertexData();
-
 	this->setupBuffers(shader);
+
 }
 
 Terrain::~Terrain()
@@ -56,13 +56,14 @@ void Terrain::setupVertexData()
 
 
 
-			temp.x = (float)j * offset;//(float)(j - (Height / 2)) * offset;
+			temp.x = (float)j * offset; 
 
-			float tempY = ((float)(int)pixels[0] / 255) * offset;
+			float tempY = ((float)(int)pixels[0] / 255);
+			tempY = glm::mix(MAX_HEIGHT, MIN_HEIGHT, tempY);
 			tempY -= offset;
 
 			temp.y = tempY;
-			temp.z = ((float)i * offset); //(float)(i - (Height / 2)) * offset;
+			temp.z = ((float)i * offset);
 
 			temp.r = 0.0f;
 			temp.g = 0.0f;
@@ -80,7 +81,6 @@ void Terrain::setupVertexData()
 	//	for (int j = 0; j < this->HeightMap.width; j++)
 	//	{
 	//		TerrainVertex temp;
-
 	//		glReadPixels(i, j, this->HeightMap.width, this->HeightMap.height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 	//		temp.u = (float)j / (float)this->HeightMap.width;
 	//		temp.v = (float)i / (float)this->HeightMap.height;
@@ -90,10 +90,6 @@ void Terrain::setupVertexData()
 	//		temp.r = 0.0f;
 	//		temp.g = 0.0f;
 	//		temp.b = 0.0f;
-
-	//		this->terrainVertices.push_back(temp);
-
-
 	//	}
 	//}
 
@@ -187,8 +183,6 @@ void Terrain::setupVertexData()
 void Terrain::setupBuffers(GLint gShaderProgram)
 {
 
-
-
 	//vao
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -252,11 +246,6 @@ float Terrain::getHeight(int x, int z)
 
 	return Heights[x][z];
 
-
-	//return terrainVertices[((x+1) * (z+1)) - 1].y;
-
-	//glm::vec3 height = HeightMap.getRGB(x, z);
-
 }
 
 
@@ -290,10 +279,6 @@ GLuint Terrain::getVAO()
 
 void Terrain::bindVertexArray()
 {
-	//glBindBuffer(GL_ARRAY_BUFFER, this->VAO);
-
-
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
 	glBindVertexArray(this->VAO);
 
 }
@@ -306,8 +291,6 @@ void Terrain::bindTextures(GLuint shader)
 
 
 	glUniform1i(glGetUniformLocation(shader, "foundAlbedo"), this->foundAlbedo);
-
-
 }
 
 float Terrain::calculateY(float x, float z)

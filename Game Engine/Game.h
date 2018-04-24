@@ -81,7 +81,7 @@ private:
 	void addPlayer(GameScene &scene);
 	void addMeshFilter(GameScene &scene);
 	void addTerrain(GameScene &scene);
-	void readMeshName();
+	void readMeshName(GameScene &scene);
 	
 	//...
 	void processInput(GLFWwindow *window, float deltaTime, GameScene& scene);

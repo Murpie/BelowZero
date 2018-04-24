@@ -72,9 +72,9 @@ void GameScene::addTerrain(const std::string & heightMap, GLuint shader)
 {
 	addEmptyGameObject();
 	std::cout << "TERRAIN INDEX:: " << gameObjects.size() - 1 << std::endl;
-	Terrain* terrain = new Terrain(heightMap, shader);
+	newTerrain = new Terrain(heightMap, shader);
 	gameObjects[gameObjects.size() - 1].name = "Terrain";
-	gameObjects[gameObjects.size() - 1].addComponent(terrain);
+	gameObjects[gameObjects.size() - 1].addComponent(newTerrain);
 }
 
 void GameScene::update(float deltaTime, float seconds)
@@ -108,4 +108,9 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		gameObjects[i].processEvents(window, deltaTime);
 	}
+}
+
+Terrain* GameScene::getTerrainPointer()
+{
+	return this->newTerrain;
 }

@@ -18,6 +18,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->terrainShaderProgram = shaderProgram->getShader<TerrainShaders>()->TerrainShaderProgram;
 	createBuffers();
 	vao = 0;
+
 }
 
 RenderManager::~RenderManager()
@@ -185,7 +186,6 @@ void RenderManager::Render() {
 				}
 		}
 	}
-
 
 	//... Set view and projection matrix
 	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
@@ -497,6 +497,16 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+}
+
+void RenderManager::setupMeshY()
+{
+	FindObjectsToRender();
+	for (int i = 0; i < gameObjectsToRender.size(); i++)
+	{
+		float yTemp = this->gameScene->gameObjects[1].getTerrain()->calculateY(this->gameObjectsToRender[i]->transform->position.x, this->gameObjectsToRender[i]->transform->position.z);
+		this->gameObjectsToRender[i]->transform->position.y = yTemp;
+	}
 }
 
 void RenderManager::Update()

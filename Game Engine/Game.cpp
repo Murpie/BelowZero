@@ -275,7 +275,7 @@ void Game::initScene(GameScene & scene)
 	if (!meshesLoaded)
 	{
 		//Load the meshes once and store them.
-		readMeshName();
+		readMeshName(scene);
 		meshesLoaded = true;
 	}
 	//...
@@ -361,14 +361,14 @@ void Game::addMeshFilter(GameScene &scene)
 }
 void Game::addTerrain(GameScene &scene)
 {
-	scene.addTerrain("secondHeightMap.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->TerrainShaderProgram);
+	scene.addTerrain("firstheightmap.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->TerrainShaderProgram);
 }
 
-void Game::readMeshName()
+void Game::readMeshName(GameScene &scene)
 {
 	for (int i = 0; i < meshName.size(); i++)
 	{
-		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram, meshType[i]);
+		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram, meshType[i], scene.getTerrainPointer());
 	}
 
 	materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
