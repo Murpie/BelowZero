@@ -337,6 +337,12 @@
     <None Include="TerrainVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
+    <None Include="MainMenuVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="MainMenuFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="axeTexture.png">
