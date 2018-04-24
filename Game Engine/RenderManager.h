@@ -14,6 +14,7 @@
 #include "Player.h"
 #include "ShaderProgramLib.h"
 #include "VFX.h"
+#include "TextureLib.h"
 #define STB_IMAGE_IMPLEMENTATION
 
 // Cube Map defines for its positions
@@ -45,7 +46,6 @@ public:
 	void Render();
 	void createBuffers();
 	void renderQuad();
-	void renderVFX();
 	void Update();
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
@@ -69,6 +69,8 @@ private:
 	float deltaTime;
 	float seconds;
 	int count;
+
+	int doneOnce = 0;
 
 	unsigned int UIFBO;
 	unsigned int UITexture;
@@ -134,4 +136,11 @@ private:
 	GLuint VFXShaderProgram;
 
 	int display_w, display_h;
+
+	GLfloat billboard[12] = {
+		0.0f, 4.5f, 0.5f,
+		0.0f, 4.5f, -0.5f,
+		0.0f,  5.5f, 0.5f,
+		0.0f,  5.5f, -0.5f,
+	};
 };
