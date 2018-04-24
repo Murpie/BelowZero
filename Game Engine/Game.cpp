@@ -274,7 +274,6 @@ void Game::initScene(GameScene & scene)
 	//... Create Camera
 	addPlayer(scene);
 	//... Create Lights
-	testBool = false;
 	addLights(scene);
 	//... Read OBJ and MTL File
 	if (!meshesLoaded)
@@ -336,8 +335,8 @@ void Game::addMeshName()
 void Game::addLights(GameScene &scene)
 {
 	// add for loop and use array for transforms ?
-	//scene.addLight(glm::vec3(7, 9, -4), 0);
-	//scene.addLight(glm::vec3(4, 0.4, -2), 1);
+	scene.addLight(glm::vec3(7, 9, -4), 0);
+	scene.addLight(glm::vec3(4, 0.4, -2), 1);
 }
 
 void Game::addRenderManager(GameScene &scene)
