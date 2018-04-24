@@ -24,10 +24,12 @@ public:
 
 	void CreateMeshData(std::string filePath, GLuint gShaderProgram);
 
-	std::vector<Vertex> Vertices;
-	std::vector<unsigned int> indices;
-	int vertexCount;
-	GLuint meshType;
+	//std::vector<Vertex> Vertices;
+	//std::vector<unsigned int> indices;
+
+	LeapMesh* leapMesh;
+	//int vertexCount;
+	GLuint meshType; //remove this later and use *leapMesh
 	GLuint gVertexBuffer;
 	GLuint gVertexAttribute;
 };
