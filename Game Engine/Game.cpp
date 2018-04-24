@@ -93,6 +93,26 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 
 	//...
 	scene.processEvents(window, deltaTime);
+
+
+
+	double xPos = 0;
+	double yPos = 0;
+	glfwGetCursorPos(window, &xPos, &yPos);
+	glm::vec2 startButtonMinMax[2];
+
+	startButtonMinMax[0].x = 100;
+	startButtonMinMax[0].y = 50;
+	startButtonMinMax[1].x = 300;
+	startButtonMinMax[1].y = 100;
+
+	if (startButtonMinMax[0].x > xPos && xPos < startButtonMinMax[1].x
+		&& startButtonMinMax[0].y > yPos && yPos < startButtonMinMax[1].y)
+	{
+		std::cout << "------------------- CURSOR IS INSIDE STARTBUTTONBOX -------------------" << std::endl;
+
+	}
+
 }
 
 Game::Game() :
