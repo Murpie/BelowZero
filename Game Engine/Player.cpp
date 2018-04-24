@@ -270,6 +270,32 @@ void Player::addTextToScreen(std::string item)
 	
 }
 
+void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
+{
+	this->currentY = currentHeight;
+	this->frontVertexHeight = frontV;
+	this->backVertexHeight = backV;
+	this->leftVertexHeight = leftV;
+	this->rightVertexHeight = rightV;
+	this->distanceToNextVertex = distance;
+	this->vertexLength = nrof;
+
+}
+
+void Player::setCurrentHeight(float height)
+{
+	this->currentY = height;
+}
+
+glm::vec2 Player::setXZ()
+{
+	float u = Transformable::transform.position.x;
+	float v = Transformable::transform.position.z;
+
+
+	return glm::vec2(u, v);
+}
+
 void Player::update(float deltaTime, float seconds)
 {
 	float tempSeconds = seconds / 1000;
@@ -450,8 +476,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		float tempY = Transformable::transform.position.y;
 		direction += Transformable::transform.forward;
-		if (shift == true)
-			Transformable::transform.position += cameraSpeed * (Transformable::transform.forward * 1.5f) * deltaTime;
+		if(shift == true)
+			Transformable::transform.position += cameraSpeed * (Transformable::transform.forward * 1.8f) * deltaTime;
 		else
 			Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
 		Transformable::transform.position.y = tempY;
@@ -475,7 +501,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
 	{
-		float tempY = Transformable::transform.position.y;
+ 		float tempY = Transformable::transform.position.y;
 		direction += Transformable::transform.right;
 		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
@@ -485,7 +511,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true)
 	{
 		inAir = true;
-		gravity = false;
 		time = 0.0f;
 		jumpReady = false;
 	}
@@ -493,10 +518,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (time <= timeInAir && inAir == true)
 	{
 		glm::vec3 jumpdir = Transformable::transform.up;
-		//if(jumpReady = true)
-		//	jumpdir = glm::normalize(direction + Transformable::transform.up);
-		//	if (shift == true)
-		//		jumpdir *= 1.5;
 
 		Transformable::transform.position += jumpSpeed * jumpdir * deltaTime;
 	}
@@ -504,7 +525,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		inAir = false;
 
 
-	if (inAir == false && Transformable::transform.position.y <= 0.0f)
+	if (inAir == false && Transformable::transform.position.y <= currentY)
 	{
 		gravity = false;
 		jumpReady = true;
@@ -516,8 +537,25 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (gravity == true && inAir == false)
 		Transformable::transform.position -= fallSpeed * Transformable::transform.up  * deltaTime;
 
-	if (Transformable::transform.position.y <= -0.1f)
-		Transformable::transform.position.y = 0.0f;
+	//if (Transformable::transform.position.y <= currentY -0.1f)
+	//	Transformable::transform.position.y = currentY;
+	if (Transformable::transform.position.y <= currentY - 0.0001)
+		Transformable::transform.position.y = currentY;
+}
+
+void Player::findY()
+{
+	//float frontTemp = glm::mix(currentY, frontVertexHeight);
+	int gridX = (int)glm::floor(cameraPos.x / distanceToNextVertex);
+	int gridZ = (int)glm::floor(cameraPos.z / distanceToNextVertex);
+	float gridSquareSize(distanceToNextVertex / ((float)vertexLength - 1));
+	float xpos = cameraPos.x;
+
+
+
+	float xCoord = ((int)cameraPos.x % (int)distanceToNextVertex) / distanceToNextVertex;
+	float zCoord = ((int)cameraPos.z % (int)distanceToNextVertex) / distanceToNextVertex;
+
 }
 
 //glm::mat4 Player::getViewMatrix() const

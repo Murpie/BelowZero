@@ -57,6 +57,9 @@ public:
 	bool checkInventory(std::string item);
 	void addTextToScreen(std::string item);
 
+	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
+	void setCurrentHeight(float height);
+	glm::vec2 setXZ();
 	//Physics
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
@@ -64,6 +67,7 @@ public:
 	//glm::mat4 getViewMatrix()const;
 
 private:
+
 
 	bool frontCollision = false;
 	bool bottomCollision = false;
@@ -97,4 +101,16 @@ private:
 	bool inAir = false;
 	float timeInAir = 0.3;
 	bool gravity = false;
+
+	//Terrain
+	float currentY;
+	float frontVertexHeight;
+	float backVertexHeight;
+	float leftVertexHeight;
+	float rightVertexHeight;
+	float distanceToNextVertex;
+
+	int vertexLength;
+
+	void findY();
 };

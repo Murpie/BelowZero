@@ -51,6 +51,7 @@ public:
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
+	void setupMeshY();
 
 private:
 
@@ -102,6 +103,7 @@ private:
 	GLuint lightpassShaderProgram;
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
+	GLuint terrainShaderProgram;
 
 	int display_w, display_h;
 };

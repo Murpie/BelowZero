@@ -83,6 +83,7 @@ void main()
 		// diffuse
 		vec3 lightDir = normalize(lights[i].Position - FragPos);
 		vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color;
+		//diffuse = Albedo;
 
 		vec3 halfwayDir = normalize(lightDir + viewDir);
 		float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
@@ -104,7 +105,7 @@ void main()
 	float attenuation = 1.0;
 	lighting += diffuse;
 
-	float density = 0.05;
+	float density = 0.03;
 	float gradient = 3.0;
 	float distanceToPos = length(view_position - FragPos);
 	float visibility = exp(-pow((distanceToPos * density), gradient));

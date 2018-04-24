@@ -8,9 +8,9 @@ MeshLib::~MeshLib()
 {
 }
 
-void MeshLib::addMesh(std::string filePath, GLuint gShaderProgram, GLuint meshType)
+void MeshLib::addMesh(std::string filePath, GLuint gShaderProgram, GLuint meshType, Terrain * terrain)
 {
-	Mesh newMesh = Mesh(filePath, gShaderProgram, meshType);
+	Mesh newMesh = Mesh(filePath, gShaderProgram, meshType, terrain);
 	meshes.push_back(newMesh);
 }
 

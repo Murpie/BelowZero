@@ -160,10 +160,10 @@
       <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
     <ClCompile Include="Terrain.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
-    <ClCompile Include="TerrainShader.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="TerrainShaders.cpp">
+      <Filter>Source Files\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="MainMenuScene.cpp">
       <Filter>Source Files\Data Types</Filter>
@@ -266,9 +266,6 @@
     <ClInclude Include="AnimationShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="Terrain.h">
-      <Filter>Header Files\Data Types</Filter>
-    </ClInclude>
     <ClInclude Include="TerrainShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
@@ -295,6 +292,9 @@
     </ClInclude>
     <ClInclude Include="MainMenuScene.h">
       <Filter>Header Files\Data Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -329,6 +329,12 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="AnimationVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="TerrainFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="TerrainVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>
