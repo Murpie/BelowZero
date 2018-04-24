@@ -15,6 +15,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//this->animationShaderProgram = shaderProgram->getShader<AnimationShaders>()->animationShaderProgram;
 	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
 	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
+	this->terrainShaderProgram = shaderProgram->getShader<TerrainShaders>()->TerrainShaderProgram;
 	createBuffers();
 	vao = 0;
 }
@@ -42,6 +43,9 @@ void RenderManager::FindObjectsToRender() {
 
 void RenderManager::createBuffers()
 {
+
+
+
 	//screen size
 	glfwGetFramebufferSize(window, &display_w, &display_h);
 
@@ -169,6 +173,20 @@ void RenderManager::createBuffers()
 void RenderManager::Render() {
 	FindObjectsToRender();
 
+	for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	{
+		if (gameScene->gameObjects[i].getPlayer() != nullptr)
+		{
+			glm::vec2 temp = gameScene->gameObjects[i].getPlayer()->setXZ();
+			for (int j = 0; j < gameScene->gameObjects.size(); j++)
+				if (gameScene->gameObjects[j].getTerrain() != nullptr)
+				{
+					gameScene->gameObjects[i].getPlayer()->setCurrentHeight(gameScene->gameObjects[j].getTerrain()->calculateY(temp.x, temp.y));
+				}
+		}
+	}
+
+
 	//... Set view and projection matrix
 	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
 		gameScene->gameObjects[0].transform->position + gameScene->gameObjects[0].transform->forward,
@@ -195,7 +213,7 @@ void RenderManager::Render() {
 	glCullFace(GL_BACK);
 
 	glUseProgram(shadowMapShaderProgram);
-	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[1].transform->position);
+	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[2].transform->position);
 	glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -204,17 +222,16 @@ void RenderManager::Render() {
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
+		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
+
 	}
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
 		if (gameScene->gameObjects[i].getTerrain() != nullptr)
 		{
-			//gameScene->gameObjects[i].getTerrain()->bindTextures(terrainShaderProgram);
 			gameScene->gameObjects[i].getTerrain()->bindVertexArray();
-
 			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i].getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
 		}
 	}
@@ -227,25 +244,24 @@ void RenderManager::Render() {
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
 	
-	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
+	//... Terrain PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glUseProgram(terrainShaderProgram);
 	glUniformMatrix4fv(glGetUniformLocation(terrainShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(terrainShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(terrainShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+	
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilMask(0xFF); // enable writing to the stencil buffer
-
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
 		if (gameScene->gameObjects[i].getTerrain() != nullptr)
 		{
-			gameScene->gameObjects[i].getTerrain()->bindTextures(terrainShaderProgram);
 			gameScene->gameObjects[i].getTerrain()->bindVertexArray();
 	
 			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i].getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
@@ -255,6 +271,7 @@ void RenderManager::Render() {
 	}
 	
 
+	
 	
 	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
 	//glBindFramebuffer(GL_FRAMEBUFFER, gbo);
@@ -296,7 +313,7 @@ void RenderManager::Render() {
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glUseProgram(lightpassShaderProgram);
-	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[1].transform->position);
+	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[2].transform->position);
 
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0].transform->position));
@@ -475,8 +492,8 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 {
 	glUseProgram(shaderToUse);
 
-	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 40.0f);
-	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0));
+	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 45.0f);
+	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 1.0, 0.0));
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));

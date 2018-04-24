@@ -68,6 +68,15 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 	}
 }
 
+void GameScene::addTerrain(const std::string & heightMap, GLuint shader)
+{
+	addEmptyGameObject();
+	std::cout << "TERRAIN INDEX:: " << gameObjects.size() - 1 << std::endl;
+	Terrain* terrain = new Terrain(heightMap, shader);
+	gameObjects[gameObjects.size() - 1].name = "Terrain";
+	gameObjects[gameObjects.size() - 1].addComponent(terrain);
+}
+
 void GameScene::update(float deltaTime, float seconds)
 {
 	for (unsigned int i = 0; i < gameObjects.size(); i++)

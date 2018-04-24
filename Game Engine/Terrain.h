@@ -7,19 +7,19 @@
 #include "glm/glm/glm.hpp"
 #include "Component.h"
 #include "Texture.h"
+
 #define BUFFER_OFFSET(i) ((char *)nullptr + (i))
 
 struct TerrainVertex
 {
 	float x, y, z;
 	float r, g, b;
-	float u, v;
 	//glm::vec3 vertPos;
 	//glm::vec3 vertNorm;
 	//glm::vec2 UVs;
 };
 
-class Terrain
+class Terrain : public Component
 {
 private:
 	float MAX_HEIGHT = 10;
@@ -29,7 +29,7 @@ private:
 	Texture HeightMap;
 	Texture AlbedoMap;
 
-	int offset = 8;
+	int offset = 4;
 
 	int Length = 40;
 	int Height = 40;
@@ -42,7 +42,6 @@ private:
 	GLuint EBO;
 	GLuint PBO;
 	GLuint FBO;
-	std::vector<TerrainVertex> terrainVertices;
 
 	bool foundAlbedo = true;
 	bool foundNormal = false;
@@ -50,14 +49,9 @@ private:
 	bool foundMetallic = false;
 	bool foundAO = false;
 
-	float xOffset;
-	float zOffset;
-
-	int vertexCount;
-
 public:
 	Terrain();
-	Terrain(const std::string & height, const std::string & color);
+	Terrain(const std::string & height, GLuint shader);
 	~Terrain();
 
 

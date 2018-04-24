@@ -99,6 +99,7 @@ private:
 	GLuint lightpassShaderProgram;
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
+	GLuint terrainShaderProgram;
 
 	int display_w, display_h;
 };

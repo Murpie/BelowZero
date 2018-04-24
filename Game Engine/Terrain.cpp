@@ -4,54 +4,15 @@ Terrain::Terrain()
 {
 }
 
-Terrain::Terrain(const std::string & height, const std::string & color)
+Terrain::Terrain(const std::string & height, GLuint shader)
 {
 	Component::id = ComponentType::TERRAIN;
 	this->HeightMap.CreateTextureData(height);
-	this->AlbedoMap.CreateTextureData(color);
 	Length = sizePerSide;
 	Height = sizePerSide;
 
 
 	this->setupVertexData();
-
-
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	for (int j = 0; j < 4; j++)
-	//	{
-	//		TerrainVertex temp;
-	//		temp.x = (float)i * 400;
-	//		temp.y = 1.2f;
-	//		temp.z = (float)j * 400;
-	//		temp.r = 0.0;
-	//		temp.g = 0.0;
-	//		temp.b = 0.0;
-	//		temp.u = 0.0;
-	//		temp.v = 0.0;
-	//
-	//		terrainVertices.push_back(temp);
-	//	}
-	//}
-	//
-	//for (int y = 0; y < 4 - 1; y++)
-	//{
-	//	if (y > 0)
-	//		indices.push_back((short)(y * 4));
-	//
-	//	for (int x = 0; x < 4; x++)
-	//	{
-	//		indices.push_back((short)((y * 4) + x));
-	//		indices.push_back((short)((y + 1) * 4) + x);
-	//	}
-	//	if (y < 4 - 2)
-	//	{
-	//		indices.push_back((short)((y + 1) * 4) + 4 -1);
-	//	}
-	//
-	//
-	//
-	//}
 
 	this->setupBuffers(shader);
 }
@@ -59,7 +20,8 @@ Terrain::Terrain(const std::string & height, const std::string & color)
 Terrain::~Terrain()
 {
 	for (int i = 0; i < this->Length; i++)
-		delete Heights[i];
+		delete[] Heights[i];
+		
 
 	delete[] Heights;
 }
@@ -80,8 +42,6 @@ void Terrain::setupVertexData()
 	int heightTemp = (int)(HeightMap.height / Height);
 	int lengthTemp = (int)(HeightMap.width / Length);
 
-	this->zOffset = Height * offset;
-	this->xOffset = Length * offset;
 
 	Heights = new float*[Height];
 
@@ -98,7 +58,7 @@ void Terrain::setupVertexData()
 
 			temp.x = (float)j * offset;//(float)(j - (Height / 2)) * offset;
 
-			float tempY = ((float)(int)pixels[0] / 256) * offset;
+			float tempY = ((float)(int)pixels[0] / 255) * offset;
 			tempY -= offset;
 
 			temp.y = tempY;
@@ -107,9 +67,6 @@ void Terrain::setupVertexData()
 			temp.r = 0.0f;
 			temp.g = 0.0f;
 			temp.b = 0.0f;
-
-			temp.u = (float)j / (float)(this->Length - 1);
-			temp.v = -(float)i / (float)(this->Height - 1);
 
 			this->terrainVertices.push_back(temp);
 
@@ -198,7 +155,7 @@ void Terrain::setupVertexData()
 	//	this->terrainVertices[(int)this->indices[i + 2]].b += normal.z;
 	//
 	//} 
-	for (int i = 0; i < this->indices.size()-3; i += 2)
+	for (int i = 0; i < this->indices.size()-2; i += 2)
 	{
 
 		glm::vec3 v1 = glm::vec3(this->terrainVertices[indices[i]].x, this->terrainVertices[indices[i]].y, this->terrainVertices[indices[i]].z);
@@ -285,22 +242,6 @@ void Terrain::setupBuffers(GLint gShaderProgram)
 		BUFFER_OFFSET(sizeof(float) * 3)	// note, the first color starts after the first vertex.
 	);
 
-	// repeat the process for the third attribute.
-	// query which "slot" corresponds to the input uv coord in the Vertex Shader 
-	GLuint uvPos = glGetAttribLocation(gShaderProgram, "uv_coord");
-
-	if (uvPos == -1) {
-		OutputDebugStringA("Error, cannot find 'uv_coord' attribute in Vertex shader\n");
-		return;
-	}
-
-	glVertexAttribPointer(
-		uvPos,
-		2,
-		GL_FLOAT,
-		GL_FALSE, sizeof(TerrainVertex), // distance between two uv coord 
-		BUFFER_OFFSET(sizeof(float) * 6)	// note, the first uv starts after the first color.
-	);
 
 }
 
@@ -378,25 +319,27 @@ float Terrain::calculateY(float x, float z)
 	if (gridX >= terrainVertices.size() - 1 || gridZ >= terrainVertices.size() - 1 || gridX < 0 || gridZ < 0)
 		return -10000;
 
-	float xCoord = ((int)x % (int)offset) / (float)offset;
-	float zCoord = ((int)z % (int)offset) / (float)offset;
+	float xCoord = std::fmod(x, (float)offset) / (float)offset;
+	float zCoord = std::fmod(z, (float)offset) / (float)offset;
 	float answer;
+
 	if (xCoord <= (1 - zCoord))
 	{
 		answer = barryCentric(
 			glm::vec3(0, Heights[gridZ][gridX], 0),
-			glm::vec3(1, Heights[gridZ + 1][gridX], 0),
-			glm::vec3(0, Heights[gridZ][gridX + 1], 1),
+			glm::vec3(0, Heights[gridZ + 1][gridX], 1),
+			glm::vec3(1, Heights[gridZ][gridX + 1], 0),
 			glm::vec2(xCoord, zCoord));
 	}
 	else
 	{
 		answer = barryCentric(
-			glm::vec3(1, Heights[gridZ + 1][gridX], 0),
+			glm::vec3(0, Heights[gridZ + 1][gridX], 1),
 			glm::vec3(1, Heights[gridZ + 1][gridX + 1], 1),
-			glm::vec3(0, Heights[gridZ][gridX + 1], 1),
+			glm::vec3(1, Heights[gridZ][gridX + 1], 0),
 			glm::vec2(xCoord, zCoord));
 	}
+
 	answer += 2;
 	return answer;
 

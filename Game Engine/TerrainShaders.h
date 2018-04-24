@@ -23,7 +23,7 @@ public:
 	//GLuint gVertexBuffer;
 	//GLuint gVertexAttribute;
 	//GLuint gElementBuffer;
-	GLuint terrainShaderProgram;
+	GLuint TerrainShaderProgram;
 	int assetID;
 
 };

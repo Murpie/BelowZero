@@ -83,6 +83,7 @@ void main()
 		// diffuse
 		vec3 lightDir = normalize(lights[i].Position - FragPos);
 		vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color;
+		//diffuse = Albedo;
 
 		vec3 halfwayDir = normalize(lightDir + viewDir);
 		float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
@@ -104,7 +105,7 @@ void main()
 	float attenuation = 1.0;
 	lighting += diffuse;
 
-	float density = 0.01;
+	float density = 0.03;
 	float gradient = 3.0;
 	float distanceToPos = length(view_position - FragPos);
 	float visibility = exp(-pow((distanceToPos * density), gradient));
@@ -114,5 +115,5 @@ void main()
 		shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal, lights[1].Position);
 
 	FragColor = lighting * (1.0f - shadowFactor);
-	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 3, visibility);
+	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5, visibility);
 }

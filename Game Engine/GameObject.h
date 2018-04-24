@@ -10,6 +10,7 @@
 #include "glm/glm/gtc/type_ptr.hpp"
 #include "glm/glm/glm.hpp"
 #include "Player.h"
+#include "Terrain.h"
 
 #include "Ray.h"
 #include "Intersection.h"
@@ -61,6 +62,7 @@ public:
     const bool getIsRenderable();
 
 	Player* getPlayer();
+	Terrain* getTerrain();
 
 	template <class T>
 	T* getComponent() {
