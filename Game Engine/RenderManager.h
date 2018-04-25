@@ -11,7 +11,6 @@
 #include <random>
 #include "stb_image.h"
 #include "GameScene.h"
-#include "Player.h"
 #include "ShaderProgramLib.h"
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -45,6 +44,7 @@ public:
 	void clearObjectsToRender();
 
 	void Render();
+	void renderMainMenu();
 	void createBuffers();
 	void renderQuad();
 	void Update();

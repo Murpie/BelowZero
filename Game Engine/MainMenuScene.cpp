@@ -2,6 +2,8 @@
 
 MainMenuScene::MainMenuScene()
 {
+	Component::id = ComponentType::ID::MAINMENU;
+
 	this->mouseIsOverButton = false;
 	this->buttonHasBeenClicked = false;
 	this->buttonHasBeenReleased = false;
@@ -12,10 +14,12 @@ MainMenuScene::MainMenuScene()
 	this->startButtonMinMax[1].x = 300;
 	this->startButtonMinMax[1].y = 100;
 
-	loadBackgroundTexture("MainMenuBackground");
 	loadBuffers();
 	createShaders();
-	renderButtons();
+	loadBackgroundTexture("MainMenuBackground");
+	loadButtonTexture("", 1);
+	loadButtonTexture("", 2);
+	loadButtonTexture("", 3);
 }
 
 MainMenuScene::~MainMenuScene()
@@ -62,6 +66,104 @@ void MainMenuScene::loadBackgroundTexture(std::string backgroundTextureName)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, backgroundTexture, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Background Framebuffer not complete!" << std::endl;
+}
+
+void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonNumber)
+{
+	if (buttonNumber == 1)
+	{
+		std::string texturePNG = ".png";
+		std::string filePath = buttonTextureName + texturePNG;
+		int width, height, nrOfChannels;
+
+		// ----------========== Equipment FrameBuffer ==========----------
+		unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
+
+		glGenFramebuffers(1, &startButtonFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, startButtonFBO);
+
+		glGenTextures(1, &startButtonTexture);
+		glBindTexture(GL_TEXTURE_2D, startButtonTexture);
+
+		stbi_set_flip_vertically_on_load(true);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		if (data)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		else
+			std::cout << "Failed to load Background Texture from path" << std::endl;
+
+		stbi_image_free(data);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, startButtonTexture, 0);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			std::cout << "Background Framebuffer not complete!" << std::endl;
+	}
+	if (buttonNumber == 2)
+	{
+		std::string texturePNG = ".png";
+		std::string filePath = buttonTextureName + texturePNG;
+		int width, height, nrOfChannels;
+
+		// ----------========== Equipment FrameBuffer ==========----------
+		unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
+
+		glGenFramebuffers(1, &settingButtonFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, settingButtonFBO);
+
+		glGenTextures(1, &settingsButtonTexture);
+		glBindTexture(GL_TEXTURE_2D, settingsButtonTexture);
+
+		stbi_set_flip_vertically_on_load(true);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		if (data)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		else
+			std::cout << "Failed to load Background Texture from path" << std::endl;
+
+		stbi_image_free(data);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, settingsButtonTexture, 0);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			std::cout << "Background Framebuffer not complete!" << std::endl;
+	}
+	if (buttonNumber == 3)
+	{
+		std::string texturePNG = ".png";
+		std::string filePath = buttonTextureName + texturePNG;
+		int width, height, nrOfChannels;
+
+		// ----------========== Equipment FrameBuffer ==========----------
+		unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
+
+		glGenFramebuffers(1, &ExitButtonFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, ExitButtonFBO);
+
+		glGenTextures(1, &quitButtonTexture);
+		glBindTexture(GL_TEXTURE_2D, quitButtonTexture);
+
+		stbi_set_flip_vertically_on_load(true);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		if (data)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		else
+			std::cout << "Failed to load Background Texture from path" << std::endl;
+
+		stbi_image_free(data);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, quitButtonTexture, 0);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			std::cout << "Background Framebuffer not complete!" << std::endl;
+	}
+	
 }
 
 void MainMenuScene::loadBuffers()

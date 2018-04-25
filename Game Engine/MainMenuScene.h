@@ -23,6 +23,7 @@ public:
 	void setMousePos(glm::vec2 newMousePosition);
 
 	void loadBackgroundTexture(std::string backgroundTextureName);
+	void loadButtonTexture(std::string buttonTextureName, int buttonNumber);
 	void loadBuffers();
 	void createShaders();
 	void renderButtons();
@@ -32,18 +33,20 @@ public:
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
 
-private:
 	GLuint backgroundTexture;
 	GLuint startButtonTexture;
 	GLuint settingsButtonTexture;
 	GLuint quitButtonTexture;
-	
+
 	unsigned int whichButtonIsSelected;
 	unsigned int mainMenuShaderProgram;
 	unsigned int backgroundFbo;
 	unsigned int VBO;
 	unsigned int VAO;
 	unsigned int EBO;
+	unsigned int startButtonFBO;
+	unsigned int settingButtonFBO;
+	unsigned int ExitButtonFBO;
 
 	glm::vec2 startButtonMinMax[2];
 	glm::vec2 settingsButtonMinMax[2];
@@ -55,6 +58,6 @@ private:
 
 	double xPos;
 	double yPos;
-
+private:
 	Gamestate::ID stateOfGame;
 };

@@ -191,6 +191,10 @@ void RenderManager::Render() {
 
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
+		/*
+		Use gameobject[0]
+		use transform->position in gameObject
+		*/
 		if (gameScene->gameObjects[i].getPlayer() != nullptr)
 		{
 			glm::vec2 temp = gameScene->gameObjects[i].getPlayer()->setXZ();
@@ -435,6 +439,30 @@ void RenderManager::Render() {
 
 	clearObjectsToRender();
 	Update();
+}
+
+void RenderManager::renderMainMenu()
+{
+	FindObjectsToRender();
+
+	view_matrix = gameScene->gameObjects[0].getViewMatrix();
+	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(gameScene->gameObjects[0].getMenuScene()->mainMenuShaderProgram);
+
+	glUniform1i(glGetUniformLocation(gameScene->gameObjects[0].getMenuScene()->mainMenuShaderProgram, "startButtonTexture"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->startButtonTexture);
+	glUniform1i(glGetUniformLocation(gameScene->gameObjects[0].getMenuScene()->mainMenuShaderProgram, "settingsButtonTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->settingsButtonTexture);
+	glUniform1i(glGetUniformLocation(gameScene->gameObjects[0].getMenuScene()->mainMenuShaderProgram, "ExitButtonTexture"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->quitButtonTexture);
+
+	gameScene->gameObjects[0].getMenuScene()->renderButtons();
 }
 
 void RenderManager::renderQuad()

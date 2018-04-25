@@ -41,6 +41,7 @@ namespace ComponentType
 		COMPONENT,
 		PLAYER,
 		LIGHT,
-		TERRAIN
+		TERRAIN,
+		MAINMENU
 	};
 }

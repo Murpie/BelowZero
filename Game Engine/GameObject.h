@@ -71,6 +71,7 @@ public:
 	glm::mat4 getModelMatrix();
 	glm::mat4 getViewMatrix();
 	Terrain* getTerrain();
+	MainMenuScene* getMenuScene();
 
 	template <class T>
 	T* getComponent() {

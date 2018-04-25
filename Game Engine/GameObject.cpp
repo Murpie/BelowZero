@@ -193,6 +193,20 @@ Terrain * GameObject::getTerrain()
 	return nullptr;
 }
 
+MainMenuScene * GameObject::getMenuScene()
+{
+	for (int i = 0; i < components.size(); i++)
+	{
+
+		if (components[i]->id == ComponentType::ID::MAINMENU)
+		{
+			MainMenuScene * mainmenuScene = static_cast<MainMenuScene*>(components[i]);
+			return mainmenuScene;
+		}
+	}
+	return nullptr;
+}
+
 glm::mat4 GameObject::getModelMatrix()
 {
 	modelMatrix = glm::translate(glm::mat4(1), transform->position);

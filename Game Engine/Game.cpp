@@ -204,8 +204,8 @@ void Game::menuState()
 	if (stateOfGame == Gamestate::ID::LOAD_MENU)
 	{
 		printCurrentState(stateOfGame);
-		//initScene(menuScene);
-		initMenuScene(menuScene);
+		initScene(menuScene);
+		//initMenuScene(menuScene);
 		stateOfGame = Gamestate::ID::SHOW_MENU;
 		printCurrentState(stateOfGame);
 	}
@@ -295,7 +295,6 @@ void Game::initMenuScene(GameScene & scene)
 {
 	if (renderManager.size() < 2)
 		addRenderManager(scene);
-	addPlayer(scene);
 	//addMeshFilter(scene);
 	scene.addMainMenu();
 }
