@@ -70,7 +70,7 @@ private:
 	float seconds;
 	int count;
 
-	int doneOnce = 0;
+	int width, height, nrOfChannels;
 
 	unsigned int UIFBO;
 	unsigned int UITexture;
@@ -137,10 +137,12 @@ private:
 
 	int display_w, display_h;
 
-	GLfloat billboard[12] = {
-		0.0f, 4.5f, 0.5f,
-		0.0f, 4.5f, -0.5f,
-		0.0f,  5.5f, 0.5f,
-		0.0f,  5.5f, -0.5f,
+	float billboard[36] = {
+		10.0f,  0.5f, -10.5f, 0.0f,  0.0f,//BL		//pos & uv
+		10.0f,  20.5f, -10.5f, 1.0f,  0.0f,//TL
+		10.0f,  20.5f,  10.5f, 1.0f,  1.0f,//TR
+		10.0f,  20.5f,  10.5f, 1.0f,  1.0f,//TR
+		10.0f,  0.5f,  10.5f, 0.0f,  1.0f,//BR
+		10.0f,  0.5f, -10.5f, 0.0f,  0.0f,//BL
 	};
 };

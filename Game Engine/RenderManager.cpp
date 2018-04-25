@@ -65,15 +65,40 @@ void RenderManager::createBuffers()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//... VFX
+	width = 0;
+	height = 0;
+	nrOfChannels = 0;
+	unsigned char * data = stbi_load("ocean.png", &width, &height, &nrOfChannels, 0);
+
 	glGenVertexArrays(1, &billboardVAO);
 	glGenBuffers(1, &billboardVBO);
 	glBindVertexArray(billboardVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, billboardVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(billboard), &billboard, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
-	/*glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));*/
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), BUFFER_OFFSET(sizeof(float) * 3));
+	
+	glGenTextures(1, &billboardTexture);
+	glBindTexture(GL_TEXTURE_2D, billboardTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+	else
+		std::cout << "Failed to load Equiped Texture from path" << std::endl;
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, billboardTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Billboard Framebuffer not complete!" << std::endl;
+
+	stbi_image_free(data);
+
 
 	//... Create G-buffers
 	//framebufferobject
@@ -177,8 +202,10 @@ void RenderManager::createBuffers()
 		std::cout << "Framebuffer not complete!" << std::endl;
 
 	//.. Create UI Frame Buffer with UI Texture
-	int width, height, nrOfChannels;
-	unsigned char * data = stbi_load("uiTextureFlipped.png", &width, &height, &nrOfChannels, 0);
+	width = 0;
+	height = 0;
+	nrOfChannels = 0;
+	data = stbi_load("uiTextureFlipped.png", &width, &height, &nrOfChannels, 0);
 
 	glGenFramebuffers(1, &UIFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, UIFBO);
@@ -287,77 +314,48 @@ void RenderManager::Render() {
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
 	}
 
+
 	//... VFX
-
-	if (doneOnce == 0)
-	{
-		std::string filePath = "Particle.png";
-		int width, height, nrOfChannels;
-
-		unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
-
-		glGenFramebuffers(1, &billboardFBO);
-		glBindFramebuffer(GL_FRAMEBUFFER, billboardFBO);
-
-		glGenTextures(1, &billboardTexture);
-		glBindTexture(GL_TEXTURE_2D, billboardTexture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		if (data)
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		else
-			std::cout << "Failed to load Equiped Texture from path" << std::endl;
-		
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, billboardTexture, 0);
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			std::cout << "Billboard Framebuffer not complete!" << std::endl;
-
-		stbi_image_free(data);
-		doneOnce = 1;
-	}
-
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glBindVertexArray(billboardVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, billboardVBO);
 	glUseProgram(VFXShaderProgram);
 
-	glm::mat4 viewProjectionMatrix = projection_matrix * view_matrix;
-	glm::vec3 billPos = { 0.0f, 5.0f, 0.0f };
-	glm::vec2 billSize = { 1.0f, 1.0f };
+	glm::mat4 billboardWorldMatrix = glm::mat4(1);
+	billboardWorldMatrix = glm::translate(billboardWorldMatrix, glm::vec3(0.0, 5.0, 0.0));
+	billboardWorldMatrix = glm::rotate(billboardWorldMatrix, glm::radians(deltaTime), glm::vec3(0.0, 1.0, 0.0));
+
+	//glm::mat4 viewProjectionMatrix = projection_matrix * view_matrix * world_matrix;
+	glm::vec3 billPos = { 0.0f, 1.0f, 0.0f };
+	glm::vec2 billSize = { 1.0f, 0.125f };
 	glm::vec3 cameraRight_worldspace = { view_matrix[0][0], view_matrix[1][0] , view_matrix[2][0] };
 	glm::vec3 cameraUp_worldspace = { view_matrix[0][1], view_matrix[1][1] , view_matrix[2][1] };
 
-	// Reflective Cube Map World Matrix
-	/*glm::mat4 cube_world_matrix = glm::mat4(1);
-	cube_world_matrix = glm::translate(cube_world_matrix, glm::vec3(2, 0.5, 0));
-	cube_world_matrix = glm::rotate(cube_world_matrix, glm::radians(deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
-
-	//glUniformMatrix4fv(glGetUniformLocation(cubeMapShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
-
-	//glBindFramebuffer(GL_FRAMEBUFFER, billboardFBO);
-	//glBindFramebuffer(GL_FRAMEBUFFER, gbo);*/
-
-	glUniform1i(glGetUniformLocation(VFXShaderProgram, "myTextureSampler"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, billboardTexture);
+	glUniformMatrix4fv(glGetUniformLocation(VFXShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(billboardWorldMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(VFXShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(VFXShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
 
 	glUniform3fv(glGetUniformLocation(VFXShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_worldspace));
 	glUniform3fv(glGetUniformLocation(VFXShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_worldspace));
+	
+	//glUniformMatrix4fv(glGetUniformLocation(VFXShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
 
 	glUniform3fv(glGetUniformLocation(VFXShaderProgram, "billboardPos"), 1, glm::value_ptr(billPos));
 	glUniform2fv(glGetUniformLocation(VFXShaderProgram, "billboardSize"), 1, glm::value_ptr(billSize));
-
-	glUniformMatrix4fv(glGetUniformLocation(VFXShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
+	
+	glUniform1i(glGetUniformLocation(VFXShaderProgram, "myTextureSampler"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, billboardTexture);
 
 	float lifeLevel = sin(deltaTime)* 0.1f + 0.7f;
 
 	glUniform1f(glGetUniformLocation(VFXShaderProgram, "lifeLevel"), lifeLevel);
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	/*glStencilFunc(GL_ALWAYS, 2, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);*/
 
-	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	//------=====================Animation Pass=======================-------
 	//glUseProgram(animationShaderProgram);
