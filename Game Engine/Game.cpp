@@ -335,9 +335,10 @@ void Game::useShaderProgram()
 void Game::addMeshName()
 {
 	//Add file names to vector to load when reading mesh data. 
-	std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap" };
+	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
+	std::string meshLoader[] = { "Bucket.leap", "Stone_1.leap"};
 	//meshType: 0 = Static  2 = Interactive  3 = Equiped
-	GLuint meshTypes[] = { 0, 0, 0, 0, 0 };
+	GLuint meshTypes[] = { 0 };
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 	{

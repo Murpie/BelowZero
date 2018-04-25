@@ -35,7 +35,8 @@ public:
 	Transform *transform;
 	std::vector<Component*> components;
 
-	bBox bbox;
+	std::vector <bBox> bbox;
+
 	/*
 		rework functions so we can put Material, MeshFilter and Light
 		directly into the component vector.
