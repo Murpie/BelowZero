@@ -361,7 +361,7 @@ void Game::addMeshFilter(GameScene &scene)
 }
 void Game::addTerrain(GameScene &scene)
 {
-	scene.addTerrain("firstheightmap.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->TerrainShaderProgram);
+	scene.addTerrain("test1234.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->TerrainShaderProgram);
 }
 
 void Game::readMeshName(GameScene &scene)

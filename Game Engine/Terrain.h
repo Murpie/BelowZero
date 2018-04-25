@@ -14,22 +14,19 @@ struct TerrainVertex
 {
 	float x, y, z;
 	float r, g, b;
-	//glm::vec3 vertPos;
-	//glm::vec3 vertNorm;
-	//glm::vec2 UVs;
 };
 
 class Terrain : public Component
 {
 private:
-	float MAX_HEIGHT = 50;
-	float MIN_HEIGHT = -3;
-	int sizePerSide = 32;
+	float MAX_HEIGHT = 90;
+	float MIN_HEIGHT = 0;
+	int sizePerSide = 128;
 	float MAX_PIXEL_COLOR = 256 * 256 * 256;
 	Texture HeightMap;
 	Texture AlbedoMap;
 
-	int offset = 16;
+	int offset = 8;
 
 	int Length = 40;
 	int Height = 40;

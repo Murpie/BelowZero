@@ -62,6 +62,12 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 	{
 		addEmptyGameObject();
 		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).vertexCount, meshLibrary.getMesh(i).meshType);
+		
+		glm::vec2 uv = glm::vec2(4.3, 2.4);
+		float temp = gameObjects[1].getTerrain()->calculateY(uv.x, uv.y) -2;
+
+		meshFilter->worldTransform = glm::translate(meshFilter->worldTransform, glm::vec3(uv.x, temp, uv.y));
+
 		gameObjects[gameObjects.size() - 1].name = "Mesh " + std::to_string(i); // Maybe pass the name of the object?
 		gameObjects[gameObjects.size() - 1].addComponent(meshFilter);
 		gameObjects[gameObjects.size() - 1].addComponent(matertialLibrary.getMaterial(0));

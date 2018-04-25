@@ -263,7 +263,7 @@ void RenderManager::Render() {
 		if (gameScene->gameObjects[i].getTerrain() != nullptr)
 		{
 			gameScene->gameObjects[i].getTerrain()->bindVertexArray();
-	
+			
 			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i].getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
 			
 			
@@ -274,24 +274,20 @@ void RenderManager::Render() {
 	
 	
 	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
-	//glBindFramebuffer(GL_FRAMEBUFFER, gbo);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 	glUseProgram(geometryShaderProgram);
 	
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
-	
-	//glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_STENCIL_TEST);
-	//glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	//glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	//glStencilMask(0xFF); // enable writing to the stencil buffer
-	
+
+
 	gameObjectsToRender[0]->materialComponent->bindTextures();
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
+		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "model_matrix"), 1, GL_FALSE, glm::value_ptr(gameObjectsToRender[i]->meshFilterComponent->worldTransform));
+
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 3)
 			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 1);
 		else
