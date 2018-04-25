@@ -7,6 +7,7 @@ struct bBox
 {
 	bBox()
 	{
+		/*
 		glm::mat4 worldMatrix = glm::mat4();
 		// bucket maya coords from c
 		verts[0] = glm::vec3(-0.992, 0.000, 1.064);
@@ -41,6 +42,7 @@ struct bBox
 		}
 
 		center = glm::vec3((vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f);
+		*/
 	}
 
 	glm::vec3 vMin; // smallest possible vector
@@ -48,7 +50,7 @@ struct bBox
 
 	glm::vec3 center; // center point of the bBox
 
-	glm::vec3 verts[8];
+	//glm::vec3 verts[8];
 
 };
 //--------------------------------

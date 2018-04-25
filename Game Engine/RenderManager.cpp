@@ -184,21 +184,12 @@ void RenderManager::createBuffers()
 void RenderManager::Render() {
 	FindObjectsToRender();
 	//... Set view and projection matrix
-	//view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
-	//	gameScene->gameObjects[0].transform->position + gameScene->gameObjects[0].transform->forward,
-	//	gameScene->gameObjects[0].transform->up);
-	
 	view_matrix = gameScene->gameObjects[0].getViewMatrix();
-
-	//... Set view and projection matrix
-	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position, 
-		gameScene->gameObjects[0].transform->position + gameScene->gameObjects[0].transform->forward,
-		gameScene->gameObjects[0].transform->up);
 	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
-	world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
-	world_matrix = glm::rotate(world_matrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
+	//world_matrix = glm::rotate(world_matrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	//... Clear Back Buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -244,7 +235,7 @@ void RenderManager::Render() {
 
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
-	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+//	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
@@ -262,6 +253,11 @@ void RenderManager::Render() {
 			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 0);
 
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
+
+		//...
+		world_matrix = glm::translate(world_matrix, gameObjectsToRender[i]->transform->position);
+		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+		//...
 
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}

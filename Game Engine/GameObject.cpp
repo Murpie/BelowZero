@@ -2,8 +2,6 @@
 
 GameObject::GameObject()
 {
-	std::cout << "GameObject() called" << std::endl;
-
 	transform = new Transform();
 	name = "EmptyGameObject";
     isActive = true;
@@ -18,8 +16,6 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
-	std::cout << "~GameObject() called" << std::endl;
-
 	//deleteAllComponents();
 
 	//These will probably give memory leaks if not deleted.
@@ -27,6 +23,7 @@ GameObject::~GameObject()
 	//delete materialComponent;
 	//delete meshFilterComponent;
 	//delete lightComponent;
+	bbox.clear();
 }
 
 void GameObject::update(float deltaTime, float seconds)
@@ -66,12 +63,11 @@ void GameObject::updateMaterialAndMeshFilterPointers() {
         if (temp != nullptr) {
             //rework this, we want our meshFilter inside components, or do we need it to be a component?
 			/*
-				Save the ID of the meshFIlter when Creating it our think of
+				Save the ID of the meshFIlter when Creating it or think of
 				a better solution. 
 			*/
 			meshFilterComponent = temp;
             meshTest = true;
-
         }
     }
 
@@ -132,8 +128,6 @@ void GameObject::addComponent(Component* otherComponent)
 
 void GameObject::deleteComponent(Component* otherComponent)
 {
-	//
-
 	//find component
 	int index = -1;
 	for (int i = 0; i < components.size(); i++)

@@ -57,9 +57,21 @@ void GameScene::addPlayer()
 void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibrary, GLuint meshNameSize)
 {
 	/*
+	meshNameSize should be replaced or removed
+	*/
+
+	/*
 	This function should get data from the level file and create as many objects of each type that is needed
 	to build the scene.
 	*/
+
+	/*
+	We need this for each object in the scene:
+		* World position
+		* Mesh ID or mesh name to decide which mesh from the MeshLib to use when adding a new object to the scene.
+		* ...
+	*/
+
 	for (int i = 0; i < meshNameSize; i++) // 3 - meshLibrary.getNumberOfMeshes(); meshName.size();
 	{
 		addEmptyGameObject();
@@ -69,7 +81,34 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 		gameObjects[gameObjects.size() - 1].addComponent(matertialLibrary.getMaterial(0));
 		//gameObjects[gameObjects.size() - 1].materialComponent = matertialLibrary.getMaterial(i);
 		//... set interactable
-		gameObjects[gameObjects.size() - 1].isInteractable = true;
+		//if(meshLibrary.getMesh(i).leapMesh->customMayaAttribute->meshType == 1)
+		gameObjects[gameObjects.size() - 1].isInteractable = true; // if meshType 1, set true
+		//std::cout << "MESHFILTER::" << gameObjects.size() - 1 << std::endl;
+
+		//Add BBox from leapmesh to gameObject
+		for (int i = 0; i < meshLibrary.getMesh(i).leapMesh->boundingBoxes.size(); i++)
+		{
+			//meshLibrary.getMesh(i).leapMesh->boundingBoxes
+			bBox box = bBox();
+			//add center
+			box.center.x = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->center[0];
+			box.center.y = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->center[0];
+			box.center.z = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->center[0];
+			//add max vector
+			box.vMax.x = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->maxVector[0];
+			box.vMax.y = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->maxVector[0];
+			box.vMax.z = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->maxVector[0];
+			//add min vector
+			box.vMin.x = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->minVector[0];
+			box.vMin.y = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->minVector[0];
+			box.vMin.z = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->minVector[0];
+			//push into gameobject
+			gameObjects[gameObjects.size() - 1].bbox.push_back(box);
+		}
+		if (gameObjects.size() - 1 == 4)
+		{
+			gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(10,0,0);
+		}
 	}
 }
 
@@ -104,20 +143,24 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 		//for (int i = 3; i < 4; i++)
 		//for (int i = 1; i < gameObjects.size(); ++i)
 		std::cout << "GameObjects.size() :: "<< gameObjects.size() << std::endl;
-		for (int i = 3; i < 4; i++)
+		for (int i = 3; i < 5; i++)
 		{
+		//int i = 3;
 			if (gameObjects[i].isInteractable)
 			{
-				if (Intersection::rayBoxTest(ray, gameObjects[i].bbox, gameObjects[i].getModelMatrix()))
+				for (int j = 0; j < gameObjects[i].bbox.size(); j++)
 				{
-					std::cout << "HIT::" << gameObjects[i].name << std::endl;
-					gameObjects[i].setIsRenderable(false);
-					//gameObjects[i].interactUpdate() ?
-				}
-				else
-				{
-					std::cout << "MISS" << std::endl;
-					gameObjects[i].setIsRenderable(true);
+					if (Intersection::rayBoxTest(ray, gameObjects[i].bbox[j], gameObjects[i].getModelMatrix()))
+					{
+						std::cout << "HIT::" << gameObjects[i].name << std::endl;
+						gameObjects[i].setIsRenderable(false);
+						//gameObjects[i].interactUpdate() ?
+					}
+					else
+					{
+						std::cout << "MISS" << std::endl;
+						gameObjects[i].setIsRenderable(true);
+					}
 				}
 			}
 		}
