@@ -457,6 +457,7 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 
 void RenderManager::Update()
 {
+
 }
 
 void RenderManager::setDeltaTime(float deltaTime)

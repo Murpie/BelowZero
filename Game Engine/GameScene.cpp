@@ -107,7 +107,7 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 		}
 		if (gameObjects.size() - 1 == 4)
 		{
-			gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(10,0,0);
+			gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(20,5,5);
 		}
 	}
 }
@@ -158,7 +158,7 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 					}
 					else
 					{
-						std::cout << "MISS" << std::endl;
+						//std::cout << "MISS" << std::endl;
 						gameObjects[i].setIsRenderable(true);
 					}
 				}
