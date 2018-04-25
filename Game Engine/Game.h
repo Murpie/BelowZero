@@ -56,6 +56,7 @@ private:
 	vector<GLuint> meshType;
 
 	Gamestate::ID stateOfGame; // EnumID.h, make this one global(?) 
+	
 
 	void printCurrentState(Gamestate::ID stateOfGame); // Prints to console
 
@@ -68,6 +69,7 @@ private:
 
 	void initWindow();
 	void initScene(GameScene &scene);
+	void initMenuScene(GameScene &scene);
 	void clearScene(GameScene &scene);
 	void initShaderProgramLib();
 	void initInputOptions();

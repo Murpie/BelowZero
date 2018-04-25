@@ -204,7 +204,8 @@ void Game::menuState()
 	if (stateOfGame == Gamestate::ID::LOAD_MENU)
 	{
 		printCurrentState(stateOfGame);
-		initScene(menuScene);
+		//initScene(menuScene);
+		initMenuScene(menuScene);
 		stateOfGame = Gamestate::ID::SHOW_MENU;
 		printCurrentState(stateOfGame);
 	}
@@ -275,7 +276,6 @@ void Game::initScene(GameScene & scene)
 		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
 	//... Create Camera
 	addPlayer(scene);
-	
 	addTerrain(scene);
 	//... Create Lights
 	addLights(scene);
@@ -289,6 +289,15 @@ void Game::initScene(GameScene & scene)
 	//...
 	/*Add meshes to mesh filter with level file ?*/
 	addMeshFilter(scene);
+}
+
+void Game::initMenuScene(GameScene & scene)
+{
+	if (renderManager.size() < 2)
+		addRenderManager(scene);
+	addPlayer(scene);
+	//addMeshFilter(scene);
+	scene.addMainMenu();
 }
 
 void Game::clearScene(GameScene & scene)

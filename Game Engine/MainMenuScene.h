@@ -22,13 +22,15 @@ public:
 	void checkMousePosFromFunction();
 	void setMousePos(glm::vec2 newMousePosition);
 
-	void loadMainMenu();
 	void loadBackgroundTexture(std::string backgroundTextureName);
 	void loadBuffers();
 	void createShaders();
 	void renderButtons();
 
 	void deleteObjects();
+
+	void update(float deltaTime, float seconds);
+	void processEvents(GLFWwindow *window, float deltaTime);
 
 private:
 	GLuint backgroundTexture;
@@ -54,5 +56,5 @@ private:
 	double xPos;
 	double yPos;
 
-	GLFWwindow * testWindow;
+	Gamestate::ID stateOfGame;
 };

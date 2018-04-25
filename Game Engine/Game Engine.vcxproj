@@ -181,7 +181,7 @@
     <ClCompile Include="LightpassShaders.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenuScene.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="TerrainShaders.cpp" />
     <ClCompile Include="UIShaders.cpp" />
@@ -226,7 +226,7 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightpassShaders.h" />
     <ClInclude Include="MainMenuScene.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="UIShaders.h" />
     <ClInclude Include="Material.h" />

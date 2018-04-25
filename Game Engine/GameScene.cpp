@@ -81,6 +81,14 @@ void GameScene::addTerrain(const std::string & heightMap, GLuint shader)
 	gameObjects[gameObjects.size() - 1].addComponent(newTerrain);
 }
 
+void GameScene::addMainMenu()
+{
+	addEmptyGameObject();
+	MainMenuScene* mainMenuScene = new MainMenuScene();
+	gameObjects[gameObjects.size() - 1].addComponent(mainMenuScene);
+	gameObjects[gameObjects.size() - 1].setIsRenderable(true);
+}
+
 void GameScene::update(float deltaTime, float seconds)
 {
 	for (unsigned int i = 0; i < gameObjects.size(); i++)

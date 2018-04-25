@@ -11,6 +11,7 @@
 #include "glm/glm/glm.hpp"
 #include "Player.h"
 #include "Terrain.h"
+#include "MainMenuScene.h"
 
 #include "Ray.h"
 #include "Intersection.h"
