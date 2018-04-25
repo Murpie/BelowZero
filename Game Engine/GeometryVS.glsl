@@ -6,6 +6,7 @@ layout(location = 2) in vec2 uv_coord;
 uniform mat4 world_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
+uniform mat4 model_matrix;
 uniform int followCamera;
 
 out VS_OUT {
@@ -18,8 +19,8 @@ out VS_OUT {
 } vs_out;
 
 void main() {
-	gl_Position = vec4(vertex_position, 1.0);
-	vs_out.vertex_normal = vertex_normal;
+	gl_Position = model_matrix * vec4(vertex_position, 1.0);
+	vs_out.vertex_normal = model_matrix * vertex_normal;
 	vs_out.uv_coord = uv_coord;
 	vs_out.world_matrix = world_matrix;
 	vs_out.view_matrix = view_matrix;

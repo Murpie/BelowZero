@@ -174,3 +174,17 @@ Player * GameObject::getPlayer()
 	}
 	return nullptr;
 }
+
+Terrain * GameObject::getTerrain()
+{
+	for (int i = 0; i < components.size(); i++)
+	{
+
+		if (components[i]->id == ComponentType::ID::TERRAIN)
+		{
+			Terrain* terrain = static_cast<Terrain*>(components[i]);
+			return terrain;
+		}
+	}
+	return nullptr;
+}

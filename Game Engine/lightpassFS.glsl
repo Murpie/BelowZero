@@ -38,16 +38,16 @@ float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 {
 	vec3 lightDirForShadow = normalize(vec3(lightPos) - FragPos);
 	vec4 shadowCoordinates = LightSpaceMatrix * vec4(FragPos, 1.0);
-	//vec4 shadowCoordinates = LightSpaceMatrix * (vec4(FragPos, 1.0) + (vec4(Normal, 1.0) * 0.03));
 	vec3 projectionCoordinates = shadowCoordinates.xyz / shadowCoordinates.w;
 	projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
 
 	float closestDepth = texture(depthMap, projectionCoordinates.xy).r;
 	float directionalLightshadowFactor = 0.0f;
-	//float bias = max(0.0005 * (1.0 - dot(Normal, lightDirForShadow)), 0.05);
 	float bias = 0.005;
 	directionalLightshadowFactor += projectionCoordinates.z - bias > closestDepth ? 0.35 : 0.0;
-
+	
+	//float bias = max(0.0005 * (1.0 - dot(Normal, lightDirForShadow)), 0.005);
+	//vec4 shadowCoordinates = LightSpaceMatrix * (vec4(FragPos, 1.0) + (vec4(Normal, 1.0) * 0.03));
 	/*vec2 texelSize = 1.0 / textureSize(depthMap, 0);
 	for (int x = -1; x <= 1; ++x)
 	{
@@ -57,7 +57,7 @@ float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 	directionalLightshadowFactor += projectionCoordinates.z - bias > pcfDepth ? 0.7 : 0.0;
 	}
 	}
-	directionalLightshadowFactor /= 9.0;*/
+	directionalLightshadowFactor /= 9.0;*/ 
 
 	if (projectionCoordinates.z > 1.0)
 		directionalLightshadowFactor = 0.0;
@@ -83,6 +83,7 @@ void main()
 		// diffuse
 		vec3 lightDir = normalize(lights[i].Position - FragPos);
 		vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color;
+		//diffuse = Albedo;
 
 		vec3 halfwayDir = normalize(lightDir + viewDir);
 		float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
@@ -104,7 +105,7 @@ void main()
 	float attenuation = 1.0;
 	lighting += diffuse;
 
-	float density = 0.05;
+	float density = 0.03;
 	float gradient = 3.0;
 	float distanceToPos = length(view_position - FragPos);
 	float visibility = exp(-pow((distanceToPos * density), gradient));
@@ -114,5 +115,5 @@ void main()
 		shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal, lights[1].Position);
 
 	FragColor = lighting * (1.0f - shadowFactor);
-	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 3, visibility);
+	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5, visibility);
 }

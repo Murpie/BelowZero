@@ -266,6 +266,8 @@ void Game::initScene(GameScene & scene)
 	addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
 							 //... Create Camera
 	addPlayer(scene);
+	
+	addTerrain(scene);
 	//... Create Lights
 	testBool = false;
 	addLights(scene);
@@ -273,7 +275,7 @@ void Game::initScene(GameScene & scene)
 	if (!meshesLoaded)
 	{
 		//Load the meshes once and store them.
-		readMeshName();
+		readMeshName(scene);
 		meshesLoaded = true;
 	}
 	//...
@@ -295,6 +297,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addShadowMapShaders();
 	shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
+	shaderProgramLibrary.addTerrainShaders();
 }
 
 void Game::initInputOptions()
@@ -315,7 +318,7 @@ void Game::useShaderProgram()
 void Game::addMeshName()
 {
 	//Add file names to vector to load when reading mesh data. 
-	std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
+	std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap" };
 	//meshType: 0 = Static  2 = Interactive  3 = Equiped
 	GLuint meshTypes[] = { 0, 0, 0, 0, 0 };
 
@@ -332,7 +335,7 @@ void Game::addLights(GameScene &scene)
 	if (!testBool)
 	{
 		scene.addLight(glm::vec3(-4, 2, 2), 0);
-		scene.addLight(glm::vec3(-4, 2, 0), 0);
+		scene.addLight(glm::vec3(30, 2, 0), 0);
 		testBool = true;
 	}
 	else
@@ -356,12 +359,16 @@ void Game::addMeshFilter(GameScene &scene)
 {
 	scene.addMeshFilter(meshLibrary, materialLibrary, meshName.size());
 }
+void Game::addTerrain(GameScene &scene)
+{
+	scene.addTerrain("test1234.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->TerrainShaderProgram);
+}
 
-void Game::readMeshName()
+void Game::readMeshName(GameScene &scene)
 {
 	for (int i = 0; i < meshName.size(); i++)
 	{
-		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram, meshType[i]);
+		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram, meshType[i], scene.getTerrainPointer());
 	}
 
 	materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);

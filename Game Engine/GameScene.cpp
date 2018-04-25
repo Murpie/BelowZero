@@ -62,16 +62,47 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 	{
 		addEmptyGameObject();
 		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).vertexCount, meshLibrary.getMesh(i).meshType);
+		
+		glm::vec2 uv = glm::vec2(4.3, 2.4);
+		float temp = gameObjects[1].getTerrain()->calculateY(uv.x, uv.y) -2;
+
+		meshFilter->worldTransform = glm::translate(meshFilter->worldTransform, glm::vec3(uv.x, temp, uv.y));
+
 		gameObjects[gameObjects.size() - 1].name = "Mesh " + std::to_string(i); // Maybe pass the name of the object?
 		gameObjects[gameObjects.size() - 1].addComponent(meshFilter);
 		gameObjects[gameObjects.size() - 1].addComponent(matertialLibrary.getMaterial(0));
 	}
 }
 
+void GameScene::addTerrain(const std::string & heightMap, GLuint shader)
+{
+	addEmptyGameObject();
+	std::cout << "TERRAIN INDEX:: " << gameObjects.size() - 1 << std::endl;
+	newTerrain = new Terrain(heightMap, shader);
+	gameObjects[gameObjects.size() - 1].name = "Terrain";
+	gameObjects[gameObjects.size() - 1].addComponent(newTerrain);
+}
+
 void GameScene::update(float deltaTime, float seconds)
 {
 	for (unsigned int i = 0; i < gameObjects.size(); i++)
 	{
+
+		if (gameObjects[i].getPlayer() != nullptr)
+		{
+			for (int j = 0; j < gameObjects.size(); j++)
+			{
+				glm::vec2 UVS = gameObjects[i].getPlayer()->setXZ();
+				float u = UVS.x;
+				float v = UVS.y;
+				if (gameObjects[j].getTerrain() != nullptr)
+				{
+					gameObjects[i].getPlayer()->setCurrentHeight(gameObjects[j].getTerrain()->calculateY(u, v));
+				}
+
+			}
+
+		}
 		gameObjects[i].update(deltaTime, seconds);
 	}
 
@@ -83,4 +114,9 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		gameObjects[i].processEvents(window, deltaTime);
 	}
+}
+
+Terrain* GameScene::getTerrainPointer()
+{
+	return this->newTerrain;
 }

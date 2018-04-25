@@ -9,6 +9,8 @@
 class GameScene
 {
 public:
+	Terrain * newTerrain;
+
 	GameScene(const GameScene&) = delete;
 	GameScene& operator=(const GameScene&) = default;
 	GameScene();
@@ -23,10 +25,11 @@ public:
 	void addLight(glm::vec3 transform, int lightType);
 	void addPlayer(); //player
 	void addMeshFilter(MeshLib& meshLibrary, MaterialLib& matertialLibrary, GLuint meshNameSize);
+	void addTerrain(const std::string & heightMap, GLuint shader);
 
 	void update(float deltaTime, float seconds); // Updates all the objects in the scene
 	void processEvents(GLFWwindow *window, float deltaTime); // Updates objects if a evenet occurs, mouse press, button press etc. 
-
+	Terrain* getTerrainPointer();
 private:
 
 	//...
