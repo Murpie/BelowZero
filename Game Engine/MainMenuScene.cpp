@@ -7,12 +7,23 @@ MainMenuScene::MainMenuScene()
 	this->mouseIsOverButton = false;
 	this->buttonHasBeenClicked = false;
 	this->buttonHasBeenReleased = false;
+	this->pressed = false;
 	this->whichButtonIsSelected = -1;
 
-	this->startButtonMinMax[0].x = 100;
-	this->startButtonMinMax[0].y = 50;
-	this->startButtonMinMax[1].x = 300;
-	this->startButtonMinMax[1].y = 100;
+	this->startButtonMinMax[0].x = 430;
+	this->startButtonMinMax[0].y = 290;
+	this->startButtonMinMax[1].x = 855;
+	this->startButtonMinMax[1].y = 330;
+	
+	this->settingsButtonMinMax[0].x = 455;
+	this->settingsButtonMinMax[0].y = 385;
+	this->settingsButtonMinMax[1].x = 830;
+	this->settingsButtonMinMax[1].y = 415;
+	
+	this->ExitButtonMinMax[0].x = 430;
+	this->ExitButtonMinMax[0].y = 475;
+	this->ExitButtonMinMax[1].x = 855;
+	this->ExitButtonMinMax[1].y = 510;
 
 	stbi_set_flip_vertically_on_load(true);
 
@@ -242,63 +253,78 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 {
 	glfwGetCursorPos(window, &xPos, &yPos);
 
-	if (startButtonMinMax[0].x > xPos && xPos < startButtonMinMax[1].x && startButtonMinMax[0].y > yPos && yPos < startButtonMinMax[1].y)
+	if (startButtonMinMax[0].x < xPos && xPos < startButtonMinMax[1].x && startButtonMinMax[0].y < yPos && yPos < startButtonMinMax[1].y)
 	{
 		this->whichButtonIsSelected = 1;
 		std::cout << "------------------- CURSOR IS INSIDE STARTBUTTONBOX -------------------" << std::endl;
 		this->mouseIsOverButton = true;
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 		{
 			this->buttonHasBeenClicked = true;
-			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
-			{
-				this->buttonHasBeenReleased = true;
-			}
+		}
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE )
+		{
+			this->buttonHasBeenReleased = true;
 		}
 	}
 
-	else if (settingsButtonMinMax[0].x > xPos && xPos < settingsButtonMinMax[1].x && settingsButtonMinMax[0].y > yPos && yPos < settingsButtonMinMax[1].y)
+	else if (settingsButtonMinMax[0].x < xPos && xPos < settingsButtonMinMax[1].x && settingsButtonMinMax[0].y < yPos && yPos < settingsButtonMinMax[1].y)
 	{
 		this->whichButtonIsSelected = 2;
 		std::cout << "------------------- CURSOR IS INSIDE SETTINGSBUTTONBOX -------------------" << std::endl;
 		this->mouseIsOverButton = true;
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 		{
 			this->buttonHasBeenClicked = true;
-			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
+			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
 			{
 				this->buttonHasBeenReleased = true;
 			}
 		}
 	}
 
-	else if (ExitButtonMinMax[0].x > xPos && xPos < ExitButtonMinMax[1].x && ExitButtonMinMax[0].y > yPos && yPos < ExitButtonMinMax[1].y)
+	else if (ExitButtonMinMax[0].x < xPos && xPos < ExitButtonMinMax[1].x && ExitButtonMinMax[0].y < yPos && yPos < ExitButtonMinMax[1].y)
 	{
 		this->whichButtonIsSelected = 3;
 		std::cout << "------------------- CURSOR IS INSIDE EXITBUTTONBOX -------------------" << std::endl;
 		this->mouseIsOverButton = true;
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 		{
 			this->buttonHasBeenClicked = true;
-			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
+			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
 			{
 				this->buttonHasBeenReleased = true;
 			}
 		}
 	}
 
-	if (this->buttonHasBeenClicked == true && this->buttonHasBeenReleased == true)
+	if (this->buttonHasBeenClicked == true )//&& this->buttonHasBeenReleased == true)
 	{
-		this->mouseIsOverButton = true;
-		this->buttonHasBeenClicked = true;
-		this->buttonHasBeenReleased = true;
-		if (whichButtonIsSelected == 1)
+		 pressed = false;
+		if (whichButtonIsSelected == 1 && pressed == false)
+		{
+				printf("STATE OF GAME: %d", stateOfGame);
+				stateOfGame.state = Gamestate::ID::CLEAR_MENU;
+				printf("STATE OF GAME: %d", stateOfGame);
+				pressed = true;
+		}
+		
+		else if (whichButtonIsSelected == 2 && pressed == false)
+		{
+			stateOfGame.state = Gamestate::ID::CLOSE_GAME;
+			pressed = true;
+		}
+		
+		else if (whichButtonIsSelected == 3 && pressed == false)
+		{
+				stateOfGame.state = Gamestate::ID::CLOSE_GAME;
+				pressed = true;
+		}
 
-			stateOfGame = Gamestate::ID::LOAD_LEVEL;
-		/*else if (whichButtonIsSelected == 2)
-		stateOfGame = GameState::ID::loadSettings;
-		else if (whichButtonIsSelected == 3)
-		stateOfGame = GameState::ID::loadExit;*/
+		this->mouseIsOverButton = false;
+		this->buttonHasBeenClicked = false;
+		this->buttonHasBeenReleased = false;
 	}
+
 }
 

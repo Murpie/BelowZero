@@ -10,6 +10,7 @@ class GameScene
 {
 public:
 	Terrain * newTerrain;
+	bool playerFound;
 
 	GameScene(const GameScene&) = delete;
 	GameScene& operator=(const GameScene&) = default;

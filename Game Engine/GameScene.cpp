@@ -3,7 +3,7 @@
 GameScene::GameScene() :
 	camerasInScene(0), lightsInScene(0)
 {
-
+	this->playerFound = true;
 }
 
 GameScene::~GameScene()
@@ -126,6 +126,8 @@ void GameScene::addMainMenu()
 	MainMenuScene* mainMenuScene = new MainMenuScene();
 	gameObjects[gameObjects.size() - 1].addComponent(mainMenuScene);
 	gameObjects[gameObjects.size() - 1].setIsRenderable(true);
+	// skräp
+	addEmptyGameObject();
 }
 
 void GameScene::update(float deltaTime, float seconds)
@@ -159,47 +161,49 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		gameObjects[i].processEvents(window, deltaTime);
 	}
-
-	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && gameObjects[0].getPlayer()->click == false)
+	if (gameObjects[0].getPlayer() != nullptr)
 	{
-		gameObjects[0].getPlayer()->click = true;
-		// loop rayBoxIntersection here
-		float x = 1280.0; //ScreenWidth
-		float y = 720.0; //ScreenHeight
-		RayData ray = Ray::getWorldRay(x*0.5f, y*0.5f, gameObjects[0].getViewMatrix(), x, y, gameObjects[0].transform->position);
-		
-		// crash when using for(int i=1; i < gameObjects.size(); i++)
-		// vector subscript out of range
-		// the last spot in the vector is the reason for the crash..
-
-		//for (int i = 3; i < 4; i++)
-		//for (int i = 1; i < gameObjects.size(); ++i)
-		std::cout << "GameObjects.size() :: "<< gameObjects.size() << std::endl;
-		for (int i = 3; i < 5; i++)
+		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && gameObjects[0].getPlayer()->click == false)
 		{
-		//int i = 3;
-			if (gameObjects[i].isInteractable)
+			gameObjects[0].getPlayer()->click = true;
+			// loop rayBoxIntersection here
+			float x = 1280.0; //ScreenWidth
+			float y = 720.0; //ScreenHeight
+			RayData ray = Ray::getWorldRay(x*0.5f, y*0.5f, gameObjects[0].getViewMatrix(), x, y, gameObjects[0].transform->position);
+
+			// crash when using for(int i=1; i < gameObjects.size(); i++)
+			// vector subscript out of range
+			// the last spot in the vector is the reason for the crash..
+
+			//for (int i = 3; i < 4; i++)
+			//for (int i = 1; i < gameObjects.size(); ++i)
+			std::cout << "GameObjects.size() :: " << gameObjects.size() << std::endl;
+			for (int i = 3; i < 5; i++)
 			{
-				for (int j = 0; j < gameObjects[i].bbox.size(); j++)
+				//int i = 3;
+				if (gameObjects[i].isInteractable)
 				{
-					if (Intersection::rayBoxTest(ray, gameObjects[i].bbox[j], gameObjects[i].getModelMatrix()))
+					for (int j = 0; j < gameObjects[i].bbox.size(); j++)
 					{
-						std::cout << "HIT::" << gameObjects[i].name << std::endl;
-						gameObjects[i].setIsRenderable(false);
-						//gameObjects[i].interactUpdate() ?
-					}
-					else
-					{
-						std::cout << "MISS" << std::endl;
-						gameObjects[i].setIsRenderable(true);
+						if (Intersection::rayBoxTest(ray, gameObjects[i].bbox[j], gameObjects[i].getModelMatrix()))
+						{
+							std::cout << "HIT::" << gameObjects[i].name << std::endl;
+							gameObjects[i].setIsRenderable(false);
+							//gameObjects[i].interactUpdate() ?
+						}
+						else
+						{
+							std::cout << "MISS" << std::endl;
+							gameObjects[i].setIsRenderable(true);
+						}
 					}
 				}
 			}
+
+			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) && gameObjects[0].getPlayer()->click == true) {
+				gameObjects[0].getPlayer()->click = false;
+			}
 		}
-	}
-	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) && gameObjects[0].getPlayer()->click == true)
-	{
-		gameObjects[0].getPlayer()->click = false;
 	}
 }
 

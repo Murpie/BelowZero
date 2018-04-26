@@ -85,10 +85,10 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && stateBool != true)
 	{
 		stateBool = true;
-		if(stateOfGame == Gamestate::ID::RUN_LEVEL)
-			stateOfGame = Gamestate::ID::CLEAR_LEVEL;
-		else if (stateOfGame == Gamestate::ID::SHOW_MENU)
-			stateOfGame = Gamestate::ID::CLEAR_MENU;
+		if(stateOfGame.state == Gamestate::ID::RUN_LEVEL)
+			stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
+		else if (stateOfGame.state == Gamestate::ID::SHOW_MENU)
+			stateOfGame.state = Gamestate::ID::CLEAR_MENU;
 	}
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_RELEASE && stateBool != false)
 	{
@@ -104,7 +104,6 @@ Game::Game() :
 	shaderProgramLibrary(),
 	gameScene(), menuScene(),
 	windowName("Game Engine"),
-	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
 	meshesLoaded(false), fullscreen(false), stateBool(false),
 	count(0)
@@ -112,6 +111,7 @@ Game::Game() :
 	initWindow();
 	initShaderProgramLib();
 	addMeshName();
+	stateOfGame.state = Gamestate::ID::INITIALIZE;
 }
 
 Game::~Game()
@@ -121,7 +121,7 @@ Game::~Game()
 
 void Game::run()
 {
-	printCurrentState(stateOfGame);
+	printCurrentState(stateOfGame.state);
 	//Render
 	auto startSeconds = chrono::high_resolution_clock::now();
 
@@ -133,8 +133,8 @@ void Game::run()
 
 	useShaderProgram();
 
-	stateOfGame = Gamestate::ID::LOAD_MENU;
-	printCurrentState(stateOfGame);
+	stateOfGame.state = Gamestate::ID::LOAD_MENU;
+	printCurrentState(stateOfGame.state);
 
 	// Main loop
 	while (!glfwWindowShouldClose(window))
@@ -184,14 +184,18 @@ void Game::printCurrentState(Gamestate::ID stateOfGame)
 void Game::runState()
 {
 	//... Menu
-	if (stateOfGame == Gamestate::ID::LOAD_MENU || stateOfGame == Gamestate::ID::SHOW_MENU || stateOfGame == Gamestate::ID::CLEAR_MENU)
+	if (stateOfGame.state == Gamestate::ID::LOAD_MENU || stateOfGame.state == Gamestate::ID::SHOW_MENU || stateOfGame.state == Gamestate::ID::CLEAR_MENU)
 	{
 		menuState();
 	}
 	//... Level
-	else if (stateOfGame == Gamestate::ID::LOAD_LEVEL || stateOfGame == Gamestate::ID::RUN_LEVEL || stateOfGame == Gamestate::ID::CLEAR_LEVEL)
+	else if (stateOfGame.state == Gamestate::ID::LOAD_LEVEL || stateOfGame.state == Gamestate::ID::RUN_LEVEL || stateOfGame.state == Gamestate::ID::CLEAR_LEVEL)
 	{
 		levelState();
+	}
+	else if (stateOfGame.state == Gamestate::ID::CLOSE_GAME)
+	{
+		exitState();
 	}
 	//... 
 	else
@@ -202,39 +206,39 @@ void Game::runState()
 
 void Game::menuState()
 {
-	if (stateOfGame == Gamestate::ID::LOAD_MENU)
+	if (stateOfGame.state == Gamestate::ID::LOAD_MENU)
 	{
-		printCurrentState(stateOfGame);
+		printCurrentState(stateOfGame.state);
 		//initScene(menuScene);
 		initMenuScene(menuScene);
-		stateOfGame = Gamestate::ID::SHOW_MENU;
-		printCurrentState(stateOfGame);
+		stateOfGame.state = Gamestate::ID::SHOW_MENU;
+		printCurrentState(stateOfGame.state);
 	}
-	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
+	else if (stateOfGame.state == Gamestate::ID::SHOW_MENU)
 	{
 		menuScene.update(deltaTime, seconds);
-		//processInput(window, deltaTime, menuScene);
+		processInput(window, deltaTime, menuScene);
 		renderManager[0].setDeltaTime(deltaTime);
 		renderManager[0].setSeconds(seconds);
 		renderManager[0].renderMainMenu();
 	}
-	else if (stateOfGame == Gamestate::ID::CLEAR_MENU)
+	else if (stateOfGame.state == Gamestate::ID::CLEAR_MENU)
 	{
 		clearScene(menuScene);
-		stateOfGame = Gamestate::ID::LOAD_LEVEL;
+		stateOfGame.state = Gamestate::ID::LOAD_LEVEL;
 	}
 }
 
 void Game::levelState()
 {
-	if (stateOfGame == Gamestate::ID::LOAD_LEVEL)
+	if (stateOfGame.state == Gamestate::ID::LOAD_LEVEL)
 	{
-		printCurrentState(stateOfGame);
+		printCurrentState(stateOfGame.state);
 		initScene(gameScene);
-		stateOfGame = Gamestate::ID::RUN_LEVEL;
-		printCurrentState(stateOfGame);
+		stateOfGame.state = Gamestate::ID::RUN_LEVEL;
+		printCurrentState(stateOfGame.state);
 	}
-	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
+	else if (stateOfGame.state == Gamestate::ID::RUN_LEVEL)
 	{
 		gameScene.update(deltaTime, seconds);
 		processInput(window, deltaTime, gameScene);
@@ -242,13 +246,20 @@ void Game::levelState()
 		renderManager[1].setSeconds(seconds);
 		renderManager[1].Render();
 	}
-	else if (stateOfGame == Gamestate::ID::CLEAR_LEVEL)
+	else if (stateOfGame.state == Gamestate::ID::CLEAR_LEVEL)
 	{
-		printCurrentState(stateOfGame);
+		printCurrentState(stateOfGame.state);
 		clearScene(gameScene);
 		//stateOfGame = Gamestate::ID::LOAD_MENU;
-		stateOfGame = Gamestate::ID::LOAD_MENU;
+		stateOfGame.state = Gamestate::ID::LOAD_MENU;
 	}
+}
+
+void Game::exitState()
+{
+	clearScene(menuScene);
+	renderManager.clear();
+	glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
 void Game::initWindow()
@@ -273,8 +284,11 @@ void Game::initWindow()
 
 void Game::initScene(GameScene & scene)
 {
-	if(renderManager.size() < 2)
+	if (renderManager.size() < 2)
+	{
 		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
+		renderManager[renderManager.size() - 1].createBuffers();
+	}
 	//... Create Camera
 	addPlayer(scene);
 	addTerrain(scene);
@@ -295,7 +309,10 @@ void Game::initScene(GameScene & scene)
 void Game::initMenuScene(GameScene & scene)
 {
 	if (renderManager.size() < 2)
+	{
 		addRenderManager(scene);
+		renderManager[renderManager.size() - 1].createMainMenuBuffer();
+	}
 	//addMeshFilter(scene);
 	scene.addMainMenu();
 }
@@ -359,6 +376,7 @@ void Game::addRenderManager(GameScene &scene)
 {
 	RenderManager tempRender = RenderManager(&scene, window, &shaderProgramLibrary);
 	renderManager.push_back(tempRender);
+	//renderManager[renderManager.size() - 1].createBuffers();
 }
 
 void Game::addPlayer(GameScene &scene)

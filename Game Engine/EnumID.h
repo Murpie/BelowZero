@@ -13,7 +13,10 @@ namespace Gamestate
 		CLEAR_LEVEL,
 		CLOSE_GAME
 	};
-	static ID stateOfGame;
+	struct StateOfGame
+	{
+		static ID state;
+	};
 }
 
 namespace Asset

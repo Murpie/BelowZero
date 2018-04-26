@@ -20,10 +20,10 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->mainMenuShaderProgram = shaderProgram->getShader<MainMenuShader>()->MainMenuShaderProgram;
 	//createBuffers();
 	vao = 0;
+	//createBuffers();
 
-
-	// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
-	createMainMenuBuffer();
+	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
+	//createMainMenuBuffer();
 
 }
 
@@ -522,7 +522,7 @@ void RenderManager::renderMainMenu()
 	
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	glm::vec2 startButtonMinMax[2];
+	/*glm::vec2 startButtonMinMax[2];
 	glm::vec2 settingsButtonMinMax[2];
 	glm::vec2 ExitButtonMinMax[2];
 	startButtonMinMax[0].x = 430;
@@ -551,7 +551,7 @@ void RenderManager::renderMainMenu()
 		std::cout << "------------------- CURSOR IS INSIDE SETTINGSBUTTONBOX -------------------" << std::endl;
 	else if (ExitButtonMinMax[0].x < xPos && xPos < ExitButtonMinMax[1].x && ExitButtonMinMax[0].y < yPos && yPos < ExitButtonMinMax[1].y)
 		std::cout << "------------------- CURSOR IS INSIDE EXITBUTTONBOX -------------------" << std::endl;
-
+*/
 
 	//gameScene->gameObjects[0].getMenuScene()->deleteObjects();
 	clearObjectsToRender(); 

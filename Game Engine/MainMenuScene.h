@@ -57,10 +57,11 @@ public:
 	bool mouseIsOverButton;
 	bool buttonHasBeenClicked;
 	bool buttonHasBeenReleased;
+	bool pressed;
 
 	double xPos;
 	double yPos;
 
 private:
-	Gamestate::ID stateOfGame;
+	Gamestate::StateOfGame stateOfGame;
 };
