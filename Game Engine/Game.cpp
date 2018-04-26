@@ -334,7 +334,7 @@ void Game::addLights(GameScene &scene)
 	// add for loop and use array for transforms ?
 	if (!testBool)
 	{
-		scene.addLight(glm::vec3(-4, 2, 2), 0);
+		scene.addLight(glm::vec3(-4, 20, 2), 0);
 		scene.addLight(glm::vec3(30, 2, 0), 0);
 		testBool = true;
 	}
