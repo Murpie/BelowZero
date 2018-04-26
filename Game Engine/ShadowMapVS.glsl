@@ -5,8 +5,10 @@ layout(location = 2) in vec2 uv_coord;
 
 uniform mat4 world_matrix;
 uniform mat4 LightSpaceMatrix;
+uniform mat4 model_matrix;
 
 void main()
 {
-	gl_Position = LightSpaceMatrix * world_matrix * vec4(vertex_position, 1.0);
+	vec4 temp = model_matrix * vec4(vertex_position, 1.0);
+	gl_Position = LightSpaceMatrix * world_matrix * temp;
 }

@@ -19,14 +19,14 @@ struct TerrainVertex
 class Terrain : public Component
 {
 private:
-	float MAX_HEIGHT = 90;
+	float MAX_HEIGHT = 45;
 	float MIN_HEIGHT = 0;
 	int sizePerSide = 128;
 	float MAX_PIXEL_COLOR = 256 * 256 * 256;
 	Texture HeightMap;
 	Texture AlbedoMap;
 
-	int offset = 8;
+	int offset = 4;
 
 	int Length = 40;
 	int Height = 40;

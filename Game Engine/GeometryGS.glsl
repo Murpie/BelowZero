@@ -17,6 +17,8 @@ vec4 FragPos;
 vec2 TexCoords;
 } gs_out;
 
+
+
 void main() {
 
 	vec4 pointA = gs_in[0].world_matrix * gl_in[0].gl_Position;

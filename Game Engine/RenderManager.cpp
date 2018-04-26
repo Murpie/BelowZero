@@ -222,7 +222,8 @@ void RenderManager::Render() {
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-
+		glm::mat4 modelMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
+		glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "model_matrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 
@@ -231,6 +232,7 @@ void RenderManager::Render() {
 	{
 		if (gameScene->gameObjects[i].getTerrain() != nullptr)
 		{
+			glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "model_matrix"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1)));
 			gameScene->gameObjects[i].getTerrain()->bindVertexArray();
 			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i].getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
 		}
@@ -281,12 +283,12 @@ void RenderManager::Render() {
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
 
-
 	gameObjectsToRender[0]->materialComponent->bindTextures();
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "model_matrix"), 1, GL_FALSE, glm::value_ptr(gameObjectsToRender[i]->meshFilterComponent->worldTransform));
+		glm::mat4 modelMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
+		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "model_matrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 3)
 			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 1);
