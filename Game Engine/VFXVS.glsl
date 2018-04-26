@@ -8,6 +8,7 @@ layout(location = 1) in vec2 squareUVs;
 out vec2 uv;
 
 // Values that stay constant for the whole mesh.
+uniform vec3 view_position;
 uniform mat4 world_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
@@ -19,25 +20,21 @@ uniform vec2 billboardSize; // Size of the billboard, in world units (probably m
 
 void main()
 {
-	vec3 particleCenter_wordspace = billboardPos;
+	//vec3 particleCenter_worldspace = billboardPos;
+	//vec3 camToParticle = particleCenter_worldspace - view_position;
 	
-	vec3 vertexPosition_worldspace = particleCenter_wordspace 
-		+ cameraRight_worldspace * squareVertices.x * billboardSize.x 
-		+ cameraUp_worldspace    * squareVertices.y * billboardSize.y;
+	//The Tutorial
+	//vec3 vertexPosition_worldspace = particleCenter_worldspace 
+	//	+ cameraRight_worldspace * squareVertices.x * billboardSize.x 
+	//	+ cameraUp_worldspace    * squareVertices.y * billboardSize.y;
 
 	// Output position of the vertex
-	//gl_Position = vp * vec4(vertexPosition_worldspace, 1.0f);
-	gl_Position = projection_matrix * view_matrix * world_matrix * vec4(vertexPosition_worldspace, 1.0);
+	gl_Position = projection_matrix * view_matrix * world_matrix * vec4(squareVertices, 1.0);
+	uv = squareUVs;
 
 	// Or, if BillboardSize is in percentage of the screen size (1,1 for fullscreen) :
 	//vertexPosition_worldspace = particleCenter_wordspace;
 	//gl_Position = vp * vec4(vertexPosition_worldspace, 1.0f); // Get the screen-space position of the particle's center
 	//gl_Position /= gl_Position.w; // Here we have to do the perspective division ourselves.
 	//gl_Position.xy += squareVertices.xy * vec2(0.2, 0.05); // Move the vertex in directly screen space. No need for CameraUp/Right_worlspace here.
-	
-	// Or, if BillboardSize is in pixels : 
-	// Same thing, just use (ScreenSizeInPixels / BillboardSizeInPixels) instead of BillboardSizeInScreenPercentage.
-
-	// UV of the vertex. No special space for this one.
-	uv = squareUVs;// +vec2(0.5, 0.5);
 }

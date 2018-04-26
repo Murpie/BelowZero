@@ -293,7 +293,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addGeometryPassShaders();
 	shaderProgramLibrary.addLightpassShaders();
 	shaderProgramLibrary.addShadowMapShaders();
-	shaderProgramLibrary.addAnimationShaders();
+	//shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
 	shaderProgramLibrary.addVFXShaders();
 }
