@@ -45,7 +45,9 @@ public:
 
 	void Render();
 	void renderMainMenu();
+	void renderMenuQuad();
 	void createBuffers();
+	void createMainMenuBuffer();
 	void renderQuad();
 	void Update();
 	void setDeltaTime(float deltaTime);
@@ -63,10 +65,15 @@ private:
 	glm::mat4x4 projection_matrix;
 	glm::mat4x4 currentCubeMapView;
 
+	GLuint finalMainMenuFBOTexture;
+
 	float deltaTime;
 	float seconds;
 	int count;
 
+	unsigned int finalMainMenuFBO;
+	unsigned int quadVertexArrayObject;
+	unsigned int quadVertexBufferObject;
 	unsigned int UIFBO;
 	unsigned int UITexture;
 	unsigned int shadowMap;
@@ -104,6 +111,7 @@ private:
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
 	GLuint terrainShaderProgram;
+	GLuint mainMenuShaderProgram;
 
 	int display_w, display_h;
 };

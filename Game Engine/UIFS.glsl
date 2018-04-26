@@ -101,9 +101,7 @@ void main()
 		color.xyz += texture(inventoryTexture5, texCoords).xyz;
 
 	if (texture(textTexture, texCoords).w >= 0.01)
-	{
 		color.xyz += texture(textTexture, texCoords).xyz;
-	}
 
 	if (fade < 1 && fade > 0)
 		color.xyz = color.xyz + fade;

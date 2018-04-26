@@ -171,6 +171,7 @@ void Game::run()
 			frameCount = 0;
 			initial_time = final_time;
 		}
+
 	}
 	glfwTerminate();
 }
@@ -204,18 +205,18 @@ void Game::menuState()
 	if (stateOfGame == Gamestate::ID::LOAD_MENU)
 	{
 		printCurrentState(stateOfGame);
-		initScene(menuScene);
-		//initMenuScene(menuScene);
+		//initScene(menuScene);
+		initMenuScene(menuScene);
 		stateOfGame = Gamestate::ID::SHOW_MENU;
 		printCurrentState(stateOfGame);
 	}
 	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
 		menuScene.update(deltaTime, seconds);
-		processInput(window, deltaTime, menuScene);
+		//processInput(window, deltaTime, menuScene);
 		renderManager[0].setDeltaTime(deltaTime);
 		renderManager[0].setSeconds(seconds);
-		renderManager[0].Render();
+		renderManager[0].renderMainMenu();
 	}
 	else if (stateOfGame == Gamestate::ID::CLEAR_MENU)
 	{
@@ -311,9 +312,10 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addGeometryPassShaders();
 	shaderProgramLibrary.addLightpassShaders();
 	shaderProgramLibrary.addShadowMapShaders();
-	shaderProgramLibrary.addAnimationShaders();
+	//shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
 	shaderProgramLibrary.addTerrainShaders();
+	shaderProgramLibrary.addMainMenuShaders();
 }
 
 void Game::initInputOptions()

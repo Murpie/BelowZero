@@ -13,20 +13,20 @@
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glew32.lib")
 
+struct QuadVert
+{
+	float x, y, u, v;
+};
+
 class MainMenuScene : public Component
 {
 public:
 	MainMenuScene();
 	~MainMenuScene();
 
-	void checkMousePosFromFunction();
-	void setMousePos(glm::vec2 newMousePosition);
-
 	void loadBackgroundTexture(std::string backgroundTextureName);
 	void loadButtonTexture(std::string buttonTextureName, int buttonNumber);
-	void loadBuffers();
-	void createShaders();
-	void renderButtons();
+	void renderFrameQuad(GLuint shader);
 
 	void deleteObjects();
 
@@ -36,18 +36,20 @@ public:
 	GLuint backgroundTexture;
 	GLuint startButtonTexture;
 	GLuint settingsButtonTexture;
-	GLuint quitButtonTexture;
+	GLuint exitButtonTexture;
 
 	unsigned int whichButtonIsSelected;
 	unsigned int mainMenuShaderProgram;
+	
 	unsigned int backgroundFbo;
 	unsigned int VBO;
 	unsigned int VAO;
 	unsigned int EBO;
+	
 	unsigned int startButtonFBO;
 	unsigned int settingButtonFBO;
 	unsigned int ExitButtonFBO;
-
+	
 	glm::vec2 startButtonMinMax[2];
 	glm::vec2 settingsButtonMinMax[2];
 	glm::vec2 ExitButtonMinMax[2];
@@ -58,6 +60,7 @@ public:
 
 	double xPos;
 	double yPos;
+
 private:
 	Gamestate::ID stateOfGame;
 };

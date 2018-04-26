@@ -10,14 +10,20 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	gameScene = otherGameScene;
 	window = otherWindow;
 
+
 	this->geometryShaderProgram = shaderProgram->getShader<GeometryShaders>()->geometryShaderProgram;
 	this->lightpassShaderProgram = shaderProgram->getShader<LightpassShaders>()->lightpassShaderProgram;
 	//this->animationShaderProgram = shaderProgram->getShader<AnimationShaders>()->animationShaderProgram;
 	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
 	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
 	this->terrainShaderProgram = shaderProgram->getShader<TerrainShaders>()->TerrainShaderProgram;
-	createBuffers();
+	this->mainMenuShaderProgram = shaderProgram->getShader<MainMenuShader>()->MainMenuShaderProgram;
+	//createBuffers();
 	vao = 0;
+
+
+	// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
+	createMainMenuBuffer();
 
 }
 
@@ -59,8 +65,6 @@ void RenderManager::clearObjectsToRender()
 
 void RenderManager::createBuffers()
 {
-
-
 
 	//screen size
 	glfwGetFramebufferSize(window, &display_w, &display_h);
@@ -184,6 +188,46 @@ void RenderManager::createBuffers()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, UITexture, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "UI Framebuffer not complete!" << std::endl;
+}
+
+void RenderManager::createMainMenuBuffer()
+{
+	glGenFramebuffers(1, &finalMainMenuFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, finalMainMenuFBO);
+
+	glGenTextures(1, &finalMainMenuFBOTexture);
+	glBindTexture(GL_TEXTURE_2D, finalMainMenuFBOTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalMainMenuFBOTexture, 0);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, finalMainMenuFBOTexture);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Main Menu Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	float quadVertices[] =
+	{
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
+
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
+		1.0f,  1.0f,  1.0f, 1.0f
+	};
+
+	glGenVertexArrays(1, &quadVertexArrayObject);
+	glGenBuffers(1, &quadVertexBufferObject);
+	glBindVertexArray(quadVertexArrayObject);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
 void RenderManager::Render() {
@@ -449,20 +493,73 @@ void RenderManager::renderMainMenu()
 	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
 
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glUseProgram(gameScene->gameObjects[0].getMenuScene()->mainMenuShaderProgram);
+	glViewport(0, 0, display_w, display_h);
+	glClearColor(0.749, 0.843, 0.823, 1.0f);
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(mainMenuShaderProgram);
 
-	glUniform1i(glGetUniformLocation(gameScene->gameObjects[0].getMenuScene()->mainMenuShaderProgram, "startButtonTexture"), 0);
+	glBindVertexArray(quadVertexArrayObject);
+
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "backGroundTexture"), 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->startButtonTexture);
-	glUniform1i(glGetUniformLocation(gameScene->gameObjects[0].getMenuScene()->mainMenuShaderProgram, "settingsButtonTexture"), 1);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->backgroundTexture);
+	
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "startButtonTexture"), 1);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->settingsButtonTexture);
-	glUniform1i(glGetUniformLocation(gameScene->gameObjects[0].getMenuScene()->mainMenuShaderProgram, "ExitButtonTexture"), 2);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->startButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "settingsButtonTexture"), 2);
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->quitButtonTexture);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->settingsButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "ExitButtonTexture"), 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->exitButtonTexture);
 
-	gameScene->gameObjects[0].getMenuScene()->renderButtons();
+
+	//gameScene->gameObjects[0].getMenuScene()->renderFrameQuad(mainMenuShaderProgram);
+	
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glm::vec2 startButtonMinMax[2];
+	glm::vec2 settingsButtonMinMax[2];
+	glm::vec2 ExitButtonMinMax[2];
+	startButtonMinMax[0].x = 430;
+	startButtonMinMax[0].y = 290;
+	startButtonMinMax[1].x = 855;
+	startButtonMinMax[1].y = 330;
+
+	settingsButtonMinMax[0].x = 455;
+	settingsButtonMinMax[0].y = 385;
+	settingsButtonMinMax[1].x = 830;
+	settingsButtonMinMax[1].y = 415;
+
+	ExitButtonMinMax[0].x = 430;
+	ExitButtonMinMax[0].y = 475;
+	ExitButtonMinMax[1].x = 855;
+	ExitButtonMinMax[1].y = 510;
+
+	double xPos;
+	double yPos;
+
+	glfwGetCursorPos(window, &xPos, &yPos);
+
+	if (startButtonMinMax[0].x < xPos && xPos < startButtonMinMax[1].x && startButtonMinMax[0].y < yPos && yPos < startButtonMinMax[1].y)
+		std::cout << "------------------- CURSOR IS INSIDE STARTBUTTONBOX -------------------" << std::endl;
+	else if (settingsButtonMinMax[0].x < xPos && xPos < settingsButtonMinMax[1].x && settingsButtonMinMax[0].y < yPos && yPos < settingsButtonMinMax[1].y)
+		std::cout << "------------------- CURSOR IS INSIDE SETTINGSBUTTONBOX -------------------" << std::endl;
+	else if (ExitButtonMinMax[0].x < xPos && xPos < ExitButtonMinMax[1].x && ExitButtonMinMax[0].y < yPos && yPos < ExitButtonMinMax[1].y)
+		std::cout << "------------------- CURSOR IS INSIDE EXITBUTTONBOX -------------------" << std::endl;
+
+
+	//gameScene->gameObjects[0].getMenuScene()->deleteObjects();
+	clearObjectsToRender(); 
+	Update();
+}
+
+void RenderManager::renderMenuQuad()
+{
 }
 
 void RenderManager::renderQuad()

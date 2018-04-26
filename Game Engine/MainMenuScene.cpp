@@ -14,12 +14,12 @@ MainMenuScene::MainMenuScene()
 	this->startButtonMinMax[1].x = 300;
 	this->startButtonMinMax[1].y = 100;
 
-	loadBuffers();
-	createShaders();
+	stbi_set_flip_vertically_on_load(true);
+
 	loadBackgroundTexture("MainMenuBackground");
-	loadButtonTexture("", 1);
-	loadButtonTexture("", 2);
-	loadButtonTexture("", 3);
+	loadButtonTexture("StartGameButton", 1);
+	loadButtonTexture("SettingsGameButton", 2);
+	loadButtonTexture("ExitGameButton", 3);
 }
 
 MainMenuScene::~MainMenuScene()
@@ -27,31 +27,17 @@ MainMenuScene::~MainMenuScene()
 	deleteObjects();
 }
 
-void MainMenuScene::checkMousePosFromFunction()
-{
-	
-}
-
-void MainMenuScene::setMousePos(glm::vec2 newMousePosition)
-{
-}
-
 void MainMenuScene::loadBackgroundTexture(std::string backgroundTextureName)
 {
 	std::string texturePNG = ".png";
 	std::string filePath = backgroundTextureName + texturePNG;
 	int width, height, nrOfChannels;
-
 	// ----------========== Equipment FrameBuffer ==========----------
 	unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
-
 	glGenFramebuffers(1, &backgroundFbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, backgroundFbo);
-
 	glGenTextures(1, &backgroundTexture);
 	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
-	
-	stbi_set_flip_vertically_on_load(true);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -62,7 +48,6 @@ void MainMenuScene::loadBackgroundTexture(std::string backgroundTextureName)
 		std::cout << "Failed to load Background Texture from path" << std::endl;
 
 	stbi_image_free(data);
-
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, backgroundTexture, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Background Framebuffer not complete!" << std::endl;
@@ -70,6 +55,7 @@ void MainMenuScene::loadBackgroundTexture(std::string backgroundTextureName)
 
 void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonNumber)
 {
+	
 	if (buttonNumber == 1)
 	{
 		std::string texturePNG = ".png";
@@ -144,8 +130,8 @@ void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonN
 		glGenFramebuffers(1, &ExitButtonFBO);
 		glBindFramebuffer(GL_FRAMEBUFFER, ExitButtonFBO);
 
-		glGenTextures(1, &quitButtonTexture);
-		glBindTexture(GL_TEXTURE_2D, quitButtonTexture);
+		glGenTextures(1, &exitButtonTexture);
+		glBindTexture(GL_TEXTURE_2D, exitButtonTexture);
 
 		stbi_set_flip_vertically_on_load(true);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -159,120 +145,85 @@ void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonN
 
 		stbi_image_free(data);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, quitButtonTexture, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, exitButtonTexture, 0);
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			std::cout << "Background Framebuffer not complete!" << std::endl;
 	}
 	
 }
 
-void MainMenuScene::loadBuffers()
+void MainMenuScene::renderFrameQuad(GLuint shader)
 {
-	float vertices[] = {
-		// positions          // colors           // texture coords
-		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-		-0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-	};
-	unsigned int indices[] = { 
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
-	};
+	if (VAO == 0)
+	{
+		unsigned int vertexPos;
+		unsigned int uvPos;
 
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+		vertexPos = glGetAttribLocation(shader, "aPos");
+		uvPos = glGetAttribLocation(shader, "aTexCoords");
+
+		//create vertices
+		QuadVert vertices[] = {
+			// pos and normal and uv for each vertex
+		{ 1.0,  1.0, 1.0f, 1.0f },
+		{ 1.0, -1.0, 1.0f, 0.0f },
+		{ -1.0, -1.0, 0.0f, 0.0f },
+		{ -1.0,  1.0, 0.0f, 1.0f },
+		};
+
+		unsigned int indices[] = {
+			0,1,3,
+			1,2,3,
+		};
+
+		glGenVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
+
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+
+		glEnableVertexAttribArray(0);
+
+		if (vertexPos == -1) {
+			OutputDebugStringA("Error, can't find aPos attribute in vertex shader\n");
+			return;
+		}
+
+		glVertexAttribPointer(
+			0,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(QuadVert),
+			BUFFER_OFFSET(0)
+		);
+
+		glEnableVertexAttribArray(1);
+
+		if (uvPos == -1) {
+			OutputDebugStringA("Error, cannt find aTexCoords attribute in vertex shader\n");
+			return;
+		}
+
+		glVertexAttribPointer(
+			1,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(QuadVert),
+			BUFFER_OFFSET(sizeof(float) * 2)
+		);
+
+		//ebo
+		glGenBuffers(1, &EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	}
 	glBindVertexArray(VAO);
-
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	// texture coord attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void MainMenuScene::createShaders()
-{
-	char buff[1024];
-	memset(buff, 0, 1024);
-	GLint compileResult = 0;
-
-	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-	std::ifstream shaderFile("ShadowMapVS.glsl");
-	std::string shaderText((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
-	shaderFile.close();
-
-	const char* shaderTextPtr = shaderText.c_str();
-	glShaderSource(vs, 1, &shaderTextPtr, nullptr);
-	glCompileShader(vs);
-	glGetShaderiv(vs, GL_COMPILE_STATUS, &compileResult);
-	if (compileResult == GL_FALSE)
-	{
-		glGetShaderInfoLog(vs, 1024, nullptr, buff);
-		OutputDebugStringA(buff);
-	}
-
-	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-	shaderFile.open("ShadowMapFS.glsl");
-	shaderText.assign((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
-	shaderFile.close();
-	shaderTextPtr = shaderText.c_str();
-	glShaderSource(fs, 1, &shaderTextPtr, nullptr);
-	glCompileShader(fs);
-	compileResult = GL_FALSE;
-	glGetShaderiv(fs, GL_COMPILE_STATUS, &compileResult);
-	if (compileResult == GL_FALSE)
-	{
-		memset(buff, 0, 1024);
-		glGetShaderInfoLog(fs, 1024, nullptr, buff);
-		OutputDebugStringA(buff);
-	}
-
-	mainMenuShaderProgram = glCreateProgram();
-	glAttachShader(mainMenuShaderProgram, fs);
-	glAttachShader(mainMenuShaderProgram, vs);
-	glLinkProgram(mainMenuShaderProgram);
-
-
-	compileResult = GL_FALSE;
-	glGetProgramiv(mainMenuShaderProgram, GL_LINK_STATUS, &compileResult);
-	if (compileResult == GL_FALSE)
-	{
-		memset(buff, 0, 1024);
-		glGetProgramInfoLog(mainMenuShaderProgram, 1024, nullptr, buff);
-		OutputDebugStringA(buff);
-	}
-
-	glDetachShader(mainMenuShaderProgram, vs);
-	glDetachShader(mainMenuShaderProgram, fs);
-	glDeleteShader(vs);
-	glDeleteShader(fs);
-}
-
-void MainMenuScene::renderButtons()
-{
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glUseProgram(mainMenuShaderProgram);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, startButtonTexture);
-
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 void MainMenuScene::deleteObjects()
