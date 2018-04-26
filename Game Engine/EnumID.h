@@ -13,6 +13,7 @@ namespace Gamestate
 		CLEAR_LEVEL,
 		CLOSE_GAME
 	};
+	static ID stateOfGame;
 }
 
 namespace Asset

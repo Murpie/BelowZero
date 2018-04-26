@@ -11,6 +11,8 @@ public:
 	Player(Transform& transform);
 	~Player();
 
+	bool click;
+
 	float hp;
 	float cold;
 	float coldMeter;
@@ -60,6 +62,9 @@ public:
 	//Physics
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
+
+	//glm::mat4 getViewMatrix()const;
+
 private:
 
 

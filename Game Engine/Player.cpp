@@ -3,6 +3,9 @@
 Player::Player(Transform& transform) : Transformable(transform)
 {
 	Component::id = ComponentType::ID::PLAYER;
+
+	click = false;
+
 	this->hp = 50;
 	this->cold = 100;
 	this->coldMeter = 0;
@@ -543,3 +546,8 @@ void Player::findY()
 	float zCoord = ((int)cameraPos.z % (int)distanceToNextVertex) / distanceToNextVertex;
 
 }
+
+//glm::mat4 Player::getViewMatrix() const
+//{
+//	return glm::lookAt(Transformable::transform.position, Transformable::transform.position + Transformable::transform.forward, Transformable::transform.up);
+//}

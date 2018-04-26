@@ -154,7 +154,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Transformable.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
     <ClCompile Include="Attributes.cpp">
       <Filter>Source Files\GameObject &amp; Components</Filter>
@@ -282,7 +282,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Transformable.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
     <ClInclude Include="Attributes.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>

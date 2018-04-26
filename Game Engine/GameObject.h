@@ -28,9 +28,13 @@ public:
 
     bool isActive;
     bool hasLight;
+	bool isInteractable;
+
 	std::string name;
 	Transform *transform;
 	std::vector<Component*> components;
+
+	std::vector <bBox> bbox;
 
 	/*
 		rework functions so we can put Material, MeshFilter and Light
@@ -60,8 +64,11 @@ public:
 	void deleteAllComponents();
 
     const bool getIsRenderable();
+	void setIsRenderable(bool isRenderable);
 
 	Player* getPlayer();
+	glm::mat4 getModelMatrix();
+	glm::mat4 getViewMatrix();
 	Terrain* getTerrain();
 
 	template <class T>
@@ -74,9 +81,10 @@ public:
 				return test;
 			}
 		}
-
 		return nullptr;
 	}
+
 private:
     bool isRenderable;
+	glm::mat4 modelMatrix;
 };
