@@ -185,18 +185,20 @@ void RenderManager::createBuffers()
 void RenderManager::Render() {
 	FindObjectsToRender();
 
-	for (int i = 0; i < gameScene->gameObjects.size(); i++)
-	{
-		if (gameScene->gameObjects[i].getPlayer() != nullptr)
-		{
-			glm::vec2 temp = gameScene->gameObjects[i].getPlayer()->setXZ();
-			for (int j = 0; j < gameScene->gameObjects.size(); j++)
-				if (gameScene->gameObjects[j].getTerrain() != nullptr)
-				{
-					gameScene->gameObjects[i].getPlayer()->setCurrentHeight(gameScene->gameObjects[j].getTerrain()->calculateY(temp.x, temp.y));
-				}
-		}
-	}
+	gameScene->gameObjects[0].transform->position.y = gameScene->gameObjects[1].getTerrain()->calculateY(gameScene->gameObjects[0].transform->position.x, gameScene->gameObjects[0].transform->position.y);
+
+	//for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	//{
+	//	if (gameScene->gameObjects[i].getPlayer() != nullptr)
+	//	{
+	//		glm::vec2 temp = gameScene->gameObjects[i].getPlayer()->setXZ();
+	//		for (int j = 0; j < gameScene->gameObjects.size(); j++)
+	//			if (gameScene->gameObjects[j].getTerrain() != nullptr)
+	//			{
+	//				gameScene->gameObjects[i].getPlayer()->setCurrentHeight(gameScene->gameObjects[j].getTerrain()->calculateY(temp.x, temp.y));
+	//			}
+	//	}
+	//}
 
 	//... Set view and projection matrix
 	view_matrix = gameScene->gameObjects[0].getViewMatrix();

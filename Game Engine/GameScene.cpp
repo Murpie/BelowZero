@@ -75,7 +75,7 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 	for (int i = 0; i < meshNameSize; i++) // 3 - meshLibrary.getNumberOfMeshes(); meshName.size();
 	{
 		addEmptyGameObject();
-		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).vertexCount, meshLibrary.getMesh(i).meshType);
+		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).leapMesh->getVertexCount(), meshLibrary.getMesh(i).meshType);
 		
 		glm::vec2 uv = glm::vec2(4.3, 2.4);
 		float temp = gameObjects[1].getTerrain()->calculateY(uv.x, uv.y) -2;
@@ -116,6 +116,11 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 			gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(20,5,5);
 		}
 	}
+}
+
+void GameScene::addTerrain(const std::string & heightMap, GLuint shader)
+{
+
 }
 
 void GameScene::update(float deltaTime, float seconds)
@@ -191,4 +196,9 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		gameObjects[0].getPlayer()->click = false;
 	}
+}
+
+Terrain * GameScene::getTerrainPointer()
+{
+	return nullptr;
 }
