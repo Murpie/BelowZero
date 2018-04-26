@@ -12,27 +12,25 @@ uniform sampler2D ExitButtonTexture;
 void main()
 {
 	
-	color.xyz = texture(backGroundTexture, TexCoords).xyz;
+		color = texture(backGroundTexture, TexCoords);
 
-	if (texture(backGroundTexture, TexCoords).w >= 0.01)
+	if (texture(startButtonTexture, TexCoords).w >= 0.01)
 	{
 		color.xyz = texture(backGroundTexture, TexCoords).xyz * abs(texture(startButtonTexture, TexCoords).w - 1);
 		color.w = texture(backGroundTexture, TexCoords).w;
 	}
-	if (texture(backGroundTexture, TexCoords).w >= 0.01)
+	else if (texture(settingsButtonTexture, TexCoords).w >= 0.01)
 	{
 		color.xyz = texture(backGroundTexture, TexCoords).xyz * abs(texture(settingsButtonTexture, TexCoords).w - 1);
 		color.w = texture(backGroundTexture, TexCoords).w;
 	}
-	if (texture(backGroundTexture, TexCoords).w >= 0.01)
+	else if (texture(ExitButtonTexture, TexCoords).w >= 0.01)
 	{
 		color.xyz = texture(backGroundTexture, TexCoords).xyz * abs(texture(ExitButtonTexture, TexCoords).w - 1);
 		color.w = texture(backGroundTexture, TexCoords).w;
 	}
 	else
-	{
 		color = texture(backGroundTexture, TexCoords);
-	}
 
 	if (texture(startButtonTexture, TexCoords).w >= 0.01)
 		color.xyz += texture(startButtonTexture, TexCoords).xyz;
@@ -43,7 +41,6 @@ void main()
 	if (texture(ExitButtonTexture, TexCoords).w >= 0.01)
 		color.xyz += texture(ExitButtonTexture, TexCoords).xyz;
 
-	//color = vec4(1.0, 1.0, 1.0, 1.0);
 
 	FragColor = color;
 	

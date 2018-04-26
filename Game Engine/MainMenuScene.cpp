@@ -311,7 +311,7 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 		
 		else if (whichButtonIsSelected == 2 && pressed == false)
 		{
-			stateOfGame.state = Gamestate::ID::CLOSE_GAME;
+			//stateOfGame.state = Gamestate::ID::CLOSE_GAME;
 			pressed = true;
 		}
 		
