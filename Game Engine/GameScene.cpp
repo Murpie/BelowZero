@@ -52,7 +52,7 @@ void GameScene::addPlayer()
 	gameObjects[gameObjects.size()-1].name = "Player " + camerasInScene;
 	gameObjects[gameObjects.size()-1].addComponent(moveScript);
 	gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(0.f, 0.f, 0.f);
-	}
+}
 
 void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibrary, GLuint meshNameSize)
 {
@@ -169,4 +169,25 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		gameObjects[0].getPlayer()->click = false;
 	}
+
+	//....
+	//for (int i = 1; i < gameObjects.size(); i++)
+	//{
+	//	for (int j = 0; j < gameObjects[i].bbox.size(); j++)
+	//	{
+	//		float normalX, normalY, normalZ;
+	//		float collisiontime = Intersection::sweptAABB(gameObjects[0].bbox[0], gameObjects[i].bbox[j], normalX, normalY, normalZ, gameObjects[0].transform);
+	//		gameObjects[0].bbox[0].center.x += gameObjects[0].transform->velocity.x * collisiontime;
+	//		gameObjects[0].bbox[0].center.y += gameObjects[0].transform->velocity.y * collisiontime;
+	//		gameObjects[0].bbox[0].center.z += gameObjects[0].transform->velocity.z * collisiontime;
+	//		float remainingtime = 1.0f - collisiontime;
+	//		// slide
+	//		/* add solution for the z-axis*/
+	//		float dotprod = (gameObjects[0].transform->velocity.x * normalY + gameObjects[0].transform->velocity.y * normalX) * remainingtime;
+	//		gameObjects[0].transform->velocity.x = dotprod * normalY;
+	//		gameObjects[0].transform->velocity.y = dotprod * normalX;
+	//		//gameObjects[0].transform->velocity.z = dotprod * normalx;
+	//	}
+	//}
+
 }

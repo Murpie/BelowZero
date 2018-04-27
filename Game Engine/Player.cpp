@@ -212,6 +212,10 @@ bool Player::checkInventory(std::string item)
 
 void Player::update(float deltaTime, float seconds)
 {
+	//update velocity
+	//Transformable::transform.velocity = Transformable::transform.forward * deltaTime;
+	//...
+
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
 
@@ -377,6 +381,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		else
 			Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
 		Transformable::transform.position.y = tempY;
+		//velocity
+		Transformable::transform.velocity = Transformable::transform.forward * deltaTime * cameraSpeed;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && backCollision == false)
@@ -385,6 +391,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		direction -= Transformable::transform.forward;
 		Transformable::transform.position -= cameraSpeed * Transformable::transform.forward * deltaTime;
 		Transformable::transform.position.y = tempY;
+		//velocity
+		Transformable::transform.velocity = Transformable::transform.forward * deltaTime * cameraSpeed;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && leftCollision == false)
@@ -393,6 +401,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		direction -= Transformable::transform.right;
 		Transformable::transform.position -= Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
+		//velocity
+		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
@@ -401,6 +411,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		direction += Transformable::transform.right;
 		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
+		//velocity
+		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;
 	}
 
 	//... Jump mechanic
@@ -421,6 +433,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		//		jumpdir *= 1.5;
 
 		Transformable::transform.position += jumpSpeed * jumpdir * deltaTime;
+		Transformable::transform.velocity = Transformable::transform.up * deltaTime * cameraSpeed;
 	}
 	else
 		inAir = false;
