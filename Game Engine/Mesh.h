@@ -30,7 +30,7 @@ public:
 
 	LeapMesh* leapMesh;
 	//int vertexCount;
-	GLuint meshType; //remove this later and use *leapMesh
+	unsigned int meshType; //remove this later and use *leapMesh
 	GLuint gVertexBuffer;
 	GLuint gVertexAttribute;
 };

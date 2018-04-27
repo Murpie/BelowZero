@@ -44,3 +44,17 @@ namespace ComponentType
 		TERRAIN
 	};
 }
+
+namespace ObjectType
+{
+	enum ID
+	{
+		PLAYER,
+		BUCKET,
+		STONE_1,
+		AXE,
+		WOOD,
+		MEAT,
+		TREE
+	};
+}

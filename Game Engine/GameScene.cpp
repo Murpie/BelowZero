@@ -88,8 +88,8 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 		gameObjects[gameObjects.size() - 1].addComponent(matertialLibrary.getMaterial(0));
 		//gameObjects[gameObjects.size() - 1].materialComponent = matertialLibrary.getMaterial(i);
 		//... set interactable
-		//if(meshLibrary.getMesh(i).leapMesh->customMayaAttribute->meshType == 1)
-		gameObjects[gameObjects.size() - 1].isInteractable = true; // if meshType 1, set true
+		if(meshLibrary.getMesh(i).meshType == 1)
+			gameObjects[gameObjects.size() - 1].isInteractable = true; // if meshType 1, set true
 		//std::cout << "MESHFILTER::" << gameObjects.size() - 1 << std::endl;
 
 		//Add BBox from leapmesh to gameObject
@@ -188,6 +188,11 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 						std::cout << "HIT::" << gameObjects[i].name << std::endl;
 						gameObjects[i].setIsRenderable(false);
 						//gameObjects[i].interactUpdate() ?
+						if (gameObjects[i].objectID == ObjectType::ID::BUCKET)
+						{
+							gameObjects[0].getPlayer()->equip("BucketIcon");
+							gameObjects[0].getPlayer()->addImageToInventory("InventoryBucketIcon", 4);
+						}
 					}
 					else
 					{
