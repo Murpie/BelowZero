@@ -4,33 +4,23 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(std::string filePath, GLuint gShaderProgram, Terrain* terrain)
+Mesh::Mesh(std::string filePath, GLuint gShaderProgram)
 {
 	//vertexCount = 0;
-	CreateMeshData(filePath, gShaderProgram, terrain);
+	CreateMeshData(filePath, gShaderProgram);
 }
 
 Mesh::~Mesh()
 {
 }
 
-void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram, Terrain *terrain)
+void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram)
 {
 	LeapImporter importer;
 
 	leapMesh = importer.getMesh(filePath.c_str());
 
-	this->meshType = leapMesh->customMayaAttribute->meshType;
 
-	//vertexCount = leapMesh->getVertexCount();
-
-	//float tempY;
-	//for (int i = 0; i < vertexCount; i++)
-	//{
-	//	
-	//	tempY = terrain->calculateY(mesh->vertices[i].x, mesh->vertices[i].z);
-	//	mesh->vertices[i].y += tempY -2;
-	//}
 
 	//vao
 	glGenVertexArrays(1, &gVertexAttribute);

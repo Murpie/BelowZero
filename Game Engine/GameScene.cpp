@@ -75,10 +75,9 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 	for (int i = 0; i < meshNameSize; i++) // 3 - meshLibrary.getNumberOfMeshes(); meshName.size();
 	{
 		addEmptyGameObject();
-		gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(20, 0, 50 + i * 2);
+		gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(10, 0, 20);
 		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).leapMesh->getVertexCount(), meshLibrary.getMesh(i).meshType);
 		
-		glm::vec2 uv = glm::vec2(4.3* i, 2.4 * i);
 		float temp = gameObjects[1].getTerrain()->calculateY(gameObjects[gameObjects.size() - 1].transform->position.x, gameObjects[gameObjects.size() - 1].transform->position.z) -2;
 
 		/*meshFilter->worldTransform = glm::translate(meshFilter->worldTransform, glm::vec3(uv.x, temp, uv.y));*/
@@ -112,10 +111,6 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 			//push into gameobject
 			gameObjects[gameObjects.size() - 1].bbox.push_back(box);
 		}
-		//if (gameObjects.size() - 1 == 4)
-		//{
-		//	gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(20,0,50 +i*20);
-		//}
 	}
 }
 
@@ -123,7 +118,7 @@ void GameScene::addTerrain(const std::string & heightMap, GLuint shader)
 {
 	addEmptyGameObject();
 	std::cout << "TERRAIN INDEX:: " << gameObjects.size() - 1 << std::endl;
-	newTerrain = new Terrain(heightMap, shader);
+	Terrain * newTerrain = new Terrain(heightMap, shader);
 	gameObjects[gameObjects.size() - 1].name = "Terrain";
 	gameObjects[gameObjects.size() - 1].addComponent(newTerrain);
 }
@@ -225,7 +220,7 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 
 }
 
-Terrain* GameScene::getTerrainPointer()
-{
-	return this->newTerrain;
-}
+//Terrain* GameScene::getTerrainPointer()
+//{
+//	return this->newTerrain;
+//}

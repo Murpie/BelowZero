@@ -44,44 +44,12 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	/*
-	In this function we want to call on the sceneObjects.
-
-	example :
-	scene.pollEvent(window, deltaTime);
-
-	and check inside the classes if we want to make something
-	happen depending on which button we press.
-
-	This function should be called on within the correct state in runState().
-	*/
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	//------------------------------------
-	//This statement should be used inside the GUI class
-	/*
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-	{
-	double xpos, ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
-	std::cout << "CUROSR::X::POSITION::" << xpos << std::endl;
-	std::cout << "CUROSR::Y::POSITION::" << ypos << std::endl;
-
-	//
-	//glm::vec3 worldRay = Ray::getWorldRay(xpos, ypos, glm::mat4(), SCREEN_WIDTH, SCREEN_HEIGHT);
-	//std::cout << "CUROSR::WORLDRAY::" << worldRay.x << " " << worldRay.y << " " << worldRay.z << std::endl;
-
-	}
-
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-	{
-
-	}
-	*/
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && stateBool != true)
 	{
 		stateBool = true;
@@ -90,6 +58,7 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 		else if (stateOfGame == Gamestate::ID::SHOW_MENU)
 			stateOfGame = Gamestate::ID::CLEAR_MENU;
 	}
+
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_RELEASE && stateBool != false)
 	{
 		stateBool = false;
@@ -242,7 +211,6 @@ void Game::levelState()
 	{
 		printCurrentState(stateOfGame);
 		clearScene(gameScene);
-		//stateOfGame = Gamestate::ID::LOAD_MENU;
 		stateOfGame = Gamestate::ID::LOAD_MENU;
 	}
 }
@@ -273,7 +241,7 @@ void Game::initScene(GameScene & scene)
 		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
 	//... Create Camera
 	addPlayer(scene);
-	
+
 	addTerrain(scene);
 	//... Create Lights
 	addLights(scene);
@@ -325,7 +293,7 @@ void Game::addMeshName()
 {
 	//Add file names to vector to load when reading mesh data. 
 	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
-	std::string meshLoader[] = { "Bucket.leap", "Stone_1.leap", "Player_temp.Leap"};
+	std::string meshLoader[] = { "Bucket.leap", "Stone_1.leap"};
 	//meshType: 0 = Static  2 = Interactive  3 = Equiped
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
@@ -354,6 +322,7 @@ void Game::addPlayer(GameScene &scene)
 
 void Game::addMeshFilter(GameScene &scene)
 {
+	// rework for LeapLevel file
 	scene.addMeshFilter(meshLibrary, materialLibrary, meshName.size());
 }
 void Game::addTerrain(GameScene &scene)
@@ -365,7 +334,7 @@ void Game::readMeshName(GameScene &scene)
 {
 	for (int i = 0; i < meshName.size(); i++)
 	{
-		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram, scene.getTerrainPointer());
+		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
 	}
 
 	materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);

@@ -20,10 +20,10 @@ class Mesh
 {
 public:
 	Mesh();
-	Mesh(std::string filePath, GLuint gShaderProgram, Terrain * terrain);
+	Mesh(std::string filePath, GLuint gShaderProgram);
 	~Mesh();
 
-	void CreateMeshData(std::string filePath, GLuint gShaderProgram, Terrain *terrain);
+	void CreateMeshData(std::string filePath, GLuint gShaderProgram);
 
 	//std::vector<Vertex> Vertices;
 	//std::vector<unsigned int> indices;

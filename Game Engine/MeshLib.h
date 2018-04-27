@@ -12,7 +12,7 @@ public:
 
 	~MeshLib();
 
-	void addMesh(std::string filePath, GLuint gShaderProgram, Terrain * terrain);
+	void addMesh(std::string filePath, GLuint gShaderProgram);
 
 	void addAnimatedMesh(std::string filePath, GLuint gShaderProgram);
 	Mesh& getMesh(int key);
