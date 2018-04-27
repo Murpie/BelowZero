@@ -6,7 +6,7 @@ AnimatedMesh::AnimatedMesh()
 }
 AnimatedMesh::AnimatedMesh(std::string filePath, GLuint gShaderProgram)
 {
-
+	CreateMeshData(filePath, gShaderProgram);
 }
 
 AnimatedMesh::~AnimatedMesh()

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <limits>
+
 #include "Ray.h"
 
 // remove this when we can import
@@ -7,6 +9,7 @@ struct bBox
 {
 	bBox()
 	{
+		/*
 		glm::mat4 worldMatrix = glm::mat4();
 		// bucket maya coords from c
 		verts[0] = glm::vec3(-0.992, 0.000, 1.064);
@@ -41,6 +44,7 @@ struct bBox
 		}
 
 		center = glm::vec3((vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f);
+		*/
 	}
 
 	glm::vec3 vMin; // smallest possible vector
@@ -48,7 +52,7 @@ struct bBox
 
 	glm::vec3 center; // center point of the bBox
 
-	glm::vec3 verts[8];
+	//glm::vec3 verts[8];
 
 };
 //--------------------------------
@@ -109,7 +113,7 @@ public:
 				return false;
 		} 	
 		// Test intersection with the 2 planes perpendicular to the OBB's Y axis
-		// Exactly the same thing than above.
+		// Exactly the same thing as above.
 		glm::vec3 yAxis(modelMatrix[1].x, modelMatrix[1].y, modelMatrix[1].z);
 		e = glm::dot(yAxis, delta);
 		f = glm::dot(rayData.rayDirection, yAxis);
@@ -202,5 +206,150 @@ public:
 			bBox1.vMin.y < bBox2.vMax.y &&
 			bBox1.vMax.z > bBox2.vMin.z &&
 			bBox1.vMin.z < bBox2.vMax.z);
+	}
+
+	static float sweptAABB(bBox b1, bBox b2, float& normalX, float& normalY, float& normalZ, Transform* player)
+	{
+		// b1 is a moving box -> the player
+		// b2 is a static box
+
+		float xInvEntry, yInvEntry, zInvEntry;
+		float xInvExit, yInvExit, zInvExit;
+		//find the distance between the objects on the near and far sides for x, y and z
+		// x-axis
+		if (player->velocity.x > 0.0f)
+		{
+			xInvEntry = b2.vMin.x - b1.vMax.x;
+			xInvExit = b2.vMax.x - b1.vMin.x;
+		}
+		else
+		{
+			xInvEntry = b2.vMax.x - b1.vMin.x;
+			xInvExit = b2.vMin.x - b1.vMax.x;
+		}
+		// y-axis
+		if (player->velocity.y > 0.0f)
+		{
+			yInvEntry = b2.vMin.y - b1.vMax.y;
+			yInvExit = b2.vMax.y - b1.vMin.y;
+		}
+		else
+		{
+			yInvEntry = b2.vMax.y - b1.vMin.y;
+			yInvExit = b2.vMin.y - b1.vMax.y;
+		}
+		// z-axis
+		if (player->velocity.x > 0.0f)
+		{
+			zInvEntry = b2.vMin.z - b1.vMax.z;
+			zInvExit = b2.vMax.z - b1.vMin.z;
+		}
+		else
+		{
+			zInvEntry = b2.vMax.z - b1.vMin.z;
+			zInvExit = b2.vMin.z - b1.vMax.z;
+		}
+
+		// find time of collision and time of leaving for each axis (if statement is to prevent divide by zero)
+		float xEntry, yEntry, zEntry;
+		float xExit, yExit, zExit;
+		//x-axis
+		if (player->velocity.x == 0.0f)
+		{
+			xEntry = -std::numeric_limits<float>::infinity();
+			xExit = std::numeric_limits<float>::infinity();
+		}
+		else
+		{
+			xEntry = xInvEntry / player->velocity.x;
+			xExit = xInvExit / player->velocity.x;
+		}
+		//y-axis
+		if (player->velocity.y == 0.0f)
+		{
+			yEntry = -std::numeric_limits<float>::infinity();
+			yExit = std::numeric_limits<float>::infinity();
+		}
+		else
+		{
+			yEntry = yInvEntry / player->velocity.y;
+			yExit = yInvExit / player->velocity.y;
+		}
+		//z-axis
+		if (player->velocity.z == 0.0f)
+		{
+			zEntry = -std::numeric_limits<float>::infinity();
+			zExit = std::numeric_limits<float>::infinity();
+		}
+		else
+		{
+			xEntry = xInvEntry / player->velocity.x;
+			xExit = xInvExit / player->velocity.x;
+		}
+
+		// find the earliest/latest times of collision
+		float entryTime = glm::max(xEntry, yEntry);
+		float exitTime = glm::min(xExit, yExit);
+
+		// if there was no collision
+		if (entryTime > exitTime || xEntry < 0.0f && yEntry < 0.0f  && zEntry < 0.0f || xEntry > 1.0f || yEntry > 1.0f || zEntry > 1.0f)
+		{
+			normalX = 0.0f;
+			normalY = 0.0f;
+			normalZ = 0.0f;
+			return 1.0f;
+		}
+		else // if there was a collision
+		{
+			// rewrite this code to 3D... 
+			// https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
+			
+			if (xEntry > yEntry && xEntry > zEntry)
+			{
+				if (xInvEntry < 0.0f)
+				{
+					normalX = 1.0f;
+					normalY = 0.0f;
+					normalZ = 0.0f;
+				}
+				else
+				{
+					normalX = -1.0f;
+					normalY = 0.0f;
+					normalZ = 0.0f;
+				}
+			}
+			else if (yEntry > xEntry && yEntry > zEntry)
+			{
+				if (yInvEntry < 0.0f)
+				{
+					normalX = 0.0f;
+					normalY = 1.0f;
+					normalZ = 0.0f;
+				}
+				else
+				{
+					normalX = 0.0f;
+					normalY = -1.0f;
+					normalZ = 0.0f;
+				}
+			}
+			else
+			{
+				if (zInvEntry < 0.0f)
+				{
+					normalX = 0.0f;
+					normalY = 0.0f;
+					normalZ = 1.0f;
+				}
+				else
+				{
+					normalX = 0.0f;
+					normalY = 0.0f;
+					normalZ = -1.0f;
+				}
+			}
+		}
+		return entryTime;
 	}
 };

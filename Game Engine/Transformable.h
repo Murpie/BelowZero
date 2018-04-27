@@ -21,6 +21,8 @@ struct Transform
 	glm::vec3 forward = glm::vec3(1, 0, 0);
 	glm::vec3 up = glm::vec3(0, 1, 0);
 	glm::vec3 right = glm::vec3(0, 0, 1);
+
+	glm::vec3 velocity = glm::vec3(0, 0, 0); //used in collision detection
 };
 
 class Transformable : public Component

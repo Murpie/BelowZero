@@ -2,16 +2,14 @@
 #include<vector>
 #include "Shader.h"
 #include "GeometryShaders.h"
-#include "CubeMapShaders.h"
 #include "LightpassShaders.h"
-#include "SkyboxShaders.h"
 #include "AnimationShaders.h"
 #include <string>
 #include "Mesh.h"
 #include "ShaderBase.h"
 #include "ShadowMapShaders.h"
-#include "PointLightShadowMapShaders.h"
 #include "UIShaders.h"
+#include "TerrainShaders.h"
 
 class ShaderProgramLib
 {
@@ -20,13 +18,11 @@ public:
 	~ShaderProgramLib();
 
 	void addGeometryPassShaders();
-	void addCubeMapShaders();
 	void addLightpassShaders();
-	void addSkyboxShaders();
 	void addShadowMapShaders();
-	void addPointLightShadowMapShaders();
 	void addAnimationShaders();
 	void addUIShaders();
+	void addTerrainShaders();
 
 	template <class T>
 	T* getShader() {

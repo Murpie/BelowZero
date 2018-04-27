@@ -10,6 +10,7 @@
 #include "glm/glm/gtc/type_ptr.hpp"
 #include "glm/glm/glm.hpp"
 #include "Player.h"
+#include "Terrain.h"
 
 #include "Ray.h"
 #include "Intersection.h"
@@ -23,18 +24,19 @@ public:
 	GameObject();
 	~GameObject();
 
-	void update(float deltaTime);
+	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
 
     bool isActive;
     bool hasLight;
 	bool isInteractable;
-
+	ObjectType::ID objectID;
 	std::string name;
 	Transform *transform;
 	std::list<Component*> components;
 
-	bBox bbox;
+	std::vector <bBox> bbox;
+
 	/*
 		rework functions so we can put Material, MeshFilter and Light
 		directly into the component vector.
@@ -68,6 +70,7 @@ public:
 	Player* getPlayer();
 	glm::mat4 getModelMatrix();
 	glm::mat4 getViewMatrix();
+	Terrain* getTerrain();
 
 	template <class T>
 	T* getComponent() {

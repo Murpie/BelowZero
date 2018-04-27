@@ -17,7 +17,7 @@ public:
 	float Linear;
 	float Quadratic;
 
-	void update(float deltaTime);
+	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
 private:
 

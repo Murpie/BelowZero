@@ -13,6 +13,7 @@ namespace Gamestate
 		CLEAR_LEVEL,
 		CLOSE_GAME
 	};
+	static ID stateOfGame;
 }
 
 namespace Asset
@@ -40,7 +41,21 @@ namespace ComponentType
 		COMPONENT,
 		PLAYER,
 		LIGHT,
+		TERRAIN,
 		MATERIAL
+	};
+}
 
+namespace ObjectType
+{
+	enum ID
+	{
+		PLAYER,
+		BUCKET,
+		STONE_1,
+		AXE,
+		WOOD,
+		MEAT,
+		TREE
 	};
 }

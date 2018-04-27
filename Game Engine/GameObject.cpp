@@ -2,8 +2,6 @@
 
 GameObject::GameObject()
 {
-	std::cout << "GameObject() called" << std::endl;
-
 	transform = new Transform();
 	name = "EmptyGameObject";
     isActive = true;
@@ -11,6 +9,7 @@ GameObject::GameObject()
     hasLight = false;
 	isInteractable = false;
 	modelMatrix = glm::mat4();
+	objectID = ObjectType::ID::BUCKET;
 	//transform.forward = glm::vec3(1, 0, 0);
 	//transform.up = glm::vec3(0, 1, 0);
 	//transform.right = glm::vec3(0, 0, 1);
@@ -19,15 +18,21 @@ GameObject::GameObject()
 GameObject::~GameObject()
 {
 	//deleteAllComponents();
-	//delete transform;
+
+	//These will probably give memory leaks if not deleted.
+
+	//delete materialComponent;
+	//delete meshFilterComponent;
+	//delete lightComponent;
+	bbox.clear();
 }
 
-void GameObject::update(float deltaTime)
+void GameObject::update(float deltaTime, float seconds)
 {
 	for (Component* components_ptr : components)
 	{
 		Component& component = *components_ptr;
-		component.update(deltaTime);
+		component.update(deltaTime, seconds);
 	}
 }
 
@@ -192,4 +197,18 @@ glm::mat4 GameObject::getViewMatrix()
 {
 	return glm::lookAt(transform->position, transform->position + transform->forward, transform->up);
 
+}
+
+Terrain * GameObject::getTerrain()
+{
+	for (int i = 0; i < components.size(); i++)
+	{
+
+		if (components[i]->id == ComponentType::ID::TERRAIN)
+		{
+			Terrain* terrain = static_cast<Terrain*>(components[i]);
+			return terrain;
+		}
+	}
+	return nullptr;
 }
