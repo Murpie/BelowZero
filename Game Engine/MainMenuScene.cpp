@@ -28,7 +28,7 @@ MainMenuScene::MainMenuScene()
 	stbi_set_flip_vertically_on_load(true);
 
 	loadBackgroundTexture("MainMenuBackground");
-	loadButtonTexture("StartGameButton", 1);
+	loadButtonTexture("StartGameButtonNew", 1);
 	loadButtonTexture("SettingsGameButton", 2);
 	loadButtonTexture("ExitGameButton", 3);
 }

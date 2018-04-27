@@ -230,6 +230,71 @@ void RenderManager::createMainMenuBuffer()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
+void RenderManager::createButtonQuads()
+{
+	float buttonQuadVertices1[] = 
+	{
+		-0.3f,  0.1f, 0.0f, 1.0f, //same
+		-0.3f, -0.1f, 0.0f, 0.0f,
+		0.3f, -0.1f,  1.0f, 0.0f, //same
+
+		-0.3f,  0.1f, 0.0f, 1.0f, //same
+		0.3f, -0.1f,  1.0f, 0.0f, //same
+		0.3f,  0.1f,  1.0f, 1.0f
+	
+	};
+	float buttonQuadVertices2[] =
+	{
+		-0.3f,  0.1f,  0.0f, 1.0f,
+		-0.3f, -0.1f,  0.0f, 0.0f,
+		0.3f, -0.1f,  1.0f, 0.0f,
+
+		-0.3f,  0.1f,  0.0f, 1.0f,
+		0.3f, -0.1f,  1.0f, 0.0f,
+		0.3f,  0.1f,  1.0f, 1.0f
+
+	};
+	float buttonQuadVertices3[] =
+	{
+		-0.3f,  0.1f, 0.0f, 1.0f,
+		-0.3f, -0.1f,  0.0f, 0.0f,
+		0.3f, -0.1f,  1.0f, 0.0f,
+
+		-0.3f,  0.1f,  0.0f, 1.0f,
+		0.3f, -0.1f,  1.0f, 0.0f,
+		0.3f,  0.1f,  1.0f, 1.0f
+	};
+	glGenVertexArrays(1, &buttonVertexArrayObject[0]);
+	glGenBuffers(1, &buttonBufferObject[0]);
+	glBindVertexArray(buttonVertexArrayObject[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, buttonBufferObject[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(buttonQuadVertices1), &buttonQuadVertices1, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	glGenVertexArrays(1, &buttonVertexArrayObject[1]);
+	glGenBuffers(1, &buttonBufferObject[1]);
+	glBindVertexArray(buttonVertexArrayObject[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, buttonBufferObject[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(buttonQuadVertices2), &buttonQuadVertices2, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	glGenVertexArrays(1, &buttonVertexArrayObject[2]);
+	glGenBuffers(1, &buttonBufferObject[2]);
+	glBindVertexArray(buttonVertexArrayObject[2]);
+	glBindBuffer(GL_ARRAY_BUFFER, buttonBufferObject[2]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(buttonQuadVertices3), &buttonQuadVertices3, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+}
+
 void RenderManager::Render() {
 	FindObjectsToRender();
 
@@ -492,6 +557,8 @@ void RenderManager::renderMainMenu()
 	view_matrix = gameScene->gameObjects[0].getViewMatrix();
 	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -501,65 +568,44 @@ void RenderManager::renderMainMenu()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(mainMenuShaderProgram);
 
-	glBindVertexArray(quadVertexArrayObject);
+	createButtonQuads();
 
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "backGroundTexture"), 0);
+	gameScene->gameObjects[0].getMenuScene()->buttonTransformations = 1;
+	glBindVertexArray(buttonVertexArrayObject[0]);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->backgroundTexture);
-	
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "startButtonTexture"), 1);
-	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->startButtonTexture);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "settingsButtonTexture"), 2);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->settingsButtonTexture);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "ExitButtonTexture"), 3);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->exitButtonTexture);
-
-
-	//gameScene->gameObjects[0].getMenuScene()->renderFrameQuad(mainMenuShaderProgram);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0].getMenuScene()->buttonTransformations);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 	
+	gameScene->gameObjects[0].getMenuScene()->buttonTransformations = 2;
+	glBindVertexArray(buttonVertexArrayObject[1]);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->settingsButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0].getMenuScene()->buttonTransformations);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	
+	gameScene->gameObjects[0].getMenuScene()->buttonTransformations = 3;
+	glBindVertexArray(buttonVertexArrayObject[2]);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->exitButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0].getMenuScene()->buttonTransformations);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	/*glm::vec2 startButtonMinMax[2];
-	glm::vec2 settingsButtonMinMax[2];
-	glm::vec2 ExitButtonMinMax[2];
-	startButtonMinMax[0].x = 430;
-	startButtonMinMax[0].y = 290;
-	startButtonMinMax[1].x = 855;
-	startButtonMinMax[1].y = 330;
-
-	settingsButtonMinMax[0].x = 455;
-	settingsButtonMinMax[0].y = 385;
-	settingsButtonMinMax[1].x = 830;
-	settingsButtonMinMax[1].y = 415;
-
-	ExitButtonMinMax[0].x = 430;
-	ExitButtonMinMax[0].y = 475;
-	ExitButtonMinMax[1].x = 855;
-	ExitButtonMinMax[1].y = 510;
-
-	double xPos;
-	double yPos;
-
-	glfwGetCursorPos(window, &xPos, &yPos);
-
-	if (startButtonMinMax[0].x < xPos && xPos < startButtonMinMax[1].x && startButtonMinMax[0].y < yPos && yPos < startButtonMinMax[1].y)
-		std::cout << "------------------- CURSOR IS INSIDE STARTBUTTONBOX -------------------" << std::endl;
-	else if (settingsButtonMinMax[0].x < xPos && xPos < settingsButtonMinMax[1].x && settingsButtonMinMax[0].y < yPos && yPos < settingsButtonMinMax[1].y)
-		std::cout << "------------------- CURSOR IS INSIDE SETTINGSBUTTONBOX -------------------" << std::endl;
-	else if (ExitButtonMinMax[0].x < xPos && xPos < ExitButtonMinMax[1].x && ExitButtonMinMax[0].y < yPos && yPos < ExitButtonMinMax[1].y)
-		std::cout << "------------------- CURSOR IS INSIDE EXITBUTTONBOX -------------------" << std::endl;
-*/
+	gameScene->gameObjects[0].getMenuScene()->buttonTransformations = 0;
+	glBindVertexArray(quadVertexArrayObject);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->backgroundTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0].getMenuScene()->buttonTransformations);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	//gameScene->gameObjects[0].getMenuScene()->deleteObjects();
 	clearObjectsToRender(); 
 	Update();
-}
-
-void RenderManager::renderMenuQuad()
-{
+	glDisable(GL_BLEND);
 }
 
 void RenderManager::renderQuad()

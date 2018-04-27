@@ -45,9 +45,9 @@ public:
 
 	void Render();
 	void renderMainMenu();
-	void renderMenuQuad();
 	void createBuffers();
 	void createMainMenuBuffer();
+	void createButtonQuads();
 	void renderQuad();
 	void Update();
 	void setDeltaTime(float deltaTime);
@@ -74,6 +74,9 @@ private:
 	unsigned int finalMainMenuFBO;
 	unsigned int quadVertexArrayObject;
 	unsigned int quadVertexBufferObject;
+	unsigned int buttonVertexArrayObject[3];
+	unsigned int buttonBufferObject[3];
+
 	unsigned int UIFBO;
 	unsigned int UITexture;
 	unsigned int shadowMap;

@@ -54,6 +54,8 @@ public:
 	glm::vec2 settingsButtonMinMax[2];
 	glm::vec2 ExitButtonMinMax[2];
 
+	int buttonTransformations;
+
 	bool mouseIsOverButton;
 	bool buttonHasBeenClicked;
 	bool buttonHasBeenReleased;
