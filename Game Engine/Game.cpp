@@ -158,7 +158,7 @@ void Game::runState()
 	else if (stateOfGame == Gamestate::ID::LOAD_LEVEL || stateOfGame == Gamestate::ID::RUN_LEVEL || stateOfGame == Gamestate::ID::CLEAR_LEVEL)
 	{
 		levelState();
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		//glfwDisable(GLFW_MOUSE_CURSOR);
 	}
 	//... 
@@ -271,14 +271,14 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addGeometryPassShaders();
 	shaderProgramLibrary.addLightpassShaders();
 	shaderProgramLibrary.addShadowMapShaders();
-	shaderProgramLibrary.addAnimationShaders();
+	//shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
 	shaderProgramLibrary.addTerrainShaders();
 }
 
 void Game::initInputOptions()
 {
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorEnterCallback(window, mouse_enter_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, 1);
