@@ -4,10 +4,9 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(std::string filePath, GLuint gShaderProgram, GLuint meshType, Terrain* terrain)
+Mesh::Mesh(std::string filePath, GLuint gShaderProgram, Terrain* terrain)
 {
 	//vertexCount = 0;
-	this->meshType = meshType;
 	CreateMeshData(filePath, gShaderProgram, terrain);
 }
 
@@ -20,6 +19,8 @@ void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram, Terrain *
 	LeapImporter importer;
 
 	leapMesh = importer.getMesh(filePath.c_str());
+
+	this->meshType = leapMesh->customMayaAttribute->meshType;
 
 	//vertexCount = leapMesh->getVertexCount();
 

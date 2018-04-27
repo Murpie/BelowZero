@@ -20,7 +20,7 @@ class Mesh
 {
 public:
 	Mesh();
-	Mesh(std::string filePath, GLuint gShaderProgram, GLuint meshType, Terrain * terrain);
+	Mesh(std::string filePath, GLuint gShaderProgram, Terrain * terrain);
 	~Mesh();
 
 	void CreateMeshData(std::string filePath, GLuint gShaderProgram, Terrain *terrain);
