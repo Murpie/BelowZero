@@ -6,11 +6,17 @@ MeshLib::MeshLib()
 
 MeshLib::~MeshLib()
 {
+	for (int i = 0; i < meshes.size(); i++)
+	{
+		meshes[i].deleteLeapMesh();
+	}
+	meshes.clear();
+	animatedMeshes.clear();
 }
 
-void MeshLib::addMesh(std::string filePath, GLuint gShaderProgram, GLuint meshType)
+void MeshLib::addMesh(std::string filePath, GLuint gShaderProgram)
 {
-	Mesh newMesh = Mesh(filePath, gShaderProgram, meshType);
+	Mesh newMesh = Mesh(filePath, gShaderProgram);
 	meshes.push_back(newMesh);
 }
 

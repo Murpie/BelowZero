@@ -39,6 +39,12 @@ void ShaderProgramLib::addAnimationShaders()
 	shaders.push_back(newShaderProgram);
 }
 
+void ShaderProgramLib::addTerrainShaders()
+{
+	TerrainShaders* newShaderProgram = new TerrainShaders();
+	shaders.push_back(newShaderProgram);
+}
+
 void ShaderProgramLib::addUIShaders()
 {
 	UIShaders* newShaderProgram = new UIShaders();

@@ -44,53 +44,25 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	/* 
-		In this function we want to call on the sceneObjects.
-		
-		example : 
-			scene.pollEvent(window, deltaTime);
-
-		and check inside the classes if we want to make something 
-		happen depending on which button we press.
-
-		This function should be called on within the correct state in runState().
-	*/
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	//------------------------------------
-	//This statement should be used inside the GUI class
-	/*
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && stateBool != true)
 	{
-		double xpos, ypos;
-		glfwGetCursorPos(window, &xpos, &ypos);
-		std::cout << "CUROSR::X::POSITION::" << xpos << std::endl;
-		std::cout << "CUROSR::Y::POSITION::" << ypos << std::endl;
-
-		//
-		//glm::vec3 worldRay = Ray::getWorldRay(xpos, ypos, glm::mat4(), SCREEN_WIDTH, SCREEN_HEIGHT);
-		//std::cout << "CUROSR::WORLDRAY::" << worldRay.x << " " << worldRay.y << " " << worldRay.z << std::endl;
-
+		stateBool = true;
+		if(stateOfGame == Gamestate::ID::RUN_LEVEL)
+			stateOfGame = Gamestate::ID::CLEAR_LEVEL;
+		else if (stateOfGame == Gamestate::ID::SHOW_MENU)
+			stateOfGame = Gamestate::ID::CLEAR_MENU;
 	}
 
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_RELEASE && stateBool != false)
 	{
-
+		stateBool = false;
 	}
-	*/
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-	{
-		stateOfGame = Gamestate::ID::RUN_LEVEL;
-	}
-	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-	{
-		stateOfGame = Gamestate::ID::SHOW_MENU;
-	}
-
 	//...
 	scene.processEvents(window, deltaTime);
 }
@@ -101,7 +73,7 @@ Game::Game() :
 	windowName("Game Engine"),
 	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
-	meshesLoaded(false), testBool(false), fullscreen(false),
+	meshesLoaded(false), fullscreen(false), stateBool(false),
 	count(0)
 {
 	initWindow();
@@ -125,13 +97,10 @@ void Game::run()
 	int initial_time = time(NULL);
 	int final_time;
 	int frameCount = 0;
-	
-	initScene(menuScene);
-	initScene(gameScene);
 
 	useShaderProgram();
 
-	stateOfGame = Gamestate::ID::RUN_LEVEL;
+	stateOfGame = Gamestate::ID::LOAD_MENU;
 	printCurrentState(stateOfGame);
 
 	// Main loop
@@ -141,7 +110,7 @@ void Game::run()
 		deltaTime = float(end - begin) / CLOCKS_PER_SEC;
 		begin = end;
 
-	/*	auto nowDeltaTime = chrono::high_resolution_clock::now();
+		/*	auto nowDeltaTime = chrono::high_resolution_clock::now();
 		deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count() / 1000;
 		startDeltaTime = nowDeltaTime;*/
 
@@ -181,17 +150,19 @@ void Game::printCurrentState(Gamestate::ID stateOfGame)
 void Game::runState()
 {
 	//... Menu
-	if (stateOfGame == Gamestate::ID::LOAD_MENU || stateOfGame == Gamestate::ID::SHOW_MENU || stateOfGame == Gamestate::ID::CLEAR_MENU )
+	if (stateOfGame == Gamestate::ID::LOAD_MENU || stateOfGame == Gamestate::ID::SHOW_MENU || stateOfGame == Gamestate::ID::CLEAR_MENU)
 	{
 		menuState();
 	}
 	//... Level
-	else if(stateOfGame == Gamestate::ID::LOAD_LEVEL || stateOfGame == Gamestate::ID::RUN_LEVEL || stateOfGame == Gamestate::ID::CLEAR_LEVEL)
+	else if (stateOfGame == Gamestate::ID::LOAD_LEVEL || stateOfGame == Gamestate::ID::RUN_LEVEL || stateOfGame == Gamestate::ID::CLEAR_LEVEL)
 	{
 		levelState();
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		//glfwDisable(GLFW_MOUSE_CURSOR);
 	}
 	//... 
-	else 
+	else
 	{
 		return;
 	}
@@ -201,8 +172,10 @@ void Game::menuState()
 {
 	if (stateOfGame == Gamestate::ID::LOAD_MENU)
 	{
-		//initScene(menuScene);
+		printCurrentState(stateOfGame);
+		initScene(menuScene);
 		stateOfGame = Gamestate::ID::SHOW_MENU;
+		printCurrentState(stateOfGame);
 	}
 	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
 	{
@@ -223,8 +196,10 @@ void Game::levelState()
 {
 	if (stateOfGame == Gamestate::ID::LOAD_LEVEL)
 	{
-		//initScene(gameScene);
+		printCurrentState(stateOfGame);
+		initScene(gameScene);
 		stateOfGame = Gamestate::ID::RUN_LEVEL;
+		printCurrentState(stateOfGame);
 	}
 	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
 	{
@@ -236,6 +211,7 @@ void Game::levelState()
 	}
 	else if (stateOfGame == Gamestate::ID::CLEAR_LEVEL)
 	{
+		printCurrentState(stateOfGame);
 		clearScene(gameScene);
 		stateOfGame = Gamestate::ID::LOAD_MENU;
 	}
@@ -263,17 +239,19 @@ void Game::initWindow()
 
 void Game::initScene(GameScene & scene)
 {
-	addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
+	if(renderManager.size() < 2)
+		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
 	//... Create Camera
 	addPlayer(scene);
+
+	addTerrain(scene);
 	//... Create Lights
-	testBool = false;
 	addLights(scene);
 	//... Read OBJ and MTL File
-	if(!meshesLoaded)
-	{ 
+	if (!meshesLoaded)
+	{
 		//Load the meshes once and store them.
-		readMeshName();	
+		readMeshName(scene);
 		meshesLoaded = true;
 	}
 	//...
@@ -283,8 +261,8 @@ void Game::initScene(GameScene & scene)
 
 void Game::clearScene(GameScene & scene)
 {
-	//scene.clearGameObjects();
-
+	scene.clearGameObjects();
+	//renderManager.clear();
 	/* Add function to also clear the renderManager*/
 }
 
@@ -293,9 +271,9 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addGeometryPassShaders();
 	shaderProgramLibrary.addLightpassShaders();
 	shaderProgramLibrary.addShadowMapShaders();
-	//shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
 	shaderProgramLibrary.addVFXShaders();
+	shaderProgramLibrary.addTerrainShaders();
 }
 
 void Game::initInputOptions()
@@ -316,30 +294,21 @@ void Game::useShaderProgram()
 void Game::addMeshName()
 {
 	//Add file names to vector to load when reading mesh data. 
-	std::string meshLoader[] = { "Axe.obj", "HandAxe.obj", "Floor.obj", "Stone.obj", "TreeWithSnow.obj"};
+	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
+	std::string meshLoader[] = { "Player_temp.leap", "Bucket.leap", "Stone_1.leap"};
 	//meshType: 0 = Static  2 = Interactive  3 = Equiped
-	GLuint meshTypes[] = { 3, 3 };
-	
+
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 	{
 		meshName.push_back(meshLoader[i]);
-		meshType.push_back(meshTypes[i]);
 	}
 }
 
 void Game::addLights(GameScene &scene)
 {
 	// add for loop and use array for transforms ?
-	if (!testBool)
-	{
-		scene.addLight(glm::vec3(-4, 2, 2), 0);
-		scene.addLight(glm::vec3(-4, 2, 0), 0);
-		testBool = true;
-	}
-	else
-	{
-		scene.gameObjects[0].transform->position = glm::vec3(4, 0.4, -2);
-	}	
+	scene.addLight(glm::vec3(7, 9, -4), 0);
+	scene.addLight(glm::vec3(4, 0.4, -2), 1);
 }
 
 void Game::addRenderManager(GameScene &scene)
@@ -355,198 +324,24 @@ void Game::addPlayer(GameScene &scene)
 
 void Game::addMeshFilter(GameScene &scene)
 {
-	scene.addMeshFilter(meshLibrary, materialLibrary, meshName.size());
+	// rework for LeapLevel file
+	LeapLevel* level = new LeapLevel("Level_test.leap");
+	scene.addMeshFilter(meshLibrary, materialLibrary, level);
+	delete level;
+}
+void Game::addTerrain(GameScene &scene)
+{
+	scene.addTerrain("test1234.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->TerrainShaderProgram);
 }
 
-void Game::readMeshName()
+void Game::readMeshName(GameScene &scene)
 {
 	for (int i = 0; i < meshName.size(); i++)
 	{
-		//scene.addEmptyGameObject();
-		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram, meshType[i]);
-		//Add material
-		materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
-
-		//If found variables are not querried, Set standard values in shader.
-		//1: send in texture
-		//2: send in mtl values
-		unsigned int foundAlbedo = 0;
-		unsigned int foundNormal = 0;
-		unsigned int foundSpecular = 0;
-		unsigned int foundMetallic = 0;
-		unsigned int foundAO = 0;
-		glm::mat3 mtlInfo;
-
-		const char *meshNameChar = meshName[i].c_str();
-		FILE *file = fopen(meshNameChar, "r");
-		while (file != NULL)
-		{
-			char lineHeader[128];
-			int word = fscanf(file, "%s", lineHeader);
-			if (word == EOF) //EOF = End Of Line.
-			{
-				materialLibrary.getMaterial(i)->addFoundAlbedo(foundAlbedo);
-				materialLibrary.getMaterial(i)->addFoundNormal(foundNormal);
-				materialLibrary.getMaterial(i)->addFoundSpecular(foundSpecular);
-				materialLibrary.getMaterial(i)->addFoundMetallic(foundMetallic);
-				materialLibrary.getMaterial(i)->addFoundAO(foundAO);
-				materialLibrary.getMaterial(i)->addMtlInfo(mtlInfo);
-
-				foundAlbedo = 0;
-				foundSpecular = 0;
-				foundNormal = 0;
-				foundMetallic = 0;
-				foundAO = 0;
-				break;
-			}
-			else if (strcmp(lineHeader, "mtllib") == 0)
-			{
-
-				char mtlChar[128];
-				fscanf(file, "%s", mtlChar);
-				FILE* mtlFile = fopen(mtlChar, "r");
-
-				while (true)
-				{
-					int textureLocation = 0;
-					char mtlLineHeader[128];
-					int mtlWord = fscanf(mtlFile, "%s", mtlLineHeader);
-					if (mtlWord == EOF)
-					{
-						break;
-					}
-					else if (strcmp(mtlLineHeader, "Kd") == 0)
-					{
-						fscanf(mtlFile, "%f %f %f", &mtlInfo[0].x, &mtlInfo[0].y, &mtlInfo[0].z);
-						foundAlbedo = 2;
-					}
-					else if (strcmp(mtlLineHeader, "Ks") == 0)
-					{
-						fscanf(mtlFile, "%f %f %f", &mtlInfo[1].x, &mtlInfo[1].y, &mtlInfo[1].z);
-						foundSpecular = 2;
-					}
-					else if (strcmp(mtlLineHeader, "map_Kd") == 0)
-					{
-						char textureFile[128];
-						fscanf(mtlFile, "%s", textureFile);
-						textureLibrary.addAlbedo(textureFile);
-						if (textureLibrary.albedo.size() - 1 != i)
-						{
-							for (int j = i; j > 0; j--)
-							{
-								if (j == textureLibrary.albedo.size() - 1)
-								{
-									textureLocation = j;
-									break;
-								}
-							}
-						}
-						else
-						{
-							textureLocation = i;
-						}
-						materialLibrary.getMaterial(i)->addAlbedo(textureLibrary.getAlbedo(textureLocation)->gTexture);
-						foundAlbedo = 1;
-					}
-					else if (strcmp(mtlLineHeader, "map_Ks") == 0)
-					{
-						char textureFile[128];
-						fscanf(mtlFile, "%s", textureFile);
-						textureLibrary.addSpecular(textureFile);
-						if (textureLibrary.specular.size() - 1 != i)
-						{
-							for (int j = i; j > 0; j--)
-							{
-								if (j == textureLibrary.specular.size() - 1)
-								{
-									textureLocation = j;
-									break;
-								}
-							}
-						}
-						else
-						{
-							textureLocation = i;
-						}
-						materialLibrary.getMaterial(i)->addSpecular(textureLibrary.getSpecular(textureLocation)->gTexture);
-						foundSpecular = 1;
-					}
-					else if (strcmp(mtlLineHeader, "map_Normal") == 0)
-					{
-						char textureFile[128];
-						fscanf(mtlFile, "%s", textureFile);
-						textureLibrary.addNormal(textureFile);
-						if (textureLibrary.normal.size() - 1 != i)
-						{
-							for (int j = i; j > 0; j--)
-							{
-								if (j == textureLibrary.normal.size() - 1)
-								{
-									textureLocation = j;
-									break;
-								}
-							}
-						}
-						else
-						{
-							textureLocation = i;
-						}
-						materialLibrary.getMaterial(i)->addNormal(textureLibrary.getNormal(textureLocation)->gTexture);
-						foundNormal = 1;
-					}
-					else if (strcmp(mtlLineHeader, "map_Metallic") == 0)
-					{
-						char textureFile[128];
-						fscanf(mtlFile, "%s", textureFile);
-						textureLibrary.addMetallic(textureFile);
-						if (textureLibrary.metallic.size() - 1 != i)
-						{
-							for (int j = i; j > 0; j--)
-							{
-								if (j == textureLibrary.metallic.size() - 1)
-								{
-									textureLocation = j;
-									break;
-								}
-							}
-						}
-						else
-						{
-							textureLocation = i;
-						}
-						materialLibrary.getMaterial(i)->addMetallic(textureLibrary.getMetallic(textureLocation)->gTexture);
-						foundMetallic = 1;
-					}
-					else if (strcmp(mtlLineHeader, "map_AO") == 0)
-					{
-						char textureFile[128];
-						fscanf(mtlFile, "%s", textureFile);
-						textureLibrary.addAO(textureFile);
-						if (textureLibrary.ao.size() - 1 != i)
-						{
-							for (int j = i; j > 0; j--)
-							{
-								if (j == textureLibrary.ao.size() - 1)
-								{
-									textureLocation = j;
-									break;
-								}
-							}
-						}
-						else
-						{
-							textureLocation = i;
-						}
-						materialLibrary.getMaterial(i)->addAO(textureLibrary.getAO(textureLocation)->gTexture);
-						foundAO = 1;
-					}
-				}
-			}
-		}
+		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
 	}
+
+	materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
+	textureLibrary.addAlbedo("Colors.png");
+	materialLibrary.getMaterial(0)->addAlbedo(textureLibrary.getAlbedo(0)->gTexture);
 }
-
-
-
-
-

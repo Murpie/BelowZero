@@ -17,6 +17,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
 	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
 	this->vfxShaderProgram = shaderProgram->getShader<VFXShaders>()->vfxShaderProgram;
+	this->terrainShaderProgram = shaderProgram->getShader<TerrainShaders>()->TerrainShaderProgram;
 	createBuffers();
 	vao = 0;
 }
@@ -27,11 +28,11 @@ RenderManager::~RenderManager()
 
 void RenderManager::FindObjectsToRender() {
 	for (unsigned int i = 0; i < gameScene->gameObjects.size(); i++) {
-	/*	glm::vec3 vectorToObject = gameScene->gameObjects[0].transform.position - gameScene->gameObjects[i].transform.position;
+	glm::vec3 vectorToObject = gameScene->gameObjects[0].transform->position - gameScene->gameObjects[i].transform->position;
 
-		float distance = length(vectorToObject);*/
+		float distance = length(vectorToObject);
 
-		if (gameScene->gameObjects[i].getIsRenderable() == true) {
+		if (gameScene->gameObjects[i].getIsRenderable() == true && distance < 83) {
 			gameObjectsToRender.push_back(&gameScene->gameObjects[i]);
 		}
 
@@ -40,6 +41,21 @@ void RenderManager::FindObjectsToRender() {
 			//rework this
 		}
 	}
+}
+
+void RenderManager::clearObjectsToRender()
+{
+	while (!gameObjectsToRender.empty())
+	{
+		gameObjectsToRender.pop_back();
+	}
+	gameObjectsToRender.clear();
+	
+	while (!lightsToRender.empty())
+	{
+		lightsToRender.pop_back();
+	}
+	lightsToRender.clear();
 }
 
 void RenderManager::createBuffers()
@@ -115,15 +131,7 @@ void RenderManager::createBuffers()
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//attach texture to current framebuffer
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
-	//g-buffer normal
-	glGenTextures(1, &gNormal);
-	glBindTexture(GL_TEXTURE_2D, gNormal);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	//attach texture to current framebuffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+
 	//g-buffer albedo
 	glGenTextures(1, &gAlbedo);
 	glBindTexture(GL_TEXTURE_2D, gAlbedo);
@@ -132,39 +140,19 @@ void RenderManager::createBuffers()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//attach texture to current framebuffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedo, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gAlbedo, 0);
 
-	//g-buffer specular
-	glGenTextures(1, &gSpecular);
-	glBindTexture(GL_TEXTURE_2D, gSpecular);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	//g-buffer normal
+	glGenTextures(1, &gNormal);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//attach texture to current framebuffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gSpecular, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gNormal, 0);
 
-	//g-buffer metallic
-	glGenTextures(1, &gMetallic);
-	glBindTexture(GL_TEXTURE_2D, gMetallic);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	//attach texture to current framebuffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, gMetallic, 0);
-
-	//g-buffer AO
-	glGenTextures(1, &gAO);
-	glBindTexture(GL_TEXTURE_2D, gAO);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	//attach texture to current framebuffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT5, GL_TEXTURE_2D, gAO, 0);
-
-	glDrawBuffers(6, attachments);
+	glDrawBuffers(3, attachments);
 
 	//... Create and attach depth buffer
 	glGenRenderbuffers(1, &rboDepth);
@@ -236,16 +224,27 @@ void RenderManager::createBuffers()
 void RenderManager::Render() {
 	FindObjectsToRender();
 
-	//... Set view and projection matrix
-	view_matrix = glm::lookAt(gameScene->gameObjects[0].transform->position,
-		gameScene->gameObjects[0].transform->position + gameScene->gameObjects[0].transform->forward,
-		gameScene->gameObjects[0].transform->up);
 
+	for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	{
+		if (gameScene->gameObjects[i].getPlayer() != nullptr)
+		{
+			glm::vec2 temp = gameScene->gameObjects[i].getPlayer()->setXZ();
+			for (int j = 0; j < gameScene->gameObjects.size(); j++)
+				if (gameScene->gameObjects[j].getTerrain() != nullptr)
+				{
+					gameScene->gameObjects[i].getPlayer()->setCurrentHeight(gameScene->gameObjects[j].getTerrain()->calculateY(temp.x, temp.y));
+				}
+		}
+	}
+
+	//... Set view and projection matrix
+	view_matrix = gameScene->gameObjects[0].getViewMatrix();
 	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
-	world_matrix = glm::translate(world_matrix, glm::vec3(10.0f, -5.0f, 0.0f));
-	world_matrix = glm::rotate(world_matrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
+	//world_matrix = glm::rotate(world_matrix, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	//... Clear Back Buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -257,12 +256,12 @@ void RenderManager::Render() {
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	//DIRECTIONAL LIGHT SHADOWMAP PASS----------------------------------------------------------------------------------------------------------------------------------------
+	//DIRECTIONAL LIGHT SHADOWMAP PASS-----------------------------------------------------------------------------------------------------------------------
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 
 	glUseProgram(shadowMapShaderProgram);
-	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[1].transform->position);
+	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[2].transform->position);
 	glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -271,9 +270,18 @@ void RenderManager::Render() {
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
+		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
+		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
+
+	}
+	for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	{
+		if (gameScene->gameObjects[i].getTerrain() != nullptr)
+		{
+			gameScene->gameObjects[i].getTerrain()->bindVertexArray();
+			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i].getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
+		}
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -283,35 +291,61 @@ void RenderManager::Render() {
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
-
-	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
+	
+	//... Terrain PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glUseProgram(geometryShaderProgram);
+	glUseProgram(terrainShaderProgram);
 
-	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
-	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
-	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(terrainShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(terrainShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(terrainShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilMask(0xFF); // enable writing to the stencil buffer
+	for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	{
+		if (gameScene->gameObjects[i].getTerrain() != nullptr)
+		{
+			gameScene->gameObjects[i].getTerrain()->bindVertexArray();
+			
+			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i].getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
+		}
+	}
+	
+	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
 
-	gameObjectsToRender[0]->materialComponent->bindTextures();
-	gameObjectsToRender[0]->materialComponent->bindFoundTextures();
+	glUseProgram(geometryShaderProgram);
+	
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	//glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+
+	if (gameObjectsToRender.size() > 0)
+		gameObjectsToRender[0]->materialComponent->bindTextures();
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-		if (i < 2)
+		//glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "model_matrix"), 1, GL_FALSE, glm::value_ptr(gameObjectsToRender[i]->transform->position));
+
+		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 3)
 			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 1);
 		else
 			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 0);
 
+		
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
+		//...
+		glm::mat4 tempMatrix = glm::mat4(1);
+		tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
+		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
+		//...
+
+		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
 
 	//... VFX
@@ -374,7 +408,7 @@ void RenderManager::Render() {
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glUseProgram(lightpassShaderProgram);
-	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[1].transform->position);
+	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[2].transform->position);
 
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0].transform->position));
@@ -402,28 +436,16 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
 
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gNormal"), 1);
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gAlbedo"), 1);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, gNormal);
-
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gAlbedo"), 2);
-	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, gAlbedo);
 
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gSpecular"), 3);
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gNormal"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "depthMap"), 3);
 	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, gSpecular);
-
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gMetallic"), 4);
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, gMetallic);
-
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gAO"), 5);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, gAO);
-
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "depthMap"), 6);
-	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, shadowMap);
 
 	glEnable(GL_STENCIL_TEST);
@@ -463,9 +485,12 @@ void RenderManager::Render() {
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[4]);
-	
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 7);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "textTexture"), 7);
 	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->textTexture);
+	
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 8);
+	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0].getPlayer()->hp);
@@ -473,6 +498,7 @@ void RenderManager::Render() {
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0].getPlayer()->water);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0].getPlayer()->food);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0].getPlayer()->fade);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0].getPlayer()->textFade);
 
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
@@ -480,8 +506,7 @@ void RenderManager::Render() {
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
-	gameObjectsToRender.clear();
-	lightsToRender.clear();
+	clearObjectsToRender();
 	Update();
 }
 
@@ -555,127 +580,20 @@ void RenderManager::renderQuad()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 }
 
-void RenderManager::renderBillboard(float* billboardArray)
-{
-	if (billboardVAO == 0)
-	{
-		vertexPos = glGetAttribLocation(vfxShaderProgram, "squareVertices");
-		uvPos = glGetAttribLocation(vfxShaderProgram, "squareUVs");
-
-		//... VFX
-		width = 0;
-		height = 0;
-		nrOfChannels = 0;
-		data = stbi_load("nature.png", &width, &height, &nrOfChannels, 0);
-
-		glGenVertexArrays(1, &billboardVAO);
-		glGenBuffers(1, &billboardVBO);
-		glBindVertexArray(billboardVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, billboardVBO);
-
-		glBindVertexArray(billboardVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, billboardVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(billboardArray), &billboardArray, GL_DYNAMIC_DRAW);
-		
-		glEnableVertexAttribArray(0);
-		if (vertexPos == -1) {
-			OutputDebugStringA("Error, can't find squareVertices attribute in vertex shader\n");
-			return;
-		}
-		glVertexAttribPointer(
-			0, 
-			3, 
-			GL_FLOAT, 
-			GL_FALSE, 
-			5 * sizeof(float), 
-			BUFFER_OFFSET(0));
-		
-		glEnableVertexAttribArray(1);
-		if (uvPos == -1) {
-			OutputDebugStringA("Error, can't find squareUVs attribute in vertex shader\n");
-			return;
-		}
-		glVertexAttribPointer(
-			1, 
-			2, 
-			GL_FLOAT, 
-			GL_FALSE, 
-			5 * sizeof(float), 
-			BUFFER_OFFSET(sizeof(float) * 3));
-
-		glGenTextures(1, &billboardTexture);
-		glBindTexture(GL_TEXTURE_2D, billboardTexture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		if (data)
-		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		}
-		else
-			std::cout << "Failed to load Equiped Texture from path" << std::endl;
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, billboardTexture, 0);
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			std::cout << "Billboard Framebuffer not complete!" << std::endl;
-
-		stbi_image_free(data);
-	}
-
-	glBindVertexArray(billboardVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, billboardVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(billboardArray), billboardArray, GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(0);
-	if (vertexPos == -1) {
-		OutputDebugStringA("Error, can't find aPos attribute in vertex shader\n");
-		return;
-	}
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), BUFFER_OFFSET(0));
-	glEnableVertexAttribArray(1);
-	if (uvPos == -1) {
-		OutputDebugStringA("Error, can't find squareUVs attribute in vertex shader\n");
-		return;
-	}
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), BUFFER_OFFSET(sizeof(float) * 3));
-}
-
 void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 {
 	glUseProgram(shaderToUse);
 
-	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 40.0f);
-	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 0.0));
+	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 45.0f);
+	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 1.0, 0.0));
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 }
 
-int RenderManager::FindUnusedParticle()
-{
-	for (int i = 0; i < maxParticles; i++)
-	{
-		if (particleContainer[i].life < 0)
-		{
-			lastUsedParticle = i;
-			return i;
-		}
-	}
-
-	for (int i = 0; i < lastUsedParticle; i++)
-	{
-		if (particleContainer[i].life < 0)
-		{
-			lastUsedParticle = i;
-			return i;
-		}
-	}
-
-	return 0;
-}
-
 void RenderManager::Update()
 {
+
 }
 
 void RenderManager::setDeltaTime(float deltaTime)

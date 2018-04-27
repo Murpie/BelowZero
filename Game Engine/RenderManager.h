@@ -43,25 +43,23 @@ public:
 	~RenderManager();
 
 	GameScene *gameScene;
+	
 	void FindObjectsToRender();
+	void clearObjectsToRender();
+
 	void Render();
 	void createBuffers();
 	void renderQuad();
-	void renderBillboard(float* billboardArray);
 	void Update();
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
-	int FindUnusedParticle();
 	/*void setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition);*/
 
 private:
-	/*unsigned int loadCubemap(std::vector<std::string> faces);*/
 
 	std::vector<GameObject*> gameObjectsToRender;
-	
 	std::vector<Light*> lightsToRender;
-	std::vector<glm::vec3> kernel;
 
 	glm::mat4x4 view_matrix;
 	glm::mat4x4 fpsView_matrix;
@@ -79,8 +77,6 @@ private:
 	unsigned int UITexture;
 	unsigned int shadowMap;
 	unsigned int shadowFBO;
-	//unsigned int cubeMapShadowMap;
-	//unsigned int cubeMapShadowFBO;
 	unsigned int animationVAO;
 	unsigned int animationVBO;
 	unsigned int animationEBO;
@@ -92,10 +88,7 @@ private:
 	unsigned int finalFBO;
 	unsigned int finalColorBuffer;
 	unsigned int finalDepthStensil;
-	unsigned int billboardFBO;
 	unsigned int billboardTexture;
-	unsigned int billboardVAO = 0;
-	unsigned int billboardVBO;
 	unsigned int billboard_vertex_array;
 	unsigned int billboard_vertex_buffer;
 	unsigned int particlePositionBuffer;
@@ -113,45 +106,27 @@ private:
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
 
-	//unsigned int cubemapTexture;
 	unsigned int gAlbedo;
-	unsigned int gNormal;
 	unsigned int gPosition;
-	unsigned int gSpecular;
-	unsigned int gMetallic;
-	unsigned int gAO;
-	unsigned int attachments[6] = {
+	unsigned int gNormal;
+	unsigned int attachments[3] = {
 		GL_COLOR_ATTACHMENT0,
 		GL_COLOR_ATTACHMENT1,
 		GL_COLOR_ATTACHMENT2,
-		GL_COLOR_ATTACHMENT3,
-		GL_COLOR_ATTACHMENT4,
-		GL_COLOR_ATTACHMENT5 };
+	};
 
 	QuadVertex vertices;
 	GLFWwindow* window;
 
 	GLuint shadowMapShaderProgram;
 	GLuint geometryShaderProgram;
-	GLuint cubeMapShaderProgram;
 	GLuint lightpassShaderProgram;
-	GLuint skyboxShaderProgram;
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
+	GLuint terrainShaderProgram;
 	GLuint vfxShaderProgram;
 
 	int display_w, display_h;
 	unsigned int vertexPos;
 	unsigned int uvPos;
-
-	float billboard[36] = {
-		10.0f,  0.5f, -10.5f, 0.0f,  0.0f,//BL		//pos & uv
-		10.0f,  20.5f, -10.5f, 1.0f,  0.0f,//TL
-		10.0f,  20.5f,  10.5f, 1.0f,  1.0f,//TR
-		10.0f,  20.5f,  10.5f, 1.0f,  1.0f,//TR
-		10.0f,  0.5f,  10.5f, 0.0f,  1.0f,//BR
-		10.0f,  0.5f, -10.5f, 0.0f,  0.0f,//BL
-	};
-
-	float newBillboard[20];
 };

@@ -8,26 +8,30 @@
 #include <string>
 #include <GL/gl3w.h>  
 #include "Vertex.h"
+#include "LeapImporter.h"
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include "glm/glm/glm.hpp"
 #include <algorithm>    // std::unique, std::distance
+#include "Terrain.h"
 
 class Mesh
 {
 public:
 	Mesh();
-	Mesh(std::string filePath, GLuint gShaderProgram, GLuint meshType);
+	Mesh(std::string filePath, GLuint gShaderProgram);
 	~Mesh();
 
 	void CreateMeshData(std::string filePath, GLuint gShaderProgram);
-
-	std::vector<Vertex> Vertices;
-	std::vector<unsigned int> indices;
-	int vertexCount;
-	GLuint meshType;
+	void deleteLeapMesh();
+	//std::vector<Vertex> Vertices;
+	//std::vector<unsigned int> indices;
+	LeapImporter importer;
+	LeapMesh* leapMesh;
+	//int vertexCount;
+	unsigned int meshType; //remove this later and use *leapMesh
 	GLuint gVertexBuffer;
 	GLuint gVertexAttribute;
-	GLuint gElementBuffer;
 };
 

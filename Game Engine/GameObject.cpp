@@ -7,7 +7,9 @@ GameObject::GameObject()
     isActive = true;
     isRenderable = false;
     hasLight = false;
-
+	isInteractable = false;
+	modelMatrix = glm::mat4();
+	objectID = ObjectType::ID::BUCKET;
 	//transform.forward = glm::vec3(1, 0, 0);
 	//transform.up = glm::vec3(0, 1, 0);
 	//transform.right = glm::vec3(0, 0, 1);
@@ -22,6 +24,7 @@ GameObject::~GameObject()
 	//delete materialComponent;
 	//delete meshFilterComponent;
 	//delete lightComponent;
+	bbox.clear();
 }
 
 void GameObject::update(float deltaTime, float seconds)
@@ -61,12 +64,11 @@ void GameObject::updateMaterialAndMeshFilterPointers() {
         if (temp != nullptr) {
             //rework this, we want our meshFilter inside components, or do we need it to be a component?
 			/*
-				Save the ID of the meshFIlter when Creating it our think of
+				Save the ID of the meshFIlter when Creating it or think of
 				a better solution. 
 			*/
 			meshFilterComponent = temp;
             meshTest = true;
-
         }
     }
 
@@ -127,8 +129,6 @@ void GameObject::addComponent(Component* otherComponent)
 
 void GameObject::deleteComponent(Component* otherComponent)
 {
-	//
-
 	//find component
 	int index = -1;
 	for (int i = 0; i < components.size(); i++)
@@ -146,9 +146,9 @@ void GameObject::deleteComponent(Component* otherComponent)
 
 void GameObject::deleteAllComponents()
 {
-	for (Component* component : components)
+	for (Component* component_ptr : components)
 	{
-		delete component;
+		delete component_ptr;
 	}
 	components.clear();
 
@@ -161,6 +161,11 @@ const bool GameObject::getIsRenderable() {
     return isRenderable;
 }
 
+void GameObject::setIsRenderable(bool isRenderable)
+{
+	this->isRenderable = isRenderable;
+}
+
 Player * GameObject::getPlayer()
 {
 	for (int i = 0; i < components.size(); i++)
@@ -170,6 +175,34 @@ Player * GameObject::getPlayer()
 		{
 			Player* player = static_cast<Player*>(components[i]);
 			return player;
+		}
+	}
+	return nullptr;
+}
+
+glm::mat4 GameObject::getModelMatrix()
+{
+	modelMatrix = glm::translate(glm::mat4(1), transform->position);
+	//... 
+	//modelMatrix = glm::rotate(modelMatrix, glm::radians(0.0f), transform->rotation);
+	return this->modelMatrix;
+}
+
+glm::mat4 GameObject::getViewMatrix()
+{
+	return glm::lookAt(transform->position, transform->position + transform->forward, transform->up);
+
+}
+
+Terrain * GameObject::getTerrain()
+{
+	for (int i = 0; i < components.size(); i++)
+	{
+
+		if (components[i]->id == ComponentType::ID::TERRAIN)
+		{
+			Terrain* terrain = static_cast<Terrain*>(components[i]);
+			return terrain;
 		}
 	}
 	return nullptr;
