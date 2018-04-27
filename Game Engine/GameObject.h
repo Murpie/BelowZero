@@ -29,7 +29,7 @@ public:
     bool isActive;
     bool hasLight;
 	bool isInteractable;
-
+	ObjectType::ID objectID;
 	std::string name;
 	Transform *transform;
 	std::vector<Component*> components;

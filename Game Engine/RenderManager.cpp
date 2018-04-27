@@ -275,13 +275,8 @@ void RenderManager::Render() {
 			gameScene->gameObjects[i].getTerrain()->bindVertexArray();
 			
 			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i].getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
-			
-			
 		}
 	}
-	
-
-	
 	
 	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
 

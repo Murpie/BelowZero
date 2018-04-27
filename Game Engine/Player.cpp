@@ -412,40 +412,38 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	//... Mouse Movement
 	glfwGetCursorPos(window, &xpos, &ypos);
 
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-	{
-		xoffset *= sensitivity;
-		yoffset *= sensitivity;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
 
-		yaw = xoffset;
-		pitch = yoffset;
+	yaw = xoffset;
+	pitch = yoffset;
 
-		if (pitch > 90.f)
-			pitch = 90.0f;
-		if (pitch < -90.0f)
-			pitch = -90.0f;
+	if (pitch > 90.f)
+		pitch = 90.0f;
+	if (pitch < -90.0f)
+		pitch = -90.0f;
 
-		glm::mat4 matrix = glm::mat4(1);
+	glm::mat4 matrix = glm::mat4(1);
 
-		glm::vec4 forward = glm::vec4(Transformable::transform.forward, 0);
-		glm::vec4 right = glm::vec4(Transformable::transform.right, 0);
-		glm::vec4 up = glm::vec4(Transformable::transform.up, 0);
+	glm::vec4 forward = glm::vec4(Transformable::transform.forward, 0);
+	glm::vec4 right = glm::vec4(Transformable::transform.right, 0);
+	glm::vec4 up = glm::vec4(Transformable::transform.up, 0);
+	printf("%f\n", up);
 
-		matrix = glm::rotate(matrix, pitch, Transformable::transform.right);
-		matrix *= glm::rotate(matrix, -yaw, Transformable::transform.up);
+	matrix = glm::rotate(matrix, pitch, Transformable::transform.right);
+	matrix *= glm::rotate(matrix, -yaw, Transformable::transform.up);
 
-		forward = matrix * forward;
-		up = matrix * up;
-		right = matrix * right;
+	forward = matrix * forward;
+	up = matrix * up;
+	right = matrix * right;
 
-		Transformable::transform.forward.x = forward.x;
-		Transformable::transform.forward.y = forward.y;
-		Transformable::transform.forward.z = forward.z;
+	Transformable::transform.forward.x = forward.x;
+	Transformable::transform.forward.y = forward.y;
+	Transformable::transform.forward.z = forward.z;
 
-		Transformable::transform.right.x = right.x;
-		Transformable::transform.right.y = right.y;
-		Transformable::transform.right.z = right.z;
-	}
+	Transformable::transform.right.x = right.x;
+	Transformable::transform.right.y = right.y;
+	Transformable::transform.right.z = right.z;
 
 	if (firstMouse) {
 		lastX = (float)xpos;
