@@ -18,16 +18,16 @@ void GameScene::addEmptyGameObject()
 
 void GameScene::clearGameObjects()
 {
-	while(!gameObjects.empty())
+	if (!gameObjects.empty())
 	{
 		for (unsigned int i = 0; i < gameObjects.size(); i++)
 		{
-			for(int j = 0; i < gameObjects[i].components.size(); i++)
-				gameObjects[i].deleteComponent(gameObjects[i].components[j]);
+			gameObjects[i].deleteAllComponents();
+			//for(int j = 0; i < gameObjects[i].components.size(); i++)
+			//	gameObjects[i].deleteComponent(gameObjects[i].components[j]);
 		}
-		gameObjects.pop_back();
+		gameObjects.clear();
 	}
-	gameObjects.clear();
 }
 
 void GameScene::addLight(glm::vec3 transform, int lightType)
@@ -65,11 +65,13 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 	{
 		addEmptyGameObject();
 		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).gElementBuffer, meshLibrary.getMesh(i).vertexCount);
+		//Material*
 		gameObjects[gameObjects.size() - 1].name = "Mesh " + i; // Maybe pass the name of the object?
 		gameObjects[gameObjects.size() - 1].addComponent(meshFilter);
 		gameObjects[gameObjects.size() - 1].addComponent(matertialLibrary.getMaterial(i));
 		//... set interactable
 		gameObjects[gameObjects.size() - 1].isInteractable = true;
+		gameObjects[gameObjects.size() - 1].setIsRenderable(true);
 	}
 }
 

@@ -13,6 +13,7 @@
 
 #include "Ray.h"
 #include "Intersection.h"
+#include <list>
 
 class Component;
 
@@ -31,7 +32,7 @@ public:
 
 	std::string name;
 	Transform *transform;
-	std::vector<Component*> components;
+	std::list<Component*> components;
 
 	bBox bbox;
 	/*
@@ -70,11 +71,11 @@ public:
 
 	template <class T>
 	T* getComponent() {
-		for (int i = 0; i < components.size(); i++)
+		for (Component* component_ptr : components)
 		{
-			if (dynamic_cast<T*>(components[i]) != nullptr)
+			if (dynamic_cast<T*>(component_ptr) != nullptr)
 			{
-				T *test = dynamic_cast<T*>(components[i]);
+				T *test = dynamic_cast<T*>(component_ptr);
 				return test;
 			}
 		}

@@ -3,11 +3,12 @@
 Material::Material():Component()
 {
 	assetName = "Material";
-
+	Component::id = ComponentType::ID::MATERIAL;
 }
 
 Material::Material(GLuint otherShaderProgram)
 {
+	Component::id = ComponentType::ID::MATERIAL;
 	assetName = "Material";
 	geometryShaderProgram = otherShaderProgram;
 }

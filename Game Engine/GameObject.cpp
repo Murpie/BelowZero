@@ -18,15 +18,8 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
-	std::cout << "~GameObject() called" << std::endl;
-
 	//deleteAllComponents();
-
-	//These will probably give memory leaks if not deleted.
-
-	//delete materialComponent;
-	//delete meshFilterComponent;
-	//delete lightComponent;
+	//delete transform;
 }
 
 void GameObject::update(float deltaTime)
@@ -40,11 +33,9 @@ void GameObject::update(float deltaTime)
 
 void GameObject::processEvents(GLFWwindow * window, float deltaTime)
 {
-	for (int i = 0; i < components.size(); i++)
+	for (Component* component_ptr : components)
 	{
-		// store a reference for the correct type
-		auto& component = components[i];
-		component->processEvents(window, deltaTime);
+		component_ptr->processEvents(window, deltaTime);
 	}
 }
 
@@ -64,14 +55,8 @@ void GameObject::updateMaterialAndMeshFilterPointers() {
     for (int i = 0; i < components.size(); i++) {
         MeshFilter* temp = getComponent<MeshFilter>();
         if (temp != nullptr) {
-            //rework this, we want our meshFilter inside components, or do we need it to be a component?
-			/*
-				Save the ID of the meshFIlter when Creating it our think of
-				a better solution. 
-			*/
 			meshFilterComponent = temp;
             meshTest = true;
-
         }
     }
 
@@ -90,10 +75,7 @@ void GameObject::updateHasLight() {
         Light* temp = getComponent<Light>();
         if (temp != nullptr) {
             foundLight = true;
-
 			lightComponent = temp;
-			//rework this if needed
-
         }
     }
 
@@ -106,21 +88,24 @@ void GameObject::updateHasLight() {
 
 void GameObject::addComponent(Component* otherComponent)
 {
+	components.push_back(otherComponent);
+	updateMaterialAndMeshFilterPointers();
+	updateHasLight();
 	//check if component exist
-	int index = -1;
-	for (int i = 0; i < components.size(); i++)
-	{
-		if (*otherComponent == *components[i]) {
-			index = i;
-		}
-	}
-	//add if not
-	if (index == -1) {
-        //otherComponent->gameObject = this;
-		components.push_back(otherComponent);
-	}
-    updateMaterialAndMeshFilterPointers();
-    updateHasLight();
+	//int index = -1;
+	//for (int i = 0; i < components.size(); i++)
+	//{
+	//	if (*otherComponent == *components[i]) {
+	//		index = i;
+	//	}
+	//}
+	////add if not
+	//if (index == -1) {
+ //       //otherComponent->gameObject = this;
+	//	components.push_back(otherComponent);
+	//}
+ //   updateMaterialAndMeshFilterPointers();
+ //   updateHasLight();
 }
 
 /*
@@ -132,31 +117,32 @@ void GameObject::addComponent(Component* otherComponent)
 
 void GameObject::deleteComponent(Component* otherComponent)
 {
-	//
-
-	//find component
-	int index = -1;
-	for (int i = 0; i < components.size(); i++)
-	{
-		if (*otherComponent == *components[i]) {
-			index = i;
-		}
-	}
-	if (index != -1) {
-		//delete components[index];
-		components.erase(components.begin() + index);
-	}
-    updateMaterialAndMeshFilterPointers();
+	////find component
+	//int index = -1;
+	//for (int i = 0; i < components.size(); i++)
+	//{
+	//	if (*otherComponent == *components[i]) {
+	//		index = i;
+	//	}
+	//}
+	//if (index != -1) {
+	//	//delete components[index];
+	//	components.erase(components.begin() + index);
+	//}
+ //   updateMaterialAndMeshFilterPointers();
 }
 
 void GameObject::deleteAllComponents()
 {
 	for (Component* component_ptr : components)
 	{
-		delete component_ptr;
+		std::cout << component_ptr << std::endl;
+		if(component_ptr->id != ComponentType::ID::MATERIAL)
+			delete component_ptr;
 	}
 	components.clear();
 
+	//delete transform;
 	//delete materialComponent;
 	//delete meshFilterComponent;
 	//delete lightComponent;
@@ -173,15 +159,24 @@ void GameObject::setIsRenderable(bool isRenderable)
 
 Player * GameObject::getPlayer()
 {
-	for (int i = 0; i < components.size(); i++)
+	for (Component* component_ptr : components)
 	{
-
-		if (components[i]->id == ComponentType::ID::PLAYER)
+		if (component_ptr->id == ComponentType::ID::PLAYER)
 		{
-			Player* player = static_cast<Player*>(components[i]);
+			Player* player = static_cast<Player*>(component_ptr);
 			return player;
 		}
 	}
+
+	//for (int i = 0; i < components.size(); i++)
+	//{
+
+	//	if (components[i]->id == ComponentType::ID::PLAYER)
+	//	{
+	//		Player* player = static_cast<Player*>(components[i]);
+	//		return player;
+	//	}
+	//}
 	return nullptr;
 }
 

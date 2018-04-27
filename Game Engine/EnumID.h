@@ -39,7 +39,8 @@ namespace ComponentType
 	{
 		COMPONENT,
 		PLAYER,
-		LIGHT
+		LIGHT,
+		MATERIAL
 
 	};
 }

@@ -170,6 +170,9 @@ void Game::run()
 			initial_time = final_time;
 		}
 	}
+	clearScene(menuScene);
+	clearScene(gameScene);
+
 	glfwTerminate();
 }
 
@@ -302,8 +305,8 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addSkyboxShaders();
 	shaderProgramLibrary.addShadowMapShaders();
 	shaderProgramLibrary.addPointLightShadowMapShaders();
-	shaderProgramLibrary.addAnimationShaders();
-	shaderProgramLibrary.addUIShaders();
+	//shaderProgramLibrary.addAnimationShaders();
+	//shaderProgramLibrary.addUIShaders();
 }
 
 void Game::initInputOptions()
@@ -332,9 +335,8 @@ void Game::addMeshName()
 
 void Game::addLights(GameScene &scene)
 {
-	// add for loop and use array for transforms ?
-	//scene.addLight(glm::vec3(7, 9, -4), 0);
-	//scene.addLight(glm::vec3(4, 0.4, -2), 1);
+	scene.addLight(glm::vec3(7, 9, -4), 0);
+	scene.addLight(glm::vec3(4, 0.4, -2), 1);
 }
 
 void Game::addRenderManager(GameScene &scene)

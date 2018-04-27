@@ -16,7 +16,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//this->animationShaderProgram = shaderProgram->getShader<AnimationShaders>()->animationShaderProgram;
 	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
 	this->pointLightShaderProgram = shaderProgram->getShader<PointLightShadowMapShaders>()->PointLightShaderProgram;
-	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
+	//this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
 	createBuffers();
 	vao = 0;
 	skyboxVAO = 0;
