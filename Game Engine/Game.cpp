@@ -273,13 +273,15 @@ void Game::initScene(GameScene & scene)
 		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
 	//... Create Camera
 	addPlayer(scene);
+	
+	addTerrain(scene);
 	//... Create Lights
 	addLights(scene);
 	//... Read OBJ and MTL File
 	if (!meshesLoaded)
 	{
 		//Load the meshes once and store them.
-		readMeshName();
+		readMeshName(scene);
 		meshesLoaded = true;
 	}
 	//...
@@ -301,6 +303,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addShadowMapShaders();
 	shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
+	shaderProgramLibrary.addTerrainShaders();
 }
 
 void Game::initInputOptions()
@@ -324,12 +327,10 @@ void Game::addMeshName()
 	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
 	std::string meshLoader[] = { "Bucket.leap", "Stone_1.leap", "Player_temp.Leap"};
 	//meshType: 0 = Static  2 = Interactive  3 = Equiped
-	GLuint meshTypes[] = { 0 };
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 	{
 		meshName.push_back(meshLoader[i]);
-		meshType.push_back(meshTypes[i]);
 	}
 }
 
@@ -355,12 +356,16 @@ void Game::addMeshFilter(GameScene &scene)
 {
 	scene.addMeshFilter(meshLibrary, materialLibrary, meshName.size());
 }
+void Game::addTerrain(GameScene &scene)
+{
+	scene.addTerrain("test1234.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->TerrainShaderProgram);
+}
 
-void Game::readMeshName()
+void Game::readMeshName(GameScene &scene)
 {
 	for (int i = 0; i < meshName.size(); i++)
 	{
-		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram, meshType[i]);
+		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram, scene.getTerrainPointer());
 	}
 
 	materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);

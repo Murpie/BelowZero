@@ -40,7 +40,7 @@ namespace ComponentType
 	{
 		COMPONENT,
 		PLAYER,
-		LIGHT
-
+		LIGHT,
+		TERRAIN
 	};
 }

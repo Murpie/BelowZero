@@ -21,6 +21,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->inventoryCount = 0;
 	this->maxAmountOfItems = 5;
 	this->fade = 1;
+	this->textFade = 1;
 	this->startGame = true;
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
@@ -46,6 +47,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	equip("EmptyImage");
 	for (int i = 0; i < 5; i++)
 		initiateInventoryTextures("EmptyImage");
+	addTextToScreen("EmptyImageTexture");
 }
 
 Player::~Player()
@@ -160,7 +162,13 @@ void Player::equip(std::string item)
 void Player::addImageToInventory(std::string item, int inventorySlot)
 {
 	if (checkInventory(item) && item != "EmptyImage")
-		std::cout << "Item already exists in players inventory" << std::endl;
+	{
+		if (this->textTimer >= 1.0f)
+		{
+			std::cout << "Item already exists in players inventory" << std::endl;
+			addTextToScreen("Text-ItemAlreadyEquipped");
+		}
+	}
 	else
 	{
 		std::string texturePNG = "Texture.png";
@@ -210,6 +218,77 @@ bool Player::checkInventory(std::string item)
 	return check;
 }
 
+void Player::addTextToScreen(std::string item)
+{
+	std::string texturePNG = ".png";
+	std::string filePath = item + texturePNG;
+	int width, height, nrOfChannels;
+
+	// ----------========== Equipment FrameBuffer ==========----------
+	unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
+
+	glGenFramebuffers(1, &textFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, textFBO);
+
+	glGenTextures(1, &textTexture);
+	glBindTexture(GL_TEXTURE_2D, textTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+	else
+	{
+		std::cout << "Failed to load Text Texture from path" << std::endl;
+	}
+
+	stbi_image_free(data);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Text Framebuffer not complete!" << std::endl;
+	
+	if (item == "EmptyImageTexture")
+		this->textOnScreen = false;
+	else
+	{
+		this->textOnScreen = true;
+		this->textFade = 1.0;
+	}
+
+	this->textTimer = 0.0;
+	
+}
+
+void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
+{
+	this->currentY = currentHeight;
+	this->frontVertexHeight = frontV;
+	this->backVertexHeight = backV;
+	this->leftVertexHeight = leftV;
+	this->rightVertexHeight = rightV;
+	this->distanceToNextVertex = distance;
+	this->vertexLength = nrof;
+
+}
+
+void Player::setCurrentHeight(float height)
+{
+	this->currentY = height;
+}
+
+glm::vec2 Player::setXZ()
+{
+	float u = Transformable::transform.position.x;
+	float v = Transformable::transform.position.z;
+
+
+	return glm::vec2(u, v);
+}
+
 void Player::update(float deltaTime, float seconds)
 {
 	//update velocity
@@ -218,7 +297,13 @@ void Player::update(float deltaTime, float seconds)
 
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
-
+	
+	this->textTimer += tempSeconds;
+	if (this->textTimer >= 1.0f && this->textOnScreen == true)
+	{
+		addTextToScreen("EmptyImageTexture");
+	}
+	
 	// LOOSING HP
 	if (this->cold < 20)
 		this->coldMeter = 0.5;
@@ -270,10 +355,18 @@ void Player::update(float deltaTime, float seconds)
 
 	if (this->hp <= 0 && this->fade < 1)
 		this->fade += deltaTime;
+
+	// Text Fade
+	if (this->textOnScreen == true)
+		this->textFade -= 0.005;
+	else if (this->textOnScreen == false)
+		this->textFade = 1.0;
 }
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
 {
+	
+
 	//Equipment and Stats
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 		setCold(10);
@@ -376,8 +469,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		float tempY = Transformable::transform.position.y;
 		direction += Transformable::transform.forward;
-		if (shift == true)
-			Transformable::transform.position += cameraSpeed * (Transformable::transform.forward * 1.5f) * deltaTime;
+		if(shift == true)
+			Transformable::transform.position += cameraSpeed * (Transformable::transform.forward * 1.8f) * deltaTime;
 		else
 			Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
 		Transformable::transform.position.y = tempY;
@@ -407,7 +500,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
 	{
-		float tempY = Transformable::transform.position.y;
+ 		float tempY = Transformable::transform.position.y;
 		direction += Transformable::transform.right;
 		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
@@ -419,7 +512,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true)
 	{
 		inAir = true;
-		gravity = false;
 		time = 0.0f;
 		jumpReady = false;
 	}
@@ -427,10 +519,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (time <= timeInAir && inAir == true)
 	{
 		glm::vec3 jumpdir = Transformable::transform.up;
-		//if(jumpReady = true)
-		//	jumpdir = glm::normalize(direction + Transformable::transform.up);
-		//	if (shift == true)
-		//		jumpdir *= 1.5;
 
 		Transformable::transform.position += jumpSpeed * jumpdir * deltaTime;
 		Transformable::transform.velocity = Transformable::transform.up * deltaTime * cameraSpeed;
@@ -439,7 +527,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		inAir = false;
 
 
-	if (inAir == false && Transformable::transform.position.y <= 0.0f)
+	if (inAir == false && Transformable::transform.position.y <= currentY)
 	{
 		gravity = false;
 		jumpReady = true;
@@ -451,8 +539,25 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (gravity == true && inAir == false)
 		Transformable::transform.position -= fallSpeed * Transformable::transform.up  * deltaTime;
 
-	if (Transformable::transform.position.y <= -0.1f)
-		Transformable::transform.position.y = 0.0f;
+	//if (Transformable::transform.position.y <= currentY -0.1f)
+	//	Transformable::transform.position.y = currentY;
+	if (Transformable::transform.position.y <= currentY - 0.0001)
+		Transformable::transform.position.y = currentY;
+}
+
+void Player::findY()
+{
+	//float frontTemp = glm::mix(currentY, frontVertexHeight);
+	int gridX = (int)glm::floor(cameraPos.x / distanceToNextVertex);
+	int gridZ = (int)glm::floor(cameraPos.z / distanceToNextVertex);
+	float gridSquareSize(distanceToNextVertex / ((float)vertexLength - 1));
+	float xpos = cameraPos.x;
+
+
+
+	float xCoord = ((int)cameraPos.x % (int)distanceToNextVertex) / distanceToNextVertex;
+	float zCoord = ((int)cameraPos.z % (int)distanceToNextVertex) / distanceToNextVertex;
+
 }
 
 //glm::mat4 Player::getViewMatrix() const

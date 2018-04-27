@@ -14,15 +14,16 @@
 #include <fstream>
 #include "glm/glm/glm.hpp"
 #include <algorithm>    // std::unique, std::distance
+#include "Terrain.h"
 
 class Mesh
 {
 public:
 	Mesh();
-	Mesh(std::string filePath, GLuint gShaderProgram, GLuint meshType);
+	Mesh(std::string filePath, GLuint gShaderProgram, Terrain * terrain);
 	~Mesh();
 
-	void CreateMeshData(std::string filePath, GLuint gShaderProgram);
+	void CreateMeshData(std::string filePath, GLuint gShaderProgram, Terrain *terrain);
 
 	//std::vector<Vertex> Vertices;
 	//std::vector<unsigned int> indices;

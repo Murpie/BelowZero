@@ -10,6 +10,7 @@ uniform sampler2D inventoryTexture2;
 uniform sampler2D inventoryTexture3;
 uniform sampler2D inventoryTexture4;
 uniform sampler2D inventoryTexture5;
+uniform sampler2D textTexture;
 uniform sampler2D SceneTexture;
 
 uniform float hp;
@@ -17,6 +18,7 @@ uniform float cold;
 uniform float water;
 uniform float food;
 uniform float fade;
+uniform float textFade;
 
 void main()
 {
@@ -55,6 +57,12 @@ void main()
 		color.xyz = texture(SceneTexture, texCoords).xyz * abs(texture(inventoryTexture5, texCoords).w - 1);
 		color.w = texture(SceneTexture, texCoords).w;
 	}
+	else if (texture(textTexture, texCoords).w >= 0.01)
+	{
+		color.xyz = texture(SceneTexture, texCoords).xyz * abs(texture(textTexture, texCoords).w - 1);
+		color.w = texture(SceneTexture, texCoords).w;
+		color.w = textFade;
+	}
 	else
 	{
 		color = texture(SceneTexture, texCoords);
@@ -91,8 +99,12 @@ void main()
 
 	if (texture(inventoryTexture5, texCoords).w >= 0.01)
 		color.xyz += texture(inventoryTexture5, texCoords).xyz;
-	
 
+	if (texture(textTexture, texCoords).w >= 0.01)
+	{
+		color.xyz += texture(textTexture, texCoords).xyz;
+		color.w = textFade;
+	}
 
 	if (fade < 1 && fade > 0)
 		color.xyz = color.xyz + fade;

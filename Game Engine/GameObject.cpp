@@ -192,3 +192,17 @@ glm::mat4 GameObject::getViewMatrix()
 	return glm::lookAt(transform->position, transform->position + transform->forward, transform->up);
 
 }
+
+Terrain * GameObject::getTerrain()
+{
+	for (int i = 0; i < components.size(); i++)
+	{
+
+		if (components[i]->id == ComponentType::ID::TERRAIN)
+		{
+			Terrain* terrain = static_cast<Terrain*>(components[i]);
+			return terrain;
+		}
+	}
+	return nullptr;
+}

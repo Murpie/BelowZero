@@ -119,7 +119,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)glfw\lib-vc2010-64;$(SolutionDir)glew-1.11.0\lib\Release\x64;$(SolutionDir)Game Engine\LeapImporter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)glfw\lib-vc2010-64;$(SolutionDir)glew-1.11.0\lib\Release\x64;LeapImporter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;LeapImporter.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -180,6 +180,7 @@
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightpassShaders.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TerrainShaders.cpp" />
     <ClCompile Include="UIShaders.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialLib.cpp" />
@@ -194,7 +195,6 @@
     <ClCompile Include="SkelletonVertex.cpp" />
     <ClCompile Include="stb.cpp" />
     <ClCompile Include="Terrain.cpp" />
-    <ClCompile Include="TerrainShader.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureLib.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -252,6 +252,8 @@
     <None Include="GeometryVS.glsl" />
     <None Include="lightpassFS.glsl" />
     <None Include="lightpassVS.glsl" />
+    <None Include="TerrainFS.glsl" />
+    <None Include="TerrainVS.glsl" />
     <None Include="UIFS.glsl" />
     <None Include="UIVS.glsl" />
     <None Include="ShadowMapFS.glsl" />

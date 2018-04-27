@@ -25,8 +25,10 @@ public:
 	float foodTick;
 	float damage;
 	float fade;
+	float textFade;
 
 	bool startGame;
+	bool textOnScreen;
 
 	int initializer;
 	int inventory[5];
@@ -40,6 +42,8 @@ public:
 	unsigned int equipedTexture;
 	unsigned int inventoryFBO[5];
 	unsigned int inventoryTexture[5];
+	unsigned int textFBO;
+	unsigned int textTexture;
 
 	void setCold(float value);
 	void setWater(float value);
@@ -50,7 +54,11 @@ public:
 	void equip(std::string item);
 	void addImageToInventory(std::string item, int inventorySlot);
 	bool checkInventory(std::string item);
+	void addTextToScreen(std::string item);
 
+	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
+	void setCurrentHeight(float height);
+	glm::vec2 setXZ();
 	//Physics
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
@@ -58,6 +66,7 @@ public:
 	//glm::mat4 getViewMatrix()const;
 
 private:
+
 
 	bool frontCollision = false;
 	bool bottomCollision = false;
@@ -80,6 +89,7 @@ private:
 	float sensitivity;
 
 	float time = 0.0;
+	float textTimer = 0.0;
 
 	float jumpSpeed = 7.64;
 	float cameraSpeed = 7.06;
@@ -90,4 +100,16 @@ private:
 	bool inAir = false;
 	float timeInAir = 0.3;
 	bool gravity = false;
+
+	//Terrain
+	float currentY;
+	float frontVertexHeight;
+	float backVertexHeight;
+	float leftVertexHeight;
+	float rightVertexHeight;
+	float distanceToNextVertex;
+
+	int vertexLength;
+
+	void findY();
 };
