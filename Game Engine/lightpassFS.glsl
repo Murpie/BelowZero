@@ -116,4 +116,5 @@ void main()
 
 	FragColor = lighting * (1.0f - shadowFactor);
 	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5, visibility);
+	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
 }

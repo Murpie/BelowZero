@@ -26,11 +26,11 @@ RenderManager::~RenderManager()
 
 void RenderManager::FindObjectsToRender() {
 	for (unsigned int i = 0; i < gameScene->gameObjects.size(); i++) {
-	/*	glm::vec3 vectorToObject = gameScene->gameObjects[0].transform.position - gameScene->gameObjects[i].transform.position;
+	glm::vec3 vectorToObject = gameScene->gameObjects[0].transform->position - gameScene->gameObjects[i].transform->position;
 
-		float distance = length(vectorToObject);*/
+		float distance = length(vectorToObject);
 
-		if (gameScene->gameObjects[i].getIsRenderable() == true) {
+		if (gameScene->gameObjects[i].getIsRenderable() == true && distance < 83) {
 			gameObjectsToRender.push_back(&gameScene->gameObjects[i]);
 		}
 
@@ -185,20 +185,20 @@ void RenderManager::createBuffers()
 void RenderManager::Render() {
 	FindObjectsToRender();
 
-	gameScene->gameObjects[0].transform->position.y = gameScene->gameObjects[1].getTerrain()->calculateY(gameScene->gameObjects[0].transform->position.x, gameScene->gameObjects[0].transform->position.y);
+	//gameScene->gameObjects[0].transform->position.y = gameScene->gameObjects[1].getTerrain()->calculateY(gameScene->gameObjects[0].transform->position.x, gameScene->gameObjects[0].transform->position.y);
 
-	//for (int i = 0; i < gameScene->gameObjects.size(); i++)
-	//{
-	//	if (gameScene->gameObjects[i].getPlayer() != nullptr)
-	//	{
-	//		glm::vec2 temp = gameScene->gameObjects[i].getPlayer()->setXZ();
-	//		for (int j = 0; j < gameScene->gameObjects.size(); j++)
-	//			if (gameScene->gameObjects[j].getTerrain() != nullptr)
-	//			{
-	//				gameScene->gameObjects[i].getPlayer()->setCurrentHeight(gameScene->gameObjects[j].getTerrain()->calculateY(temp.x, temp.y));
-	//			}
-	//	}
-	//}
+	for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	{
+		if (gameScene->gameObjects[i].getPlayer() != nullptr)
+		{
+			glm::vec2 temp = gameScene->gameObjects[i].getPlayer()->setXZ();
+			for (int j = 0; j < gameScene->gameObjects.size(); j++)
+				if (gameScene->gameObjects[j].getTerrain() != nullptr)
+				{
+					gameScene->gameObjects[i].getPlayer()->setCurrentHeight(gameScene->gameObjects[j].getTerrain()->calculateY(temp.x, temp.y));
+				}
+		}
+	}
 
 	//... Set view and projection matrix
 	view_matrix = gameScene->gameObjects[0].getViewMatrix();
@@ -257,11 +257,11 @@ void RenderManager::Render() {
 	//... Terrain PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glUseProgram(geometryShaderProgram);
+	glUseProgram(terrainShaderProgram);
 
-	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
-	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
-//	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(terrainShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(terrainShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(terrainShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
@@ -289,25 +289,27 @@ void RenderManager::Render() {
 	
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
-	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+	//glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
 
-
-	gameObjectsToRender[0]->materialComponent->bindTextures();
+	if (gameObjectsToRender.size() > 0)
+		gameObjectsToRender[0]->materialComponent->bindTextures();
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "model_matrix"), 1, GL_FALSE, glm::value_ptr(gameObjectsToRender[i]->meshFilterComponent->worldTransform));
+		//glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "model_matrix"), 1, GL_FALSE, glm::value_ptr(gameObjectsToRender[i]->transform->position));
 
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 3)
 			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 1);
 		else
 			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 0);
 
+		
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
 		//...
-		world_matrix = glm::translate(world_matrix, gameObjectsToRender[i]->transform->position);
-		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+		glm::mat4 tempMatrix = glm::mat4(1);
+		tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
+		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
 		//...
 
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);

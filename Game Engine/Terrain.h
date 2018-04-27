@@ -22,7 +22,6 @@ private:
 	float MAX_HEIGHT = 90;
 	float MIN_HEIGHT = 0;
 	int sizePerSide = 128;
-	float MAX_PIXEL_COLOR = 256 * 256 * 256;
 	Texture HeightMap;
 	Texture AlbedoMap;
 
