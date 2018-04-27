@@ -97,7 +97,7 @@ void RenderManager::createBuffers()
 	width = 0;
 	height = 0;
 	nrOfChannels = 0;
-	data = stbi_load("Particle.png", &width, &height, &nrOfChannels, 0);
+	data = stbi_load("fire.png", &width, &height, &nrOfChannels, 0);
 	glGenTextures(1, &billboardTexture);
 	glBindTexture(GL_TEXTURE_2D, billboardTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -369,7 +369,7 @@ void RenderManager::Render() {
 	glm::vec3 cameraRight_vector = glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
 	glm::vec3 cameraUp_vector = glm::vec3(view_matrix[0][1], view_matrix[1][2], view_matrix[2][3]);
 
-	glm::vec3 billPos = { 3.0f, 0.5f, 0.0f };
+	glm::vec3 billPos = { 20.0f, 30.f, 20.0f };
 	glm::vec2 billSize = { 1.0f, 1.125f };
 
 	glUniform3fv(glGetUniformLocation(vfxShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
