@@ -33,6 +33,8 @@ void Terrain::setupVertexData()
 	glBindFramebuffer(GL_FRAMEBUFFER, PBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, HeightMap.gTexture, 0);
 
+	glViewport(0, 0, Height, Length);
+
 
 	GLubyte pixels[4];// = (GLubyte*)malloc(this->HeightMap.width * this->HeightMap.height * sizeof(GLubyte) * 4);
 
@@ -52,7 +54,7 @@ void Terrain::setupVertexData()
 		{
 			TerrainVertex temp;
 
-			glReadPixels((i*lengthTemp), (j*heightTemp), /*this->HeightMap.width*/1, /*this->HeightMap.height*/1, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+			glReadPixels((i*lengthTemp), (j*heightTemp), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 
 
@@ -153,6 +155,8 @@ void Terrain::setupVertexData()
 	//} 
 	for (int i = 0; i < this->indices.size()-2; i += 2)
 	{
+		if (i >= 65270)
+			int ar = 0;
 
 		glm::vec3 v1 = glm::vec3(this->terrainVertices[indices[i]].x, this->terrainVertices[indices[i]].y, this->terrainVertices[indices[i]].z);
 		glm::vec3 v2 = glm::vec3(this->terrainVertices[indices[i + 1]].x, this->terrainVertices[indices[i + 1]].y, this->terrainVertices[indices[i + 1]].z);
