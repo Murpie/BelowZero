@@ -22,13 +22,13 @@ void main()
 {
 	vec3 particleCenter_wordspace = billboardPos;
 
-	vec3 vertexPosition_worldspace = particleCenter_wordspace + cameraRight_worldspace * squareVertices.x * billboardSize.x + cameraUp_worldspace * squareVertices.y * billboardSize.y;
+	vec3 vertexPosition_worldspace = particleCenter_wordspace + cameraRight_worldspace * squareVertices.x * billboardSize.x + vec3(0,-0.8,0) * squareVertices.y * billboardSize.y;
 
 
 	// Output position of the vertex test 2
 	gl_Position = vp * vec4(vertexPosition_worldspace, 1.0f);
+	//gl_Position.w = 0.1;
 	
-	// Output position of the vertex test 3
-	//gl_Position = projection_matrix * view_matrix * world_matrix * vec4(squareVertices, 1.0);
+	// UVs
 	uv = squareVertices.xy + vec2(0.5, 0.5);
 }

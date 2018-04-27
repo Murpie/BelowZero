@@ -11,11 +11,11 @@ uniform float lifeLevel;
 
 
 void main(){
-	vec3 bbTexture = texture(particleTexture, uv).rgb;
+	vec4 bbTexture = texture(particleTexture, uv).rgba;
 
 	// Output color = color of the texture at the specified UV
 	//color = texture(myTextureSampler, uv);
-	color = vec4(bbTexture, 1.0);
+	color = vec4(bbTexture);
 	//color = vec4(1.0, 0.0, 0.0, 1.0)
 	
 	// Hardcoded life level, should be in a separate texture.

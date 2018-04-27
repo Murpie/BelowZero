@@ -81,7 +81,7 @@ void RenderManager::createBuffers()
 	width = 0;
 	height = 0;
 	nrOfChannels = 0;
-	data = stbi_load("ocean.png", &width, &height, &nrOfChannels, 0);
+	data = stbi_load("Particle.png", &width, &height, &nrOfChannels, 0);
 	glGenTextures(1, &billboardTexture);
 	glBindTexture(GL_TEXTURE_2D, billboardTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -284,57 +284,6 @@ void RenderManager::Render() {
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
 
-	//... VFX
-	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glUseProgram(vfxShaderProgram);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, billboardTexture);
-	glUniform1i(glGetUniformLocation(vfxShaderProgram, "myTextureSampler"), 0);
-
-	/*glm::mat4 billboardWorldMatrix = glm::mat4(1);
-	billboardWorldMatrix = glm::translate(billboardWorldMatrix, glm::vec3(5.0, 1.0, 0.0));*/
-
-	glm::mat4 viewProjectionMatrix = projection_matrix * view_matrix;
-	glm::vec3 cameraRight_vector = glm::vec3(view_matrix[0][0], -view_matrix[1][0], view_matrix[2][0]);
-	glm::vec3 cameraUp_vector = glm::vec3(view_matrix[0][1], -view_matrix[1][2], view_matrix[2][3]);
-
-	glm::vec3 billPos = { 3.0f, 0.5f, 0.0f };
-	glm::vec2 billSize = { 1.0f, 1.125f };
-
-	glUniform3fv(glGetUniformLocation(vfxShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
-	glUniform3fv(glGetUniformLocation(vfxShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
-	glUniformMatrix4fv(glGetUniformLocation(vfxShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
-
-	glUniform3fv(glGetUniformLocation(vfxShaderProgram, "billboardPos"), 1, glm::value_ptr(billPos));
-	glUniform2fv(glGetUniformLocation(vfxShaderProgram, "billboardSize"), 1, glm::value_ptr(billSize));
-
-	float lifeLevel = sin(deltaTime)* 0.1f + 0.7f;
-
-	glUniform1f(glGetUniformLocation(vfxShaderProgram, "lifeLevel"), lifeLevel);
-
-	glBindVertexArray(billboard_vertex_array);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-	glVertexAttribPointer(
-		0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-		3,                  // size
-		GL_FLOAT,           // type
-		GL_FALSE,           // normalized?
-		0,                  // stride
-		(void*)0            // array buffer offset
-	);
-
-	glStencilFunc(GL_ALWAYS, 2, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	
-	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-
 	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -365,13 +314,62 @@ void RenderManager::Render() {
 		glDrawElements(GL_TRIANGLES, gameObjectsToRender[i]->meshFilterComponent->vertexCount, GL_UNSIGNED_INT, 0);
 	}
 
-	//------=====================Animation Pass=======================-------
-	//glUseProgram(animationShaderProgram);
+	//... VFX
+	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
+	glStencilMask(0xFF); // enable writing to the stencil buffer
+	glStencilFunc(GL_ALWAYS, 2, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glUseProgram(vfxShaderProgram);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, billboardTexture);
+	glUniform1i(glGetUniformLocation(vfxShaderProgram, "myTextureSampler"), 0);
+
+	/*glm::mat4 billboardWorldMatrix = glm::mat4(1);
+	billboardWorldMatrix = glm::translate(billboardWorldMatrix, glm::vec3(5.0, 1.0, 0.0));*/
+
+	glm::mat4 viewProjectionMatrix = projection_matrix * view_matrix;
+	glm::vec3 cameraRight_vector = glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
+	glm::vec3 cameraUp_vector = glm::vec3(view_matrix[0][1], view_matrix[1][2], view_matrix[2][3]);
+
+	glm::vec3 billPos = { 3.0f, 0.5f, 0.0f };
+	glm::vec2 billSize = { 1.0f, 1.125f };
+
+	glUniform3fv(glGetUniformLocation(vfxShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
+	glUniform3fv(glGetUniformLocation(vfxShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
+	glUniformMatrix4fv(glGetUniformLocation(vfxShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
+
+	glUniform3fv(glGetUniformLocation(vfxShaderProgram, "billboardPos"), 1, glm::value_ptr(billPos));
+	glUniform2fv(glGetUniformLocation(vfxShaderProgram, "billboardSize"), 1, glm::value_ptr(billSize));
+
+	float lifeLevel = sin(deltaTime)* 0.1f + 0.7f;
+
+	glUniform1f(glGetUniformLocation(vfxShaderProgram, "lifeLevel"), lifeLevel);
+
+	glBindVertexArray(billboard_vertex_array);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+	glVertexAttribPointer(
+		0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+	);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glDisable(GL_BLEND);
 
 	//... Copy Stencil Buffer from gbo to finalFBO
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, finalFBO);
 	glBlitFramebuffer(0, 0, display_w, display_h, 0, 0, display_w, display_h, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+	glBlitFramebuffer(0, 0, display_w, display_h, 0, 0, display_w, display_h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
