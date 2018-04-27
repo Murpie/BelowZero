@@ -2,6 +2,7 @@
 
 Mesh::Mesh()
 {
+	//this->importer = LeapImporter();
 }
 
 Mesh::Mesh(std::string filePath, GLuint gShaderProgram)
@@ -12,11 +13,12 @@ Mesh::Mesh(std::string filePath, GLuint gShaderProgram)
 
 Mesh::~Mesh()
 {
+	//importer.deleteObject(leapMesh);
 }
 
 void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram)
 {
-	LeapImporter importer;
+	//LeapImporter importer;
 
 	leapMesh = importer.getMesh(filePath.c_str());
 
@@ -72,4 +74,9 @@ void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram)
 	);
 
 	//importer.deleteObject(leapMesh);
+}
+
+void Mesh::deleteLeapMesh()
+{
+	importer.deleteObject(leapMesh);
 }

@@ -22,7 +22,7 @@ public:
 
 	void addLight(glm::vec3 transform, int lightType);
 	void addPlayer(); //player
-	void addMeshFilter(MeshLib& meshLibrary, MaterialLib& matertialLibrary, GLuint meshNameSize);
+	void addMeshFilter(MeshLib& meshLibrary, MaterialLib& matertialLibrary, LeapLevel* level);
 	void addTerrain(const std::string & heightMap, GLuint shader);
 
 	void update(float deltaTime, float seconds); // Updates all the objects in the scene

@@ -54,7 +54,7 @@ void GameScene::addPlayer()
 	gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(0.f, 0.f, 0.f);
 }
 
-void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibrary, GLuint meshNameSize)
+void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibrary, LeapLevel* level)
 {
 	/*
 	meshNameSize should be replaced or removed
@@ -72,27 +72,33 @@ void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibra
 		* ...
 	*/
 
-	for (int i = 0; i < meshNameSize; i++) // 3 - meshLibrary.getNumberOfMeshes(); meshName.size();
+	for (int i = 0; i < level->levelObjects.size(); i++) // 3 - meshLibrary.getNumberOfMeshes(); meshName.size();
 	{
 		addEmptyGameObject();
-		gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(10, 0, 20);
-		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).leapMesh->getVertexCount(), meshLibrary.getMesh(i).meshType);
+
+		gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
+		MeshFilter* meshFilter = 
+			new MeshFilter(meshLibrary.getMesh(level->levelObjects[i]->id).gVertexBuffer, 
+				meshLibrary.getMesh(level->levelObjects[i]->id).gVertexAttribute, 
+				meshLibrary.getMesh(level->levelObjects[i]->id).leapMesh->getVertexCount(), 
+				meshLibrary.getMesh(level->levelObjects[i]->id).meshType);
 		
 		float temp = gameObjects[1].getTerrain()->calculateY(gameObjects[gameObjects.size() - 1].transform->position.x, gameObjects[gameObjects.size() - 1].transform->position.z) -2;
 
 		/*meshFilter->worldTransform = glm::translate(meshFilter->worldTransform, glm::vec3(uv.x, temp, uv.y));*/
-		gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(gameObjects[gameObjects.size() - 1].transform->position.x, temp, gameObjects[gameObjects.size() - 1].transform->position.z);
+		gameObjects[gameObjects.size() - 1].transform->position.y = temp;
 		gameObjects[gameObjects.size() - 1].name = "Mesh " + std::to_string(i); // Maybe pass the name of the object?
 		gameObjects[gameObjects.size() - 1].addComponent(meshFilter);
 		gameObjects[gameObjects.size() - 1].addComponent(matertialLibrary.getMaterial(0));
+		gameObjects[gameObjects.size() - 1].objectID = (ObjectType::ID)level->levelObjects[i]->id;
 		//gameObjects[gameObjects.size() - 1].materialComponent = matertialLibrary.getMaterial(i);
 		//... set interactable
-		if(meshLibrary.getMesh(i).meshType == 1)
+		if(meshLibrary.getMesh(level->levelObjects[i]->id).meshType == 1)
 			gameObjects[gameObjects.size() - 1].isInteractable = true; // if meshType 1, set true
 		//std::cout << "MESHFILTER::" << gameObjects.size() - 1 << std::endl;
 
 		//Add BBox from leapmesh to gameObject
-		for (int i = 0; i < meshLibrary.getMesh(i).leapMesh->boundingBoxes.size(); i++)
+		for (int i = 0; i < meshLibrary.getMesh(level->levelObjects[i]->id).leapMesh->boundingBoxes.size(); i++)
 		{
 			//meshLibrary.getMesh(i).leapMesh->boundingBoxes
 			bBox box = bBox();

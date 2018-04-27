@@ -24,10 +24,10 @@ public:
 	~Mesh();
 
 	void CreateMeshData(std::string filePath, GLuint gShaderProgram);
-
+	void deleteLeapMesh();
 	//std::vector<Vertex> Vertices;
 	//std::vector<unsigned int> indices;
-
+	LeapImporter importer;
 	LeapMesh* leapMesh;
 	//int vertexCount;
 	unsigned int meshType; //remove this later and use *leapMesh
