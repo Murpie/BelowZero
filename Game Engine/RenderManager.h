@@ -96,6 +96,8 @@ private:
 	unsigned int billboardTexture;
 	unsigned int billboardVAO = 0;
 	unsigned int billboardVBO;
+	unsigned int billboard_vertex_array;
+	unsigned int billboard_vertex_buffer;
 	unsigned int particlePositionBuffer;
 	unsigned int particleColorBuffer;
 
@@ -139,6 +141,8 @@ private:
 	GLuint vfxShaderProgram;
 
 	int display_w, display_h;
+	unsigned int vertexPos;
+	unsigned int uvPos;
 
 	float billboard[36] = {
 		10.0f,  0.5f, -10.5f, 0.0f,  0.0f,//BL		//pos & uv

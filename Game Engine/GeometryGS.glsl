@@ -21,7 +21,7 @@ out GS_OUT{
 
 void main() {
 
-	vec4 pointA = gs_in[0].world_matrix * gl_in[0].gl_Position;
+	/*vec4 pointA = gs_in[0].world_matrix * gl_in[0].gl_Position;
 	vec4 pointB = gs_in[0].world_matrix * gl_in[1].gl_Position;
 	vec4 pointC = gs_in[0].world_matrix * gl_in[2].gl_Position;
 
@@ -33,7 +33,7 @@ void main() {
 
 	float d = dot(-normal, camRay.xyz);
 	if (d > 0.0 || gs_in[0].followCamera == 1)
-	{
+	{*/
 		for (int i = 0; i < gl_in.length(); i++)
 		{
 			if (gs_in[0].followCamera == 1)
@@ -55,5 +55,5 @@ void main() {
 		}
 
 		EndPrimitive();
-	}
+	//}
 }
