@@ -10,9 +10,6 @@ GameObject::GameObject()
 	isInteractable = false;
 	modelMatrix = glm::mat4();
 	objectID = ObjectType::ID::BUCKET;
-	//transform.forward = glm::vec3(1, 0, 0);
-	//transform.up = glm::vec3(0, 1, 0);
-	//transform.right = glm::vec3(0, 0, 1);
 }
 
 GameObject::~GameObject()
