@@ -27,7 +27,7 @@ public:
 	void deleteLeapMesh();
 	//std::vector<Vertex> Vertices;
 	//std::vector<unsigned int> indices;
-	LeapImporter importer;
+	//LeapImporter importer;
 	LeapMesh* leapMesh;
 	//int vertexCount;
 	unsigned int meshType; //remove this later and use *leapMesh
