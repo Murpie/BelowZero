@@ -48,52 +48,36 @@ void GameScene::addPlayer()
 
 void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibrary, LeapLevel* level)
 {
-	/*
-	meshNameSize should be replaced or removed
-	*/
-
-	/*
-	This function should get data from the level file and create as many objects of each type that is needed
-	to build the scene.
-	*/
-
-	/*
-	We need this for each object in the scene:
-		* World position
-		* Mesh ID or mesh name to decide which mesh from the MeshLib to use when adding a new object to the scene.
-		* ...
-	*/
-
-	for (int i = 0; i < level->levelObjects.size(); i++) // 3 - meshLibrary.getNumberOfMeshes(); meshName.size();
+	for (int i = 0; i < level->levelObjects.size(); i++)
 	{
 		addEmptyGameObject();
 
-		gameObjects[gameObjects.size() - 1]->transform->position =
-			glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
-		
+		//Set gameObjectName
+		gameObjects[gameObjects.size() - 1]->name = "Mesh " + std::to_string(i);
+
+		//Set gameObject position in world and Calculate new world Y position from heightMap and set new Y
+		gameObjects[gameObjects.size() - 1]->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
+		float newPositionY = gameObjects[1]->getTerrain()->calculateY(gameObjects[gameObjects.size() - 1]->transform->position.x, gameObjects[gameObjects.size() - 1]->transform->position.z) - 2;
+		gameObjects[gameObjects.size() - 1]->transform->position.y = newPositionY;
+
+		//Add mesh to gameObject from meshLibrary
 		MeshFilter* meshFilter = 
 			new MeshFilter(meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer, 
 				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexAttribute,
 				meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->getVertexCount(),
 				meshLibrary.getMesh(level->levelObjects[i]->id)->meshType);
-		
-		float temp = gameObjects[1]->getTerrain()->calculateY(gameObjects[gameObjects.size() - 1]->transform->position.x, gameObjects[gameObjects.size() - 1]->transform->position.z) -2;
-
-		/*meshFilter->worldTransform = glm::translate(meshFilter->worldTransform, glm::vec3(uv.x, temp, uv.y));*/
-		gameObjects[gameObjects.size() - 1]->transform->position.y = temp;
-		gameObjects[gameObjects.size() - 1]->name = "Mesh " + std::to_string(i); // Maybe pass the name of the object?
 		gameObjects[gameObjects.size() - 1]->addComponent(meshFilter);
+		
+		//Add material to gameObject from materialLibrary
 		gameObjects[gameObjects.size() - 1]->addComponent(matertialLibrary.getMaterial(0));
+		//Set customAttribute ID from Enum.H
 		gameObjects[gameObjects.size() - 1]->objectID = (ObjectType::ID)level->levelObjects[i]->id;
-
-		//... set interactable
+		//Set customAttribute interactable
 		if((int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 1)
-			gameObjects[gameObjects.size() - 1]->isInteractable = true; // if meshType 1, set true
-
+			gameObjects[gameObjects.size() - 1]->isInteractable = true;
 		//Add BBox from leapmesh to gameObject
 		for (int i = 0; i < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); i++)
 		{
-			//meshLibrary.getMesh(i).leapMesh->boundingBoxes
 			bBox box = bBox();
 			//add center
 			box.center.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[0];

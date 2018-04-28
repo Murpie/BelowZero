@@ -6,10 +6,9 @@ ShaderProgramLib::ShaderProgramLib()
 
 ShaderProgramLib::~ShaderProgramLib()
 {
-	for (int i = 0; i < shaders.size(); i++)
-	{
-		delete shaders[i];
-	}
+	for (ShaderBase* shader_ptr : shaders)
+		delete shader_ptr;
+	shaders.clear();
 }
 
 void ShaderProgramLib::addGeometryPassShaders()

@@ -73,7 +73,7 @@ Game::Game() :
 	windowName("Game Engine"),
 	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
-	meshesLoaded(false), fullscreen(false), stateBool(false),
+	meshesLoaded(false), fullscreen(false), stateBool(false), texturesLoaded(false),
 	count(0)
 {
 	initWindow();
@@ -343,8 +343,11 @@ void Game::readMeshName(GameScene &scene)
 	{
 		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
 	}
-
-	materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
-	textureLibrary.addAlbedo("Colors.png");
-	materialLibrary.getMaterial(0)->addAlbedo(textureLibrary.getAlbedo(0)->gTexture);
+	if (!texturesLoaded)
+	{
+		materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
+		textureLibrary.addAlbedo("Colors.png");
+		materialLibrary.getMaterial(0)->addAlbedo(textureLibrary.getAlbedo(0)->gTexture);
+		texturesLoaded = true;
+	}
 }

@@ -92,6 +92,7 @@ private:
 	//
 	bool meshesLoaded;
 	bool fullscreen;
+	bool texturesLoaded;
 
 	int count;
 
