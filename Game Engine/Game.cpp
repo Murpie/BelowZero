@@ -329,7 +329,7 @@ void Game::addMeshFilter(GameScene &scene)
 {
 	// rework for LeapLevel file
 	LeapLevel* level = new LeapLevel("Level_test.leap");
-	scene.addMeshFilter(meshLibrary, materialLibrary, level);
+	scene.addLevelObjects(meshLibrary, materialLibrary, level);
 	delete level;
 }
 void Game::addTerrain(GameScene &scene)

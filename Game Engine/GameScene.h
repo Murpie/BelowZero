@@ -16,21 +16,17 @@ public:
 
 	std::vector<GameObject*> gameObjects; 
 
-	void addEmptyGameObject();
-	// clearGameObjects is unused atm. 
-	void clearGameObjects(); // delete all pointers in each gameobject and reload on scene swap
-
+	void clearGameObjects();
 	void addLight(glm::vec3 transform, int lightType);
-	void addPlayer(); //player
-	void addMeshFilter(MeshLib& meshLibrary, MaterialLib& matertialLibrary, LeapLevel* level);
+	void addPlayer(); 
+	void addLevelObjects(MeshLib& meshLibrary, MaterialLib& matertialLibrary, LeapLevel* level);
 	void addTerrain(const std::string & heightMap, GLuint shader);
 
 	void update(float deltaTime, float seconds); // Updates all the objects in the scene
 	void processEvents(GLFWwindow *window, float deltaTime); // Updates objects if a evenet occurs, mouse press, button press etc. 
+	void interactionTest(GameObject & other, GLFWwindow * window); // Intersection test on mouse click
 
 private:
-
-	//...
-	int camerasInScene; //player atm
-	int lightsInScene; //
+	int camerasInScene; //player 
+	int lightsInScene; 
 };

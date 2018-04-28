@@ -1,5 +1,7 @@
 #pragma once
 #define _CRTDBG_MAP_ALLOC
+#define SCREEN_WIDTH 1280.0
+#define SCREEN_HEIGHT 720.0
 
 namespace Gamestate
 {

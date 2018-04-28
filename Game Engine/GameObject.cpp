@@ -3,7 +3,7 @@
 GameObject::GameObject()
 {
 	transform = new Transform();
-	name = "EmptyGameObject";
+	name = "";
     isActive = true;
     isRenderable = false;
     hasLight = false;
