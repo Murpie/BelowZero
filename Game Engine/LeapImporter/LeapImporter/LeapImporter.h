@@ -4,6 +4,8 @@
 
 #include <vector>
 #include <iostream>
+#include <list>
+#include <memory>
 
 using namespace std;
 
@@ -16,6 +18,12 @@ public:
 	LeapMesh* getMesh(const char* meshName);
 	LeapLevel* getLevel(const char* levelName);
 
-	void deleteObject(LeapMesh* mesh);
-	void deleteObject(LeapLevel* level);
+	list<LeapMesh*> leapMesh;
+	list<LeapLevel*> leapLevel;
+
+	void deleteLevel();
+	void deleteMesh();
+
+private:
+
 };

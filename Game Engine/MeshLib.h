@@ -14,13 +14,13 @@ public:
 
 	void addMesh(std::string filePath, GLuint gShaderProgram);
 
-	void addAnimatedMesh(std::string filePath, GLuint gShaderProgram);
-	Mesh& getMesh(int key);
-	AnimatedMesh& getAnimatedMesh(int key);
+	//void addAnimatedMesh(std::string filePath, GLuint gShaderProgram);
+	Mesh* getMesh(int key);
+	//AnimatedMesh& getAnimatedMesh(int key);
 
 	int getNumberOfMeshes();
 
 private:
-	std::vector<Mesh> meshes;
-	std::vector<AnimatedMesh> animatedMeshes;
+	std::vector<Mesh*> meshes;
+	//std::vector<AnimatedMesh> animatedMeshes;
 };

@@ -2,36 +2,40 @@
 
 LeapImporter::LeapImporter()
 {
+
 }
 
 LeapImporter::~LeapImporter()
-{
-
+{	
+	deleteMesh();
+	deleteLevel();
 }
 
 LeapMesh * LeapImporter::getMesh(const char* meshName)
 {
-	//Check file type and get error if not correct.
-
-	LeapMesh* newMesh = new LeapMesh(meshName);
-
-	return newMesh;
+	LeapMesh* mesh = new LeapMesh(meshName);
+	leapMesh.push_back(mesh);
+	return mesh;
 }
 
 LeapLevel * LeapImporter::getLevel(const char * levelName)
 {
-
-	LeapLevel* newLevel = new LeapLevel(levelName);
-
-	return newLevel;
+	LeapLevel* level = new LeapLevel(levelName);
+	leapLevel.push_back(level);
+	return level;
 }
 
-void LeapImporter::deleteObject(LeapMesh * mesh)
+void LeapImporter::deleteLevel()
 {
-	delete mesh;
+	for (LeapLevel* level_ptr : leapLevel)
+		delete level_ptr;
+	leapLevel.clear();
 }
 
-void LeapImporter::deleteObject(LeapLevel * level)
+void LeapImporter::deleteMesh()
 {
-	delete level;
+	for (LeapMesh* mesh_ptr : leapMesh)
+		delete mesh_ptr;
+	leapMesh.clear();
 }
+

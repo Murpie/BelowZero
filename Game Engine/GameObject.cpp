@@ -17,13 +17,8 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
-	//deleteAllComponents();
-
-	//These will probably give memory leaks if not deleted.
-
-	//delete materialComponent;
-	//delete meshFilterComponent;
-	//delete lightComponent;
+	deleteAllComponents();
+	delete transform;
 	bbox.clear();
 }
 
@@ -141,16 +136,10 @@ void GameObject::deleteAllComponents()
 {
 	for (Component* component_ptr : components)
 	{
-		std::cout << component_ptr << std::endl;
 		if(component_ptr->id != ComponentType::ID::MATERIAL)
 			delete component_ptr;
 	}
 	components.clear();
-
-	//delete transform;
-	//delete materialComponent;
-	//delete meshFilterComponent;
-	//delete lightComponent;
 }
 
 const bool GameObject::getIsRenderable() {
@@ -201,14 +190,12 @@ glm::mat4 GameObject::getViewMatrix()
 
 Terrain * GameObject::getTerrain()
 {
-	for (int i = 0; i < components.size(); i++)
+	for (Component* component_ptr : components)
 	{
-
-		if (components[i]->id == ComponentType::ID::TERRAIN)
+		if (component_ptr->id == ComponentType::ID::TERRAIN)
 		{
-			Terrain* terrain = static_cast<Terrain*>(components[i]);
+			Terrain* terrain = static_cast<Terrain*>(component_ptr);
 			return terrain;
 		}
 	}
-	return nullptr;
 }

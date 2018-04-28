@@ -1,11 +1,13 @@
 #include "Mesh.h"
 
-Mesh::Mesh()
+Mesh::Mesh() :
+	importer()	
 {
 	//this->importer = LeapImporter();
 }
 
-Mesh::Mesh(std::string filePath, GLuint gShaderProgram)
+Mesh::Mesh(std::string filePath, GLuint gShaderProgram) :
+	importer()
 {
 	//vertexCount = 0;
 	CreateMeshData(filePath, gShaderProgram);
@@ -13,14 +15,16 @@ Mesh::Mesh(std::string filePath, GLuint gShaderProgram)
 
 Mesh::~Mesh()
 {
+	//delete leapMesh;
 	//importer.deleteObject(leapMesh);
 }
 
 void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram)
 {
-	//LeapImporter importer;
+	/*LeapImporter importer;*/
 
 	leapMesh = importer.getMesh(filePath.c_str());
+	//leapMesh = new LeapMesh(filePath.c_str());
 
 	this->meshType = (int)leapMesh->customMayaAttribute;
 
@@ -78,5 +82,5 @@ void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram)
 
 void Mesh::deleteLeapMesh()
 {
-	importer.deleteObject(leapMesh);
+	//importer.deleteObject(leapMesh);
 }

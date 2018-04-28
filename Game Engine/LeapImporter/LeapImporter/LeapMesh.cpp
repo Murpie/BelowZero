@@ -7,6 +7,7 @@ LeapMesh::LeapMesh()
 LeapMesh::LeapMesh(const char* fileName)
 {
 	loader(fileName);
+	this->fileName = fileName;
 }
 
 LeapMesh::~LeapMesh()
@@ -15,7 +16,10 @@ LeapMesh::~LeapMesh()
 	{
 		delete bbox_ptr;
 	}
-	boundingBoxes.clear();
+	//boundingBoxes.clear();
+
+	delete[] this->vertices;
+	delete this->customMayaAttribute;
 }
 
 int LeapMesh::getVertexCount()
@@ -41,9 +45,9 @@ void LeapMesh::loader(const char* fileName)
 		infile.read((char*)boundingBoxes[i], sizeof(BoundingBox));
 	}
 
-	customMayaAttribute = new CustomMayaAttributes;
+	customMayaAttribute = new CustomMayaAttributes();
 
-	infile.read((char*)&customMayaAttribute, sizeof(CustomMayaAttributes));
+	infile.read((char*)customMayaAttribute, sizeof(CustomMayaAttributes));
 
 	if (infile.is_open())
 	{

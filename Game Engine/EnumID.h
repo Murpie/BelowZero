@@ -1,4 +1,5 @@
 #pragma once
+#define _CRTDBG_MAP_ALLOC
 
 namespace Gamestate
 {
@@ -38,10 +39,10 @@ namespace ComponentType
 {
 	enum ID
 	{
-		COMPONENT,
 		PLAYER,
-		LIGHT,
+		COMPONENT,
 		TERRAIN,
+		LIGHT,
 		MATERIAL
 	};
 }

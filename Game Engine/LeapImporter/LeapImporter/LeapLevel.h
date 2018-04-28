@@ -15,6 +15,8 @@ public:
 	LeapLevel(const char* fileName);
 	~LeapLevel();
 
+	std::string fileName;
+
 	Counter counterReader;
 	std::vector <LevelObject*> levelObjects;
 };

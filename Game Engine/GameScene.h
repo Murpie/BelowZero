@@ -14,7 +14,7 @@ public:
 	GameScene();
 	~GameScene();
 
-	std::vector<GameObject> gameObjects; 
+	std::vector<GameObject*> gameObjects; 
 
 	void addEmptyGameObject();
 	// clearGameObjects is unused atm. 
