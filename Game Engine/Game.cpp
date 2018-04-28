@@ -33,12 +33,12 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 {
 	if (glfwGetKey(window, GLFW_KEY_F5) && !fullscreen)
 	{
-		glfwSetWindowMonitor(window, primary[0], 0, 0, 1280, 720, mode->refreshRate);
+		glfwSetWindowMonitor(window, primary[0], 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, mode->refreshRate);
 		fullscreen = true;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_F5) && fullscreen)
 	{
-		glfwSetWindowMonitor(window, 0, 100, 100, 1280, 720, mode->refreshRate);
+		glfwSetWindowMonitor(window, 0, 100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, mode->refreshRate);
 		fullscreen = false;
 	}
 
@@ -141,6 +141,7 @@ void Game::run()
 	}
 	clearScene(menuScene);
 	clearScene(gameScene);
+	renderManager.clear();
 
 	glfwTerminate();
 }
@@ -246,7 +247,7 @@ void Game::initScene(GameScene & scene)
 		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
 	//... Create Camera
 	addPlayer(scene);
-
+	//... Create Terrain
 	addTerrain(scene);
 	//... Create Lights
 	addLights(scene);
@@ -259,7 +260,7 @@ void Game::initScene(GameScene & scene)
 	}
 	//...
 	/*Add meshes to mesh filter with level file ?*/
-	addMeshFilter(scene);
+	addLevelObjects(scene);
 }
 
 void Game::clearScene(GameScene & scene)
@@ -281,7 +282,7 @@ void Game::initShaderProgramLib()
 
 void Game::initInputOptions()
 {
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	glfwSetCursorEnterCallback(window, mouse_enter_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, 1);
@@ -325,13 +326,14 @@ void Game::addPlayer(GameScene &scene)
 	scene.addPlayer();
 }
 
-void Game::addMeshFilter(GameScene &scene)
+void Game::addLevelObjects(GameScene &scene)
 {
 	// rework for LeapLevel file
 	LeapLevel* level = new LeapLevel("Level_test.leap");
 	scene.addLevelObjects(meshLibrary, materialLibrary, level);
 	delete level;
 }
+
 void Game::addTerrain(GameScene &scene)
 {
 	scene.addTerrain("test1234.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->TerrainShaderProgram);

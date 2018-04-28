@@ -79,7 +79,7 @@ private:
 	void addLights(GameScene &scene);
 	void addRenderManager(GameScene &scene);
 	void addPlayer(GameScene &scene);
-	void addMeshFilter(GameScene &scene);
+	void addLevelObjects(GameScene &scene);
 	void addTerrain(GameScene &scene);
 	void readMeshName(GameScene &scene);
 	

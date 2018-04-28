@@ -173,6 +173,9 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 						if (Intersection::rayBoxTest(ray, other.bbox[i], other.getModelMatrix()))
 						{
 							std::cout << "HIT::" << other.name << std::endl;
+							/*
+							gameObject_ptr.doSomething(other.objectID); //use function inside the player class and make things happen. 		 				
+							*/
 							other.setIsRenderable(false);
 							if (other.objectID == ObjectType::ID::BUCKET)
 							{
