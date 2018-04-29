@@ -35,5 +35,5 @@ private:
 	void addTerrain(const std::string & heightMap, GLuint shader);
 
 	void interactionTest(GameObject & other, GLFWwindow * window); // Intersection test on mouse click
-
+	void collisionTest(GameObject & other);
 };

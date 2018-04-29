@@ -37,6 +37,7 @@ void GameScene::update(float deltaTime, float seconds)
 			}
 		}
 		gameObjects[i]->update(deltaTime, seconds);
+		collisionTest(*gameObjects[i]);
 	}
 }
 
@@ -132,12 +133,12 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 	//Create game objects from level file
 	for (int i = 0; i < level->levelObjects.size(); i++)
 	{
-		std::cout << level->levelObjects[i]->id << std::endl;
+		std::cout << "LEVELOBJECT::ID::" << level->levelObjects[i]->id << std::endl;
 		if (level->levelObjects[i]->id == ObjectType::ID::PLAYER)
 		{
 			for (GameObject* gameObject_ptr : gameObjects)
 			{
-				// Find player
+				// Find player object
 				if (gameObject_ptr->getPlayer() != nullptr)
 				{
 					//Add new mesh component to player with data from mesh library
@@ -287,6 +288,30 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 			}
 			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) && gameObject_ptr->getPlayer()->click == true)
 				gameObject_ptr->getPlayer()->click = false;
+		}
+	}
+}
+
+void GameScene::collisionTest(GameObject & other)
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->getPlayer() != nullptr && other.objectID != ObjectType::ID::PLAYER)
+		{
+			float distance = glm::abs(glm::distance(other.transform->position, gameObject_ptr->transform->position));
+			if (distance < 10)
+			{
+				for (int i = 0; i < gameObject_ptr->bbox.size(); i++)
+				{
+					for (int j = 0; j < other.bbox.size(); j++)
+					{
+						if (Intersection::collisionTest(*gameObject_ptr->bbox[i], gameObject_ptr->transform->position, *other.bbox[j], other.transform->position))
+						{
+							std::cout << "COLLISIONTEST::" << gameObject_ptr->name << " -> " << other.name << std::endl;
+						}
+					}
+				}
+			}
 		}
 	}
 }
