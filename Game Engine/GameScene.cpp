@@ -18,6 +18,74 @@ void GameScene::clearGameObjects()
 	gameObjects.clear();
 }
 
+void GameScene::update(float deltaTime, float seconds)
+{
+	for (unsigned int i = 0; i < gameObjects.size(); i++)
+	{
+
+		if (gameObjects[i]->getPlayer() != nullptr)
+		{
+			for (int j = 0; j < gameObjects.size(); j++)
+			{
+				glm::vec2 UVS = gameObjects[i]->getPlayer()->setXZ();
+				float u = UVS.x;
+				float v = UVS.y;
+				if (gameObjects[j]->getTerrain() != nullptr)
+				{
+					gameObjects[i]->getPlayer()->setCurrentHeight(gameObjects[j]->getTerrain()->calculateY(u, v));
+				}
+			}
+		}
+		gameObjects[i]->update(deltaTime, seconds);
+	}
+}
+
+void GameScene::processEvents(GLFWwindow * window, float deltaTime)
+{
+	for (int i = 0; i < gameObjects.size(); i++)
+	{
+		gameObjects[i]->processEvents(window, deltaTime);
+		interactionTest(*gameObjects[i], window);
+	}
+}
+
+void GameScene::addLevelScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary, ShaderProgramLib & shader, Scene::ID typeOfScene)
+{
+	if (typeOfScene == Scene::ID::LEVEL_1)
+	{
+		addPlayer();
+		//...
+		addLight(glm::vec3(7, 9, -4), 0);
+		addLight(glm::vec3(4, 0.4, -2), 1);
+		//...
+		std::string heightMap = "test1234.jpg";
+		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
+	
+		LeapLevel* level = new LeapLevel("Level_test.leap");
+		addLevelObjects(meshLibrary, matertialLibrary, level);
+		delete level;
+	}
+	else if (typeOfScene == Scene::ID::MENU)
+	{
+		// Put menu specific scene in here. 
+		//...
+		addPlayer();
+		addLight(glm::vec3(7, 9, -4), 0);
+		addLight(glm::vec3(4, 0.4, -2), 1);
+
+		std::string heightMap = "test1234.jpg";
+		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
+
+		LeapLevel* level = new LeapLevel("Level_test.leap");
+		addLevelObjects(meshLibrary, matertialLibrary, level);
+		delete level;
+	}
+	else
+	{
+		std::cout << "GAMESCENE::NO_SCENE_TO_LOAD" << std::endl;
+	}
+}
+
 void GameScene::addLight(glm::vec3 transform, int lightType)
 {
 	//Create light object
@@ -68,22 +136,23 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 		meshObject->name = "Mesh " + std::to_string(i);
 		//Set mesh object position in world
 		meshObject->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
+		meshObject->transform->rotation = glm::vec3(level->levelObjects[i]->rotationX, level->levelObjects[i]->rotationY, level->levelObjects[i]->rotationZ);
 		//Calculate new world Y-position from height map and update value
 		float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z) - 2;
 		meshObject->transform->position.y = newPositionY;
 		//Add new mesh component with data from mesh library
 		MeshFilter* meshFilter = new MeshFilter(
-				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer, 
-				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexAttribute,
-				meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->getVertexCount(),
-				meshLibrary.getMesh(level->levelObjects[i]->id)->meshType);
+			meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer,
+			meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexAttribute,
+			meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->getVertexCount(),
+			meshLibrary.getMesh(level->levelObjects[i]->id)->meshType);
 		meshObject->addComponent(meshFilter);
 		//Add material to gameObject from materialLibrary
 		meshObject->addComponent(materialLibrary.getMaterial(0));
 		//Set customAttribute ID from Enum.H
 		meshObject->objectID = (ObjectType::ID)level->levelObjects[i]->id;
 		//Set customAttribute interactable
-		if((int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 1)
+		if ((int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 1)
 			meshObject->isInteractable = true;
 		//Add BBox from leapmesh to gameObject
 		for (int i = 0; i < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); i++)
@@ -121,37 +190,6 @@ void GameScene::addTerrain(const std::string & heightMap, GLuint shader)
 	gameObjects.push_back(terrainObject);
 }
 
-void GameScene::update(float deltaTime, float seconds)
-{
-	for (unsigned int i = 0; i < gameObjects.size(); i++)
-	{
-
-		if (gameObjects[i]->getPlayer() != nullptr)
-		{
-			for (int j = 0; j < gameObjects.size(); j++)
-			{
-				glm::vec2 UVS = gameObjects[i]->getPlayer()->setXZ();
-				float u = UVS.x;
-				float v = UVS.y;
-				if (gameObjects[j]->getTerrain() != nullptr)
-				{
-					gameObjects[i]->getPlayer()->setCurrentHeight(gameObjects[j]->getTerrain()->calculateY(u, v));
-				}
-			}
-		}
-		gameObjects[i]->update(deltaTime, seconds);
-	}
-}
-
-void GameScene::processEvents(GLFWwindow * window, float deltaTime)
-{
-	for (int i = 0; i < gameObjects.size(); i++)
-	{
-		gameObjects[i]->processEvents(window, deltaTime);
-		interactionTest(*gameObjects[i], window);
-	}
-}
-
 void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 {
 	for (GameObject* gameObject_ptr : gameObjects)
@@ -165,8 +203,8 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 				{
 					gameObject_ptr->getPlayer()->click = true;
 					RayData ray = Ray::getWorldRay(
-						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f, 
-						gameObject_ptr->getViewMatrix(), SCREEN_WIDTH, SCREEN_HEIGHT, 
+						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,
+						gameObject_ptr->getViewMatrix(), SCREEN_WIDTH, SCREEN_HEIGHT,
 						gameObject_ptr->transform->position);
 					for (int i = 0; i < other.bbox.size(); i++)
 					{
@@ -174,7 +212,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 						{
 							std::cout << "HIT::" << other.name << std::endl;
 							/*
-							gameObject_ptr.doSomething(other.objectID); //use function inside the player class and make things happen. 		 				
+							gameObject_ptr.doSomething(other.objectID); //use function inside the player class and make things happen.
 							*/
 							other.setIsRenderable(false);
 							if (other.objectID == ObjectType::ID::BUCKET)
@@ -194,42 +232,5 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) && gameObject_ptr->getPlayer()->click == true)
 				gameObject_ptr->getPlayer()->click = false;
 		}
-	}
-}
-
-void GameScene::addLevelScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary, ShaderProgramLib & shader, Scene::ID typeOfScene)
-{
-	if (typeOfScene == Scene::ID::LEVEL_1)
-	{
-		addPlayer();
-		//...
-		addLight(glm::vec3(7, 9, -4), 0);
-		addLight(glm::vec3(4, 0.4, -2), 1);
-
-		std::string heightMap = "test1234.jpg";
-		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
-	
-		LeapLevel* level = new LeapLevel("Level_test.leap");
-		addLevelObjects(meshLibrary, matertialLibrary, level);
-		delete level;
-	}
-	else if (typeOfScene == Scene::ID::MENU)
-	{
-		// Put menu specific scene in here. 
-		//...
-		addPlayer();
-		addLight(glm::vec3(7, 9, -4), 0);
-		addLight(glm::vec3(4, 0.4, -2), 1);
-
-		std::string heightMap = "test1234.jpg";
-		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
-
-		LeapLevel* level = new LeapLevel("Level_test.leap");
-		addLevelObjects(meshLibrary, matertialLibrary, level);
-		delete level;
-	}
-	else
-	{
-		std::cout << "GAMESCENE::NO_SCENE_TO_LOAD" << std::endl;
 	}
 }
