@@ -10,9 +10,11 @@
 class GameScene
 {
 public:
+	Scene::ID typeOfScene;
+
 	GameScene(const GameScene&) = delete;
 	GameScene& operator=(const GameScene&) = default;
-	GameScene();
+	GameScene(Scene::ID typeOfScene);
 	~GameScene();
 
 	std::vector<GameObject*> gameObjects; 
@@ -21,7 +23,7 @@ public:
 	void update(float deltaTime, float seconds); // Updates all the objects in the scene
 	void processEvents(GLFWwindow *window, float deltaTime); // Updates objects if a evenet occurs, mouse press, button press etc. 
 
-	void addLevelScene(MeshLib& meshLibrary, MaterialLib& matertialLibrary, ShaderProgramLib& shader);
+	void addLevelScene(MeshLib& meshLibrary, MaterialLib& matertialLibrary, ShaderProgramLib& shader, Scene::ID typeOfScene);
 
 private:
 	int camerasInScene; //player 

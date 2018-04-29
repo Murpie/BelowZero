@@ -19,21 +19,14 @@ namespace Gamestate
 	static ID stateOfGame;
 }
 
-namespace Asset
-{
-	enum ID
-	{
-		Tree,
-		Bucket
-	};
-}
-
 namespace Scene
 {
 	enum ID
 	{
+		EMPTY,
 		MENU,
-		LEVEL_1
+		LEVEL_1,
+		LEVEL_2
 	};
 }
 

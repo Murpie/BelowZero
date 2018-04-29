@@ -1,9 +1,9 @@
 #include "GameScene.h"
 
-GameScene::GameScene() :
+GameScene::GameScene(Scene::ID typeOfScene) :
 	camerasInScene(0), lightsInScene(0)
 {
-
+	this->typeOfScene = typeOfScene;
 }
 
 GameScene::~GameScene()
@@ -197,17 +197,39 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 	}
 }
 
-void GameScene::addLevelScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary, ShaderProgramLib & shader)
+void GameScene::addLevelScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary, ShaderProgramLib & shader, Scene::ID typeOfScene)
 {
-	addPlayer();
-	//...
-	addLight(glm::vec3(7, 9, -4), 0);
-	addLight(glm::vec3(4, 0.4, -2), 1);
+	if (typeOfScene == Scene::ID::LEVEL_1)
+	{
+		addPlayer();
+		//...
+		addLight(glm::vec3(7, 9, -4), 0);
+		addLight(glm::vec3(4, 0.4, -2), 1);
 
-	std::string heightMap = "test1234.jpg";
-	addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
+		std::string heightMap = "test1234.jpg";
+		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 	
-	LeapLevel* level = new LeapLevel("Level_test.leap");
-	addLevelObjects(meshLibrary, matertialLibrary, level);
-	delete level;
+		LeapLevel* level = new LeapLevel("Level_test.leap");
+		addLevelObjects(meshLibrary, matertialLibrary, level);
+		delete level;
+	}
+	else if (typeOfScene == Scene::ID::MENU)
+	{
+		// Put menu specific scene in here. 
+		//...
+		addPlayer();
+		addLight(glm::vec3(7, 9, -4), 0);
+		addLight(glm::vec3(4, 0.4, -2), 1);
+
+		std::string heightMap = "test1234.jpg";
+		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
+
+		LeapLevel* level = new LeapLevel("Level_test.leap");
+		addLevelObjects(meshLibrary, matertialLibrary, level);
+		delete level;
+	}
+	else
+	{
+		std::cout << "GAMESCENE::NO_SCENE_TO_LOAD" << std::endl;
+	}
 }

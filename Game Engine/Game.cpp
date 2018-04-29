@@ -69,7 +69,7 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 
 Game::Game() :
 	shaderProgramLibrary(),
-	gameScene(), menuScene(),
+	gameScene(Scene::ID::LEVEL_1), menuScene(Scene::ID::MENU),
 	windowName("Game Engine"),
 	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
@@ -253,7 +253,7 @@ void Game::initScene(GameScene & scene)
 		meshesLoaded = true;
 	}
 	//...
-	scene.addLevelScene(meshLibrary, materialLibrary, shaderProgramLibrary);
+	scene.addLevelScene(meshLibrary, materialLibrary, shaderProgramLibrary, scene.typeOfScene);
 }
 
 void Game::clearScene(GameScene & scene)
@@ -293,7 +293,6 @@ void Game::addMeshName()
 	//Add file names to vector to load when reading mesh data. 
 	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
 	std::string meshLoader[] = { "Player_temp.leap", "Bucket.leap", "Stone_1.leap"};
-	//meshType: 0 = Static  2 = Interactive  3 = Equiped
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 	{
