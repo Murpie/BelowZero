@@ -35,7 +35,7 @@ public:
 	Transform *transform;
 	std::list<Component*> components;
 
-	std::vector <bBox> bbox;
+	std::vector <bBox*> bbox;
 
     Material *materialComponent;
     MeshFilter *meshFilterComponent; 

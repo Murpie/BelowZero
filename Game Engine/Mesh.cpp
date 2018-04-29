@@ -14,7 +14,7 @@ Mesh::Mesh(std::string filePath, GLuint gShaderProgram)
 
 Mesh::~Mesh()
 {
-	delete leapMesh;
+	delete this->leapMesh;
 }
 
 void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram)

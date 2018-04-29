@@ -5,6 +5,7 @@
 #include "GameObject.h"
 #include "MeshLib.h"
 #include "MaterialLib.h"
+#include "ShaderProgramLib.h"
 
 class GameScene
 {
@@ -25,6 +26,8 @@ public:
 	void update(float deltaTime, float seconds); // Updates all the objects in the scene
 	void processEvents(GLFWwindow *window, float deltaTime); // Updates objects if a evenet occurs, mouse press, button press etc. 
 	void interactionTest(GameObject & other, GLFWwindow * window); // Intersection test on mouse click
+
+	void addLevelScene(MeshLib& meshLibrary, MaterialLib& matertialLibrary, ShaderProgramLib& shader);
 
 private:
 	int camerasInScene; //player 

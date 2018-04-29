@@ -245,12 +245,6 @@ void Game::initScene(GameScene & scene)
 {
 	if(renderManager.size() < 2)
 		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
-	//... Create Camera
-	addPlayer(scene);
-	//... Create Terrain
-	addTerrain(scene);
-	//... Create Lights
-	addLights(scene);
 	//... Read OBJ and MTL File
 	if (!meshesLoaded)
 	{
@@ -259,8 +253,7 @@ void Game::initScene(GameScene & scene)
 		meshesLoaded = true;
 	}
 	//...
-	/*Add meshes to mesh filter with level file ?*/
-	addLevelObjects(scene);
+	scene.addLevelScene(meshLibrary, materialLibrary, shaderProgramLibrary);
 }
 
 void Game::clearScene(GameScene & scene)
@@ -308,35 +301,10 @@ void Game::addMeshName()
 	}
 }
 
-void Game::addLights(GameScene &scene)
-{
-	// add for loop and use array for transforms ?
-	scene.addLight(glm::vec3(7, 9, -4), 0);
-	scene.addLight(glm::vec3(4, 0.4, -2), 1);
-}
-
 void Game::addRenderManager(GameScene &scene)
 {
 	RenderManager tempRender = RenderManager(&scene, window, &shaderProgramLibrary);
 	renderManager.push_back(tempRender);
-}
-
-void Game::addPlayer(GameScene &scene)
-{
-	scene.addPlayer();
-}
-
-void Game::addLevelObjects(GameScene &scene)
-{
-	// rework for LeapLevel file
-	LeapLevel* level = new LeapLevel("Level_test.leap");
-	scene.addLevelObjects(meshLibrary, materialLibrary, level);
-	delete level;
-}
-
-void Game::addTerrain(GameScene &scene)
-{
-	scene.addTerrain("test1234.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->TerrainShaderProgram);
 }
 
 void Game::readMeshName(GameScene &scene)

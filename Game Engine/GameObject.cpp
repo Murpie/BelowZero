@@ -16,6 +16,9 @@ GameObject::~GameObject()
 {
 	deleteAllComponents();
 	delete transform;
+
+	for (bBox* bbox_ptr : bbox)
+		delete bbox_ptr;
 	bbox.clear();
 }
 

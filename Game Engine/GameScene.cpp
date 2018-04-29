@@ -88,19 +88,19 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 		//Add BBox from leapmesh to gameObject
 		for (int i = 0; i < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); i++)
 		{
-			bBox box = bBox();
+			bBox* box = new bBox();
 			//add center
-			box.center.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[0];
-			box.center.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[1];
-			box.center.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[2];
+			box->center.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[0];
+			box->center.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[1];
+			box->center.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[2];
 			//add max vector
-			box.vMax.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[0];
-			box.vMax.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[1];
-			box.vMax.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[2];
+			box->vMax.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[0];
+			box->vMax.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[1];
+			box->vMax.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[2];
 			//add min vector
-			box.vMin.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[0];
-			box.vMin.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[1];
-			box.vMin.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[2];
+			box->vMin.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[0];
+			box->vMin.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[1];
+			box->vMin.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[2];
 			//push into gameobject
 			meshObject->bbox.push_back(box);
 		}
@@ -170,7 +170,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 						gameObject_ptr->transform->position);
 					for (int i = 0; i < other.bbox.size(); i++)
 					{
-						if (Intersection::rayBoxTest(ray, other.bbox[i], other.getModelMatrix()))
+						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
 						{
 							std::cout << "HIT::" << other.name << std::endl;
 							/*
@@ -195,4 +195,19 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 				gameObject_ptr->getPlayer()->click = false;
 		}
 	}
+}
+
+void GameScene::addLevelScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary, ShaderProgramLib & shader)
+{
+	addPlayer();
+	//...
+	addLight(glm::vec3(7, 9, -4), 0);
+	addLight(glm::vec3(4, 0.4, -2), 1);
+
+	std::string heightMap = "test1234.jpg";
+	addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
+	
+	LeapLevel* level = new LeapLevel("Level_test.leap");
+	addLevelObjects(meshLibrary, matertialLibrary, level);
+	delete level;
 }

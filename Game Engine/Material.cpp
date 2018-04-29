@@ -15,6 +15,7 @@ Material::Material(GLuint otherShaderProgram)
 
 Material::~Material()
 {
+
 }
 
 void Material::update(float deltaTime, float seconds)

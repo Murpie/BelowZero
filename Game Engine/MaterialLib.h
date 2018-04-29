@@ -14,5 +14,5 @@ public:
 	void addMaterial(GLuint otherShaderProgram);
 	Material* getMaterial(int key);
 private:
-	std::vector<Material> materials;
+	std::vector<Material*> materials;
 };

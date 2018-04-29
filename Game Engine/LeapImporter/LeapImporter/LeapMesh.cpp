@@ -16,7 +16,7 @@ LeapMesh::~LeapMesh()
 	{
 		delete bbox_ptr;
 	}
-	//boundingBoxes.clear();
+	boundingBoxes.clear();
 
 	delete[] this->vertices;
 	delete this->customMayaAttribute;
