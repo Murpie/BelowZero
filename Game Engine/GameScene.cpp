@@ -261,8 +261,10 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 					gameObject_ptr->getPlayer()->click = true;
 					RayData ray = Ray::getWorldRay(
 						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,
-						gameObject_ptr->getViewMatrix(), SCREEN_WIDTH, SCREEN_HEIGHT,
+						gameObject_ptr->getViewMatrix(), 
+						SCREEN_WIDTH, SCREEN_HEIGHT,
 						gameObject_ptr->transform->position);
+
 					for (int i = 0; i < other.bbox.size(); i++)
 					{
 						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
@@ -298,7 +300,7 @@ void GameScene::collisionTest(GameObject & other)
 	{
 		if (gameObject_ptr->getPlayer() != nullptr && other.objectID != ObjectType::ID::PLAYER)
 		{
-			float distance = glm::abs(glm::distance(other.transform->position, gameObject_ptr->transform->position));
+			float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
 			if (distance < 10)
 			{
 				for (int i = 0; i < gameObject_ptr->bbox.size(); i++)
@@ -307,7 +309,7 @@ void GameScene::collisionTest(GameObject & other)
 					{
 						if (Intersection::collisionTest(*gameObject_ptr->bbox[i], gameObject_ptr->transform->position, *other.bbox[j], other.transform->position))
 						{
-							std::cout << "COLLISIONTEST::" << gameObject_ptr->name << " -> " << other.name << std::endl;
+							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
 						}
 					}
 				}
