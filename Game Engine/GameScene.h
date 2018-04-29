@@ -23,7 +23,7 @@ public:
 	void update(float deltaTime, float seconds); // Updates all the objects in the scene
 	void processEvents(GLFWwindow *window, float deltaTime); // Updates objects if a evenet occurs, mouse press, button press etc. 
 
-	void addLevelScene(MeshLib& meshLibrary, MaterialLib& matertialLibrary, ShaderProgramLib& shader, Scene::ID typeOfScene);
+	void initScene(MeshLib& meshLibrary, MaterialLib& matertialLibrary, ShaderProgramLib& shader, Scene::ID typeOfScene);
 
 private:
 	int camerasInScene; //player 

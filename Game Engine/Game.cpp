@@ -243,6 +243,7 @@ void Game::initWindow()
 
 void Game::initScene(GameScene & scene)
 {
+	// RenderManager probably needs a rework when loaded with scene. 
 	if(renderManager.size() < 2)
 		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
 	//... Read OBJ and MTL File
@@ -253,7 +254,7 @@ void Game::initScene(GameScene & scene)
 		meshesLoaded = true;
 	}
 	//...
-	scene.addLevelScene(meshLibrary, materialLibrary, shaderProgramLibrary, scene.typeOfScene);
+	scene.initScene(meshLibrary, materialLibrary, shaderProgramLibrary, scene.typeOfScene);
 }
 
 void Game::clearScene(GameScene & scene)
