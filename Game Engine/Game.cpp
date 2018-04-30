@@ -33,12 +33,12 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 {
 	if (glfwGetKey(window, GLFW_KEY_F5) && !fullscreen)
 	{
-		glfwSetWindowMonitor(window, primary[0], 0, 0, 1280, 720, mode->refreshRate);
+		glfwSetWindowMonitor(window, primary[0], 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, mode->refreshRate);
 		fullscreen = true;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_F5) && fullscreen)
 	{
-		glfwSetWindowMonitor(window, 0, 100, 100, 1280, 720, mode->refreshRate);
+		glfwSetWindowMonitor(window, 0, 100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, mode->refreshRate);
 		fullscreen = false;
 	}
 
@@ -69,11 +69,11 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 
 Game::Game() :
 	shaderProgramLibrary(),
-	gameScene(), menuScene(),
+	gameScene(Scene::ID::LEVEL_1), menuScene(Scene::ID::MENU),
 	windowName("Game Engine"),
 	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
-	meshesLoaded(false), fullscreen(false), stateBool(false),
+	meshesLoaded(false), fullscreen(false), stateBool(false), texturesLoaded(false),
 	count(0)
 {
 	initWindow();
@@ -139,6 +139,10 @@ void Game::run()
 			initial_time = final_time;
 		}
 	}
+	clearScene(menuScene);
+	clearScene(gameScene);
+	renderManager.clear();
+
 	glfwTerminate();
 }
 
@@ -158,7 +162,7 @@ void Game::runState()
 	else if (stateOfGame == Gamestate::ID::LOAD_LEVEL || stateOfGame == Gamestate::ID::RUN_LEVEL || stateOfGame == Gamestate::ID::CLEAR_LEVEL)
 	{
 		levelState();
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		//glfwDisable(GLFW_MOUSE_CURSOR);
 	}
 	//... 
@@ -239,14 +243,9 @@ void Game::initWindow()
 
 void Game::initScene(GameScene & scene)
 {
+	// RenderManager probably needs a rework when loaded with scene. 
 	if(renderManager.size() < 2)
 		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
-	//... Create Camera
-	addPlayer(scene);
-
-	addTerrain(scene);
-	//... Create Lights
-	addLights(scene);
 	//... Read OBJ and MTL File
 	if (!meshesLoaded)
 	{
@@ -255,8 +254,7 @@ void Game::initScene(GameScene & scene)
 		meshesLoaded = true;
 	}
 	//...
-	/*Add meshes to mesh filter with level file ?*/
-	addMeshFilter(scene);
+	scene.initScene(meshLibrary, materialLibrary, shaderProgramLibrary, scene.typeOfScene);
 }
 
 void Game::clearScene(GameScene & scene)
@@ -296,19 +294,11 @@ void Game::addMeshName()
 	//Add file names to vector to load when reading mesh data. 
 	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
 	std::string meshLoader[] = { "Player_temp.leap", "Bucket.leap", "Stone_1.leap"};
-	//meshType: 0 = Static  2 = Interactive  3 = Equiped
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 	{
 		meshName.push_back(meshLoader[i]);
 	}
-}
-
-void Game::addLights(GameScene &scene)
-{
-	// add for loop and use array for transforms ?
-	scene.addLight(glm::vec3(7, 9, -4), 0);
-	scene.addLight(glm::vec3(4, 0.4, -2), 1);
 }
 
 void Game::addRenderManager(GameScene &scene)
@@ -317,31 +307,17 @@ void Game::addRenderManager(GameScene &scene)
 	renderManager.push_back(tempRender);
 }
 
-void Game::addPlayer(GameScene &scene)
-{
-	scene.addPlayer();
-}
-
-void Game::addMeshFilter(GameScene &scene)
-{
-	// rework for LeapLevel file
-	LeapLevel* level = new LeapLevel("Level_test.leap");
-	scene.addMeshFilter(meshLibrary, materialLibrary, level);
-	delete level;
-}
-void Game::addTerrain(GameScene &scene)
-{
-	scene.addTerrain("test1234.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->TerrainShaderProgram);
-}
-
 void Game::readMeshName(GameScene &scene)
 {
 	for (int i = 0; i < meshName.size(); i++)
 	{
 		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
 	}
-
-	materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
-	textureLibrary.addAlbedo("Colors.png");
-	materialLibrary.getMaterial(0)->addAlbedo(textureLibrary.getAlbedo(0)->gTexture);
+	if (!texturesLoaded)
+	{
+		materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
+		textureLibrary.addAlbedo("Colors.png");
+		materialLibrary.getMaterial(0)->addAlbedo(textureLibrary.getAlbedo(0)->gTexture);
+		texturesLoaded = true;
+	}
 }

@@ -28,16 +28,16 @@ RenderManager::~RenderManager()
 
 void RenderManager::FindObjectsToRender() {
 	for (unsigned int i = 0; i < gameScene->gameObjects.size(); i++) {
-	glm::vec3 vectorToObject = gameScene->gameObjects[0].transform->position - gameScene->gameObjects[i].transform->position;
+	glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
 
 		float distance = length(vectorToObject);
 
-		if (gameScene->gameObjects[i].getIsRenderable() == true && distance < 83) {
-			gameObjectsToRender.push_back(&gameScene->gameObjects[i]);
+		if (gameScene->gameObjects[i]->getIsRenderable() == true && distance < 83) {
+			gameObjectsToRender.push_back(gameScene->gameObjects[i]);
 		}
 
-		if (gameScene->gameObjects[i].hasLight == true) {
-			lightsToRender.push_back(gameScene->gameObjects[i].lightComponent);
+		if (gameScene->gameObjects[i]->hasLight == true) {
+			lightsToRender.push_back(gameScene->gameObjects[i]->lightComponent);
 			//rework this
 		}
 	}
@@ -224,22 +224,28 @@ void RenderManager::createBuffers()
 void RenderManager::Render() {
 	FindObjectsToRender();
 
-
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
-		if (gameScene->gameObjects[i].getPlayer() != nullptr)
+		if (gameScene->gameObjects[i]->getPlayer() != nullptr)
 		{
-			glm::vec2 temp = gameScene->gameObjects[i].getPlayer()->setXZ();
+			glm::vec2 temp = gameScene->gameObjects[i]->getPlayer()->setXZ();
 			for (int j = 0; j < gameScene->gameObjects.size(); j++)
-				if (gameScene->gameObjects[j].getTerrain() != nullptr)
+				if (gameScene->gameObjects[j]->getTerrain() != nullptr)
 				{
-					gameScene->gameObjects[i].getPlayer()->setCurrentHeight(gameScene->gameObjects[j].getTerrain()->calculateY(temp.x, temp.y));
+					gameScene->gameObjects[i]->getPlayer()->setCurrentHeight(gameScene->gameObjects[j]->getTerrain()->calculateY(temp.x, temp.y));
 				}
 		}
 	}
 
 	//... Set view and projection matrix
-	view_matrix = gameScene->gameObjects[0].getViewMatrix();
+	for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	{
+		if (gameScene->gameObjects[i]->getPlayer() != nullptr)
+		{
+			view_matrix = gameScene->gameObjects[i]->getViewMatrix();
+			break;
+		}
+	}
 	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
@@ -261,7 +267,7 @@ void RenderManager::Render() {
 	glCullFace(GL_BACK);
 
 	glUseProgram(shadowMapShaderProgram);
-	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[2].transform->position);
+	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[2]->transform->position); //? what is gameObject[2] supposed to be?
 	glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -277,10 +283,10 @@ void RenderManager::Render() {
 	}
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
-		if (gameScene->gameObjects[i].getTerrain() != nullptr)
+		if (gameScene->gameObjects[i]->getTerrain() != nullptr)
 		{
-			gameScene->gameObjects[i].getTerrain()->bindVertexArray();
-			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i].getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
+			gameScene->gameObjects[i]->getTerrain()->bindVertexArray();
+			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
 		}
 	}
 
@@ -308,11 +314,11 @@ void RenderManager::Render() {
 	glStencilMask(0xFF); // enable writing to the stencil buffer
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
-		if (gameScene->gameObjects[i].getTerrain() != nullptr)
+		if (gameScene->gameObjects[i]->getTerrain() != nullptr)
 		{
-			gameScene->gameObjects[i].getTerrain()->bindVertexArray();
+			gameScene->gameObjects[i]->getTerrain()->bindVertexArray();
 			
-			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i].getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
 		}
 	}
 	
@@ -339,12 +345,16 @@ void RenderManager::Render() {
 		
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-		//...
+		//... Position
 		glm::mat4 tempMatrix = glm::mat4(1);
 		tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
-		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
+		//... Rotation, not sure if this works (probably not)
+		// need to calculate radians from rotation vector from maya
+		float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0,0,0));
+		float F = glm::pow(oneMinusDot, 5.0);
+		tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
 		//...
-
+		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
 
@@ -408,10 +418,10 @@ void RenderManager::Render() {
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glUseProgram(lightpassShaderProgram);
-	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[2].transform->position);
+	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[2]->transform->position);
 
 	//CAM pos
-	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0].transform->position));
+	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
 
 	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)
@@ -460,51 +470,57 @@ void RenderManager::Render() {
 	glDisable(GL_STENCIL_TEST);
 
 	//... UI -----------------------------------------------------------------------------------------------------------------------------------
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glUseProgram(UIShaderProgram);
+	for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	{
+		if (gameScene->gameObjects[i]->getPlayer() != nullptr)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glUseProgram(UIShaderProgram);
 
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "theTexture"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, UITexture);
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "equipedTexture"), 1);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->equipedTexture);
+			glUniform1i(glGetUniformLocation(UIShaderProgram, "theTexture"), 0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, UITexture);
+			glUniform1i(glGetUniformLocation(UIShaderProgram, "equipedTexture"), 1);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->equipedTexture);
 
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture1"), 2);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[0]);
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture2"), 3);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[1]);
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture3"), 4);
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[2]);
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture4"), 5);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[3]);
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->inventoryTexture[4]);
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "textTexture"), 7);
-	glActiveTexture(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getPlayer()->textTexture);
-	
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 8);
-	glActiveTexture(GL_TEXTURE8);
-	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
+			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture1"), 2);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[0]);
+			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture2"), 3);
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[1]);
+			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture3"), 4);
+			glActiveTexture(GL_TEXTURE4);
+			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[2]);
+			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture4"), 5);
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[3]);
+			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
+			glActiveTexture(GL_TEXTURE6);
+			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[4]);
+			glUniform1i(glGetUniformLocation(UIShaderProgram, "textTexture"), 7);
+			glActiveTexture(GL_TEXTURE7);
+			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->textTexture);
 
-	glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0].getPlayer()->hp);
-	glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0].getPlayer()->cold);
-	glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0].getPlayer()->water);
-	glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0].getPlayer()->food);
-	glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0].getPlayer()->fade);
-	glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0].getPlayer()->textFade);
+			glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 8);
+			glActiveTexture(GL_TEXTURE8);
+			glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
-	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
+			glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
+			glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
+			glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
+			glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0]->getPlayer()->food);
+			glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0]->getPlayer()->fade);
+			glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0]->getPlayer()->textFade);
 
-	renderQuad();
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
+			renderQuad();
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			break;
+		}
+	}
 
 	clearObjectsToRender();
 	Update();

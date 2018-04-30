@@ -30,6 +30,7 @@ LeapLevel::LeapLevel()
 LeapLevel::LeapLevel(const char * fileName)
 {
 	loader(fileName);
+	this->fileName = fileName;
 }
 
 

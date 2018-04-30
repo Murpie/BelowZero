@@ -76,12 +76,7 @@ private:
 	void useShaderProgram();
 
 	void addMeshName();
-	//...
-	void addLights(GameScene &scene);
 	void addRenderManager(GameScene &scene);
-	void addPlayer(GameScene &scene);
-	void addMeshFilter(GameScene &scene);
-	void addTerrain(GameScene &scene);
 	void readMeshName(GameScene &scene);
 	
 	//...
@@ -93,6 +88,7 @@ private:
 	//
 	bool meshesLoaded;
 	bool fullscreen;
+	bool texturesLoaded;
 
 	int count;
 

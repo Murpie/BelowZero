@@ -7,53 +7,9 @@
 // remove this when we can import
 struct bBox
 {
-	bBox()
-	{
-		/*
-		glm::mat4 worldMatrix = glm::mat4();
-		// bucket maya coords from c
-		verts[0] = glm::vec3(-0.992, 0.000, 1.064);
-		verts[1] = glm::vec3(0.992, 0.000, 1.064);
-		verts[2] = glm::vec3(-0.992, 2.398, 1.064);
-		verts[3] = glm::vec3(0.992, 2.398, 1.064);
-		verts[4] = glm::vec3(-0.992, 2.398, -1.064);
-		verts[5] = glm::vec3(0.992, 2.398, -1.064);
-		verts[6] = glm::vec3(-0.992, 0.000, -1.064);
-		verts[7] = glm::vec3(0.992, 0.000, -1.064);
-
-		vMin = verts[0];
-		vMax = verts[0];
-
-		for (int i = 1; i < 8; i++)
-		{
-			//Min
-			if (vMin.x > verts[i].x)
-				vMin.x = verts[i].x;
-			if (vMin.y > verts[i].y)
-				vMin.y = verts[i].y;
-			if (vMin.z > verts[i].z)
-				vMin.z = verts[i].z;
-
-			//Max
-			if (vMax.x < verts[i].x)
-				vMax.x = verts[i].x;
-			if (vMax.y < verts[i].y)
-				vMax.y = verts[i].y;
-			if (vMax.z < verts[i].z)
-				vMax.z = verts[i].z;
-		}
-
-		center = glm::vec3((vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f);
-		*/
-	}
-
 	glm::vec3 vMin; // smallest possible vector
 	glm::vec3 vMax; // largest possible vector
-
 	glm::vec3 center; // center point of the bBox
-
-	//glm::vec3 verts[8];
-
 };
 //--------------------------------
 
@@ -197,15 +153,24 @@ public:
 		*/
 	}
 
-	static bool collisionTest(const bBox& bBox1, const bBox& bBox2)
+	static bool collisionTest(const bBox& bBox1, glm::vec3& position1, const bBox& bBox2, glm::vec3& posittion2)
 	{
+		//bBox1
+		bBox temp1 = bBox1;
+		temp1.vMax += position1;
+		temp1.vMin += position1;
+		//bBox2
+		bBox temp2 = bBox2;
+		temp2.vMax += posittion2;
+		temp2.vMin += posittion2;
+		//Collision test
 		return(
-			bBox1.vMax.x > bBox2.vMin.x &&
-			bBox1.vMin.x < bBox2.vMax.x &&
-			bBox1.vMax.y > bBox2.vMin.y &&
-			bBox1.vMin.y < bBox2.vMax.y &&
-			bBox1.vMax.z > bBox2.vMin.z &&
-			bBox1.vMin.z < bBox2.vMax.z);
+			temp1.vMax.x > temp2.vMin.x &&
+			temp1.vMin.x < temp2.vMax.x &&
+			temp1.vMax.y > temp2.vMin.y &&
+			temp1.vMin.y < temp2.vMax.y &&
+			temp1.vMax.z > temp2.vMin.z &&
+			temp1.vMin.z < temp2.vMax.z);
 	}
 
 	static float sweptAABB(bBox b1, bBox b2, float& normalX, float& normalY, float& normalZ, Transform* player)

@@ -52,6 +52,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 
 Player::~Player()
 {
+
 }
 
 void Player::setCold(float value)
@@ -428,7 +429,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	glm::vec4 forward = glm::vec4(Transformable::transform.forward, 0);
 	glm::vec4 right = glm::vec4(Transformable::transform.right, 0);
 	glm::vec4 up = glm::vec4(Transformable::transform.up, 0);
-	printf("%f\n", up);
 
 	matrix = glm::rotate(matrix, pitch, Transformable::transform.right);
 	matrix *= glm::rotate(matrix, -yaw, Transformable::transform.up);

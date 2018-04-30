@@ -16,6 +16,8 @@ public:
 	LeapMesh(const char* fileName);
 	~LeapMesh();
 
+	std::string fileName;
+
 	int getVertexCount();
 
 	VertexInformation* vertices;
