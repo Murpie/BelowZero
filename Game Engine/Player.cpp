@@ -278,7 +278,7 @@ void Player::recieveTerrainInformation(float currentHeight, float frontV, float 
 
 void Player::setCurrentHeight(float height)
 {
-	this->currentY = height;
+	this->currentY = height + 5.0;
 }
 
 glm::vec2 Player::setXZ()

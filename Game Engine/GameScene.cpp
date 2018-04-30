@@ -78,7 +78,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 
-		LeapLevel* level = new LeapLevel("Level_test.leap");
+		LeapLevel* level = new LeapLevel("camping_level.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
 	}

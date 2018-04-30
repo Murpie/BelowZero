@@ -49,9 +49,10 @@ namespace ObjectType
 		PLAYER,
 		BUCKET,
 		STONE_1,
-		AXE,
-		WOOD,
-		MEAT,
-		TREE
+		CAMPFIRE,
+		CLIFFSIDE_1,
+		CLIFFSIDE_2,
+		CLIFFSIDE_3,
+		CLIFFSIDE_4
 	};
 }
