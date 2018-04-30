@@ -8,22 +8,28 @@ MainMenuScene::MainMenuScene()
 	this->buttonHasBeenClicked = false;
 	this->buttonHasBeenReleased = false;
 	this->pressed = false;
+	this->buttonIsUpScaled1 = false;
+	this->buttonIsUpScaled2 = false;
+	this->buttonIsUpScaled3 = false;
+	this->scaling1 = 1.0;
+	this->scaling2 = 1.0;
+	this->scaling3 = 1.0;
 	this->whichButtonIsSelected = -1;
 
-	this->startButtonMinMax[0].x = 430;
-	this->startButtonMinMax[0].y = 290;
-	this->startButtonMinMax[1].x = 855;
-	this->startButtonMinMax[1].y = 330;
+	this->startButtonMinMax[0].x = 523;
+	this->startButtonMinMax[0].y = 270;
+	this->startButtonMinMax[1].x = 755;
+	this->startButtonMinMax[1].y = 318;
 	
-	this->settingsButtonMinMax[0].x = 455;
-	this->settingsButtonMinMax[0].y = 385;
-	this->settingsButtonMinMax[1].x = 830;
-	this->settingsButtonMinMax[1].y = 415;
+	this->settingsButtonMinMax[0].x = 558;
+	this->settingsButtonMinMax[0].y = 375;
+	this->settingsButtonMinMax[1].x = 722;
+	this->settingsButtonMinMax[1].y = 425;
 	
-	this->ExitButtonMinMax[0].x = 430;
-	this->ExitButtonMinMax[0].y = 475;
-	this->ExitButtonMinMax[1].x = 855;
-	this->ExitButtonMinMax[1].y = 510;
+	this->ExitButtonMinMax[0].x = 537;
+	this->ExitButtonMinMax[0].y = 482;
+	this->ExitButtonMinMax[1].x = 740;
+	this->ExitButtonMinMax[1].y = 533;
 
 	stbi_set_flip_vertically_on_load(true);
 
@@ -88,7 +94,10 @@ void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonN
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		if (data)
+		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			//glGenerateMipmap(GL_TEXTURE_2D);
+		}
 		else
 			std::cout << "Failed to load Background Texture from path" << std::endl;
 
@@ -119,7 +128,10 @@ void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonN
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		if (data)
+		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			//glGenerateMipmap(GL_TEXTURE_2D);
+		}
 		else
 			std::cout << "Failed to load Background Texture from path" << std::endl;
 
@@ -150,7 +162,10 @@ void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonN
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		if (data)
+		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			//glGenerateMipmap(GL_TEXTURE_2D);
+		}
 		else
 			std::cout << "Failed to load Background Texture from path" << std::endl;
 
@@ -255,9 +270,15 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (startButtonMinMax[0].x < xPos && xPos < startButtonMinMax[1].x && startButtonMinMax[0].y < yPos && yPos < startButtonMinMax[1].y)
 	{
-		this->whichButtonIsSelected = 1;
 		std::cout << "------------------- CURSOR IS INSIDE STARTBUTTONBOX -------------------" << std::endl;
+		this->whichButtonIsSelected = 1;
 		this->mouseIsOverButton = true;
+
+		if (this->scaling1 <= 1.3)
+		{
+			this->scaling1 += 0.01;
+			this->buttonIsUpScaled1 = true;
+		}
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 		{
 			this->buttonHasBeenClicked = true;
@@ -267,12 +288,32 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 			this->buttonHasBeenReleased = true;
 		}
 	}
-
-	else if (settingsButtonMinMax[0].x < xPos && xPos < settingsButtonMinMax[1].x && settingsButtonMinMax[0].y < yPos && yPos < settingsButtonMinMax[1].y)
+	else
 	{
-		this->whichButtonIsSelected = 2;
+		if (this->buttonIsUpScaled1 == true)
+		{
+			if (scaling1 > 1.0)
+				scaling1 -= 0.01;
+			else if (scaling1 < 1.0)
+			{
+				scaling1 = 1.0;
+				this->buttonIsUpScaled1 = false;
+			}
+		}
+	}
+
+	if (settingsButtonMinMax[0].x < xPos && xPos < settingsButtonMinMax[1].x && settingsButtonMinMax[0].y < yPos && yPos < settingsButtonMinMax[1].y)
+	{
 		std::cout << "------------------- CURSOR IS INSIDE SETTINGSBUTTONBOX -------------------" << std::endl;
+		this->whichButtonIsSelected = 2;
 		this->mouseIsOverButton = true;
+
+		if (this->scaling2 <= 1.3)
+		{
+			this->scaling2 += 0.01;
+			this->buttonIsUpScaled2 = true;
+		}
+
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 		{
 			this->buttonHasBeenClicked = true;
@@ -282,18 +323,51 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 			}
 		}
 	}
-
-	else if (ExitButtonMinMax[0].x < xPos && xPos < ExitButtonMinMax[1].x && ExitButtonMinMax[0].y < yPos && yPos < ExitButtonMinMax[1].y)
+	else
 	{
-		this->whichButtonIsSelected = 3;
+		if (this->buttonIsUpScaled2 == true)
+		{
+			if (scaling2 > 1.0)
+				scaling2 -= 0.01;
+			else if (scaling2 < 1.0)
+			{
+				scaling2 = 1.0;
+				this->buttonIsUpScaled2 = false;
+			}
+		}
+	}
+
+	if (ExitButtonMinMax[0].x < xPos && xPos < ExitButtonMinMax[1].x && ExitButtonMinMax[0].y < yPos && yPos < ExitButtonMinMax[1].y)
+	{
 		std::cout << "------------------- CURSOR IS INSIDE EXITBUTTONBOX -------------------" << std::endl;
+		this->whichButtonIsSelected = 3;
 		this->mouseIsOverButton = true;
+
+		if (this->scaling3 <= 1.3)
+		{
+			this->scaling3 += 0.01;
+			this->buttonIsUpScaled3 = true;
+		}
+
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 		{
 			this->buttonHasBeenClicked = true;
 			if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
 			{
 				this->buttonHasBeenReleased = true;
+			}
+		}
+	}
+	else
+	{
+		if (this->buttonIsUpScaled3 == true)
+		{
+			if (scaling3 > 1.0)
+				scaling3 -= 0.01;
+			else if (scaling3 < 1.0)
+			{
+				scaling3 = 1.0;
+				this->buttonIsUpScaled3 = false;
 			}
 		}
 	}

@@ -55,11 +55,18 @@ public:
 	glm::vec2 ExitButtonMinMax[2];
 
 	int buttonTransformations;
+	float scaling1;
+	float scaling2;
+	float scaling3;
+
 
 	bool mouseIsOverButton;
 	bool buttonHasBeenClicked;
 	bool buttonHasBeenReleased;
 	bool pressed;
+	bool buttonIsUpScaled1;
+	bool buttonIsUpScaled2;
+	bool buttonIsUpScaled3;
 
 	double xPos;
 	double yPos;

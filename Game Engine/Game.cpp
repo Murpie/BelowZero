@@ -312,6 +312,7 @@ void Game::initMenuScene(GameScene & scene)
 	{
 		addRenderManager(scene);
 		renderManager[renderManager.size() - 1].createMainMenuBuffer();
+		renderManager[renderManager.size() - 1].createButtonQuads();
 	}
 	//addMeshFilter(scene);
 	scene.addMainMenu();
