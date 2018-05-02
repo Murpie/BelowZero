@@ -96,7 +96,7 @@ void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonN
 		if (data)
 		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-			//glGenerateMipmap(GL_TEXTURE_2D);
+			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		else
 			std::cout << "Failed to load Background Texture from path" << std::endl;
@@ -130,7 +130,7 @@ void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonN
 		if (data)
 		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-			//glGenerateMipmap(GL_TEXTURE_2D);
+			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		else
 			std::cout << "Failed to load Background Texture from path" << std::endl;
@@ -164,7 +164,7 @@ void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonN
 		if (data)
 		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-			//glGenerateMipmap(GL_TEXTURE_2D);
+			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		else
 			std::cout << "Failed to load Background Texture from path" << std::endl;
