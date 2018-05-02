@@ -11,7 +11,6 @@
 #include <random>
 #include "stb_image.h"
 #include "GameScene.h"
-#include "Player.h"
 #include "ShaderProgramLib.h"
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -45,7 +44,10 @@ public:
 	void clearObjectsToRender();
 
 	void Render();
+	void renderMainMenu();
 	void createBuffers();
+	void createMainMenuBuffer();
+	void createButtonQuads();
 	void renderQuad();
 	void Update();
 	void setDeltaTime(float deltaTime);
@@ -63,9 +65,17 @@ private:
 	glm::mat4x4 projection_matrix;
 	glm::mat4x4 currentCubeMapView;
 
+	GLuint finalMainMenuFBOTexture;
+
 	float deltaTime;
 	float seconds;
 	int count;
+
+	unsigned int finalMainMenuFBO;
+	unsigned int quadVertexArrayObject;
+	unsigned int quadVertexBufferObject;
+	unsigned int buttonVertexArrayObject[3];
+	unsigned int buttonBufferObject[3];
 
 	unsigned int UIFBO;
 	unsigned int UITexture;
@@ -104,6 +114,7 @@ private:
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
 	GLuint terrainShaderProgram;
+	GLuint mainMenuShaderProgram;
 
 	int display_w, display_h;
 };

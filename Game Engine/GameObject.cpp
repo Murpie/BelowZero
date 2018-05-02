@@ -161,16 +161,18 @@ Player * GameObject::getPlayer()
 			return player;
 		}
 	}
+}
 
-	//for (int i = 0; i < components.size(); i++)
-	//{
-
-	//	if (components[i]->id == ComponentType::ID::PLAYER)
-	//	{
-	//		Player* player = static_cast<Player*>(components[i]);
-	//		return player;
-	//	}
-	//}
+MainMenuScene * GameObject::getMenuScene()
+{
+	for (Component* component_ptr : components)
+	{
+		if (component_ptr->id == ComponentType::ID::MAINMENU)
+		{
+			MainMenuScene* mainMenu = static_cast<MainMenuScene*>(component_ptr);
+			return mainMenu;
+		}
+	}
 	return nullptr;
 }
 

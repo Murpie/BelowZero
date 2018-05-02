@@ -61,7 +61,7 @@ void main()
 	{
 		color.xyz = texture(SceneTexture, texCoords).xyz * abs(texture(textTexture, texCoords).w - 1);
 		color.w = texture(SceneTexture, texCoords).w;
-		color.w = textFade;
+
 	}
 	else
 	{
@@ -101,10 +101,7 @@ void main()
 		color.xyz += texture(inventoryTexture5, texCoords).xyz;
 
 	if (texture(textTexture, texCoords).w >= 0.01)
-	{
 		color.xyz += texture(textTexture, texCoords).xyz;
-		color.w = textFade;
-	}
 
 	if (fade < 1 && fade > 0)
 		color.xyz = color.xyz + fade;

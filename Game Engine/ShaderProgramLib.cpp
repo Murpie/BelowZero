@@ -44,6 +44,12 @@ void ShaderProgramLib::addTerrainShaders()
 	shaders.push_back(newShaderProgram);
 }
 
+void ShaderProgramLib::addMainMenuShaders()
+{
+	MainMenuShader* newShaderProgram = new MainMenuShader();
+	shaders.push_back(newShaderProgram);
+}
+
 void ShaderProgramLib::addUIShaders()
 {
 	UIShaders* newShaderProgram = new UIShaders();

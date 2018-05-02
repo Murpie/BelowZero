@@ -55,7 +55,8 @@ private:
 	vector<string> meshName; // Filepaths for the importer?
 	vector<GLuint> meshType;
 
-	Gamestate::ID stateOfGame; // EnumID.h, make this one global(?) 
+	//Gamestate::ID stateOfGame; // EnumID.h, make this one global(?) 
+	Gamestate::StateOfGame stateOfGame;
 
 	void printCurrentState(Gamestate::ID stateOfGame); // Prints to console
 
@@ -63,6 +64,7 @@ private:
 	void runState();
 	void menuState();
 	void levelState();
+	void exitState();
 
 	char windowName[20];
 

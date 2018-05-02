@@ -16,7 +16,10 @@ namespace Gamestate
 		CLEAR_LEVEL,
 		CLOSE_GAME
 	};
-	static ID stateOfGame;
+	struct StateOfGame
+	{
+		static ID state;
+	};
 }
 
 namespace Scene
@@ -38,7 +41,8 @@ namespace ComponentType
 		COMPONENT,
 		TERRAIN,
 		LIGHT,
-		MATERIAL
+		MATERIAL,
+		MAINMENU
 	};
 }
 
