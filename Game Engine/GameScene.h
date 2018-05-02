@@ -5,36 +5,36 @@
 #include "GameObject.h"
 #include "MeshLib.h"
 #include "MaterialLib.h"
+#include "ShaderProgramLib.h"
 
 class GameScene
 {
 public:
-	Terrain * newTerrain;
-	bool playerFound;
+	Scene::ID typeOfScene;
 
 	GameScene(const GameScene&) = delete;
 	GameScene& operator=(const GameScene&) = default;
-	GameScene();
+	GameScene(Scene::ID typeOfScene);
 	~GameScene();
 
-	std::vector<GameObject> gameObjects; 
+	std::vector<GameObject*> gameObjects; 
 
-	void addEmptyGameObject();
-	// clearGameObjects is unused atm. 
-	void clearGameObjects(); // delete all pointers in each gameobject and reload on scene swap
+	void clearGameObjects();
+	void update(float deltaTime, float seconds); // Updates all the objects in the scene
+	void processEvents(GLFWwindow *window, float deltaTime); // Updates objects if a evenet occurs, mouse press, button press etc. 
+
+	void initScene(MeshLib& meshLibrary, MaterialLib& matertialLibrary, ShaderProgramLib& shader, Scene::ID typeOfScene);
+
+private:
+	int camerasInScene; //player 
+	int lightsInScene; 
 
 	void addLight(glm::vec3 transform, int lightType);
-	void addPlayer(); //player
-	void addMeshFilter(MeshLib& meshLibrary, MaterialLib& matertialLibrary, GLuint meshNameSize);
+	void addPlayer();
+	void addLevelObjects(MeshLib& meshLibrary, MaterialLib& matertialLibrary, LeapLevel* level);
 	void addTerrain(const std::string & heightMap, GLuint shader);
 	void addMainMenu();
 
-	void update(float deltaTime, float seconds); // Updates all the objects in the scene
-	void processEvents(GLFWwindow *window, float deltaTime); // Updates objects if a evenet occurs, mouse press, button press etc. 
-	Terrain* getTerrainPointer();
-private:
-
-	//...
-	int camerasInScene; //player atm
-	int lightsInScene; //
+	void interactionTest(GameObject & other, GLFWwindow * window); // Intersection test on mouse click
+	void collisionTest(GameObject & other); // Collision test when two AABB overlap
 };

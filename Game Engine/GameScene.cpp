@@ -1,123 +1,250 @@
 #include "GameScene.h"
 
-GameScene::GameScene() :
+GameScene::GameScene(Scene::ID typeOfScene) :
 	camerasInScene(0), lightsInScene(0)
 {
-	this->playerFound = true;
+	this->typeOfScene = typeOfScene;
 }
 
 GameScene::~GameScene()
 {
-}
-
-void GameScene::addEmptyGameObject()
-{
-	GameObject newEmptyGameObject = GameObject();
-	gameObjects.push_back(newEmptyGameObject);
+	clearGameObjects();
 }
 
 void GameScene::clearGameObjects()
 {
-	while (!gameObjects.empty())
-	{
-		for (unsigned int i = 0; i < gameObjects.size(); i++)
-		{
-			for (int j = 0; i < gameObjects[i].components.size(); i++)
-				gameObjects[i].deleteComponent(gameObjects[i].components[j]);
-		}
-		gameObjects.pop_back();
-	}
+	for (GameObject* gameObject_ptr : gameObjects)
+		delete gameObject_ptr;
 	gameObjects.clear();
+}
+
+void GameScene::update(float deltaTime, float seconds)
+{
+	for (unsigned int i = 0; i < gameObjects.size(); i++)
+	{
+
+		if (gameObjects[i]->getPlayer() != nullptr)
+		{
+			for (int j = 0; j < gameObjects.size(); j++)
+			{
+				glm::vec2 UVS = gameObjects[i]->getPlayer()->setXZ();
+				float u = UVS.x;
+				float v = UVS.y;
+				if (gameObjects[j]->getTerrain() != nullptr)
+				{
+					gameObjects[i]->getPlayer()->setCurrentHeight(gameObjects[j]->getTerrain()->calculateY(u, v));
+				}
+			}
+		}
+		gameObjects[i]->update(deltaTime, seconds);
+		collisionTest(*gameObjects[i]);
+	}
+}
+
+void GameScene::processEvents(GLFWwindow * window, float deltaTime)
+{
+	for (int i = 0; i < gameObjects.size(); i++)
+	{
+		gameObjects[i]->processEvents(window, deltaTime);
+		interactionTest(*gameObjects[i], window);
+	}
+}
+
+void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary, ShaderProgramLib & shader, Scene::ID typeOfScene)
+{
+	if (typeOfScene == Scene::ID::LEVEL_1)
+	{
+		// Camera - (modify position with level file?)
+		addPlayer();
+		// Lights - (add lights with level file?)
+		addLight(glm::vec3(7, 9, -4), 0);
+		addLight(glm::vec3(4, 0.4, -2), 1);
+		// Terrain
+		std::string heightMap = "test1234.jpg";
+		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
+		// Read from level file and add level objects to scene
+		LeapLevel* level = new LeapLevel("Level_test.leap");
+		addLevelObjects(meshLibrary, matertialLibrary, level);
+		delete level;
+	}
+	else if (typeOfScene == Scene::ID::MENU)
+	{
+		// Put menu specific scene in here. 
+		//...
+		addPlayer();
+		addLight(glm::vec3(7, 9, -4), 0);
+		addLight(glm::vec3(4, 0.4, -2), 1);
+
+		std::string heightMap = "test1234.jpg";
+		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
+
+		LeapLevel* level = new LeapLevel("Level_test.leap");
+		addLevelObjects(meshLibrary, matertialLibrary, level);
+		delete level;
+	}
+	else
+	{
+		std::cout << "GAMESCENE::initScene() - Scene::ID : not valid" << std::endl;
+	}
 }
 
 void GameScene::addLight(glm::vec3 transform, int lightType)
 {
-	lightsInScene++;
-	addEmptyGameObject();
-	Light* light = new Light(*gameObjects[gameObjects.size() - 1].transform);
+	//Create light object
+	GameObject* lightObject = new GameObject();
+	lightObject->name = "Light " + std::to_string(lightsInScene);
+	lightObject->transform->position = transform;
+	//Add light component
+	Light* light = new Light(*lightObject->transform);
 	light->lightType = lightType;
-	gameObjects[gameObjects.size() - 1].addComponent(light);
-	gameObjects[gameObjects.size() - 1].name = "Light " + std::to_string(lightsInScene);
-	gameObjects[gameObjects.size() - 1].transform->position = transform;
-	//...
-	//gameObjects[gameObjects.size() - 1].lightComponent->lightType = lightType; 
+	lightObject->addComponent(light);
+	//Add to scene
+	gameObjects.push_back(lightObject);
+	lightsInScene++;
 }
 
 void GameScene::addPlayer()
 {
+	//Create player object
+	GameObject* playerObject = new GameObject();
+	playerObject->transform->position = glm::vec3(0.f, 0.f, 0.f);
+	playerObject->objectID = ObjectType::ID::PLAYER;
+	playerObject->name = "Player " + camerasInScene;
+	//Add player component
+	Player* player = new Player(*playerObject->transform);
+	playerObject->addComponent(player);
+	//Add to scene
+	gameObjects.push_back(playerObject);
 	camerasInScene++;
-	addEmptyGameObject();
-	std::cout << "PLAYER INDEX:: " << gameObjects.size() - 1 << std::endl;
-	Player* moveScript = new Player(*gameObjects[gameObjects.size()-1].transform);
-	gameObjects[gameObjects.size()-1].name = "Player " + camerasInScene;
-	gameObjects[gameObjects.size()-1].addComponent(moveScript);
-	gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(0.f, 0.f, 0.f);
-	}
+}
 
-void GameScene::addMeshFilter(MeshLib & meshLibrary, MaterialLib& matertialLibrary, GLuint meshNameSize)
+void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibrary, LeapLevel* level)
 {
-	/*
-	meshNameSize should be replaced or removed
-	*/
-
-	/*
-	This function should get data from the level file and create as many objects of each type that is needed
-	to build the scene.
-	*/
-
-	/*
-	We need this for each object in the scene:
-		* World position
-		* Mesh ID or mesh name to decide which mesh from the MeshLib to use when adding a new object to the scene.
-		* ...
-	*/
-
-	for (int i = 0; i < meshNameSize; i++) // 3 - meshLibrary.getNumberOfMeshes(); meshName.size();
+	//Find terrain object
+	Terrain* terrain;
+	for (GameObject* gameObject_ptr : gameObjects)
 	{
-		addEmptyGameObject();
-		MeshFilter* meshFilter = new MeshFilter(meshLibrary.getMesh(i).gVertexBuffer, meshLibrary.getMesh(i).gVertexAttribute, meshLibrary.getMesh(i).leapMesh->getVertexCount(), meshLibrary.getMesh(i).meshType);
-		gameObjects[gameObjects.size() - 1].name = "Mesh " + std::to_string(i); // Maybe pass the name of the object?
-		gameObjects[gameObjects.size() - 1].addComponent(meshFilter);
-		gameObjects[gameObjects.size() - 1].addComponent(matertialLibrary.getMaterial(0));
-		//... set interactable
-		//if(meshLibrary.getMesh(i).leapMesh->customMayaAttribute->meshType == 1)
-		gameObjects[gameObjects.size() - 1].isInteractable = true; // if meshType 1, set true
-		//std::cout << "MESHFILTER::" << gameObjects.size() - 1 << std::endl;
-
-		//Add BBox from leapmesh to gameObject
-		for (int i = 0; i < meshLibrary.getMesh(i).leapMesh->boundingBoxes.size(); i++)
+		if (gameObject_ptr->getTerrain() != nullptr)
 		{
-			//meshLibrary.getMesh(i).leapMesh->boundingBoxes
-			bBox box = bBox();
-			//add center
-			box.center.x = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->center[0];
-			box.center.y = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->center[0];
-			box.center.z = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->center[0];
-			//add max vector
-			box.vMax.x = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->maxVector[0];
-			box.vMax.y = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->maxVector[0];
-			box.vMax.z = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->maxVector[0];
-			//add min vector
-			box.vMin.x = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->minVector[0];
-			box.vMin.y = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->minVector[0];
-			box.vMin.z = meshLibrary.getMesh(i).leapMesh->boundingBoxes[i]->minVector[0];
-			//push into gameobject
-			gameObjects[gameObjects.size() - 1].bbox.push_back(box);
+			terrain = gameObject_ptr->getTerrain();
+			break;
 		}
-		if (gameObjects.size() - 1 == 4)
+	}
+	//Create game objects from level file
+	for (int i = 0; i < level->levelObjects.size(); i++)
+	{
+		std::cout << "LEVELOBJECT::ID::" << level->levelObjects[i]->id << std::endl;
+		if (level->levelObjects[i]->id == ObjectType::ID::PLAYER)
 		{
-			gameObjects[gameObjects.size() - 1].transform->position = glm::vec3(10,0,0);
+			for (GameObject* gameObject_ptr : gameObjects)
+			{
+				// Find player object
+				if (gameObject_ptr->getPlayer() != nullptr)
+				{
+					//Add new mesh component to player with data from mesh library
+					MeshFilter* meshFilter = new MeshFilter(
+						meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer,
+						meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexAttribute,
+						meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->getVertexCount(),
+						meshLibrary.getMesh(level->levelObjects[i]->id)->meshType);
+					gameObject_ptr->addComponent(meshFilter);
+					//Set player object position in world
+					gameObject_ptr->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
+					gameObject_ptr->transform->rotation = glm::vec3(level->levelObjects[i]->rotationX, level->levelObjects[i]->rotationY, level->levelObjects[i]->rotationZ);
+					//Calculate new world Y-position from height map and update value
+					float newPositionY = terrain->calculateY(gameObject_ptr->transform->position.x, gameObject_ptr->transform->position.z) - 2;
+					gameObject_ptr->transform->position.y = newPositionY;
+					//Add material to gameObject from materialLibrary
+					gameObject_ptr->addComponent(materialLibrary.getMaterial(0));
+					//Set customAttribute ID from Enum.H
+					gameObject_ptr->objectID = (ObjectType::ID)level->levelObjects[i]->id;
+					//Set customAttribute interactable - should probably be removed since player isn't interactable
+					if ((int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 1)
+						gameObject_ptr->isInteractable = true;
+					//Add BBox from leapmesh to player object
+					for (int i = 0; i < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); i++)
+					{
+						bBox* box = new bBox();
+						//add center
+						box->center.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[0];
+						box->center.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[1];
+						box->center.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[2];
+						//add max vector
+						box->vMax.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[0];
+						box->vMax.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[1];
+						box->vMax.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[2];
+						//add min vector
+						box->vMin.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[0];
+						box->vMin.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[1];
+						box->vMin.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[2];
+						//push into gameobject
+						gameObject_ptr->bbox.push_back(box);
+					}
+					//break loop
+					break;
+				}
+			}
+		}
+		else 
+		{
+			//Create new mesh object
+			GameObject* meshObject = new GameObject();
+			meshObject->name = "Mesh " + std::to_string(i);
+			//Set mesh object position in world
+			meshObject->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
+			meshObject->transform->rotation = glm::vec3(level->levelObjects[i]->rotationX, level->levelObjects[i]->rotationY, level->levelObjects[i]->rotationZ);
+			//Calculate new world Y-position from height map and update value
+			float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z) - 2;
+			meshObject->transform->position.y = newPositionY;
+			//Add new mesh component with data from mesh library
+			MeshFilter* meshFilter = new MeshFilter(
+				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer,
+				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexAttribute,
+				meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->getVertexCount(),
+				meshLibrary.getMesh(level->levelObjects[i]->id)->meshType);
+			meshObject->addComponent(meshFilter);
+			//Add material to gameObject from materialLibrary
+			meshObject->addComponent(materialLibrary.getMaterial(0));
+			//Set customAttribute ID from Enum.H
+			meshObject->objectID = (ObjectType::ID)level->levelObjects[i]->id;
+			//Set customAttribute interactable
+			if ((int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 1)
+				meshObject->isInteractable = true;
+			//Add BBox from leapmesh to gameObject
+			for (int i = 0; i < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); i++)
+			{
+				bBox* box = new bBox();
+				//add center
+				box->center.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[0];
+				box->center.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[1];
+				box->center.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[2];
+				//add max vector
+				box->vMax.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[0];
+				box->vMax.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[1];
+				box->vMax.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[2];
+				//add min vector
+				box->vMin.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[0];
+				box->vMin.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[1];
+				box->vMin.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[2];
+				//push into gameobject
+				meshObject->bbox.push_back(box);
+			}
+			//Add to scene
+			gameObjects.push_back(meshObject);
 		}
 	}
 }
 
 void GameScene::addTerrain(const std::string & heightMap, GLuint shader)
 {
-	addEmptyGameObject();
-	std::cout << "TERRAIN INDEX:: " << gameObjects.size() - 1 << std::endl;
-	newTerrain = new Terrain(heightMap, shader);
-	gameObjects[gameObjects.size() - 1].name = "Terrain";
-	gameObjects[gameObjects.size() - 1].addComponent(newTerrain);
+	//Create terrain object
+	GameObject* terrainObject = new GameObject();
+	terrainObject->name = "Terrain";
+	//Add terrain component
+	Terrain * terrain = new Terrain(heightMap, shader);
+	terrainObject->addComponent(terrain);
+	//Add to scene
+	gameObjects.push_back(terrainObject);
 }
 
 void GameScene::addMainMenu()
@@ -134,80 +261,73 @@ void GameScene::update(float deltaTime, float seconds)
 {
 	for (unsigned int i = 0; i < gameObjects.size(); i++)
 	{
-
-		if (gameObjects[i].getPlayer() != nullptr)
-		{
-			for (int j = 0; j < gameObjects.size(); j++)
-			{
-				glm::vec2 UVS = gameObjects[i].getPlayer()->setXZ();
-				float u = UVS.x;
-				float v = UVS.y;
-				if (gameObjects[j].getTerrain() != nullptr)
-				{
-					gameObjects[i].getPlayer()->setCurrentHeight(gameObjects[j].getTerrain()->calculateY(u, v));
-				}
-
-			}
-
-		}
-		gameObjects[i].update(deltaTime, seconds);
-	}
-
-}
-
-void GameScene::processEvents(GLFWwindow * window, float deltaTime)
+void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 {
-	for (int i = 0; i < gameObjects.size(); i++)
+	for (GameObject* gameObject_ptr : gameObjects)
 	{
-		gameObjects[i].processEvents(window, deltaTime);
-	}
-	if (gameObjects[0].getPlayer() != nullptr)
-	{
-		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && gameObjects[0].getPlayer()->click == false)
+		if (gameObject_ptr->getPlayer() != nullptr)
 		{
-			gameObjects[0].getPlayer()->click = true;
-			// loop rayBoxIntersection here
-			float x = 1280.0; //ScreenWidth
-			float y = 720.0; //ScreenHeight
-			RayData ray = Ray::getWorldRay(x*0.5f, y*0.5f, gameObjects[0].getViewMatrix(), x, y, gameObjects[0].transform->position);
-
-			// crash when using for(int i=1; i < gameObjects.size(); i++)
-			// vector subscript out of range
-			// the last spot in the vector is the reason for the crash..
-
-			//for (int i = 3; i < 4; i++)
-			//for (int i = 1; i < gameObjects.size(); ++i)
-			std::cout << "GameObjects.size() :: " << gameObjects.size() << std::endl;
-			for (int i = 3; i < 5; i++)
+			if (gameObject_ptr->getPlayer()->click == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
 			{
-				//int i = 3;
-				if (gameObjects[i].isInteractable)
+				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
+				if (distance < 10 && other.isInteractable == true)
 				{
-					for (int j = 0; j < gameObjects[i].bbox.size(); j++)
+					gameObject_ptr->getPlayer()->click = true;
+					RayData ray = Ray::getWorldRay(
+						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,
+						gameObject_ptr->getViewMatrix(), 
+						SCREEN_WIDTH, SCREEN_HEIGHT,
+						gameObject_ptr->transform->position);
+
+					for (int i = 0; i < other.bbox.size(); i++)
 					{
-						if (Intersection::rayBoxTest(ray, gameObjects[i].bbox[j], gameObjects[i].getModelMatrix()))
+						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
 						{
-							std::cout << "HIT::" << gameObjects[i].name << std::endl;
-							gameObjects[i].setIsRenderable(false);
-							//gameObjects[i].interactUpdate() ?
+							std::cout << "HIT::" << other.name << std::endl;
+							/*
+							gameObject_ptr.doSomething(other.objectID); //use function inside the player class and make things happen.
+							*/
+							other.setIsRenderable(false);
+							if (other.objectID == ObjectType::ID::BUCKET)
+							{
+								gameObject_ptr->getPlayer()->equip("BucketIcon");
+								gameObject_ptr->getPlayer()->addImageToInventory("InventoryBucketIcon", 4);
+							}
 						}
 						else
 						{
-							std::cout << "MISS" << std::endl;
-							gameObjects[i].setIsRenderable(true);
+							std::cout << "MISS::" << other.name << std::endl;
+							other.setIsRenderable(true);
 						}
 					}
 				}
 			}
-
-			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) && gameObjects[0].getPlayer()->click == true) {
-				gameObjects[0].getPlayer()->click = false;
-			}
+			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) && gameObject_ptr->getPlayer()->click == true)
+				gameObject_ptr->getPlayer()->click = false;
 		}
 	}
 }
 
-Terrain* GameScene::getTerrainPointer()
+void GameScene::collisionTest(GameObject & other)
 {
-	return this->newTerrain;
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->getPlayer() != nullptr && other.objectID != ObjectType::ID::PLAYER)
+		{
+			float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
+			if (distance < 10)
+			{
+				for (int i = 0; i < gameObject_ptr->bbox.size(); i++)
+				{
+					for (int j = 0; j < other.bbox.size(); j++)
+					{
+						if (Intersection::collisionTest(*gameObject_ptr->bbox[i], gameObject_ptr->transform->position, *other.bbox[j], other.transform->position))
+						{
+							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
+						}
+					}
+				}
+			}
+		}
+	}
 }

@@ -1,4 +1,7 @@
 #pragma once
+#define _CRTDBG_MAP_ALLOC
+#define SCREEN_WIDTH 1280.0
+#define SCREEN_HEIGHT 720.0
 
 namespace Gamestate
 {
@@ -19,21 +22,14 @@ namespace Gamestate
 	};
 }
 
-namespace Asset
-{
-	enum ID
-	{
-		Tree,
-		Bucket
-	};
-}
-
 namespace Scene
 {
 	enum ID
 	{
+		EMPTY,
 		MENU,
-		LEVEL_1
+		LEVEL_1,
+		LEVEL_2
 	};
 }
 
@@ -41,10 +37,24 @@ namespace ComponentType
 {
 	enum ID
 	{
-		COMPONENT,
 		PLAYER,
-		LIGHT,
+		COMPONENT,
 		TERRAIN,
-		MAINMENU
+		LIGHT,
+		MATERIAL
+	};
+}
+
+namespace ObjectType
+{
+	enum ID
+	{
+		PLAYER,
+		BUCKET,
+		STONE_1,
+		AXE,
+		WOOD,
+		MEAT,
+		TREE
 	};
 }

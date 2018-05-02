@@ -6,6 +6,7 @@ layout(location = 2) in vec2 uv_coord;
 uniform mat4 world_matrix;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
+//uniform mat4 model_matrix;
 uniform int followCamera;
 
 out VS_OUT {

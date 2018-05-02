@@ -59,7 +59,7 @@ void Terrain::setupVertexData()
 			temp.x = (float)j * offset; 
 
 			float tempY = ((float)(int)pixels[0] / 255);
-			tempY = glm::mix(MAX_HEIGHT, MIN_HEIGHT, tempY);
+			tempY = glm::mix(MIN_HEIGHT, MAX_HEIGHT, tempY);
 			tempY -= offset;
 
 			temp.y = tempY;

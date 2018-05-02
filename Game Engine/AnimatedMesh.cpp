@@ -164,27 +164,6 @@ void AnimatedMesh::UpdateKeyFrameTransform(float time, int index)
 void AnimatedMesh::CreateMeshData(std::string filePath, GLuint gShaderProgram)
 {
 	//Get Information ------==========||==========-------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	std::vector<int> finalIndex;
 	int uniqueFoundIndices = 0;
 	SkelletonVertex newMesh;

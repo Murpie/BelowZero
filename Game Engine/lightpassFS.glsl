@@ -105,7 +105,7 @@ void main()
 	float attenuation = 1.0;
 	lighting += diffuse;
 
-	float density = 0.03;
+	float density = 0.02;
 	float gradient = 3.0;
 	float distanceToPos = length(view_position - FragPos);
 	float visibility = exp(-pow((distanceToPos * density), gradient));
@@ -116,4 +116,5 @@ void main()
 
 	FragColor = lighting * (1.0f - shadowFactor);
 	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5, visibility);
+	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
 }

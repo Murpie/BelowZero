@@ -16,14 +16,14 @@ public:
 	LeapMesh(const char* fileName);
 	~LeapMesh();
 
+	std::string fileName;
+
 	int getVertexCount();
 
 	VertexInformation* vertices;
 	MeshInfo* transform;
 	MaterialInformation* material;
-	//BoundingBox* BBox;
 	vector <BoundingBox*> boundingBoxes;
-	//BoundingBoxVertex* BBoxVertices;
 	JointInformation* joints;
 	AnimationInformation* animation;
 	KeyFrame* keyFrame;

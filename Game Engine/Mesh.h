@@ -20,17 +20,17 @@ class Mesh
 {
 public:
 	Mesh();
-	Mesh(std::string filePath, GLuint gShaderProgram, GLuint meshType, Terrain * terrain);
+	Mesh(std::string filePath, GLuint gShaderProgram);
 	~Mesh();
 
-	void CreateMeshData(std::string filePath, GLuint gShaderProgram, Terrain *terrain);
-
+	void CreateMeshData(std::string filePath, GLuint gShaderProgram);
+	void deleteLeapMesh();
 	//std::vector<Vertex> Vertices;
 	//std::vector<unsigned int> indices;
-
+	//LeapImporter importer;
 	LeapMesh* leapMesh;
 	//int vertexCount;
-	GLuint meshType; //remove this later and use *leapMesh
+	unsigned int meshType; //remove this later and use *leapMesh
 	GLuint gVertexBuffer;
 	GLuint gVertexAttribute;
 };

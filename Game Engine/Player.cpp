@@ -53,6 +53,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 
 Player::~Player()
 {
+
 }
 
 void Player::setCold(float value)
@@ -298,6 +299,10 @@ glm::vec2 Player::setXZ()
 
 void Player::update(float deltaTime, float seconds)
 {
+	//update velocity
+	//Transformable::transform.velocity = Transformable::transform.forward * deltaTime;
+	//...
+
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
 	
@@ -419,40 +424,37 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	//... Mouse Movement
 	glfwGetCursorPos(window, &xpos, &ypos);
 
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-	{
-		xoffset *= sensitivity;
-		yoffset *= sensitivity;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
 
-		yaw = xoffset;
-		pitch = yoffset;
+	yaw = xoffset;
+	pitch = yoffset;
 
-		if (pitch > 90.f)
-			pitch = 90.0f;
-		if (pitch < -90.0f)
-			pitch = -90.0f;
+	if (pitch > 90.f)
+		pitch = 90.0f;
+	if (pitch < -90.0f)
+		pitch = -90.0f;
 
-		glm::mat4 matrix = glm::mat4(1);
+	glm::mat4 matrix = glm::mat4(1);
 
-		glm::vec4 forward = glm::vec4(Transformable::transform.forward, 0);
-		glm::vec4 right = glm::vec4(Transformable::transform.right, 0);
-		glm::vec4 up = glm::vec4(Transformable::transform.up, 0);
+	glm::vec4 forward = glm::vec4(Transformable::transform.forward, 0);
+	glm::vec4 right = glm::vec4(Transformable::transform.right, 0);
+	glm::vec4 up = glm::vec4(Transformable::transform.up, 0);
 
-		matrix = glm::rotate(matrix, pitch, Transformable::transform.right);
-		matrix *= glm::rotate(matrix, -yaw, Transformable::transform.up);
+	matrix = glm::rotate(matrix, pitch, Transformable::transform.right);
+	matrix *= glm::rotate(matrix, -yaw, Transformable::transform.up);
 
-		forward = matrix * forward;
-		up = matrix * up;
-		right = matrix * right;
+	forward = matrix * forward;
+	up = matrix * up;
+	right = matrix * right;
 
-		Transformable::transform.forward.x = forward.x;
-		Transformable::transform.forward.y = forward.y;
-		Transformable::transform.forward.z = forward.z;
+	Transformable::transform.forward.x = forward.x;
+	Transformable::transform.forward.y = forward.y;
+	Transformable::transform.forward.z = forward.z;
 
-		Transformable::transform.right.x = right.x;
-		Transformable::transform.right.y = right.y;
-		Transformable::transform.right.z = right.z;
-	}
+	Transformable::transform.right.x = right.x;
+	Transformable::transform.right.y = right.y;
+	Transformable::transform.right.z = right.z;
 
 	if (firstMouse) {
 		lastX = (float)xpos;
@@ -481,6 +483,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		else
 			Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
 		Transformable::transform.position.y = tempY;
+		//velocity
+		Transformable::transform.velocity = Transformable::transform.forward * deltaTime * cameraSpeed;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && backCollision == false)
@@ -489,6 +493,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		direction -= Transformable::transform.forward;
 		Transformable::transform.position -= cameraSpeed * Transformable::transform.forward * deltaTime;
 		Transformable::transform.position.y = tempY;
+		//velocity
+		Transformable::transform.velocity = Transformable::transform.forward * deltaTime * cameraSpeed;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && leftCollision == false)
@@ -497,6 +503,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		direction -= Transformable::transform.right;
 		Transformable::transform.position -= Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
+		//velocity
+		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
@@ -505,6 +513,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		direction += Transformable::transform.right;
 		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
+		//velocity
+		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;
 	}
 
 	//... Jump mechanic
@@ -520,6 +530,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		glm::vec3 jumpdir = Transformable::transform.up;
 
 		Transformable::transform.position += jumpSpeed * jumpdir * deltaTime;
+		Transformable::transform.velocity = Transformable::transform.up * deltaTime * cameraSpeed;
 	}
 	else
 		inAir = false;

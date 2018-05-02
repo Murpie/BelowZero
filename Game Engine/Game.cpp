@@ -33,55 +33,23 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 {
 	if (glfwGetKey(window, GLFW_KEY_F5) && !fullscreen)
 	{
-		glfwSetWindowMonitor(window, primary[0], 0, 0, 1280, 720, mode->refreshRate);
+		glfwSetWindowMonitor(window, primary[0], 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, mode->refreshRate);
 		fullscreen = true;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_F5) && fullscreen)
 	{
-		glfwSetWindowMonitor(window, 0, 100, 100, 1280, 720, mode->refreshRate);
+		glfwSetWindowMonitor(window, 0, 100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, mode->refreshRate);
 		fullscreen = false;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	/*
-	In this function we want to call on the sceneObjects.
-
-	example :
-	scene.pollEvent(window, deltaTime);
-
-	and check inside the classes if we want to make something
-	happen depending on which button we press.
-
-	This function should be called on within the correct state in runState().
-	*/
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	//------------------------------------
-	//This statement should be used inside the GUI class
-	/*
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-	{
-		double xpos, ypos;
-		glfwGetCursorPos(window, &xpos, &ypos);
-		std::cout << "CUROSR::X::POSITION::" << xpos << std::endl;
-		std::cout << "CUROSR::Y::POSITION::" << ypos << std::endl;
-
-		//
-		//glm::vec3 worldRay = Ray::getWorldRay(xpos, ypos, glm::mat4(), SCREEN_WIDTH, SCREEN_HEIGHT);
-		//std::cout << "CUROSR::WORLDRAY::" << worldRay.x << " " << worldRay.y << " " << worldRay.z << std::endl;
-
-	}
-
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
-	{
-
-	}
-	*/
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && stateBool != true)
 	{
 		stateBool = true;
@@ -90,6 +58,7 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 		else if (stateOfGame.state == Gamestate::ID::SHOW_MENU)
 			stateOfGame.state = Gamestate::ID::CLEAR_MENU;
 	}
+
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_RELEASE && stateBool != false)
 	{
 		stateBool = false;
@@ -102,10 +71,11 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 
 Game::Game() :
 	shaderProgramLibrary(),
-	gameScene(), menuScene(),
+	gameScene(Scene::ID::LEVEL_1), menuScene(Scene::ID::MENU),
 	windowName("Game Engine"),
+	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
-	meshesLoaded(false), fullscreen(false), stateBool(false),
+	meshesLoaded(false), fullscreen(false), stateBool(false), texturesLoaded(false),
 	count(0)
 {
 	initWindow();
@@ -173,6 +143,10 @@ void Game::run()
 		}
 
 	}
+	clearScene(menuScene);
+	clearScene(gameScene);
+	renderManager.clear();
+
 	glfwTerminate();
 }
 
@@ -192,6 +166,8 @@ void Game::runState()
 	else if (stateOfGame.state == Gamestate::ID::LOAD_LEVEL || stateOfGame.state == Gamestate::ID::RUN_LEVEL || stateOfGame.state == Gamestate::ID::CLEAR_LEVEL)
 	{
 		levelState();
+		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		//glfwDisable(GLFW_MOUSE_CURSOR);
 	}
 	else if (stateOfGame.state == Gamestate::ID::CLOSE_GAME)
 	{
@@ -284,16 +260,9 @@ void Game::initWindow()
 
 void Game::initScene(GameScene & scene)
 {
-	if (renderManager.size() < 2)
-	{
+	// RenderManager probably needs a rework when loaded with scene. 
+	if(renderManager.size() < 2)
 		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
-		renderManager[renderManager.size() - 1].createBuffers();
-	}
-	//... Create Camera
-	addPlayer(scene);
-	addTerrain(scene);
-	//... Create Lights
-	addLights(scene);
 	//... Read OBJ and MTL File
 	if (!meshesLoaded)
 	{
@@ -302,8 +271,7 @@ void Game::initScene(GameScene & scene)
 		meshesLoaded = true;
 	}
 	//...
-	/*Add meshes to mesh filter with level file ?*/
-	addMeshFilter(scene);
+	scene.initScene(meshLibrary, materialLibrary, shaderProgramLibrary, scene.typeOfScene);
 }
 
 void Game::initMenuScene(GameScene & scene)
@@ -355,22 +323,12 @@ void Game::addMeshName()
 {
 	//Add file names to vector to load when reading mesh data. 
 	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
-	std::string meshLoader[] = { "Bucket.leap", "Stone_1.leap"};
-	//meshType: 0 = Static  2 = Interactive  3 = Equiped
-	GLuint meshTypes[] = { 0 };
+	std::string meshLoader[] = { "Player_temp.leap", "Bucket.leap", "Stone_1.leap"};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 	{
 		meshName.push_back(meshLoader[i]);
-		meshType.push_back(meshTypes[i]);
 	}
-}
-
-void Game::addLights(GameScene &scene)
-{
-	// add for loop and use array for transforms ?
-	scene.addLight(glm::vec3(-4, 2, 0), 0);
-	scene.addLight(glm::vec3(-4, 2, 0), 0);
 }
 
 void Game::addRenderManager(GameScene &scene)
@@ -380,28 +338,17 @@ void Game::addRenderManager(GameScene &scene)
 	//renderManager[renderManager.size() - 1].createBuffers();
 }
 
-void Game::addPlayer(GameScene &scene)
-{
-	scene.addPlayer();
-}
-
-void Game::addMeshFilter(GameScene &scene)
-{
-	scene.addMeshFilter(meshLibrary, materialLibrary, meshName.size());
-}
-void Game::addTerrain(GameScene &scene)
-{
-	scene.addTerrain("firstheightmap.jpg", shaderProgramLibrary.getShader<TerrainShaders>()->TerrainShaderProgram);
-}
-
 void Game::readMeshName(GameScene &scene)
 {
 	for (int i = 0; i < meshName.size(); i++)
 	{
-		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram, meshType[i], scene.getTerrainPointer());
+		meshLibrary.addMesh(meshName[i], shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
 	}
-
-	materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
-	textureLibrary.addAlbedo("Colors.png");
-	materialLibrary.getMaterial(0)->addAlbedo(textureLibrary.getAlbedo(0)->gTexture);
+	if (!texturesLoaded)
+	{
+		materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
+		textureLibrary.addAlbedo("Colors.png");
+		materialLibrary.getMaterial(0)->addAlbedo(textureLibrary.getAlbedo(0)->gTexture);
+		texturesLoaded = true;
+	}
 }

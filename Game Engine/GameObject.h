@@ -15,10 +15,11 @@
 
 #include "Ray.h"
 #include "Intersection.h"
+#include <list>
 
 class Component;
 
-class GameObject //: public Component 
+class GameObject 
 {
 public:
 	GameObject();
@@ -30,32 +31,16 @@ public:
     bool isActive;
     bool hasLight;
 	bool isInteractable;
-
+	ObjectType::ID objectID;
 	std::string name;
 	Transform *transform;
-	std::vector<Component*> components;
+	std::list<Component*> components;
 
-	std::vector <bBox> bbox;
+	std::vector <bBox*> bbox;
 
-	/*
-		rework functions so we can put Material, MeshFilter and Light
-		directly into the component vector.
-
-		We need to this to be able to effectivly delete the components
-		in the components vector. This will be used every time we change scene
-		so we don't have to store the data in memory all the time. 
-
-		We will refill the component vector when we load a scene. 
-	*/
-
-    Material *materialComponent; // we want this one in components
-    MeshFilter *meshFilterComponent; // we want this one in components
-	Light *lightComponent; // we want this one in components
-
-	/*
-		Material, MeshFilter and Light are components. 
-		Why are they not stored in componets?
-	*/
+    Material *materialComponent;
+    MeshFilter *meshFilterComponent; 
+	Light *lightComponent; 
 
     void updateMaterialAndMeshFilterPointers();
     void updateHasLight();
@@ -75,11 +60,11 @@ public:
 
 	template <class T>
 	T* getComponent() {
-		for (int i = 0; i < components.size(); i++)
+		for (Component* component_ptr : components)
 		{
-			if (dynamic_cast<T*>(components[i]) != nullptr)
+			if (dynamic_cast<T*>(component_ptr) != nullptr)
 			{
-				T *test = dynamic_cast<T*>(components[i]);
+				T *test = dynamic_cast<T*>(component_ptr);
 				return test;
 			}
 		}
