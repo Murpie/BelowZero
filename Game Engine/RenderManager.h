@@ -13,7 +13,6 @@
 #include "GameScene.h"
 #include "Player.h"
 #include "ShaderProgramLib.h"
-#include "VFX.h"
 #include "TextureLib.h"
 #include <math.h>
 #define STB_IMAGE_IMPLEMENTATION
@@ -29,6 +28,8 @@
 #define LOW_SHADOW 1024
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
+
+#define MAX_PARTICLES 1000
 
 struct QuadVertex
 {
@@ -54,7 +55,20 @@ public:
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
-	/*void setupMatricesForCubeMapShadowMap(unsigned int shaderToUse, glm::vec3 lightPosition);*/
+	void renderParticles();
+
+	struct Particle {
+		glm::vec3 pos, speed;
+		unsigned char r, g, b, a;
+		float size, angle, weight;
+		float life;
+		float cameraDistance;
+	};
+
+	Particle particleContainer[MAX_PARTICLES];
+
+	int FindUnusedParticle(Particle* container, int lastUsedParticle);
+	void ParticleLinearSort(Particle* arr, int size);
 
 private:
 
@@ -97,11 +111,9 @@ private:
 	unsigned int lastUsedParticle;
 	unsigned int particleCount = 100;
 	unsigned int newParticles = (int)(deltaTime * 100);
-	const int maxParticles = 10000;
-	VFX::Particle* particleContainer;
 
-	GLvoid* particlePositionData = NULL;
-	GLvoid* particleColorData = NULL;
+	GLfloat* particlePositionData = 0;
+	//GLubyte* particleColorData = 0;
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;

@@ -200,7 +200,6 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Transformable.cpp" />
     <ClCompile Include="Vertex.cpp" />
-    <ClCompile Include="VFX.cpp" />
     <ClCompile Include="VFXShaders.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -245,7 +244,6 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Transformable.h" />
     <ClInclude Include="Vertex.h" />
-    <ClInclude Include="VFX.h" />
     <ClInclude Include="VFXShaders.h" />
   </ItemGroup>
   <ItemGroup>
