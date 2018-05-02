@@ -82,7 +82,7 @@ void RenderManager::createBuffers()
 
 	//VFX
 	particlePositionData = new GLfloat[MAX_PARTICLES * 4];
-	//particleColorData = new GLubyte[MAX_PARTICLES * 4];
+	particleColorData = new GLubyte[MAX_PARTICLES * 4];
 
 	glGenVertexArrays(1, &billboard_vertex_array);
 	glBindVertexArray(billboard_vertex_array);
@@ -101,9 +101,9 @@ void RenderManager::createBuffers()
 	glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
 	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
 
-	/*glGenBuffers(1, &particleColorBuffer);
+	glGenBuffers(1, &particleColorBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
-	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);*/
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
 
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
@@ -114,7 +114,7 @@ void RenderManager::createBuffers()
 	width = 0;
 	height = 0;
 	nrOfChannels = 0;
-	data = stbi_load("fire.png", &width, &height, &nrOfChannels, 0);
+	data = stbi_load("Particle.png", &width, &height, &nrOfChannels, 0);
 	glGenTextures(1, &billboardTexture);
 	glBindTexture(GL_TEXTURE_2D, billboardTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -314,7 +314,7 @@ void RenderManager::Render() {
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
 	
-	//... Terrain PASS----------------------------------------------------------------------------------------------------------------------------------------
+	//... Terrain PASS-----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glUseProgram(terrainShaderProgram);
@@ -374,7 +374,7 @@ void RenderManager::Render() {
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
 
-	//... VFX
+	//... VFX--------------------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glUseProgram(vfxShaderProgram);
 	glEnable(GL_DEPTH_TEST);
@@ -384,56 +384,57 @@ void RenderManager::Render() {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	
 	glm::vec3 cameraPosition(glm::inverse(view_matrix)[3]);
-
 	glm::vec3 billPos = { 30.0f, 20.f, 50.0f };
-	glm::vec2 billSize = { 1.0f, 1.125f };
-	
-	int lastUsedParticle = 0;
+	//glm::vec2 billSize = { 1.0f, 1.125f };
 
-	int newParticles = (int)(deltaTime * 1000.0);
-	if (newParticles > (int)(0.016f * 1000.0))
+	//Create a randomizer so it doesn't spawn all the particles on every frame
+	randomizer = rand() % 30;
+
+	if (randomizer == 1)
 	{
-		newParticles = (int)(0.016f * 1000.0);
+		if (particleCount <= MAX_PARTICLES)
+		{
+			for (int i = 0; i < newParticles; i++)
+			{
+				lastUsedParticle = FindUnusedParticle(particleContainer, lastUsedParticle);
+				int particleIndex = lastUsedParticle;
+
+				particleContainer[particleIndex].life = 1.0f;
+				particleContainer[particleIndex].pos = glm::vec3(30.0f, 8.0f, 50.0f);
+
+				float spread = 0.5f;
+				glm::vec3 mainDir = glm::vec3(0.0f, 0.3f, 0.0f);
+				glm::vec3 randomDir = glm::vec3(
+					(sin(rand() % 10 - 10.0f) / 5.0f),
+					(sin(rand() % 10 - 10.0f) / 5.0f),
+					(sin(rand() % 10 - 10.0f) / 5.0f)
+				);
+
+				particleContainer[particleIndex].speed = mainDir + randomDir * spread;
+
+				do
+				{
+					particleContainer[particleIndex].r = rand() % 220;	//256 highest
+				} while (particleContainer[particleIndex].r < 140);
+				particleContainer[particleIndex].g = rand() % 85;
+				//particleContainer[particleIndex].b = rand() % 256;
+				particleContainer[particleIndex].b = 0;
+				particleContainer[particleIndex].a = (rand() % 256) / 3;
+
+				particleContainer[particleIndex].size = (rand() % 1000) / 2000.0f + 0.4f;
+			}
+		}
 	}
-
-	int randomFlare = rand() % 100;
-
-	//if (randomFlare < 20)
-	//{
-	for (int i = 0; i < newParticles; i++)
-	{
-		int particleIndex = FindUnusedParticle(particleContainer, lastUsedParticle);
-		particleContainer[particleIndex].life = 1.0f;
-		particleContainer[particleIndex].pos = glm::vec3(30.0f, 20.0f, 30.0f);
-
-		float spread = 0.2f;
-		glm::vec3 mainDir = glm::vec3(0.0f, 0.5f, 0.0f);
-		glm::vec3 randomDir = glm::vec3(
-			(rand() % 20 - 10.0f) / 10.0f,
-			(rand() % 20 - 10.0f) / 10.0f,
-			(rand() % 20 - 10.0f) / 10.0f
-		);
-
-		particleContainer[particleIndex].speed = mainDir + randomDir * spread;
-
-		/*particleContainer[particleIndex].r = rand() % 256;
-		particleContainer[particleIndex].g = rand() % 256;
-		particleContainer[particleIndex].b = rand() % 256;
-		particleContainer[particleIndex].a = (rand() % 256) / 3;*/
-
-		particleContainer[particleIndex].size = (rand() % 1000) / 2000.0f + 0.1f;
-	}
-	//}
 
 	int particleCount = 0;
 	//Movement of the new particles
-	for (int i = 0; i < newParticles; i++)
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		particleContainer[i].life -= deltaTime;
+		particleContainer[i].life -= deltaTime / 2.0f;
 		if (particleContainer[i].life > 0.0f)
 		{
-			particleContainer[i].speed += glm::vec3(0.0f, -1.0f, 0.0f) * deltaTime * 0.3f;
-			particleContainer[i].pos += particleContainer[i].speed / 5.0f;
+			particleContainer[i].speed += glm::vec3(0.0f, -0.3f, 0.0f) * deltaTime * 0.5f;
+			particleContainer[i].pos += particleContainer[i].speed / 10.0f;
 			particleContainer[i].cameraDistance = glm::length(particleContainer[i].pos - cameraPosition);
 
 			particlePositionData[4 * particleCount + 0] = particleContainer[i].pos.x;
@@ -442,19 +443,19 @@ void RenderManager::Render() {
 
 			particlePositionData[4 * particleCount + 3] = particleContainer[i].size;
 
-			/*particleColorData[4 * particleCount + 0] = particleContainer[i].r;
+			particleColorData[4 * particleCount + 0] = particleContainer[i].r;
 			particleColorData[4 * particleCount + 1] = particleContainer[i].g;
 			particleColorData[4 * particleCount + 2] = particleContainer[i].b;
-			particleColorData[4 * particleCount + 3] = particleContainer[i].a;*/
+			particleColorData[4 * particleCount + 3] = particleContainer[i].a * particleContainer[i].life;
 		}
 		else
 		{
 			particleContainer[i].cameraDistance = -1.0f;
+			particlePositionData[4 * particleCount + 3] = 0;	//If dead -> Size = 0
 		}
-
 		particleCount++;
 	}
-
+	
 	//Sort
 	//std::sort(particleContainer[0], particleContainer[MAX_PARTICLES]);
 	//ParticleLinearSort(particleContainer, newParticles);											<-- HELP
@@ -463,12 +464,9 @@ void RenderManager::Render() {
 	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLfloat), particlePositionData);
 
-	/*glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
 	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLubyte), particleColorData);*/
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLubyte), particleColorData);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, billboardTexture);
@@ -483,17 +481,10 @@ void RenderManager::Render() {
 	glUniformMatrix4fv(glGetUniformLocation(vfxShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
 
 	glUniform3fv(glGetUniformLocation(vfxShaderProgram, "billboardPos"), 1, glm::value_ptr(billPos));
-	glUniform2fv(glGetUniformLocation(vfxShaderProgram, "billboardSize"), 1, glm::value_ptr(billSize));
-
-	float lifeLevel = sin(deltaTime)* 0.1f + 0.7f;
-	glUniform1f(glGetUniformLocation(vfxShaderProgram, "lifeLevel"), lifeLevel);
+	//glUniform2fv(glGetUniformLocation(vfxShaderProgram, "billboardSize"), 1, glm::value_ptr(billSize));					//Already generated
 
 	renderParticles();
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
-
-	//glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glDisable(GL_BLEND);
 
 	//... Copy Stencil Buffer from gbo to finalFBO
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gbo);
@@ -720,7 +711,7 @@ void RenderManager::renderParticles()
 	);
 
 	//Colors
-	/*glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
 	glVertexAttribPointer(
 		2,
@@ -729,11 +720,11 @@ void RenderManager::renderParticles()
 		GL_TRUE,
 		0,
 		(void*)0
-	);*/
+	);
 
 	glVertexAttribDivisor(0, 0);
 	glVertexAttribDivisor(1, 1);
-	//glVertexAttribDivisor(2, 1);
+	glVertexAttribDivisor(2, 1);
 }
 
 void RenderManager::ParticleLinearSort(Particle* arr, int size)

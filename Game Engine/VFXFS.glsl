@@ -4,7 +4,7 @@ out vec4 color;
 
 // Interpolated values from the vertex shaders
 in vec2 uv;
-//in vec4 particleColor;
+in vec4 particleColor;
 
 uniform sampler2D particleTexture;
 
@@ -15,7 +15,11 @@ void main(){
 	vec4 bbTexture = texture(particleTexture, uv).rgba;
 
 	// Output color = color of the texture at the specified UV
-	color = vec4(bbTexture);// *particleColor;
+	color = vec4(bbTexture) * particleColor;
+	if (color.w < 0.01f)
+	{
+		discard;
+	}
 	
 	// Hardcoded life level, should be in a separate texture.
 	//if (uv.x < lifeLevel && uv.y > 0.3 && uv.y < 0.7 && uv.x > 0.04 )

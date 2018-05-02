@@ -63,7 +63,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("level_test_campfire.leap");
+		LeapLevel* level = new LeapLevel("Level_test.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
 	}
@@ -233,26 +233,6 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 			gameObjects.push_back(meshObject);
 		}
 	}
-	////Create new mesh object
-	//GameObject* campfireObject = new GameObject();
-	//campfireObject->name = "Mesh ";
-	////Set mesh object position in world
-	//campfireObject->transform->position = glm::vec3(4, 5, 5);
-	////Calculate new world Y-position from height map and update value
-	//float newPositionY = terrain->calculateY(campfireObject->transform->position.x, campfireObject->transform->position.z) - 2;
-	//campfireObject->transform->position.y = newPositionY;
-	////Add new mesh component with data from mesh library
-	//MeshFilter* campfireMeshFilter = new MeshFilter(
-	//	meshLibrary.getMesh(3)->gVertexBuffer,
-	//	meshLibrary.getMesh(3)->gVertexAttribute,
-	//	meshLibrary.getMesh(3)->leapMesh->getVertexCount(),
-	//	meshLibrary.getMesh(3)->meshType);
-	//campfireObject->addComponent(campfireMeshFilter);
-	////Add material to gameObject from materialLibrary
-	//campfireObject->addComponent(materialLibrary.getMaterial(0));
-	//if ((int)meshLibrary.getMesh(3)->leapMesh->customMayaAttribute->meshType == 1)
-	//	campfireObject->isInteractable = true;
-	//gameObjects.push_back(campfireObject);
 }
 
 void GameScene::addTerrain(const std::string & heightMap, GLuint shader)

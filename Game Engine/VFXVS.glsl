@@ -3,12 +3,12 @@
 // Input vertex data, different for all executions of this shader.
 layout(location = 0) in vec3 squareVertices;
 layout(location = 1) in vec4 center;
-//layout(location = 2) in vec4 color;
+layout(location = 2) in vec4 color;
 //layout(location = 1) in vec2 squareUVs;
 
 // Output data ; will be interpolated for each fragment.
 out vec2 uv;
-//out vec4 particleColor;
+out vec4 particleColor;
 
 // Values that stay constant for the whole mesh.
 //uniform vec3 view_position;
@@ -36,5 +36,5 @@ void main()
 	
 	// UVs
 	uv = squareVertices.xy + vec2(0.5, 0.5);
-	//particleColor = color;
+	particleColor = color;
 }

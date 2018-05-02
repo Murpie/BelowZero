@@ -29,7 +29,7 @@
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
 
-#define MAX_PARTICLES 1000
+#define MAX_PARTICLES 100
 
 struct QuadVertex
 {
@@ -108,12 +108,13 @@ private:
 	unsigned int particlePositionBuffer;
 	unsigned int particleColorBuffer;
 
-	unsigned int lastUsedParticle;
-	unsigned int particleCount = 100;
-	unsigned int newParticles = (int)(deltaTime * 100);
+	unsigned int lastUsedParticle = 0;
+	unsigned int particleCount = 10;
+	unsigned int newParticles = 1;
+	unsigned int randomizer = 0;
 
 	GLfloat* particlePositionData = 0;
-	//GLubyte* particleColorData = 0;
+	GLubyte* particleColorData = 0;
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
