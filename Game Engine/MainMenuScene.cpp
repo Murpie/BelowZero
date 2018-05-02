@@ -17,19 +17,19 @@ MainMenuScene::MainMenuScene()
 	this->whichButtonIsSelected = -1;
 
 	this->startButtonMinMax[0].x = 30;
-	this->startButtonMinMax[0].y = 345;
+	this->startButtonMinMax[0].y = 381;
 	this->startButtonMinMax[1].x = 250;
-	this->startButtonMinMax[1].y = 372;
+	this->startButtonMinMax[1].y = 410;
 	
 	this->settingsButtonMinMax[0].x = 30;
 	this->settingsButtonMinMax[0].y = 455;
 	this->settingsButtonMinMax[1].x = 205;
-	this->settingsButtonMinMax[1].y = 490;
+	this->settingsButtonMinMax[1].y = 483;
 	
 	this->ExitButtonMinMax[0].x = 30;
-	this->ExitButtonMinMax[0].y = 560;
+	this->ExitButtonMinMax[0].y = 525;
 	this->ExitButtonMinMax[1].x = 223;
-	this->ExitButtonMinMax[1].y = 590;
+	this->ExitButtonMinMax[1].y = 555;
 
 	stbi_set_flip_vertically_on_load(true);
 
