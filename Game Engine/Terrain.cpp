@@ -300,7 +300,7 @@ float Terrain::calculateY(float x, float z)
 	int gridZ = (int)glm::floor(z / offset);
 
 	if (gridX >= terrainVertices.size() - 1 || gridZ >= terrainVertices.size() - 1 || gridX < 0 || gridZ < 0)
-		return -10000;
+		return -10;
 
 	float xCoord = std::fmod(x, (float)offset) / (float)offset;
 	float zCoord = std::fmod(z, (float)offset) / (float)offset;
