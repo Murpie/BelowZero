@@ -20,7 +20,12 @@ Terrain::Terrain(const std::string & height, GLuint shader)
 Terrain::~Terrain()
 {
 	for (int i = 0; i < this->Length; i++)
-		delete[] Heights[i];
+	{
+		if (Heights[i] != nullptr)
+		{
+			delete[] Heights[i];	
+		}
+	}
 		
 
 	delete[] Heights;

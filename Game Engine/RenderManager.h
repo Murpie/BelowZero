@@ -50,6 +50,7 @@ public:
 
 	void Render();
 	void createBuffers();
+	void deleteData();
 	void renderQuad();
 	void Update();
 	void setDeltaTime(float deltaTime);

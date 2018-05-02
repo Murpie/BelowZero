@@ -238,6 +238,18 @@ void RenderManager::createBuffers()
 		std::cout << "UI Framebuffer not complete!" << std::endl;
 }
 
+void RenderManager::deleteData()
+{
+	if (particlePositionData != nullptr)
+	{
+		delete particlePositionData;
+	}
+	if (particleColorData != nullptr)
+	{
+		delete particleColorData;
+	}
+}
+
 void RenderManager::Render() {
 	FindObjectsToRender();
 
@@ -384,8 +396,7 @@ void RenderManager::Render() {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	
 	glm::vec3 cameraPosition(glm::inverse(view_matrix)[3]);
-	glm::vec3 billPos = { 30.0f, 20.f, 50.0f };
-	//glm::vec2 billSize = { 1.0f, 1.125f };
+	
 
 	//Create a randomizer so it doesn't spawn all the particles on every frame
 	randomizer = rand() % 30;
@@ -446,7 +457,7 @@ void RenderManager::Render() {
 			particleColorData[4 * particleCount + 0] = particleContainer[i].r;
 			particleColorData[4 * particleCount + 1] = particleContainer[i].g;
 			particleColorData[4 * particleCount + 2] = particleContainer[i].b;
-			particleColorData[4 * particleCount + 3] = particleContainer[i].a * particleContainer[i].life;
+			particleColorData[4 * particleCount + 3] = (particleContainer[i].a * particleContainer[i].life) * 3.0f;
 		}
 		else
 		{
@@ -455,11 +466,8 @@ void RenderManager::Render() {
 		}
 		particleCount++;
 	}
-	
-	//Sort
-	//std::sort(particleContainer[0], particleContainer[MAX_PARTICLES]);
-	//ParticleLinearSort(particleContainer, newParticles);											<-- HELP
 
+	//Update particle information
 	glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
 	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLfloat), particlePositionData);
@@ -468,21 +476,25 @@ void RenderManager::Render() {
 	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLubyte), particleColorData);
 
+	//Apply Texture
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, billboardTexture);
 	glUniform1i(glGetUniformLocation(vfxShaderProgram, "myTextureSampler"), 0);
 
+	//Get and set matrices
 	glm::mat4 viewProjectionMatrix = projection_matrix * view_matrix;
 	glm::vec3 cameraRight_vector = glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
 	glm::vec3 cameraUp_vector = glm::vec3(view_matrix[0][1], view_matrix[1][2], view_matrix[2][3]);
-
 	glUniform3fv(glGetUniformLocation(vfxShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
 	glUniform3fv(glGetUniformLocation(vfxShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
 	glUniformMatrix4fv(glGetUniformLocation(vfxShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
 
+	//Get and set default Position
+	glm::vec3 billPos = { 30.0f, 20.f, 50.0f };
 	glUniform3fv(glGetUniformLocation(vfxShaderProgram, "billboardPos"), 1, glm::value_ptr(billPos));
 	//glUniform2fv(glGetUniformLocation(vfxShaderProgram, "billboardSize"), 1, glm::value_ptr(billSize));					//Already generated
 
+	//Draw Particles
 	renderParticles();
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
 

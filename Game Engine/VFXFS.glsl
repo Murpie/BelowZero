@@ -16,7 +16,7 @@ void main(){
 
 	// Output color = color of the texture at the specified UV
 	color = vec4(bbTexture) * particleColor;
-	if (color.w < 0.01f)
+	if (color.w < 0.02f)
 	{
 		discard;
 	}
