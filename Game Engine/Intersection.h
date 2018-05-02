@@ -153,7 +153,7 @@ public:
 		*/
 	}
 
-	static bool collisionTest(const bBox& bBox1, glm::vec3& position1, const bBox& bBox2, glm::vec3& posittion2)
+	static bool collisionTest(const bBox& bBox1, glm::vec3& position1, const bBox& bBox2, const glm::vec3& posittion2)
 	{
 		//bBox1
 		bBox temp1 = bBox1;
@@ -173,6 +173,29 @@ public:
 			temp1.vMin.z < temp2.vMax.z);
 	}
 
+	static void collisionResponse(const bBox& bBox1, Transform& playerTransform, const bBox& bBox2, const glm::vec3& posittion2)
+	{
+		//bBox1
+		bBox temp1 = bBox1;
+		temp1.vMax += playerTransform.position;
+		temp1.vMin += playerTransform.position;
+		//bBox2
+		bBox temp2 = bBox2;
+		temp2.vMax += posittion2;
+		temp2.vMin += posittion2;
+
+		int axis;
+
+		if(glm::abs(playerTransform.velocity.x ) > (glm::abs(playerTransform.velocity.y)) && glm::abs(playerTransform.velocity.x) > glm::abs(playerTransform.velocity.z))
+			axis = 0; // X
+		else if (glm::abs(playerTransform.velocity.y) > (glm::abs(playerTransform.velocity.x)) && glm::abs(playerTransform.velocity.y) > glm::abs(playerTransform.velocity.x))
+			axis = 1; // Y
+		else
+			axis = 2; // Z
+
+
+	}
+	/*
 	static float sweptAABB(bBox b1, bBox b2, float& normalX, float& normalY, float& normalZ, Transform* player)
 	{
 		// b1 is a moving box -> the player
@@ -317,4 +340,5 @@ public:
 		}
 		return entryTime;
 	}
+	*/
 };

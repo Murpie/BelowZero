@@ -63,7 +63,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("Level_test.leap");
+		LeapLevel* level = new LeapLevel("1234level.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
 	}
@@ -301,7 +301,7 @@ void GameScene::collisionTest(GameObject & other)
 		if (gameObject_ptr->getPlayer() != nullptr && other.objectID != ObjectType::ID::PLAYER)
 		{
 			float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-			if (distance < 10)
+			if (distance < 30)
 			{
 				for (int i = 0; i < gameObject_ptr->bbox.size(); i++)
 				{
@@ -309,6 +309,8 @@ void GameScene::collisionTest(GameObject & other)
 					{
 						if (Intersection::collisionTest(*gameObject_ptr->bbox[i], gameObject_ptr->transform->position, *other.bbox[j], other.transform->position))
 						{
+							//std::cout << gameObject_ptr->transform->velocity.x << std::endl;
+							Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
 							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
 						}
 					}
