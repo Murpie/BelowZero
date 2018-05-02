@@ -73,7 +73,6 @@ Game::Game() :
 	shaderProgramLibrary(),
 	gameScene(Scene::ID::LEVEL_1), menuScene(Scene::ID::MENU),
 	windowName("Game Engine"),
-	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
 	meshesLoaded(false), fullscreen(false), stateBool(false), texturesLoaded(false),
 	count(0)
@@ -185,8 +184,9 @@ void Game::menuState()
 	if (stateOfGame.state == Gamestate::ID::LOAD_MENU)
 	{
 		printCurrentState(stateOfGame.state);
-		//initScene(menuScene);
-		initMenuScene(menuScene);
+		initScene(menuScene);
+		renderManager[0].createMainMenuBuffer();
+		renderManager[0].createButtonQuads();
 		stateOfGame.state = Gamestate::ID::SHOW_MENU;
 		printCurrentState(stateOfGame.state);
 	}
@@ -211,6 +211,7 @@ void Game::levelState()
 	{
 		printCurrentState(stateOfGame.state);
 		initScene(gameScene);
+		renderManager[1].createBuffers();
 		stateOfGame.state = Gamestate::ID::RUN_LEVEL;
 		printCurrentState(stateOfGame.state);
 	}
@@ -272,18 +273,6 @@ void Game::initScene(GameScene & scene)
 	}
 	//...
 	scene.initScene(meshLibrary, materialLibrary, shaderProgramLibrary, scene.typeOfScene);
-}
-
-void Game::initMenuScene(GameScene & scene)
-{
-	if (renderManager.size() < 2)
-	{
-		addRenderManager(scene);
-		renderManager[renderManager.size() - 1].createMainMenuBuffer();
-		renderManager[renderManager.size() - 1].createButtonQuads();
-	}
-	//addMeshFilter(scene);
-	scene.addMainMenu();
 }
 
 void Game::clearScene(GameScene & scene)

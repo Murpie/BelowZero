@@ -70,7 +70,6 @@ private:
 
 	void initWindow();
 	void initScene(GameScene &scene);
-	void initMenuScene(GameScene &scene);
 	void clearScene(GameScene &scene);
 	void initShaderProgramLib();
 	void initInputOptions();

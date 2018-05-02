@@ -539,7 +539,6 @@ void RenderManager::Render() {
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0]->getPlayer()->textFade);
 
 			glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
-
 			renderQuad();
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -554,7 +553,7 @@ void RenderManager::renderMainMenu()
 {
 	FindObjectsToRender();
 
-	view_matrix = gameScene->gameObjects[0].getViewMatrix();
+	view_matrix = gameScene->gameObjects[0]->getViewMatrix();
 	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
 	glEnable(GL_BLEND);
@@ -568,50 +567,49 @@ void RenderManager::renderMainMenu()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(mainMenuShaderProgram);
 
-	gameScene->gameObjects[0].getMenuScene()->buttonTransformations = 1;
+	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 1;
 	glBindVertexArray(buttonVertexArrayObject[0]);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->startButtonTexture);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0].getMenuScene()->buttonTransformations);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0].getMenuScene()->scaling1);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0].getMenuScene()->scaling2);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0].getMenuScene()->scaling3);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->startButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	
-	gameScene->gameObjects[0].getMenuScene()->buttonTransformations = 2;
+	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 2;
 	glBindVertexArray(buttonVertexArrayObject[1]);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->settingsButtonTexture);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0].getMenuScene()->buttonTransformations);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0].getMenuScene()->scaling1);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0].getMenuScene()->scaling2);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0].getMenuScene()->scaling3);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->settingsButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	
-	gameScene->gameObjects[0].getMenuScene()->buttonTransformations = 3;
+	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 3;
 	glBindVertexArray(buttonVertexArrayObject[2]);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->exitButtonTexture);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0].getMenuScene()->buttonTransformations);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0].getMenuScene()->scaling1);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0].getMenuScene()->scaling2);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0].getMenuScene()->scaling3);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->exitButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	gameScene->gameObjects[0].getMenuScene()->buttonTransformations = 0;
+	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 0;
 	glBindVertexArray(quadVertexArrayObject);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0].getMenuScene()->backgroundTexture);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0].getMenuScene()->buttonTransformations);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0].getMenuScene()->scaling1);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0].getMenuScene()->scaling2);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0].getMenuScene()->scaling3);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->backgroundTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-
 
 	//gameScene->gameObjects[0].getMenuScene()->deleteObjects();
 	clearObjectsToRender(); 

@@ -41,7 +41,8 @@ namespace ComponentType
 		COMPONENT,
 		TERRAIN,
 		LIGHT,
-		MATERIAL
+		MATERIAL,
+		MAINMENU
 	};
 }
 

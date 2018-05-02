@@ -71,9 +71,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 	{
 		// Put menu specific scene in here. 
 		//...
-		addPlayer();
-		addLight(glm::vec3(7, 9, -4), 0);
-		addLight(glm::vec3(4, 0.4, -2), 1);
+		addMainMenu();
 
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
@@ -249,18 +247,16 @@ void GameScene::addTerrain(const std::string & heightMap, GLuint shader)
 
 void GameScene::addMainMenu()
 {
-	addEmptyGameObject();
+	GameObject* MainMenuObject = new GameObject();
 	MainMenuScene* mainMenuScene = new MainMenuScene();
-	gameObjects[gameObjects.size() - 1].addComponent(mainMenuScene);
-	gameObjects[gameObjects.size() - 1].setIsRenderable(true);
-	// skräp
-	addEmptyGameObject();
+	MainMenuObject->name = "MainMenu";
+	MainMenuObject->addComponent(mainMenuScene);
+	MainMenuObject->setIsRenderable(true);
+	
+	gameObjects.push_back(MainMenuObject);
 }
 
-void GameScene::update(float deltaTime, float seconds)
-{
-	for (unsigned int i = 0; i < gameObjects.size(); i++)
-	{
+
 void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 {
 	for (GameObject* gameObject_ptr : gameObjects)

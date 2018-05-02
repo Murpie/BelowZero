@@ -16,25 +16,25 @@ MainMenuScene::MainMenuScene()
 	this->scaling3 = 1.0;
 	this->whichButtonIsSelected = -1;
 
-	this->startButtonMinMax[0].x = 523;
-	this->startButtonMinMax[0].y = 270;
-	this->startButtonMinMax[1].x = 755;
-	this->startButtonMinMax[1].y = 318;
+	this->startButtonMinMax[0].x = 30;
+	this->startButtonMinMax[0].y = 345;
+	this->startButtonMinMax[1].x = 250;
+	this->startButtonMinMax[1].y = 372;
 	
-	this->settingsButtonMinMax[0].x = 558;
-	this->settingsButtonMinMax[0].y = 375;
-	this->settingsButtonMinMax[1].x = 722;
-	this->settingsButtonMinMax[1].y = 425;
+	this->settingsButtonMinMax[0].x = 30;
+	this->settingsButtonMinMax[0].y = 455;
+	this->settingsButtonMinMax[1].x = 205;
+	this->settingsButtonMinMax[1].y = 490;
 	
-	this->ExitButtonMinMax[0].x = 537;
-	this->ExitButtonMinMax[0].y = 482;
-	this->ExitButtonMinMax[1].x = 740;
-	this->ExitButtonMinMax[1].y = 533;
+	this->ExitButtonMinMax[0].x = 30;
+	this->ExitButtonMinMax[0].y = 560;
+	this->ExitButtonMinMax[1].x = 223;
+	this->ExitButtonMinMax[1].y = 590;
 
 	stbi_set_flip_vertically_on_load(true);
 
 	loadBackgroundTexture("MainMenuBackground");
-	loadButtonTexture("StartGameButtonNew", 1);
+	loadButtonTexture("StartGameButton", 1);
 	loadButtonTexture("SettingsGameButton", 2);
 	loadButtonTexture("ExitGameButton", 3);
 }
@@ -276,7 +276,7 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 
 		if (this->scaling1 <= 1.3)
 		{
-			this->scaling1 += 0.01;
+			this->scaling1 += 0.02;
 			this->buttonIsUpScaled1 = true;
 		}
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)

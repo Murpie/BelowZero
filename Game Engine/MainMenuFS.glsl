@@ -20,15 +20,8 @@ void main()
 		newScale = scaling3 / 10;
 	
 	color = texture(textureToUse, TexCoords);
-	if (color.a < 0.1)
+	if (color.a < 0.35)
 		discard;
-
-
-	/*if (scaling1 > 1.0)
-	{
-		newScale = scaling1 / 10;
-		FragColor = vec4(color.xyz + newScale, color.w);
-	}*/
 	else
 		FragColor = color;
 }
