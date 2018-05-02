@@ -13,7 +13,7 @@ float newScale;
 void main()
 {
 	if (scaling1 > 1.0)
-		newScale = scaling1 / 10;
+		newScale = scaling1 / 10; // Test to see if it it able to change color
 	if (scaling2 > 1.0)
 		newScale = scaling2 / 10;
 	if (scaling3 > 1.0)
@@ -24,11 +24,11 @@ void main()
 		discard;
 
 
-	if (scaling1 > 1.0)
+	/*if (scaling1 > 1.0)
 	{
 		newScale = scaling1 / 10;
 		FragColor = vec4(color.xyz + newScale, color.w);
-	}
+	}*/
 	else
 		FragColor = color;
 }
