@@ -417,10 +417,10 @@ void RenderManager::Render() {
 	directionVec.y = directionVec.y / 5.0f;
 	directionVec.z = randomDirectionZ;
 
-	//Check if the particles are far away from the player
+	//Check if the particles are far away from the player,
+	//if too far away --> Don't render
 	glm::vec3 tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
 	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
-	printf("Distance: %d\n", distanceToParticles);
 
 	if (distanceToParticles <= 50)
 	{

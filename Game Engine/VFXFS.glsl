@@ -22,7 +22,7 @@ void main(){
 	visibility = clamp(visibility, 0.0, 1.0);
 
 	// Output color = color of the texture at the specified UV
-	color = vec4(bbTexture) * particleColor*  visibility;
+	color = mix(vec4(0.749, 0.843, 0.823, 0.009), vec4(bbTexture) * particleColor, visibility);
 	if (color.w < 0.02f)
 	{
 		discard;
