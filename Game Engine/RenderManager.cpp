@@ -114,7 +114,7 @@ void RenderManager::createBuffers()
 	width = 0;
 	height = 0;
 	nrOfChannels = 0;
-	data = stbi_load("Particle.png", &width, &height, &nrOfChannels, 0);
+	data = stbi_load("ParticleQuad.png", &width, &height, &nrOfChannels, 0);
 	glGenTextures(1, &billboardTexture);
 	glBindTexture(GL_TEXTURE_2D, billboardTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -396,7 +396,12 @@ void RenderManager::Render() {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	
 	glm::vec3 cameraPosition(glm::inverse(view_matrix)[3]);
-	
+
+	//Particle system location, can be changed dynamically if e.g. a torch is wanted
+	defaultX = 30.0f;
+	defaultY = 8.0f;
+	defaultZ = 50.0f;
+	offset = 15.0f;
 
 	//Randomizer for the spawn location
 	float randomX = defaultX + (rand() % 3000 - 1500.0f) / 1000.0f;
@@ -425,7 +430,7 @@ void RenderManager::Render() {
 	if (distanceToParticles <= 50)
 	{
 		//Create a randomizer so it doesn't spawn all the particles on every frame
-		randomizer = rand() % 3;
+		randomizer = 1;//rand() % 1;
 
 		if (randomizer == 1)
 		{
@@ -436,16 +441,8 @@ void RenderManager::Render() {
 					lastUsedParticle = FindUnusedParticle(particleContainer, lastUsedParticle);
 					int particleIndex = lastUsedParticle;
 
-					//Test particle system location, can be changed dynamically if a torch is wanted
-					defaultX = 30.0f;
-					defaultY = 8.0f;
-					defaultZ = 50.0f;
-					offset = 15.0f;
-
 					particleContainer[particleIndex].life = 1.0f;
 					particleContainer[particleIndex].pos = glm::vec3(randomX, defaultY, randomZ);
-
-
 
 					//Fix the rest constants that's needed for a "living" looking fire.
 					//First, create a spread with values from 0.00 -> 1.00
@@ -464,16 +461,21 @@ void RenderManager::Render() {
 					//particleContainer[particleIndex].speed = mainDir + randomDir * spread;
 
 					//Set a "fire looking" colour to the particle
-					do
+					//Test 1
+					/*do
 					{
 						particleContainer[particleIndex].r = rand() % 220;	//256 highest
 					} while (particleContainer[particleIndex].r < 140);
-					particleContainer[particleIndex].g = rand() % 85;
-					//particleContainer[particleIndex].b = rand() % 256;
+					particleContainer[particleIndex].g = rand() % 60;*/
+
+					//Test 2
+					particleContainer[particleIndex].r = 255.0f;
+					particleContainer[particleIndex].g = 255.0f;
+
 					particleContainer[particleIndex].b = 0;
 					particleContainer[particleIndex].a = (rand() % 256) / 3;
 
-					particleContainer[particleIndex].size = (rand() % 750) / 2000.0f;
+					particleContainer[particleIndex].size = ((rand() % 750) / 2000.0f) / 1.5f;
 				}
 			}
 		}
@@ -489,14 +491,24 @@ void RenderManager::Render() {
 				particleContainer[i].pos += particleContainer[i].speed / 30.0f;
 				particleContainer[i].cameraDistance = glm::length(particleContainer[i].pos - cameraPosition);
 
+				//Set Positions
 				particlePositionData[4 * particleCount + 0] = particleContainer[i].pos.x;
 				particlePositionData[4 * particleCount + 1] = particleContainer[i].pos.y;
 				particlePositionData[4 * particleCount + 2] = particleContainer[i].pos.z;
-
 				particlePositionData[4 * particleCount + 3] = particleContainer[i].size;
 
+				//Set Colors
 				particleColorData[4 * particleCount + 0] = particleContainer[i].life * particleContainer[i].r;
-				particleColorData[4 * particleCount + 1] = particleContainer[i].life * particleContainer[i].g;
+
+				if (particleContainer[i].life > 0.7f)
+				{
+					particleColorData[4 * particleCount + 1] = (particleContainer[i].life * particleContainer[i].g) / 3.0f;
+				}
+				else
+				{
+					particleColorData[4 * particleCount + 1] = (particleContainer[i].life * particleContainer[i].g) / 4.0f;
+				}
+				
 				particleColorData[4 * particleCount + 2] = particleContainer[i].life * particleContainer[i].b;
 				particleColorData[4 * particleCount + 3] = (particleContainer[i].a * particleContainer[i].life) * 3.0f;
 			}

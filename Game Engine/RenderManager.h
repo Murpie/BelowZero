@@ -29,7 +29,7 @@
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
 
-#define MAX_PARTICLES 100
+#define MAX_PARTICLES 1000
 
 struct QuadVertex
 {
@@ -120,7 +120,6 @@ private:
 	int distanceToParticles = 0;
 	glm::vec3 startPoint;
 	glm::vec3 particlePivot;
-
 	GLfloat* particlePositionData = 0;
 	GLubyte* particleColorData = 0;
 

@@ -27,8 +27,4 @@ void main(){
 	{
 		discard;
 	}
-	
-	// Hardcoded life level, should be in a separate texture.
-	//if (uv.x < lifeLevel && uv.y > 0.3 && uv.y < 0.7 && uv.x > 0.04 )
-		//color = vec4(0.2, 0.8, 0.2, 1.0); // Opaque green
 }
