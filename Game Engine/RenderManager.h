@@ -113,6 +113,13 @@ private:
 	unsigned int particleCount = 10;
 	unsigned int newParticles = 1;
 	unsigned int randomizer = 0;
+	float defaultX = 30.0f;
+	float defaultY = 8.0f;
+	float defaultZ = 50.0f;
+	float offset = 15.0f;
+	int distanceToParticles = 0;
+	glm::vec3 startPoint;
+	glm::vec3 particlePivot;
 
 	GLfloat* particlePositionData = 0;
 	GLubyte* particleColorData = 0;
