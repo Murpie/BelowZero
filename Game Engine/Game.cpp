@@ -312,7 +312,7 @@ void Game::addMeshName()
 {
 	//Add file names to vector to load when reading mesh data. 
 	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
-	std::string meshLoader[] = { "Player_temp.leap", "Bucket.leap", "Stone_1.leap"};
+	std::string meshLoader[] = { "Player_temp.leap", "Bucket.leap", "Stone_1.leap", "EquipedAxe.leap" };
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 	{

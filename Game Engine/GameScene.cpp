@@ -293,7 +293,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 						else
 						{
 							std::cout << "MISS::" << other.name << std::endl;
-							other.setIsRenderable(true);
+							//other.setIsRenderable(true);
 						}
 					}
 				}
