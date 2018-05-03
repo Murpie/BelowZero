@@ -30,7 +30,7 @@ private:
 	int lightsInScene; 
 
 	void addLight(glm::vec3 transform, int lightType);
-	void addPlayer();
+	void addPlayer(MeshLib& meshLibrary);
 	void addLevelObjects(MeshLib& meshLibrary, MaterialLib& matertialLibrary, LeapLevel* level);
 	void addTerrain(const std::string & heightMap, GLuint shader);
 	void addMainMenu();

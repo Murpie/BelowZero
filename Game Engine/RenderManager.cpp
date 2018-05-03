@@ -36,7 +36,6 @@ void RenderManager::FindObjectsToRender() {
 	glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
 
 		float distance = length(vectorToObject);
-
 		if (gameScene->gameObjects[i]->getIsRenderable() == true && distance < 83) {
 			gameObjectsToRender.push_back(gameScene->gameObjects[i]);
 		}
@@ -349,10 +348,8 @@ void RenderManager::Render() {
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
-
 	}
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
@@ -408,14 +405,6 @@ void RenderManager::Render() {
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-		//glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "model_matrix"), 1, GL_FALSE, glm::value_ptr(gameObjectsToRender[i]->transform->position));
-
-		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 3)
-			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 1);
-		else
-			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 0);
-
-		
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
 		//... Position
@@ -423,7 +412,7 @@ void RenderManager::Render() {
 		tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
 		//... Rotation, not sure if this works (probably not)
 		// need to calculate radians from rotation vector from maya
-		float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0,0,0));
+		float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0, 0, 0));
 		float F = glm::pow(oneMinusDot, 5.0);
 		tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
 		//...

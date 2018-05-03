@@ -55,7 +55,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 	if (typeOfScene == Scene::ID::LEVEL_1)
 	{
 		// Camera - (modify position with level file?)
-		addPlayer();
+		addPlayer(meshLibrary);
 		// Lights - (add lights with level file?)
 		addLight(glm::vec3(7, 9, -4), 0);
 		addLight(glm::vec3(4, 0.4, -2), 1);
@@ -101,7 +101,7 @@ void GameScene::addLight(glm::vec3 transform, int lightType)
 	lightsInScene++;
 }
 
-void GameScene::addPlayer()
+void GameScene::addPlayer(MeshLib & meshLibrary)
 {
 	//Create player object
 	GameObject* playerObject = new GameObject();
@@ -111,6 +111,18 @@ void GameScene::addPlayer()
 	//Add player component
 	Player* player = new Player(*playerObject->transform);
 	playerObject->addComponent(player);
+	//Add Equipment Meshes
+	int equipmenID[] = { 3, 4 };
+	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++) {
+		MeshFilter* meshFilter = new MeshFilter(
+			meshLibrary.getMesh(equipmenID[i])->gVertexBuffer,
+			meshLibrary.getMesh(equipmenID[i])->gVertexAttribute,
+			meshLibrary.getMesh(equipmenID[i])->leapMesh->getVertexCount(),
+			meshLibrary.getMesh(equipmenID[i])->meshType,
+			equipmenID[i]);
+		playerObject->addComponent(meshFilter);
+	}
+
 	//Add to scene
 	gameObjects.push_back(playerObject);
 	camerasInScene++;
@@ -144,7 +156,8 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 						meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer,
 						meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexAttribute,
 						meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->getVertexCount(),
-						meshLibrary.getMesh(level->levelObjects[i]->id)->meshType);
+						meshLibrary.getMesh(level->levelObjects[i]->id)->meshType,
+						level->levelObjects[i]->id);
 					gameObject_ptr->addComponent(meshFilter);
 					//Set player object position in world
 					gameObject_ptr->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
@@ -199,7 +212,8 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer,
 				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexAttribute,
 				meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->getVertexCount(),
-				meshLibrary.getMesh(level->levelObjects[i]->id)->meshType);
+				meshLibrary.getMesh(level->levelObjects[i]->id)->meshType,
+				level->levelObjects[i]->id);
 			meshObject->addComponent(meshFilter);
 			//Add material to gameObject from materialLibrary
 			meshObject->addComponent(materialLibrary.getMaterial(0));
@@ -288,6 +302,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 							{
 								gameObject_ptr->getPlayer()->equip("BucketIcon");
 								gameObject_ptr->getPlayer()->addImageToInventory("InventoryBucketIcon", 4);
+								gameObject_ptr->updateMeshFilter(4);
 							}
 						}
 						else

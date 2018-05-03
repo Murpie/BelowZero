@@ -42,7 +42,8 @@ namespace ComponentType
 		TERRAIN,
 		LIGHT,
 		MATERIAL,
-		MAINMENU
+		MAINMENU,
+		MESHFILTER
 	};
 }
 

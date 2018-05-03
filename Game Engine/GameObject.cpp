@@ -108,6 +108,21 @@ void GameObject::addComponent(Component* otherComponent)
  //   updateHasLight();
 }
 
+void GameObject::updateMeshFilter(int id)
+{
+	for (Component* component_ptr : components)
+	{
+		if (component_ptr->id == ComponentType::ID::MESHFILTER)
+		{
+			MeshFilter* meshFilter = static_cast<MeshFilter*>(component_ptr);
+			if (meshFilter->typeID == id)
+			{
+				meshFilterComponent = meshFilter;
+			}
+		}
+	}
+}
+
 /*
 void GameObject::addComponent(Component* otherComponent)
 {
@@ -187,7 +202,6 @@ glm::mat4 GameObject::getModelMatrix()
 glm::mat4 GameObject::getViewMatrix()
 {
 	return glm::lookAt(transform->position, transform->position + transform->forward, transform->up);
-
 }
 
 Terrain * GameObject::getTerrain()
