@@ -12,6 +12,8 @@
 #include "stb_image.h"
 #include "GameScene.h"
 #include "ShaderProgramLib.h"
+#include "TextureLib.h"
+#include <math.h>
 #define STB_IMAGE_IMPLEMENTATION
 
 // Cube Map defines for its positions
@@ -25,6 +27,8 @@
 #define LOW_SHADOW 1024
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
+
+#define MAX_PARTICLES 1000
 
 struct QuadVertex
 {
@@ -48,12 +52,26 @@ public:
 	void createBuffers();
 	void createMainMenuBuffer();
 	void createButtonQuads();
+	void deleteData();
 	void renderQuad();
 	void Update();
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
-	void setupMeshY();
+	void renderParticles();
+
+	struct Particle {
+		glm::vec3 pos, speed;
+		unsigned char r, g, b, a;
+		float size, angle, weight;
+		float life;
+		float cameraDistance;
+	};
+
+	Particle particleContainer[MAX_PARTICLES];
+
+	int FindUnusedParticle(Particle* container, int lastUsedParticle);
+	void ParticleLinearSort(Particle* arr, int size);
 
 private:
 
@@ -77,6 +95,9 @@ private:
 	unsigned int buttonVertexArrayObject[3];
 	unsigned int buttonBufferObject[3];
 
+	int width, height, nrOfChannels;
+	unsigned char* data;
+
 	unsigned int UIFBO;
 	unsigned int UITexture;
 	unsigned int shadowMap;
@@ -92,6 +113,25 @@ private:
 	unsigned int finalFBO;
 	unsigned int finalColorBuffer;
 	unsigned int finalDepthStensil;
+	unsigned int billboardTexture;
+	unsigned int billboard_vertex_array;
+	unsigned int billboard_vertex_buffer;
+	unsigned int particlePositionBuffer;
+	unsigned int particleColorBuffer;
+
+	unsigned int lastUsedParticle = 0;
+	unsigned int particleCount = 10;
+	unsigned int newParticles = 1;
+	unsigned int randomizer = 0;
+	float defaultX = 30.0f;
+	float defaultY = 8.0f;
+	float defaultZ = 50.0f;
+	float offset = 15.0f;
+	int distanceToParticles = 0;
+	glm::vec3 startPoint;
+	glm::vec3 particlePivot;
+	GLfloat* particlePositionData = 0;
+	GLubyte* particleColorData = 0;
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
@@ -114,7 +154,10 @@ private:
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
 	GLuint terrainShaderProgram;
+	GLuint vfxShaderProgram;
 	GLuint mainMenuShaderProgram;
 
 	int display_w, display_h;
+	unsigned int vertexPos;
+	unsigned int uvPos;
 };

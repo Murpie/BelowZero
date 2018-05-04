@@ -184,16 +184,52 @@ public:
 		temp2.vMax += posittion2;
 		temp2.vMin += posittion2;
 
-		int axis;
+		glm::vec3 faces[6] =
+		{
+			glm::vec3(-1, 0, 0),	// left
+			glm::vec3(1, 0, 0),		// right
+			glm::vec3(0, -1, 0),	// bottom
+			glm::vec3(0, 1, 0),		// top
+			glm::vec3(0, 0, -1),	// far
+			glm::vec3(0, 0, 1)		// close
+		};
 
-		if(glm::abs(playerTransform.velocity.x ) > (glm::abs(playerTransform.velocity.y)) && glm::abs(playerTransform.velocity.x) > glm::abs(playerTransform.velocity.z))
-			axis = 0; // X
-		else if (glm::abs(playerTransform.velocity.y) > (glm::abs(playerTransform.velocity.x)) && glm::abs(playerTransform.velocity.y) > glm::abs(playerTransform.velocity.x))
-			axis = 1; // Y
-		else
-			axis = 2; // Z
+		float distance[6] = 
+		{
+			(temp2.vMax.x - temp1.vMin.x), // distance of box 'b' to face on 'left' side of 'a'.
+			(temp1.vMax.x - temp2.vMin.x), // distance of box 'b' to face on 'right' side of 'a'.
+			(temp2.vMax.y - temp1.vMin.y), // distance of box 'b' to face on 'bottom' side of 'a'.
+			(temp1.vMax.y - temp2.vMin.y), // distance of box 'b' to face on 'top' side of 'a'.
+			(temp2.vMax.z - temp1.vMin.z), // distance of box 'b' to face on 'far' side of 'a'.
+		    (temp1.vMax.z - temp2.vMin.z) // distance of box 'b' to face on 'near' side of 'a'.
+		};
+		// scan each face, make sure the box intersects,
+		// and take the face with least amount of intersection
+		// as the collided face.
+		float distanceCollision = 100.f;
+		int faceCollision = -1;
 
+		glm::vec3 normalOfCollision; // set value by velocity vector?
 
+		for (int i = 0; i < 6; i++)
+		{
+			// box does not intersect face. So boxes don't intersect at all.
+			if (distance[i] < 0.0f)
+				return;
+			// face cannot be used for collision response as it is 'blocked'.
+			/*
+			if (ignore_faces & (1 << i))
+				continue;
+			*/
+			// face of least intersection depth. That's our candidate.
+			if (distance[i] < distanceCollision)
+			{
+				faceCollision = i;
+				normalOfCollision = faces[i];
+				distanceCollision = distance[i];
+			}
+		}
+		playerTransform.position += -1.f * glm::vec3(distanceCollision * normalOfCollision.x, distanceCollision * normalOfCollision.y, distanceCollision * normalOfCollision.z);
 	}
 	/*
 	static float sweptAABB(bBox b1, bBox b2, float& normalX, float& normalY, float& normalZ, Transform* player)

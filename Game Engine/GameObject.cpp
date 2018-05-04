@@ -9,7 +9,7 @@ GameObject::GameObject()
     hasLight = false;
 	isInteractable = false;
 	modelMatrix = glm::mat4();
-	objectID = ObjectType::ID::BUCKET;
+	objectID = ObjectType::ID::Stone_1;
 }
 
 GameObject::~GameObject()

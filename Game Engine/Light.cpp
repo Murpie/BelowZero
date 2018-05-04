@@ -4,7 +4,7 @@ Light::Light(Transform& transform): Transformable(transform)
 {
 	assetName = "Light";
 
-	color = glm::vec4(1, 1.0, 1.0, 1);
+	color = glm::vec4(0.85, 0.85, 1.0, 1);
 	Linear=0.05;
 	Quadratic=0.15;
 	lightType = -1;
