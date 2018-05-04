@@ -397,6 +397,7 @@ void RenderManager::Render() {
 	
 	glm::vec3 cameraPosition(glm::inverse(view_matrix)[3]);
 
+	//... FIRE
 	//Particle system location, can be changed dynamically if e.g. a torch is wanted
 	defaultX = 30.0f;
 	defaultY = 8.0f;
@@ -509,6 +510,159 @@ void RenderManager::Render() {
 					particleColorData[4 * particleCount + 1] = (particleContainer[i].life * particleContainer[i].g) / 4.0f;
 				}
 				
+				particleColorData[4 * particleCount + 2] = particleContainer[i].life * particleContainer[i].b;
+				particleColorData[4 * particleCount + 3] = (particleContainer[i].a * particleContainer[i].life) * 3.0f;
+			}
+			else
+			{
+				particleContainer[i].cameraDistance = -1.0f;
+				particlePositionData[4 * particleCount + 3] = 0;	//If dead -> Size = 0
+			}
+			particleCount++;
+		}
+
+		//Update particle information
+		glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
+		glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLfloat), particlePositionData);
+
+		glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
+		glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLubyte), particleColorData);
+
+		//Apply Texture
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, billboardTexture);
+		glUniform1i(glGetUniformLocation(vfxShaderProgram, "myTextureSampler"), 0);
+
+		//Get and set matrices
+		glm::mat4 viewProjectionMatrix = projection_matrix * view_matrix;
+		glm::vec3 cameraRight_vector = glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
+		glm::vec3 cameraUp_vector = glm::vec3(view_matrix[0][1], view_matrix[1][2], view_matrix[2][3]);
+		glUniform3fv(glGetUniformLocation(vfxShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
+		glUniform3fv(glGetUniformLocation(vfxShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
+		glUniformMatrix4fv(glGetUniformLocation(vfxShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
+		glUniform3fv(glGetUniformLocation(vfxShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
+		glUniform3fv(glGetUniformLocation(vfxShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint));
+
+		//Draw Particles
+		renderParticles();
+		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
+	}
+
+	//... SNOW
+	//Particle system location, can be changed dynamically if e.g. a torch is wanted
+	defaultX = 30.0f;
+	defaultY = 8.0f;
+	defaultZ = 50.0f;
+	offset = 15.0f;
+
+	//Randomizer for the spawn location
+	float randomX = defaultX + (rand() % 3000 - 1500.0f) / 1000.0f;
+	float randomZ = defaultZ + (rand() % 3000 - 1500.0f) / 1000.0f;
+
+	//Create the direction vector from a start and end point
+	//and check how far away the particles are.
+	glm::vec3 targetPoint = glm::vec3(defaultX, defaultY + offset, defaultZ);
+	startPoint = glm::vec3(randomX, defaultY, randomZ);
+	particlePivot = glm::vec3(defaultX, defaultY, defaultZ);
+	glm::vec3 directionVec = targetPoint - startPoint;
+
+	//Get a random target point direction
+	float randomDirectionX = directionVec.x + (rand() % 2000 - 1000) / 3000.0f;
+	float randomDirectionZ = directionVec.z + (rand() % 2000 - 1000) / 3000.0f;
+
+	directionVec.x = randomDirectionX;
+	directionVec.y = directionVec.y / 5.0f;
+	directionVec.z = randomDirectionZ;
+
+	//Check if the particles are far away from the player,
+	//if too far away --> Don't render
+	glm::vec3 tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
+	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
+
+	if (distanceToParticles <= 50)
+	{
+		//Create a randomizer so it doesn't spawn all the particles on every frame
+		randomizer = 1;//rand() % 1;
+
+		if (randomizer == 1)
+		{
+			if (particleCount <= MAX_PARTICLES)
+			{
+				for (int i = 0; i < newParticles; i++)
+				{
+					lastUsedParticle = FindUnusedParticle(particleContainer, lastUsedParticle);
+					int particleIndex = lastUsedParticle;
+
+					particleContainer[particleIndex].life = 1.0f;
+					particleContainer[particleIndex].pos = glm::vec3(randomX, defaultY, randomZ);
+
+					//Fix the rest constants that's needed for a "living" looking fire.
+					//First, create a spread with values from 0.00 -> 1.00
+					float spread = (rand() % 100) / 100.0f;
+					glm::vec3 mainDir = glm::vec3(0.0f, 0.1f, 0.0f);
+
+					//Complete random
+					glm::vec3 randomDir = glm::vec3(
+						(sin(rand() % 10 - 10.0f) / 5.0f),
+						(sin(rand() % 10 - 10.0f) / 5.0f),
+						(sin(rand() % 10 - 10.0f) / 5.0f)
+					);
+
+					//Set the new direction for the particle
+					particleContainer[particleIndex].speed = mainDir + directionVec / 5.0f;
+					//particleContainer[particleIndex].speed = mainDir + randomDir * spread;
+
+					//Set a "fire looking" colour to the particle
+					//Test 1
+					/*do
+					{
+					particleContainer[particleIndex].r = rand() % 220;	//256 highest
+					} while (particleContainer[particleIndex].r < 140);
+					particleContainer[particleIndex].g = rand() % 60;*/
+
+					//Test 2
+					particleContainer[particleIndex].r = 255.0f;
+					particleContainer[particleIndex].g = 255.0f;
+
+					particleContainer[particleIndex].b = 0;
+					particleContainer[particleIndex].a = (rand() % 256) / 3;
+
+					particleContainer[particleIndex].size = ((rand() % 750) / 2000.0f) / 1.5f;
+				}
+			}
+		}
+
+		int particleCount = 0;
+		//Movement of the new particles
+		for (int i = 0; i < MAX_PARTICLES; i++)
+		{
+			particleContainer[i].life -= deltaTime / 2.0f;
+			if (particleContainer[i].life > 0.0f)
+			{
+				particleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * deltaTime * 0.5f;
+				particleContainer[i].pos += particleContainer[i].speed / 30.0f;
+				particleContainer[i].cameraDistance = glm::length(particleContainer[i].pos - cameraPosition);
+
+				//Set Positions
+				particlePositionData[4 * particleCount + 0] = particleContainer[i].pos.x;
+				particlePositionData[4 * particleCount + 1] = particleContainer[i].pos.y;
+				particlePositionData[4 * particleCount + 2] = particleContainer[i].pos.z;
+				particlePositionData[4 * particleCount + 3] = particleContainer[i].size;
+
+				//Set Colors
+				particleColorData[4 * particleCount + 0] = particleContainer[i].life * particleContainer[i].r;
+
+				if (particleContainer[i].life > 0.7f)
+				{
+					particleColorData[4 * particleCount + 1] = (particleContainer[i].life * particleContainer[i].g) / 3.0f;
+				}
+				else
+				{
+					particleColorData[4 * particleCount + 1] = (particleContainer[i].life * particleContainer[i].g) / 4.0f;
+				}
+
 				particleColorData[4 * particleCount + 2] = particleContainer[i].life * particleContainer[i].b;
 				particleColorData[4 * particleCount + 3] = (particleContainer[i].a * particleContainer[i].life) * 3.0f;
 			}
