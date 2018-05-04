@@ -708,7 +708,7 @@ void RenderManager::Render() {
 		renderFireParticles();
 		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
 	}
-
+	
 	//... SNOW
 	glUseProgram(vfxSnowShaderProgram);
 	//Particle system location, can be changed dynamically if e.g. a torch is wanted
