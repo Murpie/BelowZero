@@ -38,7 +38,22 @@ void GameScene::update(float deltaTime, float seconds)
 		}
 		gameObjects[i]->update(deltaTime, seconds);
 		collisionTest(*gameObjects[i]);
+
+		if (gameObjects[i]->isActive == false)
+		{
+			delete gameObjects[i];
+			//gameObjects[i] = gameObjects.erase(gameObjects[i]);
+		}
 	}
+
+	//for (auto it = gameObjects.begin(); it != gameObjects.end();)
+	//{
+	//	if ((*it)->isActive == false)
+	//	{
+	//		delete *it;
+	//		it = gameObjects.erase(it);
+	//	}
+	//}
 }
 
 void GameScene::processEvents(GLFWwindow * window, float deltaTime)
@@ -63,7 +78,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("1234level.leap");
+		LeapLevel* level = new LeapLevel("ValleyProps.leap"); 
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
 	}
@@ -76,7 +91,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 
-		LeapLevel* level = new LeapLevel("camping_level.leap");
+		LeapLevel* level = new LeapLevel("ValleyProps.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
 	}
@@ -106,7 +121,7 @@ void GameScene::addPlayer()
 	//Create player object
 	GameObject* playerObject = new GameObject();
 	playerObject->transform->position = glm::vec3(0.f, 0.f, 0.f);
-	playerObject->objectID = ObjectType::ID::PLAYER;
+	playerObject->objectID = ObjectType::ID::Player;
 	playerObject->name = "Player " + camerasInScene;
 	//Add player component
 	Player* player = new Player(*playerObject->transform);
@@ -132,7 +147,7 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 	for (int i = 0; i < level->levelObjects.size(); i++)
 	{
 		std::cout << "LEVELOBJECT::ID::" << level->levelObjects[i]->id << std::endl;
-		if (level->levelObjects[i]->id == ObjectType::ID::PLAYER)
+		if (level->levelObjects[i]->id == ObjectType::ID::Player)
 		{
 			for (GameObject* gameObject_ptr : gameObjects)
 			{
@@ -256,7 +271,6 @@ void GameScene::addMainMenu()
 	gameObjects.push_back(MainMenuObject);
 }
 
-
 void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 {
 	for (GameObject* gameObject_ptr : gameObjects)
@@ -283,8 +297,8 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 							/*
 							gameObject_ptr.doSomething(other.objectID); //use function inside the player class and make things happen.
 							*/
-							other.setIsRenderable(false);
-							if (other.objectID == ObjectType::ID::BUCKET)
+							other.isActive == false;
+							if (other.objectID == ObjectType::ID::Bucket_Empty)
 							{
 								gameObject_ptr->getPlayer()->equip("BucketIcon");
 								gameObject_ptr->getPlayer()->addImageToInventory("InventoryBucketIcon", 4);
@@ -293,7 +307,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 						else
 						{
 							std::cout << "MISS::" << other.name << std::endl;
-							other.setIsRenderable(true);
+							/*other.setIsRenderable(true);*/
 						}
 					}
 				}
@@ -308,7 +322,7 @@ void GameScene::collisionTest(GameObject & other)
 {
 	for (GameObject* gameObject_ptr : gameObjects)
 	{
-		if (gameObject_ptr->getPlayer() != nullptr && other.objectID != ObjectType::ID::PLAYER)
+		if (gameObject_ptr->getPlayer() != nullptr && other.objectID != ObjectType::ID::Player)
 		{
 			float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
 			if (distance < 30)
