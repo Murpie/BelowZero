@@ -28,7 +28,7 @@
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
 
-#define MAX_PARTICLES 10000						//Lower to increase FPS. Small increase in FPS. Minimum value: 1000
+#define MAX_PARTICLES 10000					//Lower to increase FPS. Small increase in FPS. Minimum value: 1000
 
 struct QuadVertex
 {

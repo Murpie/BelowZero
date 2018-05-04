@@ -558,9 +558,9 @@ void RenderManager::Render() {
 	//... FIRE
 	glUseProgram(vfxFireShaderProgram);
 	//Particle system location, can be changed dynamically if e.g. a torch is wanted
-	defaultX = 63.0f;
-	defaultY = 35.0f;
-	defaultZ = 65.0f;
+	defaultX = 536.0f;
+	defaultY = -6.5f;
+	defaultZ = 601.0f;
 	offset = 15.0f;
 
 	//Randomizer for the spawn location
@@ -586,12 +586,11 @@ void RenderManager::Render() {
 	//if too far away --> Don't render
 	tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
 	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
-	//printf("Distance to Fire: %d\n", distanceToParticles);
 
 	if (distanceToParticles <= 50)
 	{
-		//Create a randomizer so it doesn't spawn all the particles on every frame
-		randomizer = 1;//rand() % 1;
+		//Create a randomizer so it doesn't spawn all the particles on every frame, if needed
+		randomizer = 1;
 
 		if (randomizer == 1)
 		{
@@ -739,7 +738,7 @@ void RenderManager::Render() {
 	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
 
 	//Create a randomizer so it doesn't spawn all the particles on every frame
-	randomizer = 1;//rand() % 1;
+	randomizer = 1;
 
 	if (randomizer == 1)
 	{
