@@ -35,10 +35,7 @@ void main() {
 	{
 		for (int i = 0; i < gl_in.length(); i++)
 		{
-			if (gs_in[0].followCamera == 1)
-				gl_Position = gs_in[i].projection_matrix * gl_in[i].gl_Position;
-			else
-				gl_Position = gs_in[i].projection_matrix * gs_in[i].view_matrix * gs_in[i].world_matrix * gl_in[i].gl_Position;
+			gl_Position = gs_in[i].projection_matrix * gs_in[i].view_matrix * gs_in[i].world_matrix * gl_in[i].gl_Position;
 
 			gs_out.FragPos = gs_in[i].world_matrix * gl_in[i].gl_Position;
 

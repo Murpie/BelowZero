@@ -10,6 +10,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	gameScene = otherGameScene;
 	window = otherWindow;
 
+
 	this->geometryShaderProgram = shaderProgram->getShader<GeometryShaders>()->geometryShaderProgram;
 	this->lightpassShaderProgram = shaderProgram->getShader<LightpassShaders>()->lightpassShaderProgram;
 	//this->animationShaderProgram = shaderProgram->getShader<AnimationShaders>()->animationShaderProgram;
@@ -17,8 +18,14 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
 	this->vfxShaderProgram = shaderProgram->getShader<VFXShaders>()->vfxShaderProgram;
 	this->terrainShaderProgram = shaderProgram->getShader<TerrainShaders>()->TerrainShaderProgram;
-	createBuffers();
+	this->mainMenuShaderProgram = shaderProgram->getShader<MainMenuShader>()->MainMenuShaderProgram;
+	//createBuffers();
 	vao = 0;
+	//createBuffers();
+
+	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
+	//createMainMenuBuffer();
+
 }
 
 RenderManager::~RenderManager()
@@ -250,6 +257,111 @@ void RenderManager::deleteData()
 	}
 }
 
+void RenderManager::createMainMenuBuffer()
+{
+	glGenFramebuffers(1, &finalMainMenuFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, finalMainMenuFBO);
+
+	glGenTextures(1, &finalMainMenuFBOTexture);
+	glBindTexture(GL_TEXTURE_2D, finalMainMenuFBOTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalMainMenuFBOTexture, 0);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, finalMainMenuFBOTexture);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Main Menu Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	float quadVertices[] =
+	{
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
+
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
+		1.0f,  1.0f,  1.0f, 1.0f
+	};
+
+	glGenVertexArrays(1, &quadVertexArrayObject);
+	glGenBuffers(1, &quadVertexBufferObject);
+	glBindVertexArray(quadVertexArrayObject);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+}
+
+void RenderManager::createButtonQuads()
+{
+	float buttonQuadVertices1[] = 
+	{
+		-0.3f,  0.1f, 0.0f, 1.0f, //same
+		-0.3f, -0.1f, 0.0f, 0.0f,
+		0.3f, -0.1f,  1.0f, 0.0f, //same
+
+		-0.3f,  0.1f, 0.0f, 1.0f, //same
+		0.3f, -0.1f,  1.0f, 0.0f, //same
+		0.3f,  0.1f,  1.0f, 1.0f
+	
+	};
+	float buttonQuadVertices2[] =
+	{
+		-0.3f,  0.1f,  0.0f, 1.0f,
+		-0.3f, -0.1f,  0.0f, 0.0f,
+		0.3f, -0.1f,  1.0f, 0.0f,
+
+		-0.3f,  0.1f,  0.0f, 1.0f,
+		0.3f, -0.1f,  1.0f, 0.0f,
+		0.3f,  0.1f,  1.0f, 1.0f
+
+	};
+	float buttonQuadVertices3[] =
+	{
+		-0.3f,  0.1f, 0.0f, 1.0f,
+		-0.3f, -0.1f,  0.0f, 0.0f,
+		0.3f, -0.1f,  1.0f, 0.0f,
+
+		-0.3f,  0.1f,  0.0f, 1.0f,
+		0.3f, -0.1f,  1.0f, 0.0f,
+		0.3f,  0.1f,  1.0f, 1.0f
+	};
+	glGenVertexArrays(1, &buttonVertexArrayObject[0]);
+	glGenBuffers(1, &buttonBufferObject[0]);
+	glBindVertexArray(buttonVertexArrayObject[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, buttonBufferObject[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(buttonQuadVertices1), &buttonQuadVertices1, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	glGenVertexArrays(1, &buttonVertexArrayObject[1]);
+	glGenBuffers(1, &buttonBufferObject[1]);
+	glBindVertexArray(buttonVertexArrayObject[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, buttonBufferObject[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(buttonQuadVertices2), &buttonQuadVertices2, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	glGenVertexArrays(1, &buttonVertexArrayObject[2]);
+	glGenBuffers(1, &buttonBufferObject[2]);
+	glBindVertexArray(buttonVertexArrayObject[2]);
+	glBindBuffer(GL_ARRAY_BUFFER, buttonBufferObject[2]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(buttonQuadVertices3), &buttonQuadVertices3, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+}
+
 void RenderManager::Render() {
 	FindObjectsToRender();
 
@@ -399,9 +511,9 @@ void RenderManager::Render() {
 
 	//... FIRE
 	//Particle system location, can be changed dynamically if e.g. a torch is wanted
-	defaultX = 30.0f;
-	defaultY = 8.0f;
-	defaultZ = 50.0f;
+	defaultX = 63.0f;
+	defaultY = 35.0f;
+	defaultZ = 65.0f;
 	offset = 15.0f;
 
 	//Randomizer for the spawn location
@@ -427,6 +539,7 @@ void RenderManager::Render() {
 	//if too far away --> Don't render
 	glm::vec3 tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
 	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
+	printf("Distance to particles: %d\n", distanceToParticles);
 
 	if (distanceToParticles <= 50)
 	{
@@ -443,7 +556,7 @@ void RenderManager::Render() {
 					int particleIndex = lastUsedParticle;
 
 					particleContainer[particleIndex].life = 1.0f;
-					particleContainer[particleIndex].pos = glm::vec3(randomX, defaultY, randomZ);
+					particleContainer[particleIndex].pos = startPoint;
 
 					//Fix the rest constants that's needed for a "living" looking fire.
 					//First, create a spread with values from 0.00 -> 1.00
@@ -809,15 +922,82 @@ void RenderManager::Render() {
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0]->getPlayer()->textFade);
 
 			glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
-
 			renderQuad();
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 			break;
 		}
 	}
-
 	clearObjectsToRender();
 	Update();
+}
+
+void RenderManager::renderMainMenu()
+{
+	FindObjectsToRender();
+
+	view_matrix = gameScene->gameObjects[0]->getViewMatrix();
+	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, display_w, display_h);
+	glClearColor(0.749, 0.843, 0.823, 1.0f);
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(mainMenuShaderProgram);
+
+	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 1;
+	glBindVertexArray(buttonVertexArrayObject[0]);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->startButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	
+	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 2;
+	glBindVertexArray(buttonVertexArrayObject[1]);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->settingsButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	
+	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 3;
+	glBindVertexArray(buttonVertexArrayObject[2]);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->exitButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 0;
+	glBindVertexArray(quadVertexArrayObject);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->backgroundTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	//gameScene->gameObjects[0].getMenuScene()->deleteObjects();
+	clearObjectsToRender(); 
+	Update();
+	glDisable(GL_BLEND);
 }
 
 void RenderManager::renderQuad()
@@ -895,7 +1075,7 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 	glUseProgram(shaderToUse);
 
 	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 45.0f);
-	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 1.0, 0.0));
+	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));

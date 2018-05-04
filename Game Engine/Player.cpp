@@ -18,6 +18,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->foodTick = 2;
 	this->damage = 0;
 	this->initializer = 0;
+	this->textInitializer = 0;
 	this->inventoryCount = 0;
 	this->maxAmountOfItems = 5;
 	this->fade = 1;
@@ -164,7 +165,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 {
 	if (checkInventory(item) && item != "EmptyImage")
 	{
-		if (this->textTimer >= 1.0f)
+		if (this->textTimer >= 1.0f ||this->textOnScreen == false)
 		{
 			std::cout << "Item already exists in players inventory" << std::endl;
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -228,10 +229,16 @@ void Player::addTextToScreen(std::string item)
 	// ----------========== Equipment FrameBuffer ==========----------
 	unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
 
-	glGenFramebuffers(1, &textFBO);
+	if (this->textInitializer == 0)
+		glGenFramebuffers(1, &textFBO);
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, textFBO);
 
-	glGenTextures(1, &textTexture);
+	if (this->textInitializer == 0)
+	{
+		glGenTextures(1, &textTexture);
+		this->textInitializer = 1;
+	}
 	glBindTexture(GL_TEXTURE_2D, textTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -359,9 +366,9 @@ void Player::update(float deltaTime, float seconds)
 
 	// Text Fade
 	if (this->textOnScreen == true)
-		this->textFade -= 0.005;
-	else if (this->textOnScreen == false)
-		this->textFade = 1.0;
+		this->textFade -= 0.05;
+	//else if (this->textOnScreen == false)
+		//this->textFade = 1.0;
 }
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
@@ -407,6 +414,10 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		equip("BucketIcon");
 		addImageToInventory("InventoryBucketIcon", 4);
+	}
+	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+	{
+		equip("MainMenuConcept1");
 	}
 
 

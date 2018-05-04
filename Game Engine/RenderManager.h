@@ -11,7 +11,6 @@
 #include <random>
 #include "stb_image.h"
 #include "GameScene.h"
-#include "Player.h"
 #include "ShaderProgramLib.h"
 #include "TextureLib.h"
 #include <math.h>
@@ -49,7 +48,10 @@ public:
 	void clearObjectsToRender();
 
 	void Render();
+	void renderMainMenu();
 	void createBuffers();
+	void createMainMenuBuffer();
+	void createButtonQuads();
 	void deleteData();
 	void renderQuad();
 	void Update();
@@ -81,9 +83,17 @@ private:
 	glm::mat4x4 projection_matrix;
 	glm::mat4x4 currentCubeMapView;
 
+	GLuint finalMainMenuFBOTexture;
+
 	float deltaTime;
 	float seconds;
 	int count;
+
+	unsigned int finalMainMenuFBO;
+	unsigned int quadVertexArrayObject;
+	unsigned int quadVertexBufferObject;
+	unsigned int buttonVertexArrayObject[3];
+	unsigned int buttonBufferObject[3];
 
 	int width, height, nrOfChannels;
 	unsigned char* data;
@@ -145,6 +155,7 @@ private:
 	GLuint UIShaderProgram;
 	GLuint terrainShaderProgram;
 	GLuint vfxShaderProgram;
+	GLuint mainMenuShaderProgram;
 
 	int display_w, display_h;
 	unsigned int vertexPos;

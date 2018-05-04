@@ -53,10 +53,10 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && stateBool != true)
 	{
 		stateBool = true;
-		if(stateOfGame == Gamestate::ID::RUN_LEVEL)
-			stateOfGame = Gamestate::ID::CLEAR_LEVEL;
-		else if (stateOfGame == Gamestate::ID::SHOW_MENU)
-			stateOfGame = Gamestate::ID::CLEAR_MENU;
+		if(stateOfGame.state == Gamestate::ID::RUN_LEVEL)
+			stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
+		else if (stateOfGame.state == Gamestate::ID::SHOW_MENU)
+			stateOfGame.state = Gamestate::ID::CLEAR_MENU;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_RELEASE && stateBool != false)
@@ -67,11 +67,12 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 	scene.processEvents(window, deltaTime);
 }
 
+
+
 Game::Game() :
 	shaderProgramLibrary(),
 	gameScene(Scene::ID::LEVEL_1), menuScene(Scene::ID::MENU),
 	windowName("Game Engine"),
-	stateOfGame(Gamestate::ID::INITIALIZE),
 	deltaTime(0), seconds(0),
 	meshesLoaded(false), fullscreen(false), stateBool(false), texturesLoaded(false),
 	count(0)
@@ -79,6 +80,7 @@ Game::Game() :
 	initWindow();
 	initShaderProgramLib();
 	addMeshName();
+	stateOfGame.state = Gamestate::ID::INITIALIZE;
 }
 
 Game::~Game()
@@ -88,7 +90,7 @@ Game::~Game()
 
 void Game::run()
 {
-	printCurrentState(stateOfGame);
+	printCurrentState(stateOfGame.state);
 	//Render
 	auto startSeconds = chrono::high_resolution_clock::now();
 
@@ -100,8 +102,8 @@ void Game::run()
 
 	useShaderProgram();
 
-	stateOfGame = Gamestate::ID::LOAD_MENU;
-	printCurrentState(stateOfGame);
+	stateOfGame.state = Gamestate::ID::LOAD_MENU;
+	printCurrentState(stateOfGame.state);
 
 	// Main loop
 	while (!glfwWindowShouldClose(window))
@@ -138,6 +140,7 @@ void Game::run()
 			frameCount = 0;
 			initial_time = final_time;
 		}
+
 	}
 	clearScene(menuScene);
 	clearScene(gameScene);
@@ -159,16 +162,20 @@ void Game::printCurrentState(Gamestate::ID stateOfGame)
 void Game::runState()
 {
 	//... Menu
-	if (stateOfGame == Gamestate::ID::LOAD_MENU || stateOfGame == Gamestate::ID::SHOW_MENU || stateOfGame == Gamestate::ID::CLEAR_MENU)
+	if (stateOfGame.state == Gamestate::ID::LOAD_MENU || stateOfGame.state == Gamestate::ID::SHOW_MENU || stateOfGame.state == Gamestate::ID::CLEAR_MENU)
 	{
 		menuState();
 	}
 	//... Level
-	else if (stateOfGame == Gamestate::ID::LOAD_LEVEL || stateOfGame == Gamestate::ID::RUN_LEVEL || stateOfGame == Gamestate::ID::CLEAR_LEVEL)
+	else if (stateOfGame.state == Gamestate::ID::LOAD_LEVEL || stateOfGame.state == Gamestate::ID::RUN_LEVEL || stateOfGame.state == Gamestate::ID::CLEAR_LEVEL)
 	{
 		levelState();
 		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		//glfwDisable(GLFW_MOUSE_CURSOR);
+	}
+	else if (stateOfGame.state == Gamestate::ID::CLOSE_GAME)
+	{
+		exitState();
 	}
 	//... 
 	else
@@ -179,38 +186,41 @@ void Game::runState()
 
 void Game::menuState()
 {
-	if (stateOfGame == Gamestate::ID::LOAD_MENU)
+	if (stateOfGame.state == Gamestate::ID::LOAD_MENU)
 	{
-		printCurrentState(stateOfGame);
+		printCurrentState(stateOfGame.state);
 		initScene(menuScene);
-		stateOfGame = Gamestate::ID::SHOW_MENU;
-		printCurrentState(stateOfGame);
+		renderManager[0].createMainMenuBuffer();
+		renderManager[0].createButtonQuads();
+		stateOfGame.state = Gamestate::ID::SHOW_MENU;
+		printCurrentState(stateOfGame.state);
 	}
-	else if (stateOfGame == Gamestate::ID::SHOW_MENU)
+	else if (stateOfGame.state == Gamestate::ID::SHOW_MENU)
 	{
 		menuScene.update(deltaTime, seconds);
 		processInput(window, deltaTime, menuScene);
 		renderManager[0].setDeltaTime(deltaTime);
 		renderManager[0].setSeconds(seconds);
-		renderManager[0].Render();
+		renderManager[0].renderMainMenu();
 	}
-	else if (stateOfGame == Gamestate::ID::CLEAR_MENU)
+	else if (stateOfGame.state == Gamestate::ID::CLEAR_MENU)
 	{
 		clearScene(menuScene);
-		stateOfGame = Gamestate::ID::LOAD_LEVEL;
+		stateOfGame.state = Gamestate::ID::LOAD_LEVEL;
 	}
 }
 
 void Game::levelState()
 {
-	if (stateOfGame == Gamestate::ID::LOAD_LEVEL)
+	if (stateOfGame.state == Gamestate::ID::LOAD_LEVEL)
 	{
-		printCurrentState(stateOfGame);
+		printCurrentState(stateOfGame.state);
 		initScene(gameScene);
-		stateOfGame = Gamestate::ID::RUN_LEVEL;
-		printCurrentState(stateOfGame);
+		renderManager[1].createBuffers();
+		stateOfGame.state = Gamestate::ID::RUN_LEVEL;
+		printCurrentState(stateOfGame.state);
 	}
-	else if (stateOfGame == Gamestate::ID::RUN_LEVEL)
+	else if (stateOfGame.state == Gamestate::ID::RUN_LEVEL)
 	{
 		gameScene.update(deltaTime, seconds);
 		processInput(window, deltaTime, gameScene);
@@ -218,12 +228,20 @@ void Game::levelState()
 		renderManager[1].setSeconds(seconds);
 		renderManager[1].Render();
 	}
-	else if (stateOfGame == Gamestate::ID::CLEAR_LEVEL)
+	else if (stateOfGame.state == Gamestate::ID::CLEAR_LEVEL)
 	{
-		printCurrentState(stateOfGame);
+		printCurrentState(stateOfGame.state);
 		clearScene(gameScene);
-		stateOfGame = Gamestate::ID::LOAD_MENU;
+		//stateOfGame = Gamestate::ID::LOAD_MENU;
+		stateOfGame.state = Gamestate::ID::LOAD_MENU;
 	}
+}
+
+void Game::exitState()
+{
+	clearScene(menuScene);
+	renderManager.clear();
+	glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
 void Game::initWindow()
@@ -277,6 +295,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addUIShaders();
 	shaderProgramLibrary.addVFXShaders();
 	shaderProgramLibrary.addTerrainShaders();
+	shaderProgramLibrary.addMainMenuShaders();
 }
 
 void Game::initInputOptions()
@@ -298,7 +317,7 @@ void Game::addMeshName()
 {
 	//Add file names to vector to load when reading mesh data. 
 	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
-	std::string meshLoader[] = { "Player_temp.leap", "Bucket.leap", "Stone_1.leap", "Campfire.leap"};
+	std::string meshLoader[] = { "Player_temp.leap", "Bucket.leap", "Stone_1.leap", "EquipedAxe.leap" };
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 	{
@@ -310,6 +329,7 @@ void Game::addRenderManager(GameScene &scene)
 {
 	RenderManager tempRender = RenderManager(&scene, window, &shaderProgramLibrary);
 	renderManager.push_back(tempRender);
+	//renderManager[renderManager.size() - 1].createBuffers();
 }
 
 void Game::readMeshName(GameScene &scene)

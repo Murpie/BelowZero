@@ -16,7 +16,7 @@ void main ()
 	gPosition = fragpos.xyz;
 
 	//gAlbedo = vec3(0.86, 0.94, 0.92);
-	gAlbedo = vec3(0.8, 1.0, 1.0);
+	gAlbedo = vec3(0.82, 0.92, 0.953);
 
 	gNormal = -normalize(normal);
 
