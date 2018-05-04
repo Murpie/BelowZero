@@ -171,8 +171,11 @@
     <ClCompile Include="MainMenuShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="VFXShaders.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="VFXFireShaders.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="VFXSnowShaders.cpp">
+      <Filter>Source Files\Shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -305,8 +308,11 @@
     <ClInclude Include="MainMenuShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="VFXShaders.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="VFXFireShaders.h">
+      <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="VFXSnowShaders.h">
+      <Filter>Header Files\Shaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -343,12 +349,6 @@
     <None Include="AnimationVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
-    <None Include="VFXFS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
-    <None Include="VFXVS.glsl">
-      <Filter>Header Files\GLSL</Filter>
-    </None>
     <None Include="TerrainFS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
@@ -359,6 +359,18 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="MainMenuFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXFireFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXFireVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXSnowFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXSnowVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>

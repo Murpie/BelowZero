@@ -11,20 +11,16 @@
 #pragma comment(lib, "glew32.lib")
 
 
-class VFXShaders :public ShaderBase
+class VFXSnowShaders :public ShaderBase
 {
 public:
-	VFXShaders();
-	VFXShaders(int otherAssetID);
-	~VFXShaders();
+	VFXSnowShaders();
+	VFXSnowShaders(int otherAssetID);
+	~VFXSnowShaders();
 
 	void CreateShaderData();
 
-	//GLuint gVertexBuffer;
-	//GLuint gVertexAttribute;
-	//GLuint gElementBuffer;
-
-	GLuint vfxShaderProgram;
+	GLuint vfxSnowShaderProgram;
 	int assetID;
 
 };
