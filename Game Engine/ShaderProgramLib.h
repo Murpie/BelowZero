@@ -11,7 +11,8 @@
 #include "UIShaders.h"
 #include "TerrainShaders.h"
 #include "MainMenuShaders.h"
-#include "VFXShaders.h"
+#include "VFXFireShaders.h"
+#include "VFXSnowShaders.h"
 
 class ShaderProgramLib
 {
@@ -24,7 +25,8 @@ public:
 	void addShadowMapShaders();
 	void addAnimationShaders();
 	void addUIShaders();
-	void addVFXShaders();
+	void addVFXFireShaders();
+	void addVFXSnowShaders();
 	void addTerrainShaders();
 	void addMainMenuShaders();
 

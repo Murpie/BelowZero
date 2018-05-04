@@ -13,9 +13,9 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->waterMeter = 0;
 	this->food = 100;
 	this->foodMeter = 0;
-	this->coldTick = 2;
-	this->waterTick = 2;
-	this->foodTick = 2;
+	this->coldTick = 0.5;
+	this->waterTick = 0.5;
+	this->foodTick = 0.5;
 	this->damage = 0;
 	this->initializer = 0;
 	this->textInitializer = 0;

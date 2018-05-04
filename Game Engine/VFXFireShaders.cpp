@@ -1,27 +1,27 @@
-#include "VFXShaders.h"
+#include "VFXFireShaders.h"
 
 
-VFXShaders::VFXShaders()
+VFXFireShaders::VFXFireShaders()
 {
 	CreateShaderData();
 }
 
-VFXShaders::VFXShaders(int otherAssetID)
+VFXFireShaders::VFXFireShaders(int otherAssetID)
 {
 }
 
-VFXShaders::~VFXShaders()
+VFXFireShaders::~VFXFireShaders()
 {
 }
 
-void VFXShaders::CreateShaderData()
+void VFXFireShaders::CreateShaderData()
 {
 	char buff[1024];
 	memset(buff, 0, 1024);
 	GLint compileResult = 0;
 
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-	std::ifstream shaderFile("VFXVS.glsl");
+	std::ifstream shaderFile("VFXFireVS.glsl");
 	std::string shaderText((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
 	shaderFile.close();
 
@@ -36,7 +36,7 @@ void VFXShaders::CreateShaderData()
 	}
 
 	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-	shaderFile.open("VFXFS.glsl");
+	shaderFile.open("VFXFireFS.glsl");
 	shaderText.assign((std::istreambuf_iterator<char>(shaderFile)), std::istreambuf_iterator<char>());
 	shaderFile.close();
 	shaderTextPtr = shaderText.c_str();
@@ -51,23 +51,23 @@ void VFXShaders::CreateShaderData()
 		OutputDebugStringA(buff);
 	}
 
-	vfxShaderProgram = glCreateProgram();
-	glAttachShader(vfxShaderProgram, fs);
-	glAttachShader(vfxShaderProgram, vs);
-	glLinkProgram(vfxShaderProgram);
+	vfxFireShaderProgram = glCreateProgram();
+	glAttachShader(vfxFireShaderProgram, fs);
+	glAttachShader(vfxFireShaderProgram, vs);
+	glLinkProgram(vfxFireShaderProgram);
 
 
 	compileResult = GL_FALSE;
-	glGetProgramiv(vfxShaderProgram, GL_LINK_STATUS, &compileResult);
+	glGetProgramiv(vfxFireShaderProgram, GL_LINK_STATUS, &compileResult);
 	if (compileResult == GL_FALSE)
 	{
 		memset(buff, 0, 1024);
-		glGetProgramInfoLog(vfxShaderProgram, 1024, nullptr, buff);
+		glGetProgramInfoLog(vfxFireShaderProgram, 1024, nullptr, buff);
 		OutputDebugStringA(buff);
 	}
 
-	glDetachShader(vfxShaderProgram, vs);
-	glDetachShader(vfxShaderProgram, fs);
+	glDetachShader(vfxFireShaderProgram, vs);
+	glDetachShader(vfxFireShaderProgram, fs);
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 }

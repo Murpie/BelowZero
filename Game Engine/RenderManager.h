@@ -28,7 +28,7 @@
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
 
-#define MAX_PARTICLES 1000
+#define MAX_PARTICLES 10000						//Lower to increase FPS. Small increase in FPS. Minimum value: 1000
 
 struct QuadVertex
 {
@@ -58,7 +58,8 @@ public:
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
-	void renderParticles();
+	void renderFireParticles();
+	void renderSnowParticles();
 
 	struct Particle {
 		glm::vec3 pos, speed;
@@ -68,7 +69,8 @@ public:
 		float cameraDistance;
 	};
 
-	Particle particleContainer[MAX_PARTICLES];
+	Particle fireParticleContainer[MAX_PARTICLES];
+	Particle snowParticleContainer[MAX_PARTICLES];
 
 	int FindUnusedParticle(Particle* container, int lastUsedParticle);
 	void ParticleLinearSort(Particle* arr, int size);
@@ -85,19 +87,23 @@ private:
 
 	GLuint finalMainMenuFBOTexture;
 
+	//Time constants
 	float deltaTime;
 	float seconds;
 	int count;
 
+	//Buffer Objects
 	unsigned int finalMainMenuFBO;
 	unsigned int quadVertexArrayObject;
 	unsigned int quadVertexBufferObject;
 	unsigned int buttonVertexArrayObject[3];
 	unsigned int buttonBufferObject[3];
 
+	//Texture data
 	int width, height, nrOfChannels;
 	unsigned char* data;
 
+	//Buffers
 	unsigned int UIFBO;
 	unsigned int UITexture;
 	unsigned int shadowMap;
@@ -113,25 +119,47 @@ private:
 	unsigned int finalFBO;
 	unsigned int finalColorBuffer;
 	unsigned int finalDepthStensil;
-	unsigned int billboardTexture;
-	unsigned int billboard_vertex_array;
-	unsigned int billboard_vertex_buffer;
-	unsigned int particlePositionBuffer;
-	unsigned int particleColorBuffer;
+	unsigned int fireTexture;
+	unsigned int snowTexture;
+	unsigned int fireVAO;
+	unsigned int snowVAO;
+	unsigned int fireVBO;
+	unsigned int snowVBO;
+	unsigned int fireParticlePositionBuffer;
+	unsigned int snowParticlePositionBuffer;
+	unsigned int fireParticleColorBuffer;
+	unsigned int snowParticleColorBuffer;
 
+	//VFX
 	unsigned int lastUsedParticle = 0;
-	unsigned int particleCount = 10;
-	unsigned int newParticles = 1;
+	unsigned int particleCount;
+	unsigned int fireParticles = 1;
+	unsigned int snowParticles = 10;
 	unsigned int randomizer = 0;
-	float defaultX = 30.0f;
-	float defaultY = 8.0f;
-	float defaultZ = 50.0f;
-	float offset = 15.0f;
+	float randomX;
+	float randomY;
+	float randomZ;
+	float randomDirectionX;
+	float randomDirectionZ;
+	float defaultX;
+	float defaultY;
+	float defaultZ;
+	float offset;
 	int distanceToParticles = 0;
+	glm::mat4 viewProjectionMatrix;
 	glm::vec3 startPoint;
+	glm::vec3 randomStartPoint;
+	glm::vec3 targetPoint;
 	glm::vec3 particlePivot;
-	GLfloat* particlePositionData = 0;
-	GLubyte* particleColorData = 0;
+	glm::vec3 directionVec;
+	glm::vec3 tempDistance;
+	glm::vec3 cameraRight_vector;
+	glm::vec3 cameraUp_vector;
+
+	GLfloat* fireParticlePositionData = 0;
+	GLfloat* snowParticlePositionData = 0;
+	GLubyte* fireParticleColorData = 0;
+	GLubyte* snowParticleColorData = 0;
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
@@ -148,13 +176,15 @@ private:
 	QuadVertex vertices;
 	GLFWwindow* window;
 
+	//Shaders
 	GLuint shadowMapShaderProgram;
 	GLuint geometryShaderProgram;
 	GLuint lightpassShaderProgram;
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
 	GLuint terrainShaderProgram;
-	GLuint vfxShaderProgram;
+	GLuint vfxFireShaderProgram;
+	GLuint vfxSnowShaderProgram;
 	GLuint mainMenuShaderProgram;
 
 	int display_w, display_h;
