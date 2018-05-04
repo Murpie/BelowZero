@@ -4,12 +4,15 @@
 #include "stb_image.h"
 #include <GL/gl3w.h>
 #include "Transformable.h"
+#include "SoundMaster.h"
 
 class Player : public Transformable
 {
 public:
 	Player(Transform& transform);
 	~Player();
+
+	SoundMasterSFML SnowCrunch;
 
 	bool click;
 

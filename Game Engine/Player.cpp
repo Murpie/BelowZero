@@ -49,6 +49,9 @@ Player::Player(Transform& transform) : Transformable(transform)
 	for (int i = 0; i < 5; i++)
 		initiateInventoryTextures("EmptyImage");
 	addTextToScreen("EmptyImageTexture");
+
+	SnowCrunch.addSound("Snow.wav");
+
 }
 
 Player::~Player()
@@ -520,6 +523,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	//... Jump mechanic
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true)
 	{
+		SnowCrunch.playSound();
 		inAir = true;
 		time = 0.0f;
 		jumpReady = false;
