@@ -144,6 +144,11 @@ void Game::run()
 	}
 	clearScene(menuScene);
 	clearScene(gameScene);
+
+	for (int i = 0; i < renderManager.size(); i++)
+	{
+		renderManager[i].deleteData();
+	}
 	renderManager.clear();
 
 	glfwTerminate();
@@ -287,8 +292,8 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addGeometryPassShaders();
 	shaderProgramLibrary.addLightpassShaders();
 	shaderProgramLibrary.addShadowMapShaders();
-	//shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
+	shaderProgramLibrary.addVFXShaders();
 	shaderProgramLibrary.addTerrainShaders();
 	shaderProgramLibrary.addMainMenuShaders();
 }

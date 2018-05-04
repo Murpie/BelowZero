@@ -53,6 +53,7 @@ namespace ObjectType
 		PLAYER,
 		BUCKET,
 		STONE_1,
+		CAMPFIRE,
 		AXE,
 		WOOD,
 		MEAT,

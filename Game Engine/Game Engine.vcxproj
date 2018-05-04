@@ -204,6 +204,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Transformable.cpp" />
     <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="VFXShaders.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Desktop\Game Engine - 2.0\Game Engine\GeometryShaders.h" />
@@ -251,6 +252,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Transformable.h" />
     <ClInclude Include="Vertex.h" />
+    <ClInclude Include="VFXShaders.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AnimationFS.glsl" />
@@ -268,6 +270,8 @@
     <None Include="UIVS.glsl" />
     <None Include="ShadowMapFS.glsl" />
     <None Include="ShadowMapVS.glsl" />
+    <None Include="VFXFS.glsl" />
+    <None Include="VFXVS.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="axeTexture.png" />
