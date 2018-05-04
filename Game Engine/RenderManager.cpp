@@ -557,159 +557,174 @@ void RenderManager::Render() {
 
 	//... FIRE
 	glUseProgram(vfxFireShaderProgram);
-	//Particle system location, can be changed dynamically if e.g. a torch is wanted
-	defaultX = 536.0f;
-	defaultY = -6.5f;
-	defaultZ = 601.0f;
-	offset = 15.0f;
-
-	//Randomizer for the spawn location
-	randomX = defaultX + (rand() % 3000 - 1500.0f) / 1000.0f;
-	randomZ = defaultZ + (rand() % 3000 - 1500.0f) / 1000.0f;
-
-	//Create the direction vector from a start and end point
-	//and check how far away the particles are.
-	targetPoint = glm::vec3(defaultX, defaultY + offset, defaultZ);
-	startPoint = glm::vec3(randomX, defaultY, randomZ);
-	particlePivot = glm::vec3(defaultX, defaultY, defaultZ);
-	directionVec = targetPoint - startPoint;
-
-	//Get a random target point direction
-	randomDirectionX = directionVec.x + (rand() % 2000 - 1000) / 3000.0f;
-	randomDirectionZ = directionVec.z + (rand() % 2000 - 1000) / 3000.0f;
-
-	directionVec.x = randomDirectionX;
-	directionVec.y = directionVec.y / 5.0f;
-	directionVec.z = randomDirectionZ;
-
-	//Check if the particles are far away from the player,
-	//if too far away --> Don't render
-	tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
-	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
-	//printf("Distance to particles: %d\n", distanceToParticles);
-
-	if (distanceToParticles <= 50)
+	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
-		//Create a randomizer so it doesn't spawn all the particles on every frame, if needed
-		randomizer = 1;
-
-		if (randomizer == 1)
+		if (gameObject_ptr->objectID == ObjectType::ID::Campfire)
 		{
-			if (particleCount <= MAX_PARTICLES)
+			//glUseProgram(vfxFireShaderProgram);
+			//Particle system location, can be changed dynamically if e.g. a torch is wanted
+			
+			//defaultX = 536.0f;
+			//defaultY = -6.5f;
+			//defaultZ = 601.0f;
+			offset = 40.0f;
+
+			//Randomizer for the spawn location
+			//randomX = defaultX + (rand() % 3000 - 1500.0f) / 1000.0f;
+			//randomZ = defaultZ + (rand() % 3000 - 1500.0f) / 1000.0f;
+
+			randomX = gameObject_ptr->transform->position.x + (rand() % 5000 - 2500.0f) / 1000.0f;
+			randomZ = gameObject_ptr->transform->position.z + (rand() % 5000 - 2500.0f) / 1000.0f;
+
+			//Create the direction vector from a start and end point
+			//and check how far away the particles are.
+			//targetPoint = glm::vec3(defaultX, defaultY + offset, defaultZ);
+			targetPoint = gameObject_ptr->transform->position;
+			targetPoint.y += offset;
+			//startPoint = glm::vec3(randomX, defaultY, randomZ);
+			startPoint = glm::vec3(randomX, gameObject_ptr->transform->position.y, randomZ);
+			//particlePivot = glm::vec3(defaultX, defaultY, defaultZ);
+			particlePivot = gameObject_ptr->transform->position;
+			directionVec = targetPoint - startPoint;
+
+			//Get a random target point direction
+			randomDirectionX = directionVec.x + (rand() % 2000 - 1000) / 3000.0f;
+			randomDirectionZ = directionVec.z + (rand() % 2000 - 1000) / 3000.0f;
+
+			directionVec.x = randomDirectionX;
+			directionVec.y = directionVec.y / 5.0f;
+			directionVec.z = randomDirectionZ;
+
+			//Check if the particles are far away from the player,
+			//if too far away --> Don't render
+			// if player
+			tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
+			distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
+			//printf("Distance to particles: %d\n", distanceToParticles);
+
+			if (distanceToParticles <= 50)
 			{
-				for (int i = 0; i < fireParticles; i++)
+				//Create a randomizer so it doesn't spawn all the particles on every frame, if needed
+				randomizer = 1;
+
+				if (randomizer == 1)
 				{
-					lastUsedParticle = FindUnusedParticle(fireParticleContainer, lastUsedParticle);
-					int particleIndex = lastUsedParticle;
-
-					fireParticleContainer[particleIndex].life = 1.0f;
-					fireParticleContainer[particleIndex].pos = startPoint;
-
-					//Fix the rest constants that's needed for a "living" looking fire.
-					//First, create a spread with values from 0.00 -> 1.00
-					float spread = (rand() % 100) / 100.0f;
-					glm::vec3 mainDir = glm::vec3(0.0f, 0.1f, 0.0f);
-
-					//Complete random
-					glm::vec3 randomDir = glm::vec3(
-						(sin(rand() % 10 - 10.0f) / 5.0f),
-						(sin(rand() % 10 - 10.0f) / 5.0f),
-						(sin(rand() % 10 - 10.0f) / 5.0f)
-					);
-
-					//Set the new direction for the particle
-					fireParticleContainer[particleIndex].speed = mainDir + directionVec / 5.0f;
-					//fireParticleContainer[particleIndex].speed = mainDir + randomDir * spread;
-
-					//Set a "fire looking" colour to the particle
-					//Test 1
-					/*do
+					if (particleCount <= MAX_PARTICLES)
 					{
-						fireParticleContainer[particleIndex].r = rand() % 220;	//256 highest
-					} while (fireParticleContainer[particleIndex].r < 140);
-					fireParticleContainer[particleIndex].g = rand() % 60;*/
+						for (int i = 0; i < fireParticles; i++)
+						{
+							lastUsedParticle = FindUnusedParticle(fireParticleContainer, lastUsedParticle);
+							int particleIndex = lastUsedParticle;
 
-					//Test 2
-					fireParticleContainer[particleIndex].r = 255.0f;
-					fireParticleContainer[particleIndex].g = 255.0f;
+							fireParticleContainer[particleIndex].life = 1.0f;
+							fireParticleContainer[particleIndex].pos = startPoint;
 
-					fireParticleContainer[particleIndex].b = 0;
-					fireParticleContainer[particleIndex].a = (rand() % 256) / 3;
+							//Fix the rest constants that's needed for a "living" looking fire.
+							//First, create a spread with values from 0.00 -> 1.00
+							float spread = (rand() % 100) / 100.0f;
+							glm::vec3 mainDir = glm::vec3(0.0f, 0.1f, 0.0f);
 
-					fireParticleContainer[particleIndex].size = ((rand() % 750) / 2000.0f) / 1.5f;
+							//Complete random
+							glm::vec3 randomDir = glm::vec3(
+								(sin(rand() % 10 - 10.0f) / 5.0f),
+								(sin(rand() % 10 - 10.0f) / 5.0f),
+								(sin(rand() % 10 - 10.0f) / 5.0f)
+							);
+
+							//Set the new direction for the particle
+							fireParticleContainer[particleIndex].speed = mainDir + directionVec / 5.0f;
+							//fireParticleContainer[particleIndex].speed = mainDir + randomDir * spread;
+
+							//Set a "fire looking" colour to the particle
+							//Test 1
+							/*do
+							{
+								fireParticleContainer[particleIndex].r = rand() % 220;	//256 highest
+							} while (fireParticleContainer[particleIndex].r < 140);
+							fireParticleContainer[particleIndex].g = rand() % 60;*/
+
+							//Test 2
+							fireParticleContainer[particleIndex].r = 255.0f;
+							fireParticleContainer[particleIndex].g = 255.0f;
+
+							fireParticleContainer[particleIndex].b = 0;
+							fireParticleContainer[particleIndex].a = (rand() % 256) / 3;
+
+							fireParticleContainer[particleIndex].size = ((rand() % 1000) / 1500.0f) / 1.5f;
+						}
+					}
 				}
+
+				particleCount = 0;
+				//Movement of the new particles
+				for (int i = 0; i < MAX_PARTICLES; i++)
+				{
+					fireParticleContainer[i].life -= deltaTime / 2.0f;
+					if (fireParticleContainer[i].life > 0.0f)
+					{
+						fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * deltaTime * 0.5f;
+						fireParticleContainer[i].pos += fireParticleContainer[i].speed / 30.0f;
+						fireParticleContainer[i].cameraDistance = glm::length(fireParticleContainer[i].pos - cameraPosition);
+
+						//Set Positions
+						fireParticlePositionData[4 * particleCount + 0] = fireParticleContainer[i].pos.x;
+						fireParticlePositionData[4 * particleCount + 1] = fireParticleContainer[i].pos.y;
+						fireParticlePositionData[4 * particleCount + 2] = fireParticleContainer[i].pos.z;
+						fireParticlePositionData[4 * particleCount + 3] = fireParticleContainer[i].size;
+
+						//Set Colors
+						fireParticleColorData[4 * particleCount + 0] = fireParticleContainer[i].life * fireParticleContainer[i].r;
+
+						if (fireParticleContainer[i].life > 0.7f)
+						{
+							fireParticleColorData[4 * particleCount + 1] = (fireParticleContainer[i].life * fireParticleContainer[i].g) / 3.0f;
+						}
+						else
+						{
+							fireParticleColorData[4 * particleCount + 1] = (fireParticleContainer[i].life * fireParticleContainer[i].g) / 4.0f;
+						}
+
+						fireParticleColorData[4 * particleCount + 2] = fireParticleContainer[i].life * fireParticleContainer[i].b;
+						fireParticleColorData[4 * particleCount + 3] = (fireParticleContainer[i].a * fireParticleContainer[i].life) * 3.0f;
+					}
+					else
+					{
+						fireParticleContainer[i].cameraDistance = -1.0f;
+						fireParticlePositionData[4 * particleCount + 3] = 0;	//If dead -> Size = 0
+					}
+					particleCount++;
+				}
+
+				//Update particle information
+				glBindBuffer(GL_ARRAY_BUFFER, fireParticlePositionBuffer);
+				glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLfloat), fireParticlePositionData);
+
+				glBindBuffer(GL_ARRAY_BUFFER, fireParticleColorBuffer);
+				glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLubyte), fireParticleColorData);
+
+				//Apply Texture
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, fireTexture);
+				glUniform1i(glGetUniformLocation(vfxFireShaderProgram, "particleTexture"), 0);
+
+				//Get and set matrices
+				viewProjectionMatrix = projection_matrix * view_matrix;
+				cameraRight_vector = glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
+				cameraUp_vector = glm::vec3(view_matrix[0][1], view_matrix[1][2], view_matrix[2][3]);
+				glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
+				glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
+				glUniformMatrix4fv(glGetUniformLocation(vfxFireShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
+				glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
+				glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint));
+
+				//Draw Particles
+				renderFireParticles();
+				glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
 			}
 		}
-
-		particleCount = 0;
-		//Movement of the new particles
-		for (int i = 0; i < MAX_PARTICLES; i++)
-		{
-			fireParticleContainer[i].life -= deltaTime / 2.0f;
-			if (fireParticleContainer[i].life > 0.0f)
-			{
-				fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * deltaTime * 0.5f;
-				fireParticleContainer[i].pos += fireParticleContainer[i].speed / 30.0f;
-				fireParticleContainer[i].cameraDistance = glm::length(fireParticleContainer[i].pos - cameraPosition);
-
-				//Set Positions
-				fireParticlePositionData[4 * particleCount + 0] = fireParticleContainer[i].pos.x;
-				fireParticlePositionData[4 * particleCount + 1] = fireParticleContainer[i].pos.y;
-				fireParticlePositionData[4 * particleCount + 2] = fireParticleContainer[i].pos.z;
-				fireParticlePositionData[4 * particleCount + 3] = fireParticleContainer[i].size;
-
-				//Set Colors
-				fireParticleColorData[4 * particleCount + 0] = fireParticleContainer[i].life * fireParticleContainer[i].r;
-
-				if (fireParticleContainer[i].life > 0.7f)
-				{
-					fireParticleColorData[4 * particleCount + 1] = (fireParticleContainer[i].life * fireParticleContainer[i].g) / 3.0f;
-				}
-				else
-				{
-					fireParticleColorData[4 * particleCount + 1] = (fireParticleContainer[i].life * fireParticleContainer[i].g) / 4.0f;
-				}
-				
-				fireParticleColorData[4 * particleCount + 2] = fireParticleContainer[i].life * fireParticleContainer[i].b;
-				fireParticleColorData[4 * particleCount + 3] = (fireParticleContainer[i].a * fireParticleContainer[i].life) * 3.0f;
-			}
-			else
-			{
-				fireParticleContainer[i].cameraDistance = -1.0f;
-				fireParticlePositionData[4 * particleCount + 3] = 0;	//If dead -> Size = 0
-			}
-			particleCount++;
-		}
-
-		//Update particle information
-		glBindBuffer(GL_ARRAY_BUFFER, fireParticlePositionBuffer);
-		glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLfloat), fireParticlePositionData);
-
-		glBindBuffer(GL_ARRAY_BUFFER, fireParticleColorBuffer);
-		glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLubyte), fireParticleColorData);
-
-		//Apply Texture
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, fireTexture);
-		glUniform1i(glGetUniformLocation(vfxFireShaderProgram, "particleTexture"), 0);
-
-		//Get and set matrices
-		viewProjectionMatrix = projection_matrix * view_matrix;
-		cameraRight_vector = glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
-		cameraUp_vector = glm::vec3(view_matrix[0][1], view_matrix[1][2], view_matrix[2][3]);
-		glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
-		glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
-		glUniformMatrix4fv(glGetUniformLocation(vfxFireShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
-		glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
-		glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint));
-
-		//Draw Particles
-		renderFireParticles();
-		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
 	}
-	
 	//... SNOW
 	glUseProgram(vfxSnowShaderProgram);
 	//Particle system location, can be changed dynamically if e.g. a torch is wanted
