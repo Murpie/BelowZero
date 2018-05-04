@@ -25,6 +25,7 @@
 #include <ctime>
 #include "GeometryShaders.h"
 #include "LightpassShaders.h"
+#include "VFXShaders.h"
 
 #include <chrono>
 ////////////

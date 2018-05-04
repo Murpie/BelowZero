@@ -16,6 +16,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//this->animationShaderProgram = shaderProgram->getShader<AnimationShaders>()->animationShaderProgram;
 	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
 	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
+	this->vfxShaderProgram = shaderProgram->getShader<VFXShaders>()->vfxShaderProgram;
 	this->terrainShaderProgram = shaderProgram->getShader<TerrainShaders>()->TerrainShaderProgram;
 	this->mainMenuShaderProgram = shaderProgram->getShader<MainMenuShader>()->MainMenuShaderProgram;
 	//createBuffers();
@@ -85,6 +86,59 @@ void RenderManager::createBuffers()
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//VFX
+	particlePositionData = new GLfloat[MAX_PARTICLES * 4];
+	particleColorData = new GLubyte[MAX_PARTICLES * 4];
+
+	glGenVertexArrays(1, &billboard_vertex_array);
+	glBindVertexArray(billboard_vertex_array);
+	static const GLfloat g_vertex_buffer_data[] = {
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		-0.5f,  0.5f, 0.0f,
+		0.5f,  0.5f, 0.0f
+	};
+
+	glGenBuffers(1, &billboard_vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &particlePositionBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+
+	glGenBuffers(1, &particleColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+
+	for (int i = 0; i < MAX_PARTICLES; i++)
+	{
+		particleContainer[i].life = -1.0f;
+		particleContainer[i].cameraDistance = -1.0f;
+	}
+
+	width = 0;
+	height = 0;
+	nrOfChannels = 0;
+	data = stbi_load("ParticleQuad.png", &width, &height, &nrOfChannels, 0);
+	glGenTextures(1, &billboardTexture);
+	glBindTexture(GL_TEXTURE_2D, billboardTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load Billboard Texture from path" << std::endl;
+	}
+
+	stbi_image_free(data);
 
 	//... Create G-buffers
 	//framebufferobject
@@ -160,8 +214,10 @@ void RenderManager::createBuffers()
 		std::cout << "Framebuffer not complete!" << std::endl;
 
 	//.. Create UI Frame Buffer with UI Texture
-	int width, height, nrOfChannels;
-	unsigned char * data = stbi_load("uiTextureFlipped.png", &width, &height, &nrOfChannels, 0);
+	width = 0;
+	height = 0;
+	nrOfChannels = 0;
+	data = stbi_load("uiTextureFlipped.png", &width, &height, &nrOfChannels, 0);
 
 	glGenFramebuffers(1, &UIFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, UIFBO);
@@ -187,6 +243,18 @@ void RenderManager::createBuffers()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, UITexture, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "UI Framebuffer not complete!" << std::endl;
+}
+
+void RenderManager::deleteData()
+{
+	if (particlePositionData != nullptr)
+	{
+		delete particlePositionData;
+	}
+	if (particleColorData != nullptr)
+	{
+		delete particleColorData;
+	}
 }
 
 void RenderManager::createMainMenuBuffer()
@@ -352,7 +420,6 @@ void RenderManager::Render() {
 
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
-
 	}
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
@@ -371,7 +438,7 @@ void RenderManager::Render() {
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
 	
-	//... Terrain PASS----------------------------------------------------------------------------------------------------------------------------------------
+	//... Terrain PASS-----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glUseProgram(terrainShaderProgram);
@@ -431,13 +498,175 @@ void RenderManager::Render() {
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
 
-	//------=====================Animation Pass=======================-------
-	//glUseProgram(animationShaderProgram);
+	//... VFX--------------------------------------------------------------------------------------------------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
+	glUseProgram(vfxShaderProgram);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
+	glStencilMask(0xFF); // enable writing to the stencil buffer
+	glStencilFunc(GL_ALWAYS, 2, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	
+	glm::vec3 cameraPosition(glm::inverse(view_matrix)[3]);
+
+	//Particle system location, can be changed dynamically if e.g. a torch is wanted
+	defaultX = 63.0f;
+	defaultY = 35.0f;
+	defaultZ = 65.0f;
+	offset = 15.0f;
+
+	//Randomizer for the spawn location
+	float randomX = defaultX + (rand() % 3000 - 1500.0f) / 1000.0f;
+	float randomZ = defaultZ + (rand() % 3000 - 1500.0f) / 1000.0f;
+
+	//Create the direction vector from a start and end point
+	//and check how far away the particles are.
+	glm::vec3 targetPoint = glm::vec3(defaultX, defaultY + offset, defaultZ);
+	startPoint = glm::vec3(randomX, defaultY, randomZ);
+	particlePivot = glm::vec3(defaultX, defaultY, defaultZ);
+	glm::vec3 directionVec = targetPoint - startPoint;
+
+	//Get a random target point direction
+	float randomDirectionX = directionVec.x + (rand() % 2000 - 1000) / 3000.0f;
+	float randomDirectionZ = directionVec.z + (rand() % 2000 - 1000) / 3000.0f;
+
+	directionVec.x = randomDirectionX;
+	directionVec.y = directionVec.y / 5.0f;
+	directionVec.z = randomDirectionZ;
+
+	//Check if the particles are far away from the player,
+	//if too far away --> Don't render
+	glm::vec3 tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
+	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
+	printf("Distance to particles: %d\n", distanceToParticles);
+
+	if (distanceToParticles <= 50)
+	{
+		//Create a randomizer so it doesn't spawn all the particles on every frame
+		randomizer = 1;//rand() % 1;
+
+		if (randomizer == 1)
+		{
+			if (particleCount <= MAX_PARTICLES)
+			{
+				for (int i = 0; i < newParticles; i++)
+				{
+					lastUsedParticle = FindUnusedParticle(particleContainer, lastUsedParticle);
+					int particleIndex = lastUsedParticle;
+
+					particleContainer[particleIndex].life = 1.0f;
+					particleContainer[particleIndex].pos = startPoint;
+
+					//Fix the rest constants that's needed for a "living" looking fire.
+					//First, create a spread with values from 0.00 -> 1.00
+					float spread = (rand() % 100) / 100.0f;
+					glm::vec3 mainDir = glm::vec3(0.0f, 0.1f, 0.0f);
+
+					//Complete random
+					glm::vec3 randomDir = glm::vec3(
+						(sin(rand() % 10 - 10.0f) / 5.0f),
+						(sin(rand() % 10 - 10.0f) / 5.0f),
+						(sin(rand() % 10 - 10.0f) / 5.0f)
+					);
+
+					//Set the new direction for the particle
+					particleContainer[particleIndex].speed = mainDir + directionVec / 5.0f;
+					//particleContainer[particleIndex].speed = mainDir + randomDir * spread;
+
+					//Set a "fire looking" colour to the particle
+					//Test 1
+					/*do
+					{
+						particleContainer[particleIndex].r = rand() % 220;	//256 highest
+					} while (particleContainer[particleIndex].r < 140);
+					particleContainer[particleIndex].g = rand() % 60;*/
+
+					//Test 2
+					particleContainer[particleIndex].r = 255.0f;
+					particleContainer[particleIndex].g = 255.0f;
+
+					particleContainer[particleIndex].b = 0;
+					particleContainer[particleIndex].a = (rand() % 256) / 3;
+
+					particleContainer[particleIndex].size = ((rand() % 750) / 2000.0f) / 1.5f;
+				}
+			}
+		}
+
+		int particleCount = 0;
+		//Movement of the new particles
+		for (int i = 0; i < MAX_PARTICLES; i++)
+		{
+			particleContainer[i].life -= deltaTime / 2.0f;
+			if (particleContainer[i].life > 0.0f)
+			{
+				particleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * deltaTime * 0.5f;
+				particleContainer[i].pos += particleContainer[i].speed / 30.0f;
+				particleContainer[i].cameraDistance = glm::length(particleContainer[i].pos - cameraPosition);
+
+				//Set Positions
+				particlePositionData[4 * particleCount + 0] = particleContainer[i].pos.x;
+				particlePositionData[4 * particleCount + 1] = particleContainer[i].pos.y;
+				particlePositionData[4 * particleCount + 2] = particleContainer[i].pos.z;
+				particlePositionData[4 * particleCount + 3] = particleContainer[i].size;
+
+				//Set Colors
+				particleColorData[4 * particleCount + 0] = particleContainer[i].life * particleContainer[i].r;
+
+				if (particleContainer[i].life > 0.7f)
+				{
+					particleColorData[4 * particleCount + 1] = (particleContainer[i].life * particleContainer[i].g) / 3.0f;
+				}
+				else
+				{
+					particleColorData[4 * particleCount + 1] = (particleContainer[i].life * particleContainer[i].g) / 4.0f;
+				}
+				
+				particleColorData[4 * particleCount + 2] = particleContainer[i].life * particleContainer[i].b;
+				particleColorData[4 * particleCount + 3] = (particleContainer[i].a * particleContainer[i].life) * 3.0f;
+			}
+			else
+			{
+				particleContainer[i].cameraDistance = -1.0f;
+				particlePositionData[4 * particleCount + 3] = 0;	//If dead -> Size = 0
+			}
+			particleCount++;
+		}
+
+		//Update particle information
+		glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
+		glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLfloat), particlePositionData);
+
+		glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
+		glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLubyte), particleColorData);
+
+		//Apply Texture
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, billboardTexture);
+		glUniform1i(glGetUniformLocation(vfxShaderProgram, "myTextureSampler"), 0);
+
+		//Get and set matrices
+		glm::mat4 viewProjectionMatrix = projection_matrix * view_matrix;
+		glm::vec3 cameraRight_vector = glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
+		glm::vec3 cameraUp_vector = glm::vec3(view_matrix[0][1], view_matrix[1][2], view_matrix[2][3]);
+		glUniform3fv(glGetUniformLocation(vfxShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
+		glUniform3fv(glGetUniformLocation(vfxShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
+		glUniformMatrix4fv(glGetUniformLocation(vfxShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
+		glUniform3fv(glGetUniformLocation(vfxShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
+		glUniform3fv(glGetUniformLocation(vfxShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint));
+
+		//Draw Particles
+		renderParticles();
+		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
+	}
 
 	//... Copy Stencil Buffer from gbo to finalFBO
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, finalFBO);
 	glBlitFramebuffer(0, 0, display_w, display_h, 0, 0, display_w, display_h, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+	glBlitFramebuffer(0, 0, display_w, display_h, 0, 0, display_w, display_h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
@@ -621,9 +850,6 @@ void RenderManager::renderQuad()
 {
 	if (vao == 0)
 	{
-		unsigned int vertexPos;
-		unsigned int uvPos;
-
 		vertexPos = glGetAttribLocation(lightpassShaderProgram, "aPos");
 		uvPos = glGetAttribLocation(lightpassShaderProgram, "aTexCoords");
 
@@ -701,14 +927,84 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 }
 
-void RenderManager::setupMeshY()
+void RenderManager::renderParticles()
 {
-	FindObjectsToRender();
-	for (int i = 0; i < gameObjectsToRender.size(); i++)
+	glBindVertexArray(billboard_vertex_array);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
+	glVertexAttribPointer(
+		0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+	);
+
+	//Positions : center
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, particlePositionBuffer);
+	glVertexAttribPointer(
+		1,
+		4,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+
+	//Colors
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, particleColorBuffer);
+	glVertexAttribPointer(
+		2,
+		4,
+		GL_UNSIGNED_BYTE,
+		GL_TRUE,
+		0,
+		(void*)0
+	);
+
+	glVertexAttribDivisor(0, 0);
+	glVertexAttribDivisor(1, 1);
+	glVertexAttribDivisor(2, 1);
+}
+
+void RenderManager::ParticleLinearSort(Particle* arr, int size)
+{
+	int a, b, key;
+	for (a = 0; a < size; a++)
 	{
-		float yTemp = this->gameScene->gameObjects[1]->getTerrain()->calculateY(this->gameObjectsToRender[i]->transform->position.x, this->gameObjectsToRender[i]->transform->position.z);
-		this->gameObjectsToRender[i]->transform->position.y = yTemp;
+		key = arr[a].life;
+		b = a - 1;
+
+		while (b >= 0 && arr[b].life > key)
+		{
+			arr[b + 1] = arr[b];
+			b = b - 1;
+		}
+		arr[b + 1].life = key;
 	}
+}
+
+int RenderManager::FindUnusedParticle(Particle* container, int lastUsedParticle)
+{
+	for (int i = lastUsedParticle; i < MAX_PARTICLES; i++)
+	{
+		if (container[i].life < 0)
+		{
+			return i;
+		}
+	}
+
+	for (int i = 0; i < lastUsedParticle; i++)
+	{
+		if (container[i].life < 0)
+		{
+			return i;
+		}
+	}
+	return 0;
 }
 
 void RenderManager::Update()

@@ -15,13 +15,11 @@ void main()
 	TexCoords = aTexCoord;
 
 	if (buttonTransformation == 1)
-	{
-		finalPosition = vec4((aPos.x - 0.9) + scaling1/10, (aPos.y), 0.0, 1.0);
-	}
+		finalPosition = vec4((aPos.x - 0.9) + scaling1/10, (aPos.y - 0.1), 0.0, 1.0);
 	else if (buttonTransformation == 2)
 		finalPosition = vec4((aPos.x - 0.9) + scaling2/10, (aPos.y - 0.3), 0.0, 1.0);
 	else if (buttonTransformation == 3)
-		finalPosition = vec4((aPos.x - 0.9) + scaling3/10, (aPos.y - 0.6), 0.0, 1.0);
+		finalPosition = vec4((aPos.x - 0.9) + scaling3/10, (aPos.y - 0.5), 0.0, 1.0);
 	else if (buttonTransformation == 0)
 		finalPosition = vec4(aPos.x, aPos.y, 0.0, 1.0);
 

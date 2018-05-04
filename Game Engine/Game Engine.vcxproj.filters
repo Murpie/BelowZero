@@ -171,6 +171,9 @@
     <ClCompile Include="MainMenuShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="VFXShaders.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imgui_impl_glfw_gl3.h">
@@ -302,6 +305,9 @@
     <ClInclude Include="MainMenuShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="VFXShaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="lightpassFS.glsl">
@@ -335,6 +341,12 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="AnimationVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="TerrainFS.glsl">
