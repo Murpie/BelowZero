@@ -270,7 +270,7 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (startButtonMinMax[0].x < xPos && xPos < startButtonMinMax[1].x && startButtonMinMax[0].y < yPos && yPos < startButtonMinMax[1].y)
 	{
-		std::cout << "------------------- CURSOR IS INSIDE STARTBUTTONBOX -------------------" << std::endl;
+		//std::cout << "------------------- CURSOR IS INSIDE STARTBUTTONBOX -------------------" << std::endl;
 		this->whichButtonIsSelected = 1;
 		this->mouseIsOverButton = true;
 
@@ -304,7 +304,7 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (settingsButtonMinMax[0].x < xPos && xPos < settingsButtonMinMax[1].x && settingsButtonMinMax[0].y < yPos && yPos < settingsButtonMinMax[1].y)
 	{
-		std::cout << "------------------- CURSOR IS INSIDE SETTINGSBUTTONBOX -------------------" << std::endl;
+		//std::cout << "------------------- CURSOR IS INSIDE SETTINGSBUTTONBOX -------------------" << std::endl;
 		this->whichButtonIsSelected = 2;
 		this->mouseIsOverButton = true;
 
@@ -339,7 +339,7 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (ExitButtonMinMax[0].x < xPos && xPos < ExitButtonMinMax[1].x && ExitButtonMinMax[0].y < yPos && yPos < ExitButtonMinMax[1].y)
 	{
-		std::cout << "------------------- CURSOR IS INSIDE EXITBUTTONBOX -------------------" << std::endl;
+		//std::cout << "------------------- CURSOR IS INSIDE EXITBUTTONBOX -------------------" << std::endl;
 		this->whichButtonIsSelected = 3;
 		this->mouseIsOverButton = true;
 

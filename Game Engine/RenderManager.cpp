@@ -586,6 +586,7 @@ void RenderManager::Render() {
 	//if too far away --> Don't render
 	tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
 	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
+	//printf("Distance to particles: %d\n", distanceToParticles);
 
 	if (distanceToParticles <= 50)
 	{

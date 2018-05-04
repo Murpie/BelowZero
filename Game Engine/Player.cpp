@@ -554,6 +554,29 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		Transformable::transform.position.y = currentY;
 }
 
+void Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
+{
+	// Check ObjectType ID
+	// Set isAlive to false if you want to delete the interacted item from the world.
+	if (id == ObjectType::ID::Bucket_Empty)
+	{
+		equip("BucketIcon");
+		addImageToInventory("InventoryBucketIcon", 4);
+		isAlive = false;
+	}
+	if (id == ObjectType::ID::Jacket)
+	{
+		isAlive = false;
+	}
+	/*
+	if(id == fallenTree && axeIsEquiped)
+	{
+		logs++;
+		isAlive = false;
+	}
+	*/
+}
+
 void Player::findY()
 {
 	//float frontTemp = glm::mix(currentY, frontVertexHeight);
@@ -561,15 +584,6 @@ void Player::findY()
 	int gridZ = (int)glm::floor(cameraPos.z / distanceToNextVertex);
 	float gridSquareSize(distanceToNextVertex / ((float)vertexLength - 1));
 	float xpos = cameraPos.x;
-
-
-
 	float xCoord = ((int)cameraPos.x % (int)distanceToNextVertex) / distanceToNextVertex;
 	float zCoord = ((int)cameraPos.z % (int)distanceToNextVertex) / distanceToNextVertex;
-
 }
-
-//glm::mat4 Player::getViewMatrix() const
-//{
-//	return glm::lookAt(Transformable::transform.position, Transformable::transform.position + Transformable::transform.forward, Transformable::transform.up);
-//}

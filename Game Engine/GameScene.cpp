@@ -42,6 +42,7 @@ void GameScene::update(float deltaTime, float seconds)
 		if (gameObjects[i]->isActive == false)
 		{
 			delete gameObjects[i];
+			gameObjects.erase(gameObjects.begin() + i);
 			//gameObjects[i] = gameObjects.erase(gameObjects[i]);
 		}
 	}
@@ -172,7 +173,9 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 					//Set customAttribute ID from Enum.H
 					gameObject_ptr->objectID = (ObjectType::ID)level->levelObjects[i]->id;
 					//Set customAttribute interactable - should probably be removed since player isn't interactable
-					if ((int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 1)
+					if ((int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 1 || 
+						(int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 2 || 
+						(int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 3)
 						gameObject_ptr->isInteractable = true;
 					//Add BBox from leapmesh to player object
 					for (int i = 0; i < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); i++)
@@ -292,23 +295,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 					for (int i = 0; i < other.bbox.size(); i++)
 					{
 						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
-						{
-							std::cout << "HIT::" << other.name << std::endl;
-							/*
-							gameObject_ptr.doSomething(other.objectID); //use function inside the player class and make things happen.
-							*/
-							other.isActive == false;
-							if (other.objectID == ObjectType::ID::Bucket_Empty)
-							{
-								gameObject_ptr->getPlayer()->equip("BucketIcon");
-								gameObject_ptr->getPlayer()->addImageToInventory("InventoryBucketIcon", 4);
-							}
-						}
-						else
-						{
-							std::cout << "MISS::" << other.name << std::endl;
-							/*other.setIsRenderable(true);*/
-						}
+							gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive);
 					}
 				}
 			}
@@ -325,7 +312,7 @@ void GameScene::collisionTest(GameObject & other)
 		if (gameObject_ptr->getPlayer() != nullptr && other.objectID != ObjectType::ID::Player)
 		{
 			float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-			if (distance < 30)
+			if (distance < 25)
 			{
 				for (int i = 0; i < gameObject_ptr->bbox.size(); i++)
 				{
