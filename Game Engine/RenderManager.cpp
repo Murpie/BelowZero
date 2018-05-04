@@ -510,9 +510,9 @@ void RenderManager::Render() {
 	glm::vec3 cameraPosition(glm::inverse(view_matrix)[3]);
 
 	//Particle system location, can be changed dynamically if e.g. a torch is wanted
-	defaultX = 30.0f;
-	defaultY = 8.0f;
-	defaultZ = 50.0f;
+	defaultX = 63.0f;
+	defaultY = 35.0f;
+	defaultZ = 65.0f;
 	offset = 15.0f;
 
 	//Randomizer for the spawn location
@@ -538,6 +538,7 @@ void RenderManager::Render() {
 	//if too far away --> Don't render
 	glm::vec3 tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
 	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
+	printf("Distance to particles: %d\n", distanceToParticles);
 
 	if (distanceToParticles <= 50)
 	{
@@ -554,7 +555,7 @@ void RenderManager::Render() {
 					int particleIndex = lastUsedParticle;
 
 					particleContainer[particleIndex].life = 1.0f;
-					particleContainer[particleIndex].pos = glm::vec3(randomX, defaultY, randomZ);
+					particleContainer[particleIndex].pos = startPoint;
 
 					//Fix the rest constants that's needed for a "living" looking fire.
 					//First, create a spread with values from 0.00 -> 1.00
