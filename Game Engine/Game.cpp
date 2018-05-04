@@ -330,7 +330,7 @@ void Game::addMeshName()
 		"Campfire_NoSnow.leap",
 		"WoodenSign.leap",
 		"PineTree.leap",
-		"PineTree_Snow.leap",
+		"Pine_Tree_Snow.leap",
 		"BrokenTree.leap",
 		"BrokenTree_Snow.leap",
 		"IceTaps_1.leap",
