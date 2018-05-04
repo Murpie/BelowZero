@@ -3,6 +3,7 @@
 #include <vector>
 #include <SFML\Audio.hpp>
 #include <SFML\System.hpp>
+#include <SFML\Main.hpp>
 #include <SFML\Graphics.hpp>
 #include <SFML\Audio\Sound.hpp>
 #include <SFML\Audio\SoundBuffer.hpp>
