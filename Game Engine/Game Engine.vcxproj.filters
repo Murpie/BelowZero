@@ -123,23 +123,8 @@
     <ClCompile Include="stb.cpp">
       <Filter>Source Files\Engine Core</Filter>
     </ClCompile>
-    <ClCompile Include="AnimatedMesh.cpp">
-      <Filter>Source Files\Data Types</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>Source Files\Data Types</Filter>
-    </ClCompile>
-    <ClCompile Include="Joint.cpp">
-      <Filter>Source Files\Data Types</Filter>
-    </ClCompile>
-    <ClCompile Include="SkelletonVertex.cpp">
-      <Filter>Source Files\Data Types</Filter>
-    </ClCompile>
     <ClCompile Include="AnimationShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="Physics.cpp">
-      <Filter>Source Files\Data Types</Filter>
     </ClCompile>
     <ClCompile Include="ShadowMapShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
@@ -165,11 +150,20 @@
     <ClCompile Include="TerrainShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="MainMenuScene.cpp">
-      <Filter>Source Files\Data Types</Filter>
-    </ClCompile>
     <ClCompile Include="MainMenuShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="VFXFireShaders.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="VFXSnowShaders.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="MainMenuScene.cpp">
+      <Filter>Source Files\GameObject &amp; Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundMaster.cpp">
+      <Filter>Source Files\Data Types</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -251,19 +245,7 @@
     <ClInclude Include="ShadowMapShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="AnimatedMesh.h">
-      <Filter>Header Files\Data Types</Filter>
-    </ClInclude>
     <ClInclude Include="Animation.h">
-      <Filter>Header Files\Data Types</Filter>
-    </ClInclude>
-    <ClInclude Include="Joint.h">
-      <Filter>Header Files\Data Types</Filter>
-    </ClInclude>
-    <ClInclude Include="Physics.h">
-      <Filter>Header Files\Data Types</Filter>
-    </ClInclude>
-    <ClInclude Include="SkelletonVertex.h">
       <Filter>Header Files\Data Types</Filter>
     </ClInclude>
     <ClInclude Include="AnimationShaders.h">
@@ -293,14 +275,23 @@
     <ClInclude Include="Attributes.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
-    <ClInclude Include="MainMenuScene.h">
-      <Filter>Header Files\Data Types</Filter>
-    </ClInclude>
     <ClInclude Include="Terrain.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
     <ClInclude Include="MainMenuShaders.h">
       <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="VFXFireShaders.h">
+      <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="VFXSnowShaders.h">
+      <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="MainMenuScene.h">
+      <Filter>Header Files\GameObject &amp; Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundMaster.h">
+      <Filter>Header Files\Data Types</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -347,6 +338,18 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="MainMenuFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXFireFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXFireVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXSnowFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXSnowVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>

@@ -55,3 +55,15 @@ void ShaderProgramLib::addUIShaders()
 	UIShaders* newShaderProgram = new UIShaders();
 	shaders.push_back(newShaderProgram);
 }
+
+void ShaderProgramLib::addVFXFireShaders()
+{
+	VFXFireShaders* newShaderProgram = new VFXFireShaders();
+	shaders.push_back(newShaderProgram);
+}
+
+void ShaderProgramLib::addVFXSnowShaders()
+{
+	VFXSnowShaders* newShaderProgram = new VFXSnowShaders();
+	shaders.push_back(newShaderProgram);
+}

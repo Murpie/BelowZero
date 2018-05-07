@@ -31,6 +31,7 @@ public:
     bool isActive;
     bool hasLight;
 	bool isInteractable;
+	float timeAlive;
 	ObjectType::ID objectID;
 	std::string name;
 	Transform *transform;
@@ -51,6 +52,9 @@ public:
 
     const bool getIsRenderable();
 	void setIsRenderable(bool isRenderable);
+	void setIsBurning();
+
+	const bool getIsBurning();
 
 	Player* getPlayer();
 	glm::mat4 getModelMatrix();
@@ -73,5 +77,6 @@ public:
 
 private:
     bool isRenderable;
+	bool isBurning;
 	glm::mat4 modelMatrix;
 };

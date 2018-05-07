@@ -13,9 +13,9 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->waterMeter = 0;
 	this->food = 100;
 	this->foodMeter = 0;
-	this->coldTick = 2;
-	this->waterTick = 2;
-	this->foodTick = 2;
+	this->coldTick = 0.5;
+	this->waterTick = 0.5;
+	this->foodTick = 0.5;
 	this->damage = 0;
 	this->initializer = 0;
 	this->textInitializer = 0;
@@ -50,8 +50,18 @@ Player::Player(Transform& transform) : Transformable(transform)
 		initiateInventoryTextures("EmptyImage");
 	addTextToScreen("EmptyImageTexture");
 
-	
-	test = 0;
+	SnowCrunch.addSound("Snow.wav");
+	SnowCrunch.setVolume(50.0f);
+
+	AmbientWind.addSound("Wind.wav");
+	AmbientWind.playSound();
+	AmbientWind.loop(true);
+
+	AmbientMusic.addSound("AmbientMusic1.wav");
+	AmbientMusic.setVolume(50.0f);
+	AmbientMusic.playSound();
+	AmbientMusic.loop(true);
+
 }
 
 Player::~Player()
@@ -140,7 +150,7 @@ void Player::equip(std::string item)
 	if (this->initializer == 0)
 		glGenFramebuffers(1, &equipedFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, equipedFBO);
-	
+
 	if (this->initializer == 0)
 	{
 		glGenTextures(1, &equipedTexture);
@@ -168,7 +178,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 {
 	if (checkInventory(item) && item != "EmptyImage")
 	{
-		if (this->textTimer >= 1.0f ||this->textOnScreen == false)
+		if (this->textTimer >= 1.0f || this->textOnScreen == false)
 		{
 			std::cout << "Item already exists in players inventory" << std::endl;
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -204,7 +214,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, inventoryTexture[inventorySlot], 0);
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			std::cout << "Inventory Framebuffer not complete!" << std::endl;
-		
+
 		this->imagesCurrentlyInInventory[inventorySlot] = item;
 		inventoryCount++;
 	}
@@ -213,13 +223,13 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 bool Player::checkInventory(std::string item)
 {
 	bool check = false; // Item does not already exist in inventory
-	
+
 	for (int i = 0; i < maxAmountOfItems && check == false; i++)
 	{
 		if (item.c_str() == imagesCurrentlyInInventory[i])
 			check = true; // Item already exists in players inventory
 	}
-	
+
 	return check;
 }
 
@@ -234,7 +244,7 @@ void Player::addTextToScreen(std::string item)
 
 	if (this->textInitializer == 0)
 		glGenFramebuffers(1, &textFBO);
-	
+
 	glBindFramebuffer(GL_FRAMEBUFFER, textFBO);
 
 	if (this->textInitializer == 0)
@@ -261,7 +271,7 @@ void Player::addTextToScreen(std::string item)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textTexture, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Text Framebuffer not complete!" << std::endl;
-	
+
 	if (item == "EmptyImageTexture")
 		this->textOnScreen = false;
 	else
@@ -271,7 +281,7 @@ void Player::addTextToScreen(std::string item)
 	}
 
 	this->textTimer = 0.0;
-	
+
 }
 
 void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
@@ -288,7 +298,7 @@ void Player::recieveTerrainInformation(float currentHeight, float frontV, float 
 
 void Player::setCurrentHeight(float height)
 {
-	this->currentY = height;
+	this->currentY = height + 5.0;
 }
 
 glm::vec2 Player::setXZ()
@@ -308,13 +318,13 @@ void Player::update(float deltaTime, float seconds)
 
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
-	
+
 	this->textTimer += tempSeconds;
 	if (this->textTimer >= 1.0f && this->textOnScreen == true)
 	{
 		addTextToScreen("EmptyImageTexture");
 	}
-	
+
 	// LOOSING HP
 	if (this->cold < 20)
 		this->coldMeter = 0.5;
@@ -360,7 +370,7 @@ void Player::update(float deltaTime, float seconds)
 	if (this->startGame && this->fade > 0)
 	{
 		this->fade -= 0.005;
-		if ( this->fade <= 0)
+		if (this->fade <= 0)
 			this->startGame = false;
 	}
 
@@ -371,12 +381,12 @@ void Player::update(float deltaTime, float seconds)
 	if (this->textOnScreen == true)
 		this->textFade -= 0.05;
 	//else if (this->textOnScreen == false)
-		//this->textFade = 1.0;
+	//this->textFade = 1.0;
 }
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
 {
-	
+	isWalking = false;
 
 	//Equipment and Stats
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
@@ -551,13 +561,22 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	bool shift = false;
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	{
 		shift = true;
+		SnowCrunch.setPitch(1.5f);
+	}
+	else
+		SnowCrunch.setPitch(1.0);
+
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && frontCollision == false)
 	{
+		if (jumpReady == true)
+			isWalking = true;
+
 		float tempY = Transformable::transform.position.y;
 		direction += Transformable::transform.forward;
-		if(shift == true)
+		if (shift == true)
 			Transformable::transform.position += cameraSpeed * (Transformable::transform.forward * 1.8f) * deltaTime;
 		else
 			Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
@@ -568,6 +587,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && backCollision == false)
 	{
+		if (jumpReady == true)
+			isWalking = true;
+
 		float tempY = Transformable::transform.position.y;
 		direction -= Transformable::transform.forward;
 		Transformable::transform.position -= cameraSpeed * Transformable::transform.forward * deltaTime;
@@ -578,6 +600,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && leftCollision == false)
 	{
+		if (jumpReady == true)
+			isWalking = true;
+
 		float tempY = Transformable::transform.position.y;
 		direction -= Transformable::transform.right;
 		Transformable::transform.position -= Transformable::transform.right * cameraSpeed * deltaTime;
@@ -588,7 +613,10 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
 	{
- 		float tempY = Transformable::transform.position.y;
+		if (jumpReady == true)
+			isWalking = true;
+
+		float tempY = Transformable::transform.position.y;
 		direction += Transformable::transform.right;
 		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
@@ -599,6 +627,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	//... Jump mechanic
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true)
 	{
+
 		inAir = true;
 		time = 0.0f;
 		jumpReady = false;
@@ -631,6 +660,44 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	//	Transformable::transform.position.y = currentY;
 	if (Transformable::transform.position.y <= currentY - 0.0001)
 		Transformable::transform.position.y = currentY;
+
+	if (isWalking == true)
+	{
+		if (!SnowCrunch.isPlaying())
+			SnowCrunch.playSound();
+	}
+	else
+	{
+		SnowCrunch.stopSound();
+	}
+}
+
+int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
+{
+	// Check ObjectType ID
+	// Set isAlive to false if you want to delete the interacted item from the world.
+	if (id == ObjectType::ID::Bucket_Empty)
+	{
+		equip("BucketIcon");
+		addImageToInventory("InventoryBucketIcon", 4);
+		isAlive = false;
+	}
+	if (id == ObjectType::ID::Jacket)
+	{
+		isAlive = false;
+	}
+	if (id == ObjectType::ID::Campfire && checkInventory("InventoryLighterIcon"))
+	{
+		return 3;
+	}
+	/*
+	if(id == fallenTree && axeIsEquiped)
+	{
+		logs++;
+		isAlive = false;
+	}
+	*/
+	return -1;
 }
 
 void Player::findY()
@@ -640,15 +707,6 @@ void Player::findY()
 	int gridZ = (int)glm::floor(cameraPos.z / distanceToNextVertex);
 	float gridSquareSize(distanceToNextVertex / ((float)vertexLength - 1));
 	float xpos = cameraPos.x;
-
-
-
 	float xCoord = ((int)cameraPos.x % (int)distanceToNextVertex) / distanceToNextVertex;
 	float zCoord = ((int)cameraPos.z % (int)distanceToNextVertex) / distanceToNextVertex;
-
 }
-
-//glm::mat4 Player::getViewMatrix() const
-//{
-//	return glm::lookAt(Transformable::transform.position, Transformable::transform.position + Transformable::transform.forward, Transformable::transform.up);
-//}

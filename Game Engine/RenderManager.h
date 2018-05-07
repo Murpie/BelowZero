@@ -12,6 +12,8 @@
 #include "stb_image.h"
 #include "GameScene.h"
 #include "ShaderProgramLib.h"
+#include "TextureLib.h"
+#include <math.h>
 #define STB_IMAGE_IMPLEMENTATION
 
 // Cube Map defines for its positions
@@ -25,6 +27,8 @@
 #define LOW_SHADOW 1024
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
+
+#define MAX_PARTICLES 10000					//Lower to increase FPS. Small increase in FPS. Minimum value: 1000
 
 struct QuadVertex
 {
@@ -48,6 +52,7 @@ public:
 	void createBuffers();
 	void createMainMenuBuffer();
 	void createButtonQuads();
+	void deleteData();
 	void renderQuad();
 	void Update();
 	void setDeltaTime(float deltaTime);
@@ -55,6 +60,22 @@ public:
 	void setupMatrices(unsigned int shaderToUse);
 	void setupMeshY();
 	void calculateShadowLightPos();
+	void renderFireParticles();
+	void renderSnowParticles();
+
+	struct Particle {
+		glm::vec3 pos, speed;
+		unsigned char r, g, b, a;
+		float size, angle, weight;
+		float life;
+		float cameraDistance;
+	};
+
+	Particle fireParticleContainer[MAX_PARTICLES];
+	Particle snowParticleContainer[MAX_PARTICLES];
+
+	int FindUnusedParticle(Particle* container, int lastUsedParticle);
+	void ParticleLinearSort(Particle* arr, int size);
 
 private:
 
@@ -71,16 +92,23 @@ private:
 
 	GLuint finalMainMenuFBOTexture;
 
+	//Time constants
 	float deltaTime;
 	float seconds;
 	int count;
 
+	//Buffer Objects
 	unsigned int finalMainMenuFBO;
 	unsigned int quadVertexArrayObject;
 	unsigned int quadVertexBufferObject;
 	unsigned int buttonVertexArrayObject[3];
 	unsigned int buttonBufferObject[3];
 
+	//Texture data
+	int width, height, nrOfChannels;
+	unsigned char* data;
+
+	//Buffers
 	unsigned int UIFBO;
 	unsigned int UITexture;
 	unsigned int shadowMap;
@@ -96,6 +124,47 @@ private:
 	unsigned int finalFBO;
 	unsigned int finalColorBuffer;
 	unsigned int finalDepthStensil;
+	unsigned int fireTexture;
+	unsigned int snowTexture;
+	unsigned int fireVAO;
+	unsigned int snowVAO;
+	unsigned int fireVBO;
+	unsigned int snowVBO;
+	unsigned int fireParticlePositionBuffer;
+	unsigned int snowParticlePositionBuffer;
+	unsigned int fireParticleColorBuffer;
+	unsigned int snowParticleColorBuffer;
+
+	//VFX
+	unsigned int lastUsedParticle = 0;
+	unsigned int particleCount;
+	unsigned int fireParticles = 1;
+	unsigned int snowParticles = 10;
+	unsigned int randomizer = 0;
+	float randomX;
+	float randomY;
+	float randomZ;
+	float randomDirectionX;
+	float randomDirectionZ;
+	float defaultX;
+	float defaultY;
+	float defaultZ;
+	float offset;
+	int distanceToParticles = 0;
+	glm::mat4 viewProjectionMatrix;
+	glm::vec3 startPoint;
+	glm::vec3 randomStartPoint;
+	glm::vec3 targetPoint;
+	glm::vec3 particlePivot;
+	glm::vec3 directionVec;
+	glm::vec3 tempDistance;
+	glm::vec3 cameraRight_vector;
+	glm::vec3 cameraUp_vector;
+
+	GLfloat* fireParticlePositionData = 0;
+	GLfloat* snowParticlePositionData = 0;
+	GLubyte* fireParticleColorData = 0;
+	GLubyte* snowParticleColorData = 0;
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
@@ -112,13 +181,18 @@ private:
 	QuadVertex vertices;
 	GLFWwindow* window;
 
+	//Shaders
 	GLuint shadowMapShaderProgram;
 	GLuint geometryShaderProgram;
 	GLuint lightpassShaderProgram;
 	GLuint animationShaderProgram;
 	GLuint UIShaderProgram;
 	GLuint terrainShaderProgram;
+	GLuint vfxFireShaderProgram;
+	GLuint vfxSnowShaderProgram;
 	GLuint mainMenuShaderProgram;
 
 	int display_w, display_h;
+	unsigned int vertexPos;
+	unsigned int uvPos;
 };

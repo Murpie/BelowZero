@@ -8,8 +8,10 @@ GameObject::GameObject()
     isRenderable = false;
     hasLight = false;
 	isInteractable = false;
+	isBurning = false;
+	timeAlive = 0.0f;
 	modelMatrix = glm::mat4();
-	objectID = ObjectType::ID::BUCKET;
+	objectID = ObjectType::ID::Stone_1;
 }
 
 GameObject::~GameObject()
@@ -24,6 +26,15 @@ GameObject::~GameObject()
 
 void GameObject::update(float deltaTime, float seconds)
 {
+	if (isBurning == true)
+	{
+		timeAlive += deltaTime;
+		if (timeAlive >= 60.0f)
+		{
+			isBurning = false;
+		}
+	}
+
 	for (Component* components_ptr : components)
 	{
 		Component& component = *components_ptr;
@@ -149,6 +160,17 @@ const bool GameObject::getIsRenderable() {
 void GameObject::setIsRenderable(bool isRenderable)
 {
 	this->isRenderable = isRenderable;
+}
+
+void GameObject::setIsBurning()
+{
+	timeAlive = 0.0f;
+	isBurning = true;
+}
+
+const bool GameObject::getIsBurning()
+{
+	return this->isBurning;
 }
 
 Player * GameObject::getPlayer()

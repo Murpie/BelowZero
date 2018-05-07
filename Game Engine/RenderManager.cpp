@@ -16,6 +16,8 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//this->animationShaderProgram = shaderProgram->getShader<AnimationShaders>()->animationShaderProgram;
 	this->shadowMapShaderProgram = shaderProgram->getShader<ShadowMapShader>()->ShadowMapShaderProgram;
 	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
+	this->vfxFireShaderProgram = shaderProgram->getShader<VFXFireShaders>()->vfxFireShaderProgram;
+	this->vfxSnowShaderProgram = shaderProgram->getShader<VFXSnowShaders>()->vfxSnowShaderProgram;
 	this->terrainShaderProgram = shaderProgram->getShader<TerrainShaders>()->TerrainShaderProgram;
 	this->mainMenuShaderProgram = shaderProgram->getShader<MainMenuShader>()->MainMenuShaderProgram;
 	//createBuffers();
@@ -85,6 +87,98 @@ void RenderManager::createBuffers()
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//VFX
+	fireParticlePositionData = new GLfloat[MAX_PARTICLES * 4];
+	snowParticlePositionData = new GLfloat[MAX_PARTICLES * 4];
+	fireParticleColorData = new GLubyte[MAX_PARTICLES * 4];
+	snowParticleColorData = new GLubyte[MAX_PARTICLES * 4];
+	static const GLfloat g_vertex_buffer_data[] = {
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		-0.5f,  0.5f, 0.0f,
+		0.5f,  0.5f, 0.0f
+	};
+
+	//Fire Texture
+	glGenVertexArrays(1, &fireVAO);
+	glBindVertexArray(fireVAO);
+	glGenBuffers(1, &fireVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, fireVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &fireParticlePositionBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, fireParticlePositionBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+
+	glGenBuffers(1, &fireParticleColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, fireParticleColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+
+	width = 0;
+	height = 0;
+	nrOfChannels = 0;
+	data = stbi_load("ParticleQuad.png", &width, &height, &nrOfChannels, 0);
+	glGenTextures(1, &fireTexture);
+	glBindTexture(GL_TEXTURE_2D, fireTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load Billboard Texture from path" << std::endl;
+	}
+	stbi_image_free(data);
+	
+	//Snow Texture
+	glGenVertexArrays(1, &snowVAO);
+	glBindVertexArray(snowVAO);
+	glGenBuffers(1, &snowVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, snowVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &snowParticlePositionBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, snowParticlePositionBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+
+	glGenBuffers(1, &snowParticleColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, snowParticleColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+
+	for (int i = 0; i < MAX_PARTICLES; i++)
+	{
+		fireParticleContainer[i].life = -1.0f;
+		snowParticleContainer[i].life = -1.0f;
+		fireParticleContainer[i].cameraDistance = -1.0f;
+		snowParticleContainer[i].cameraDistance = -1.0f;
+	}
+
+	width = 0;
+	height = 0;
+	nrOfChannels = 0;
+	data = stbi_load("ParticleSnow.png", &width, &height, &nrOfChannels, 0);
+	glGenTextures(1, &snowTexture);
+	glBindTexture(GL_TEXTURE_2D, snowTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load Billboard Texture from path" << std::endl;
+	}
+	stbi_image_free(data);
 
 	//... Create G-buffers
 	//framebufferobject
@@ -160,8 +254,10 @@ void RenderManager::createBuffers()
 		std::cout << "Framebuffer not complete!" << std::endl;
 
 	//.. Create UI Frame Buffer with UI Texture
-	int width, height, nrOfChannels;
-	unsigned char * data = stbi_load("uiTextureFlipped.png", &width, &height, &nrOfChannels, 0);
+	width = 0;
+	height = 0;
+	nrOfChannels = 0;
+	data = stbi_load("uiTexture3.png", &width, &height, &nrOfChannels, 0);
 
 	glGenFramebuffers(1, &UIFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, UIFBO);
@@ -187,6 +283,26 @@ void RenderManager::createBuffers()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, UITexture, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "UI Framebuffer not complete!" << std::endl;
+}
+
+void RenderManager::deleteData()
+{
+	if (fireParticlePositionData != nullptr)
+	{
+		delete fireParticlePositionData;
+	}
+	if (fireParticleColorData != nullptr)
+	{
+		delete fireParticleColorData;
+	}
+	if (snowParticlePositionData != nullptr)
+	{
+		delete snowParticlePositionData;
+	}
+	if (snowParticleColorData != nullptr)
+	{
+		delete snowParticleColorData;
+	}
 }
 
 void RenderManager::createMainMenuBuffer()
@@ -352,7 +468,6 @@ void RenderManager::Render() {
 
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
-
 	}
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
@@ -371,7 +486,7 @@ void RenderManager::Render() {
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
 	
-	//... Terrain PASS----------------------------------------------------------------------------------------------------------------------------------------
+	//... Terrain PASS-----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glUseProgram(terrainShaderProgram);
@@ -431,13 +546,341 @@ void RenderManager::Render() {
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
 
-	//------=====================Animation Pass=======================-------
-	//glUseProgram(animationShaderProgram);
+	//... VFX--------------------------------------------------------------------------------------------------------------------------------------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
+	glStencilMask(0xFF); // enable writing to the stencil buffer
+	glStencilFunc(GL_ALWAYS, 2, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glm::vec3 cameraPosition(glm::inverse(view_matrix)[3]);
+
+	//... FIRE
+	glUseProgram(vfxFireShaderProgram);
+	for (GameObject* gameObject_ptr : gameObjectsToRender)
+	{
+		if (gameObject_ptr->getIsBurning())
+		{
+			//glUseProgram(vfxFireShaderProgram);
+			//Particle system location, can be changed dynamically if e.g. a torch is wanted
+
+			//defaultX = 536.0f;
+			//defaultY = -6.5f;
+			//defaultZ = 601.0f;
+			offset = 40.0f;
+
+			//Randomizer for the spawn location
+			//randomX = defaultX + (rand() % 3000 - 1500.0f) / 1000.0f;
+			//randomZ = defaultZ + (rand() % 3000 - 1500.0f) / 1000.0f;
+
+			randomX = gameObject_ptr->transform->position.x + (rand() % 5000 - 2500.0f) / 1000.0f;
+			randomZ = gameObject_ptr->transform->position.z + (rand() % 5000 - 2500.0f) / 1000.0f;
+
+			//Create the direction vector from a start and end point
+			//and check how far away the particles are.
+			//targetPoint = glm::vec3(defaultX, defaultY + offset, defaultZ);
+			targetPoint = gameObject_ptr->transform->position;
+			targetPoint.y += offset;
+			//startPoint = glm::vec3(randomX, defaultY, randomZ);
+			startPoint = glm::vec3(randomX, gameObject_ptr->transform->position.y, randomZ);
+			//particlePivot = glm::vec3(defaultX, defaultY, defaultZ);
+			particlePivot = gameObject_ptr->transform->position;
+			directionVec = targetPoint - startPoint;
+
+			//Get a random target point direction
+			randomDirectionX = directionVec.x + (rand() % 2000 - 1000) / 3000.0f;
+			randomDirectionZ = directionVec.z + (rand() % 2000 - 1000) / 3000.0f;
+
+			directionVec.x = randomDirectionX;
+			directionVec.y = directionVec.y / 5.0f;
+			directionVec.z = randomDirectionZ;
+
+			//Check if the particles are far away from the player,
+			//if too far away --> Don't render
+			// if player
+			tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
+			distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
+			//printf("Distance to particles: %d\n", distanceToParticles);
+
+			if (distanceToParticles <= 50)
+			{
+				//Create a randomizer so it doesn't spawn all the particles on every frame, if needed
+				randomizer = 1;
+
+				if (randomizer == 1)
+				{
+					if (particleCount <= MAX_PARTICLES)
+					{
+						for (int i = 0; i < fireParticles; i++)
+						{
+							lastUsedParticle = FindUnusedParticle(fireParticleContainer, lastUsedParticle);
+							int particleIndex = lastUsedParticle;
+
+							fireParticleContainer[particleIndex].life = 1.0f;
+							fireParticleContainer[particleIndex].pos = startPoint;
+
+							//Fix the rest constants that's needed for a "living" looking fire.
+							//First, create a spread with values from 0.00 -> 1.00
+							float spread = (rand() % 100) / 100.0f;
+							glm::vec3 mainDir = glm::vec3(0.0f, 0.1f, 0.0f);
+
+							//Complete random
+							glm::vec3 randomDir = glm::vec3(
+								(sin(rand() % 10 - 10.0f) / 5.0f),
+								(sin(rand() % 10 - 10.0f) / 5.0f),
+								(sin(rand() % 10 - 10.0f) / 5.0f)
+							);
+
+							//Set the new direction for the particle
+							fireParticleContainer[particleIndex].speed = mainDir + directionVec / 5.0f;
+							//fireParticleContainer[particleIndex].speed = mainDir + randomDir * spread;
+
+							//Set a "fire looking" colour to the particle
+							//Test 1
+							/*do
+							{
+								fireParticleContainer[particleIndex].r = rand() % 220;	//256 highest
+							} while (fireParticleContainer[particleIndex].r < 140);
+							fireParticleContainer[particleIndex].g = rand() % 60;*/
+
+							//Test 2
+							fireParticleContainer[particleIndex].r = 255.0f;
+							fireParticleContainer[particleIndex].g = 255.0f;
+
+							fireParticleContainer[particleIndex].b = 0;
+							fireParticleContainer[particleIndex].a = (rand() % 256) / 3;
+
+							fireParticleContainer[particleIndex].size = ((rand() % 1000) / 1500.0f) / 1.5f;
+						}
+					}
+				}
+
+				particleCount = 0;
+				//Movement of the new particles
+				for (int i = 0; i < MAX_PARTICLES; i++)
+				{
+					fireParticleContainer[i].life -= 0.016f / 2.0f;
+					if (fireParticleContainer[i].life > 0.0f)
+					{
+						fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//Test with 0.016 as a universal "fake" DT
+						fireParticleContainer[i].pos += fireParticleContainer[i].speed / 30.0f;
+						fireParticleContainer[i].cameraDistance = glm::length(fireParticleContainer[i].pos - cameraPosition);
+
+						//Set Positions
+						fireParticlePositionData[4 * particleCount + 0] = fireParticleContainer[i].pos.x;
+						fireParticlePositionData[4 * particleCount + 1] = fireParticleContainer[i].pos.y;
+						fireParticlePositionData[4 * particleCount + 2] = fireParticleContainer[i].pos.z;
+						fireParticlePositionData[4 * particleCount + 3] = fireParticleContainer[i].size;
+
+						//Set Colors
+						fireParticleColorData[4 * particleCount + 0] = fireParticleContainer[i].life * fireParticleContainer[i].r;
+
+						if (fireParticleContainer[i].life > 0.7f)
+						{
+							fireParticleColorData[4 * particleCount + 1] = (fireParticleContainer[i].life * fireParticleContainer[i].g) / 3.0f;
+						}
+						else
+						{
+							fireParticleColorData[4 * particleCount + 1] = (fireParticleContainer[i].life * fireParticleContainer[i].g) / 4.0f;
+						}
+
+						fireParticleColorData[4 * particleCount + 2] = fireParticleContainer[i].life * fireParticleContainer[i].b;
+						fireParticleColorData[4 * particleCount + 3] = (fireParticleContainer[i].a * fireParticleContainer[i].life) * 3.0f;
+					}
+					else
+					{
+						fireParticleContainer[i].cameraDistance = -1.0f;
+						fireParticlePositionData[4 * particleCount + 3] = 0;	//If dead -> Size = 0
+					}
+					particleCount++;
+				}
+
+				//Update particle information
+				glBindBuffer(GL_ARRAY_BUFFER, fireParticlePositionBuffer);
+				glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLfloat), fireParticlePositionData);
+
+				glBindBuffer(GL_ARRAY_BUFFER, fireParticleColorBuffer);
+				glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLubyte), fireParticleColorData);
+
+				//Apply Texture
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, fireTexture);
+				glUniform1i(glGetUniformLocation(vfxFireShaderProgram, "particleTexture"), 0);
+
+				//Get and set matrices
+				viewProjectionMatrix = projection_matrix * view_matrix;
+				cameraRight_vector = glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
+				cameraUp_vector = glm::vec3(view_matrix[0][1], view_matrix[1][2], view_matrix[2][3]);
+				glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
+				glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
+				glUniformMatrix4fv(glGetUniformLocation(vfxFireShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
+				glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
+				glUniform3fv(glGetUniformLocation(vfxFireShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint));
+
+				//Draw Particles
+				renderFireParticles();
+				glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
+			}
+		}
+	}
+	//... SNOW
+	glUseProgram(vfxSnowShaderProgram);
+	//Particle system location, can be changed dynamically if e.g. a torch is wanted
+	defaultX = gameScene->gameObjects[0]->transform->position.x;
+	defaultY = gameScene->gameObjects[0]->transform->position.y;
+	defaultZ = gameScene->gameObjects[0]->transform->position.z;
+	offset = 15.0f;
+
+	//Create the direction vector from a start and end point
+	//and check how far away the particles are.
+	targetPoint = glm::vec3(defaultX, defaultY + offset, defaultZ);
+	startPoint = glm::vec3(defaultX, defaultY, defaultZ);
+	particlePivot = glm::vec3(defaultX, defaultY, defaultZ);
+	directionVec = targetPoint - startPoint;
+
+	//Get a random target point direction
+	randomDirectionX = directionVec.x + (rand() % 2000 - 1000) / 3000.0f;
+	randomDirectionZ = directionVec.z + (rand() % 2000 - 1000) / 3000.0f;
+
+	directionVec.x = randomDirectionX;
+	directionVec.y = directionVec.y / 5.0f;
+	directionVec.z = randomDirectionZ;
+
+	//Check if the particles are far away from the player,
+	//if too far away --> Don't render
+	tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
+	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
+
+	//Create a randomizer so it doesn't spawn all the particles on every frame
+	randomizer = 1;
+
+	if (randomizer == 1)
+	{
+		if (particleCount <= MAX_PARTICLES)
+		{
+			for (int i = 0; i < snowParticles; i++)
+			{
+				//Randomizer for the spawn location
+				randomX = defaultX + (rand() % 6000 - 3000.0f) / 100.0f;
+				randomY = defaultY + (rand() % 6000 - 3000.0f) / 100.0f;
+				randomZ = defaultZ + (rand() % 6000 - 3000.0f) / 100.0f;
+
+				lastUsedParticle = FindUnusedParticle(snowParticleContainer, lastUsedParticle);
+				int particleIndex = lastUsedParticle;
+
+				snowParticleContainer[particleIndex].life = rand() % 3 + 1;
+				snowParticleContainer[particleIndex].pos = glm::vec3(randomX, randomY, randomZ);
+
+				//Fix the rest constants that's needed for a "living" looking fire.
+				//First, create a spread with values from 0.00 -> 1.00
+				float spread = (rand() % 100) / 100.0f;
+				glm::vec3 mainDir = glm::vec3(0.0f, -0.1f, 0.0f);
+
+				//Complete random
+				glm::vec3 randomDir = glm::vec3(
+					(sin(rand() % 10 - 10.0f) / 5.0f),
+					0,
+					(sin(rand() % 10 - 10.0f) / 5.0f)
+				);
+
+				//Set the new direction for the particle
+				//fireParticleContainer[particleIndex].speed = mainDir + directionVec / 5.0f;
+				snowParticleContainer[particleIndex].speed = mainDir + randomDir * spread;
+
+				//Set a "fire looking" colour to the particle
+				//Test 1
+				/*do
+				{
+				fireParticleContainer[particleIndex].r = rand() % 220;	//256 highest
+				} while (fireParticleContainer[particleIndex].r < 140);
+				fireParticleContainer[particleIndex].g = rand() % 60;*/
+
+				//Test 2
+				/*fireParticleContainer[particleIndex].r = 150.0f;
+				fireParticleContainer[particleIndex].g = 150.0f;
+				fireParticleContainer[particleIndex].b = 150.0f;*/
+				snowParticleContainer[particleIndex].a = (rand() % 256) / 3;
+
+				snowParticleContainer[particleIndex].size = ((rand() % 750) / 2000.0f) / 1.5f;
+			}
+		}
+	}
+
+	particleCount = 0;
+	//Movement of the new particles
+	for (int i = 0; i < MAX_PARTICLES; i++)
+	{
+		snowParticleContainer[i].life -= deltaTime / 2.0f;
+		if (snowParticleContainer[i].life > 0.0f)
+		{
+			snowParticleContainer[i].speed += glm::vec3(0.0f, -0.3f, 0.0f) * deltaTime * 0.5f;
+			snowParticleContainer[i].pos += snowParticleContainer[i].speed / 30.0f;
+			snowParticleContainer[i].cameraDistance = glm::length(snowParticleContainer[i].pos - cameraPosition);
+
+			//Set Positions
+			snowParticlePositionData[4 * particleCount + 0] = snowParticleContainer[i].pos.x;
+			snowParticlePositionData[4 * particleCount + 1] = snowParticleContainer[i].pos.y;
+			snowParticlePositionData[4 * particleCount + 2] = snowParticleContainer[i].pos.z;
+
+			if (snowParticleContainer[i].life > 1.0f)
+			{
+				snowParticlePositionData[4 * particleCount + 3] = snowParticleContainer[i].size;
+			}
+			else
+			{
+				snowParticlePositionData[4 * particleCount + 3] = snowParticleContainer[i].size * snowParticleContainer[i].life;
+			}
+
+			//Set Colors
+			snowParticleColorData[4 * particleCount + 0] = snowParticleContainer[i].r;
+			snowParticleColorData[4 * particleCount + 1] = snowParticleContainer[i].g;
+			snowParticleColorData[4 * particleCount + 2] = snowParticleContainer[i].b;
+			snowParticleColorData[4 * particleCount + 3] = snowParticleContainer[i].a;
+		}
+		else
+		{
+			snowParticleContainer[i].cameraDistance = -1.0f;
+			snowParticlePositionData[4 * particleCount + 3] = 0;	//If dead -> Size = 0
+		}
+		particleCount++;
+	}
+
+	//Update particle information
+	glBindBuffer(GL_ARRAY_BUFFER, snowParticlePositionBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLfloat), snowParticlePositionData);
+
+	glBindBuffer(GL_ARRAY_BUFFER, snowParticleColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLubyte), snowParticleColorData);
+
+	//Apply Texture
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, snowTexture);
+	glUniform1i(glGetUniformLocation(vfxSnowShaderProgram, "particleTexture"), 0);
+
+	//Get and set matrices
+	viewProjectionMatrix = projection_matrix * view_matrix;
+	cameraRight_vector = glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
+	cameraUp_vector = glm::vec3(view_matrix[0][1], view_matrix[1][2], view_matrix[2][3]);
+	glUniform3fv(glGetUniformLocation(vfxSnowShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
+	glUniform3fv(glGetUniformLocation(vfxSnowShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
+	glUniformMatrix4fv(glGetUniformLocation(vfxSnowShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
+	glUniform3fv(glGetUniformLocation(vfxSnowShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
+	glUniform3fv(glGetUniformLocation(vfxSnowShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint));
+
+	//Draw Particles
+	renderSnowParticles();
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
+	
 
 	//... Copy Stencil Buffer from gbo to finalFBO
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, finalFBO);
 	glBlitFramebuffer(0, 0, display_w, display_h, 0, 0, display_w, display_h, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+	glBlitFramebuffer(0, 0, display_w, display_h, 0, 0, display_w, display_h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
@@ -621,9 +1064,6 @@ void RenderManager::renderQuad()
 {
 	if (vao == 0)
 	{
-		unsigned int vertexPos;
-		unsigned int uvPos;
-
 		vertexPos = glGetAttribLocation(lightpassShaderProgram, "aPos");
 		uvPos = glGetAttribLocation(lightpassShaderProgram, "aTexCoords");
 
@@ -713,14 +1153,127 @@ void RenderManager::setupMatrices(unsigned int shaderToUse)
 	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 }
 
-void RenderManager::setupMeshY()
+void RenderManager::renderFireParticles()
 {
-	FindObjectsToRender();
-	for (int i = 0; i < gameObjectsToRender.size(); i++)
+	glBindVertexArray(fireVAO);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, fireVBO);
+	glVertexAttribPointer(
+		0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+	);
+
+	//Positions : center
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, fireParticlePositionBuffer);
+	glVertexAttribPointer(
+		1,
+		4,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+
+	//Colors
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, fireParticleColorBuffer);
+	glVertexAttribPointer(
+		2,
+		4,
+		GL_UNSIGNED_BYTE,
+		GL_TRUE,
+		0,
+		(void*)0
+	);
+
+	glVertexAttribDivisor(0, 0);
+	glVertexAttribDivisor(1, 1);
+	glVertexAttribDivisor(2, 1);
+}
+
+void RenderManager::renderSnowParticles()
+{
+	glBindVertexArray(snowVAO);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, snowVBO);
+	glVertexAttribPointer(
+		0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+	);
+
+	//Positions : center
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, snowParticlePositionBuffer);
+	glVertexAttribPointer(
+		1,
+		4,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+
+	//Colors
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, snowParticleColorBuffer);
+	glVertexAttribPointer(
+		2,
+		4,
+		GL_UNSIGNED_BYTE,
+		GL_TRUE,
+		0,
+		(void*)0
+	);
+
+	glVertexAttribDivisor(0, 0);
+	glVertexAttribDivisor(1, 1);
+	glVertexAttribDivisor(2, 1);
+}
+
+void RenderManager::ParticleLinearSort(Particle* arr, int size)
+{
+	int a, b, key;
+	for (a = 0; a < size; a++)
 	{
-		float yTemp = this->gameScene->gameObjects[1]->getTerrain()->calculateY(this->gameObjectsToRender[i]->transform->position.x, this->gameObjectsToRender[i]->transform->position.z);
-		this->gameObjectsToRender[i]->transform->position.y = yTemp;
+		key = arr[a].life;
+		b = a - 1;
+
+		while (b >= 0 && arr[b].life > key)
+		{
+			arr[b + 1] = arr[b];
+			b = b - 1;
+		}
+		arr[b + 1].life = key;
 	}
+}
+
+int RenderManager::FindUnusedParticle(Particle* container, int lastUsedParticle)
+{
+	for (int i = lastUsedParticle; i < MAX_PARTICLES; i++)
+	{
+		if (container[i].life < 0)
+		{
+			return i;
+		}
+	}
+
+	for (int i = 0; i < lastUsedParticle; i++)
+	{
+		if (container[i].life < 0)
+		{
+			return i;
+		}
+	}
+	return 0;
 }
 
 void RenderManager::calculateShadowLightPos()
