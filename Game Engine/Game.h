@@ -25,6 +25,8 @@
 #include <ctime>
 #include "GeometryShaders.h"
 #include "LightpassShaders.h"
+#include "VFXFireShaders.h"
+#include "VFXSnowShaders.h"
 
 #include <chrono>
 ////////////

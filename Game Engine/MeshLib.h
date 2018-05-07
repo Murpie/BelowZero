@@ -1,7 +1,6 @@
 #pragma once
 #include<vector>
 #include"Mesh.h"
-#include"AnimatedMesh.h"
 #include<string>
 
 

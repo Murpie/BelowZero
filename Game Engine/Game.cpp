@@ -144,6 +144,11 @@ void Game::run()
 	}
 	clearScene(menuScene);
 	clearScene(gameScene);
+
+	for (int i = 0; i < renderManager.size(); i++)
+	{
+		renderManager[i].deleteData();
+	}
 	renderManager.clear();
 
 	glfwTerminate();
@@ -287,8 +292,9 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addGeometryPassShaders();
 	shaderProgramLibrary.addLightpassShaders();
 	shaderProgramLibrary.addShadowMapShaders();
-	//shaderProgramLibrary.addAnimationShaders();
 	shaderProgramLibrary.addUIShaders();
+	shaderProgramLibrary.addVFXFireShaders();
+	shaderProgramLibrary.addVFXSnowShaders();
 	shaderProgramLibrary.addTerrainShaders();
 	shaderProgramLibrary.addMainMenuShaders();
 }
@@ -312,7 +318,50 @@ void Game::addMeshName()
 {
 	//Add file names to vector to load when reading mesh data. 
 	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
-	std::string meshLoader[] = { "Player_temp.leap", "Bucket.leap", "Stone_1.leap", "EquipedAxe.leap", "EquipedBucketSnow.leap" };
+	std::string meshLoader[] = { 
+		"Player_temp.leap", // Player_temp	//0
+		"Bucket_Empty.leap",			//1
+		"Stone_1.leap",					//2
+		"Campfire.leap",				//3
+		"Cliffside_1.leap",				//4
+		"Cliffside_2.leap",				//5
+		"Cliffside_3.leap",				//6
+		"Cliffside_4.leap",
+		"Campfire_NoSnow.leap",
+		"WoodenSign.leap",
+		"PineTree.leap",
+		"Pine_Tree_Snow.leap",
+		"BrokenTree.leap",
+		"BrokenTree_Snow.leap",
+		"IceTaps_1.leap",
+		"IceTaps_2.leap",
+		"WaterBottle.leap",
+		"Flag.leap",
+		"Can.leap",
+		"Can.leap", // Bucket_water
+		"Can.leap", // Bucket_snow
+		"Stump.leap",
+		"Tree.leap",
+		"TreeWithSnow.leap",
+		"FlareGunBox.leap",
+		"Axe.leap",
+		"Jacket.leap",
+		"Stone_2.leap",
+		"Stone_3.leap",
+		"Stone_4.leap",
+		"Stone_5.leap",
+		"Cabin.leap",
+		"DeadTree.leap",
+		"EquipedAxe.leap",
+		"EquipedEmptyBucket.leap",
+		"EquipedEmptyBucketSnow.leap",
+		"EquipedEmptyBucketWater.leap",
+		"Tree_Small.leap",
+		"DeadTree_Small.leap",
+		"DeadTreeSnow.leap",
+		"DeadTreeSnow_Small.leap",
+		"Tree_Small_Snow.leap"
+	};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 	{
