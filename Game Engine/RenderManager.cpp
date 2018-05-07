@@ -340,7 +340,7 @@ void RenderManager::Render() {
 	glCullFace(GL_BACK);
 
 	glUseProgram(shadowMapShaderProgram);
-	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[2]->transform->position); //? what is gameObject[2] supposed to be?
+	setupMatrices(shadowMapShaderProgram); //? what is gameObject[2] supposed to be?
 	glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -442,7 +442,7 @@ void RenderManager::Render() {
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glUseProgram(lightpassShaderProgram);
-	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[2]->transform->position);
+	setupMatrices(lightpassShaderProgram);
 
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
@@ -690,12 +690,24 @@ void RenderManager::renderQuad()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 }
 
-void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
+void RenderManager::setupMatrices(unsigned int shaderToUse)
 {
 	glUseProgram(shaderToUse);
 
+	for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	{
+		if (gameScene->gameObjects[i]->getPlayer() != nullptr)
+		{
+			positionForShadowToLookAt = gameScene->gameObjects[i]->getPlayer()->Transformable::transform.position;
+			shadowLightPos.x = positionForShadowToLookAt.x - 2.0;
+			shadowLightPos.y = positionForShadowToLookAt.y + 5.0;
+			shadowLightPos.z = positionForShadowToLookAt.z;
+			break;
+		}
+	}
+
 	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 45.0f);
-	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	glm::mat4 lightView = glm::lookAt(shadowLightPos, positionForShadowToLookAt, glm::vec3(0.0, 1.0, 0.0));
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
@@ -709,6 +721,12 @@ void RenderManager::setupMeshY()
 		float yTemp = this->gameScene->gameObjects[1]->getTerrain()->calculateY(this->gameObjectsToRender[i]->transform->position.x, this->gameObjectsToRender[i]->transform->position.z);
 		this->gameObjectsToRender[i]->transform->position.y = yTemp;
 	}
+}
+
+void RenderManager::calculateShadowLightPos()
+{
+
+	//glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 }
 
 void RenderManager::Update()

@@ -52,8 +52,9 @@ public:
 	void Update();
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
-	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
+	void setupMatrices(unsigned int shaderToUse);
 	void setupMeshY();
+	void calculateShadowLightPos();
 
 private:
 
@@ -64,6 +65,9 @@ private:
 	glm::mat4x4 fpsView_matrix;
 	glm::mat4x4 projection_matrix;
 	glm::mat4x4 currentCubeMapView;
+
+	glm::vec3 shadowLightPos;
+	glm::vec3 positionForShadowToLookAt;
 
 	GLuint finalMainMenuFBOTexture;
 
