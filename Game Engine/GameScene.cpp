@@ -26,7 +26,7 @@ void GameScene::update(float deltaTime, float seconds)
 		if (gameObjects[i]->getPlayer() != nullptr)
 		{
 			if (gameObjects[i]->getIsBurning())
-				gameObjects[i]->getPlayer()->takeDamange(0.05f);
+				gameObjects[i]->getPlayer()->takeDamange(5.f, deltaTime);
 
 			for (int j = 0; j < gameObjects.size(); j++)
 			{
@@ -334,9 +334,12 @@ void GameScene::collisionTest(GameObject & other)
 							Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
 							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
 							
-							if((int)other.objectID == 3 && other.getIsBurning())
+							if(other.getIsBurning())
 									gameObject_ptr->setIsBurning(5.f);
 							int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
+
+							if (gameObject_ptr->getIsBurning() && !other.getIsBurning())
+								other.setIsBurning(10.f);
 						}
 					}
 				}

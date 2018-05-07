@@ -644,9 +644,9 @@ void Player::heatResponse()
 		this->cold = 100;
 }
 
-void Player::takeDamange(float damage)
+void Player::takeDamange(float damage, float deltaTime)
 {
-	hp -= damage;
+	hp -= damage * deltaTime;
 }
 
 void Player::findY()

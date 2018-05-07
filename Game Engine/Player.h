@@ -77,7 +77,7 @@ public:
 	int interactionResponse(const ObjectType::ID id, bool & isAlive);
 	int collisionResponse(const ObjectType::ID);
 	void heatResponse();
-	void takeDamange(float damage);
+	void takeDamange(float damage, float deltaTime);
 
 private:
 
