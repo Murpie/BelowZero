@@ -16,10 +16,6 @@ SoundMasterSFML::~SoundMasterSFML()
 
 void SoundMasterSFML::addSound(const std::string & filePath)
 {
-	sf::SoundBuffer buffer;
-	if (!buffer.loadFromFile("Snow.wav"))
-		return;
-
 	if (!this->Buffer.loadFromFile(filePath))
 		std::cout << "Cant Load File" << std::endl;
 
@@ -29,6 +25,14 @@ void SoundMasterSFML::addSound(const std::string & filePath)
 	this->Samples = this->Buffer.getSamples();
 
 	Sound.setBuffer(Buffer);
+}
+
+bool SoundMasterSFML::isPlaying()
+{
+	if (Sound.getStatus() == 2)
+		return true;
+
+	return false;
 }
 
 void SoundMasterSFML::playSound()

@@ -13,6 +13,11 @@ public:
 	~Player();
 
 	SoundMasterSFML SnowCrunch;
+	SoundMasterSFML AmbientMusic;
+	SoundMasterSFML AmbientWind;
+	SoundMasterSFML Swing;
+
+
 
 	bool click;
 
@@ -39,7 +44,7 @@ public:
 	int maxAmountOfItems;
 	int inventoryCount;
 
-	std::string imageNames[5] = {"InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "MainMenuConcept"};
+	std::string imageNames[5] = { "InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "MainMenuConcept" };
 	std::string imagesCurrentlyInInventory[5] = { "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage" };
 
 	unsigned int equipedFBO;
@@ -104,6 +109,9 @@ private:
 	bool inAir = false;
 	float timeInAir = 0.3;
 	bool gravity = false;
+
+	//------=====Walking=====----
+	bool isWalking = false;
 
 	//Terrain
 	float currentY;

@@ -1,13 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <vector>
-#include <SFML\Audio.hpp>
-#include <SFML\System.hpp>
-#include <SFML\Main.hpp>
-#include <SFML\Graphics.hpp>
-#include <SFML\Audio\Sound.hpp>
-#include <SFML\Audio\SoundBuffer.hpp>
-#include <SFML\Audio\SoundBufferRecorder.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 
 class SoundMasterSFML
@@ -31,6 +25,7 @@ public:
 
 	void addSound(const std::string & filePath);
 
+	bool isPlaying();
 	void playSound();
 	void pauseSound();
 	void stopSound();
