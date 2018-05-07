@@ -65,6 +65,7 @@ public:
 	void processEvents(GLFWwindow *window, float deltaTime);
 
 	//glm::mat4 getViewMatrix()const;
+	void interactionResponse(const ObjectType::ID id, bool & isAlive);
 
 private:
 
