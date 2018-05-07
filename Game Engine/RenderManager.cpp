@@ -257,7 +257,7 @@ void RenderManager::createBuffers()
 	width = 0;
 	height = 0;
 	nrOfChannels = 0;
-	data = stbi_load("uiTextureFlipped.png", &width, &height, &nrOfChannels, 0);
+	data = stbi_load("uiTexture3.png", &width, &height, &nrOfChannels, 0);
 
 	glGenFramebuffers(1, &UIFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, UIFBO);

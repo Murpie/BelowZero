@@ -485,7 +485,13 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	bool shift = false;
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	{
 		shift = true;
+		SnowCrunch.setPitch(1.5f);
+	}
+	else
+		SnowCrunch.setPitch(1.0);
+
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && frontCollision == false)
 	{
