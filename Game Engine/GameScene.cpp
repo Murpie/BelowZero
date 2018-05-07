@@ -25,6 +25,9 @@ void GameScene::update(float deltaTime, float seconds)
 
 		if (gameObjects[i]->getPlayer() != nullptr)
 		{
+			if (gameObjects[i]->getIsBurning())
+				gameObjects[i]->getPlayer()->takeDamange(0.05f);
+
 			for (int j = 0; j < gameObjects.size(); j++)
 			{
 				glm::vec2 UVS = gameObjects[i]->getPlayer()->setXZ();
@@ -55,6 +58,7 @@ void GameScene::update(float deltaTime, float seconds)
 	//		it = gameObjects.erase(it);
 	//	}
 	//}
+
 }
 
 void GameScene::processEvents(GLFWwindow * window, float deltaTime)
@@ -82,6 +86,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		LeapLevel* level = new LeapLevel("ValleyPropsTest.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
+		makeObjectsInteractable();
 	}
 	else if (typeOfScene == Scene::ID::MENU)
 	{
@@ -309,7 +314,12 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 					for (int i = 0; i < other.bbox.size(); i++)
 					{
 						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
-							gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive);
+						{
+							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == (int)other.objectID)
+							{
+								other.setIsBurning(60.0f);
+							}
+						}
 					}
 				}
 			}
@@ -337,10 +347,29 @@ void GameScene::collisionTest(GameObject & other)
 							//std::cout << gameObject_ptr->transform->velocity.x << std::endl;
 							Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
 							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
+							
+							if((int)other.objectID == 3 && other.getIsBurning())
+									gameObject_ptr->setIsBurning(5.f);
+							int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
 						}
 					}
 				}
 			}
+			if (distance < 15 && other.getIsBurning())
+			{
+				gameObject_ptr->getPlayer()->heatResponse();
+			}
+		}
+	}
+}
+
+void GameScene::makeObjectsInteractable()
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->objectID == ObjectType::ID::Campfire)
+		{
+			gameObject_ptr->isInteractable = 1;
 		}
 	}
 }

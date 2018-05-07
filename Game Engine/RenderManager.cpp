@@ -38,7 +38,7 @@ RenderManager::~RenderManager()
 
 void RenderManager::FindObjectsToRender() {
 	for (unsigned int i = 0; i < gameScene->gameObjects.size(); i++) {
-	glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
+		glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
 
 		float distance = length(vectorToObject);
 		if (gameScene->gameObjects[i]->getIsRenderable() == true && distance < 83) {
@@ -48,7 +48,10 @@ void RenderManager::FindObjectsToRender() {
 		if (gameScene->gameObjects[i]->hasLight == true) {
 			gameScene->gameObjects[i]->lightComponent->color = glm::vec4(0.85, 0.85, 1.0, 1)*daylight;
 			lightsToRender.push_back(gameScene->gameObjects[i]->lightComponent);
-			//rework this
+		}
+		if (gameScene->gameObjects[i]->fireComponent != nullptr)
+		{
+			lightsToRender.push_back(gameScene->gameObjects[i]->fireComponent);
 		}
 	}
 }
@@ -260,7 +263,7 @@ void RenderManager::createBuffers()
 	width = 0;
 	height = 0;
 	nrOfChannels = 0;
-	data = stbi_load("uiTextureFlipped.png", &width, &height, &nrOfChannels, 0);
+	data = stbi_load("uiTexture3.png", &width, &height, &nrOfChannels, 0);
 
 	glGenFramebuffers(1, &UIFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, UIFBO);
@@ -568,11 +571,11 @@ void RenderManager::Render() {
 	glUseProgram(vfxFireShaderProgram);
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
-		if (gameObject_ptr->objectID == ObjectType::ID::Campfire)
+		if (gameObject_ptr->getIsBurning())
 		{
 			//glUseProgram(vfxFireShaderProgram);
 			//Particle system location, can be changed dynamically if e.g. a torch is wanted
-			
+
 			//defaultX = 536.0f;
 			//defaultY = -6.5f;
 			//defaultZ = 601.0f;
@@ -668,10 +671,10 @@ void RenderManager::Render() {
 				//Movement of the new particles
 				for (int i = 0; i < MAX_PARTICLES; i++)
 				{
-					fireParticleContainer[i].life -= deltaTime / 2.0f;
+					fireParticleContainer[i].life -= 0.016f / 2.0f;
 					if (fireParticleContainer[i].life > 0.0f)
 					{
-						fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * deltaTime * 0.5f;
+						fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//Test with 0.016 as a universal "fake" DT
 						fireParticleContainer[i].pos += fireParticleContainer[i].speed / 30.0f;
 						fireParticleContainer[i].cameraDistance = glm::length(fireParticleContainer[i].pos - cameraPosition);
 
@@ -762,7 +765,7 @@ void RenderManager::Render() {
 	tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
 	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
 
-	//Create a randomizer so it doesn't spawn all the particles on every frame
+	//Create a randomizer so it doesn't spawn all the particles on every frame, if needed
 	randomizer = 1;
 
 	if (randomizer == 1)
