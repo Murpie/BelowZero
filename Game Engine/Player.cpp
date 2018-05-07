@@ -7,7 +7,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	click = false;
 	this->currentlyEquipedItem = -1;
 
-	this->hp = 50;
+	this->hp = 80;
 	this->cold = 100;
 	this->coldMeter = 0;
 	this->water = 100;
@@ -370,8 +370,10 @@ void Player::update(float deltaTime, float seconds)
 	this->damage = this->coldMeter + this->waterMeter + this->foodMeter;
 
 	// HP DMG / REG
-	if (this->hp < 100 && this->hp > 0)
+	if (this->hp <= 100 && this->hp > 0)
 		this->hp = this->hp - (this->damage * deltaTime);
+	else
+		this->hp = 100;
 
 	// SPAWN & GAME OVER FADE
 	if (this->startGame && this->fade > 0)
@@ -402,6 +404,12 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		setWater(10);
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		setFood(10);
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+		setCold(-10);
+	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+		setWater(-10);
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+		setFood(-10);
 
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 	{
