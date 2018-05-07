@@ -582,6 +582,16 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	return -1;
 }
 
+int Player::collisionResponse(const ObjectType::ID)
+{
+	if (id == ObjectType::ID::Campfire)
+	{
+		return 3;
+	}
+
+	return -1;
+}
+
 void Player::findY()
 {
 	//float frontTemp = glm::mix(currentY, frontVertexHeight);

@@ -10,6 +10,7 @@ GameObject::GameObject()
 	isInteractable = false;
 	isBurning = false;
 	timeAlive = 0.0f;
+	timeToBurn = 10.f;
 	modelMatrix = glm::mat4();
 	objectID = ObjectType::ID::Stone_1;
 }
@@ -29,7 +30,7 @@ void GameObject::update(float deltaTime, float seconds)
 	if (isBurning == true)
 	{
 		timeAlive += deltaTime;
-		if (timeAlive >= 60.0f)
+		if (timeAlive >= timeToBurn)
 		{
 			isBurning = false;
 		}
@@ -162,8 +163,9 @@ void GameObject::setIsRenderable(bool isRenderable)
 	this->isRenderable = isRenderable;
 }
 
-void GameObject::setIsBurning()
+void GameObject::setIsBurning(float timeToBurn)
 {
+	this->timeToBurn = timeToBurn;
 	timeAlive = 0.0f;
 	isBurning = true;
 }

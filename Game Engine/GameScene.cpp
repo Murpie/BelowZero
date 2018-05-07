@@ -82,7 +82,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		LeapLevel* level = new LeapLevel("ValleyPropsTest.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
-		makeCampfireInteractable();
+		makeObjectsInteractable();
 	}
 	else if (typeOfScene == Scene::ID::MENU)
 	{
@@ -299,7 +299,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 						{
 							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == (int)other.objectID)
 							{
-								other.setIsBurning();
+								other.setIsBurning(60.0f);
 							}
 						}
 					}
@@ -329,6 +329,10 @@ void GameScene::collisionTest(GameObject & other)
 							//std::cout << gameObject_ptr->transform->velocity.x << std::endl;
 							Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
 							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
+							
+							if((int)other.objectID == 3 && other.getIsBurning())
+									gameObject_ptr->setIsBurning(5.f);
+							int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
 						}
 					}
 				}
@@ -337,7 +341,7 @@ void GameScene::collisionTest(GameObject & other)
 	}
 }
 
-void GameScene::makeCampfireInteractable()
+void GameScene::makeObjectsInteractable()
 {
 	for (GameObject* gameObject_ptr : gameObjects)
 	{

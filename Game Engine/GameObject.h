@@ -52,10 +52,10 @@ public:
 
     const bool getIsRenderable();
 	void setIsRenderable(bool isRenderable);
-	void setIsBurning();
+	void setIsBurning(float timeToBurn);
 
 	const bool getIsBurning();
-
+	
 	Player* getPlayer();
 	glm::mat4 getModelMatrix();
 	glm::mat4 getViewMatrix();
@@ -78,5 +78,7 @@ public:
 private:
     bool isRenderable;
 	bool isBurning;
+	float timeToBurn;
+
 	glm::mat4 modelMatrix;
 };
