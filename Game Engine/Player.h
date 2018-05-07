@@ -66,6 +66,8 @@ public:
 
 	//glm::mat4 getViewMatrix()const;
 
+	int test;
+
 private:
 
 

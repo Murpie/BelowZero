@@ -49,6 +49,9 @@ Player::Player(Transform& transform) : Transformable(transform)
 	for (int i = 0; i < 5; i++)
 		initiateInventoryTextures("EmptyImage");
 	addTextToScreen("EmptyImageTexture");
+
+	
+	test = 0;
 }
 
 Player::~Player()
@@ -424,6 +427,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	//... Mouse Movement
 	glfwGetCursorPos(window, &xpos, &ypos);
 
+	// -----===== Normal Matrix Camera =====-----
+
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
 
@@ -442,7 +447,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	glm::vec4 up = glm::vec4(Transformable::transform.up, 0);
 
 	matrix = glm::rotate(matrix, pitch, Transformable::transform.right);
-	matrix *= glm::rotate(matrix, -yaw, Transformable::transform.up);
+	matrix *= glm::rotate(matrix, yaw, Transformable::transform.up);
 
 	forward = matrix * forward;
 	up = matrix * up;
@@ -456,16 +461,90 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	Transformable::transform.right.y = right.y;
 	Transformable::transform.right.z = right.z;
 
+
 	if (firstMouse) {
 		lastX = (float)xpos;
 		lastY = (float)ypos;
 		firstMouse = false;
 	}
 
-	xoffset = (float)xpos - lastX;
+	if (ypos >= 600.0)
+		ypos = 600.0;
+	if (ypos <= 5.0)
+		ypos = 5.0;
+
+	xoffset = lastX - (float)xpos;
 	yoffset = lastY - (float)ypos;
 	lastX = (float)xpos;
 	lastY = (float)ypos;
+
+
+	// -----===== Qauternion Camera =====-----
+	/*xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw = xoffset;
+	pitch = yoffset;
+
+	std::cout << std::to_string(xpos) << std::endl;
+	//std::cout << std::to_string(xpos) << std::endl;
+
+	glm::quat camera_quat = glm::quat_cast(glm::mat4(1.0f));
+	glm::mat4 rotate = glm::mat4(1.0f);
+	glm::mat4 translate = glm::mat4(1.0f);
+	glm::mat4 matrix = glm::mat4(1.0f);
+
+	glm::vec4 forward = glm::vec4(Transformable::transform.forward, 0.0);
+	glm::vec4 right = glm::vec4(Transformable::transform.right, 0.0);
+	glm::vec4 up = glm::vec4(Transformable::transform.up, 0.0);
+	
+	glm::vec3 eyeVector = Transformable::transform.position + Transformable::transform.forward;
+	glm::quat key_quat = glm::quat(glm::vec3(pitch, yaw, 0.0f));
+	
+	camera_quat = key_quat * camera_quat;
+	camera_quat = glm::normalize(camera_quat);
+	rotate = glm::mat4_cast(camera_quat);
+
+	translate = glm::translate(translate, -eyeVector);
+	matrix = rotate * translate;
+
+	xoffset = 0.0;
+	yoffset = 0.0;
+	pitch = 0.0f;
+	yaw = 0.0f;
+
+	forward = matrix * forward;
+	up = matrix * up;
+	right = matrix * right;
+
+	Transformable::transform.forward.x = forward.x;
+	Transformable::transform.forward.y = forward.y;
+	Transformable::transform.forward.z = forward.z;
+	Transformable::transform.right.x = right.x;
+	Transformable::transform.right.y = right.y;
+	Transformable::transform.right.z = right.z;
+	
+	
+	if (firstMouse) {
+		lastX = (float)xpos;
+		lastY = (float)ypos;
+		firstMouse = false;
+	}
+
+	if (ypos >= 600.0)
+		ypos = 600.0;
+	if (ypos <= 10.0)
+		ypos = 10.0;
+
+	xoffset = lastX - (float)xpos;
+	yoffset = lastY - (float)ypos;
+	lastX = (float)xpos;
+	lastY = (float)ypos;*/
+
+
+	/*std::cout << std::to_string(xpos) << std::endl;*/
+	
+
 
 	//... WASD Movement
 	glm::vec3 direction = glm::vec3(0);

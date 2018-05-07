@@ -276,7 +276,7 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 
 		if (this->scaling1 <= 1.3)
 		{
-			this->scaling1 += 0.02;
+			this->scaling1 += 0.01;
 			this->buttonIsUpScaled1 = true;
 		}
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
