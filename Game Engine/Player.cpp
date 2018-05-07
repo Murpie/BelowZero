@@ -5,6 +5,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	Component::id = ComponentType::ID::PLAYER;
 
 	click = false;
+	this->currentlyEquipedItem = -1;
 
 	this->hp = 50;
 	this->cold = 100;
@@ -49,6 +50,19 @@ Player::Player(Transform& transform) : Transformable(transform)
 	for (int i = 0; i < 5; i++)
 		initiateInventoryTextures("EmptyImage");
 	addTextToScreen("EmptyImageTexture");
+
+	SnowCrunch.addSound("Snow.wav");
+	SnowCrunch.setVolume(50.0f);
+
+	AmbientWind.addSound("Wind.wav");
+	AmbientWind.playSound();
+	AmbientWind.loop(true);
+
+	AmbientMusic.addSound("AmbientMusic1.wav");
+	AmbientMusic.setVolume(50.0f);
+	AmbientMusic.playSound();
+	AmbientMusic.loop(true);
+
 }
 
 Player::~Player()
@@ -137,7 +151,7 @@ void Player::equip(std::string item)
 	if (this->initializer == 0)
 		glGenFramebuffers(1, &equipedFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, equipedFBO);
-	
+
 	if (this->initializer == 0)
 	{
 		glGenTextures(1, &equipedTexture);
@@ -165,7 +179,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 {
 	if (checkInventory(item) && item != "EmptyImage")
 	{
-		if (this->textTimer >= 1.0f ||this->textOnScreen == false)
+		if (this->textTimer >= 1.0f || this->textOnScreen == false)
 		{
 			std::cout << "Item already exists in players inventory" << std::endl;
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -173,6 +187,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 	}
 	else
 	{
+		this->currentlyEquipedItem = inventorySlot;
 		std::string texturePNG = "Texture.png";
 		std::string filePath = item + texturePNG;
 		int width, height, nrOfChannels;
@@ -201,7 +216,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, inventoryTexture[inventorySlot], 0);
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			std::cout << "Inventory Framebuffer not complete!" << std::endl;
-		
+
 		this->imagesCurrentlyInInventory[inventorySlot] = item;
 		inventoryCount++;
 	}
@@ -210,13 +225,13 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 bool Player::checkInventory(std::string item)
 {
 	bool check = false; // Item does not already exist in inventory
-	
+
 	for (int i = 0; i < maxAmountOfItems && check == false; i++)
 	{
 		if (item.c_str() == imagesCurrentlyInInventory[i])
 			check = true; // Item already exists in players inventory
 	}
-	
+
 	return check;
 }
 
@@ -231,7 +246,7 @@ void Player::addTextToScreen(std::string item)
 
 	if (this->textInitializer == 0)
 		glGenFramebuffers(1, &textFBO);
-	
+
 	glBindFramebuffer(GL_FRAMEBUFFER, textFBO);
 
 	if (this->textInitializer == 0)
@@ -258,7 +273,7 @@ void Player::addTextToScreen(std::string item)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textTexture, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Text Framebuffer not complete!" << std::endl;
-	
+
 	if (item == "EmptyImageTexture")
 		this->textOnScreen = false;
 	else
@@ -268,7 +283,7 @@ void Player::addTextToScreen(std::string item)
 	}
 
 	this->textTimer = 0.0;
-	
+
 }
 
 void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
@@ -305,13 +320,13 @@ void Player::update(float deltaTime, float seconds)
 
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
-	
+
 	this->textTimer += tempSeconds;
 	if (this->textTimer >= 1.0f && this->textOnScreen == true)
 	{
 		addTextToScreen("EmptyImageTexture");
 	}
-	
+
 	// LOOSING HP
 	if (this->cold < 20)
 		this->coldMeter = 0.5;
@@ -357,7 +372,7 @@ void Player::update(float deltaTime, float seconds)
 	if (this->startGame && this->fade > 0)
 	{
 		this->fade -= 0.005;
-		if ( this->fade <= 0)
+		if (this->fade <= 0)
 			this->startGame = false;
 	}
 
@@ -368,12 +383,12 @@ void Player::update(float deltaTime, float seconds)
 	if (this->textOnScreen == true)
 		this->textFade -= 0.05;
 	//else if (this->textOnScreen == false)
-		//this->textFade = 1.0;
+	//this->textFade = 1.0;
 }
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
 {
-	
+	isWalking = false;
 
 	//Equipment and Stats
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
@@ -393,31 +408,32 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 	{
 		equip("AxeIcon");
+		this->currentlyEquipedItem = 0;
 		addImageToInventory("InventoryAxeIcon", 0);
 	}
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 	{
 		equip("LighterIcon");
+		this->currentlyEquipedItem = 1;
 		addImageToInventory("InventoryLighterIcon", 1);
 	}
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 	{
 		equip("WoodIcon");
+		this->currentlyEquipedItem = 2;
 		addImageToInventory("InventoryWoodIcon", 2);
 	}
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 	{
 		equip("FoodIcon");
+		this->currentlyEquipedItem = 3;
 		addImageToInventory("InventoryFoodIcon", 3);
 	}
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
 	{
 		equip("BucketIcon");
+		this->currentlyEquipedItem = 4;
 		addImageToInventory("InventoryBucketIcon", 4);
-	}
-	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
-	{
-		equip("MainMenuConcept1");
 	}
 
 
@@ -472,13 +488,22 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	bool shift = false;
 
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	{
 		shift = true;
+		SnowCrunch.setPitch(1.5f);
+	}
+	else
+		SnowCrunch.setPitch(1.0);
+
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && frontCollision == false)
 	{
+		if (jumpReady == true)
+			isWalking = true;
+
 		float tempY = Transformable::transform.position.y;
 		direction += Transformable::transform.forward;
-		if(shift == true)
+		if (shift == true)
 			Transformable::transform.position += cameraSpeed * (Transformable::transform.forward * 1.8f) * deltaTime;
 		else
 			Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
@@ -489,6 +514,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && backCollision == false)
 	{
+		if (jumpReady == true)
+			isWalking = true;
+
 		float tempY = Transformable::transform.position.y;
 		direction -= Transformable::transform.forward;
 		Transformable::transform.position -= cameraSpeed * Transformable::transform.forward * deltaTime;
@@ -499,6 +527,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && leftCollision == false)
 	{
+		if (jumpReady == true)
+			isWalking = true;
+
 		float tempY = Transformable::transform.position.y;
 		direction -= Transformable::transform.right;
 		Transformable::transform.position -= Transformable::transform.right * cameraSpeed * deltaTime;
@@ -509,7 +540,10 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
 	{
- 		float tempY = Transformable::transform.position.y;
+		if (jumpReady == true)
+			isWalking = true;
+
+		float tempY = Transformable::transform.position.y;
 		direction += Transformable::transform.right;
 		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
@@ -520,6 +554,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	//... Jump mechanic
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true)
 	{
+
 		inAir = true;
 		time = 0.0f;
 		jumpReady = false;
@@ -552,6 +587,16 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	//	Transformable::transform.position.y = currentY;
 	if (Transformable::transform.position.y <= currentY - 0.0001)
 		Transformable::transform.position.y = currentY;
+
+	if (isWalking == true)
+	{
+		if (!SnowCrunch.isPlaying())
+			SnowCrunch.playSound();
+	}
+	else
+	{
+		SnowCrunch.stopSound();
+	}
 }
 
 int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
@@ -568,7 +613,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	{
 		isAlive = false;
 	}
-	if (id == ObjectType::ID::Campfire && checkInventory("InventoryLighterIcon"))
+	if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
 	{
 		return 3;
 	}
