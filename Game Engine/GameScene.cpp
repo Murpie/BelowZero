@@ -82,6 +82,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		LeapLevel* level = new LeapLevel("ValleyPropsTest.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
+		makeCampfireInteractable();
 	}
 	else if (typeOfScene == Scene::ID::MENU)
 	{
@@ -295,7 +296,12 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 					for (int i = 0; i < other.bbox.size(); i++)
 					{
 						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
-							gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive);
+						{
+							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == (int)other.objectID)
+							{
+								other.setIsBurning();
+							}
+						}
 					}
 				}
 			}
@@ -328,5 +334,14 @@ void GameScene::collisionTest(GameObject & other)
 				}
 			}
 		}
+	}
+}
+
+void GameScene::makeCampfireInteractable()
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->objectID == ObjectType::ID::Campfire)
+			gameObject_ptr->isInteractable = 1;
 	}
 }

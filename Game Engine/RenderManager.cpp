@@ -559,11 +559,11 @@ void RenderManager::Render() {
 	glUseProgram(vfxFireShaderProgram);
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
-		if (gameObject_ptr->objectID == ObjectType::ID::Campfire)
+		if (gameObject_ptr->getIsBurning())
 		{
 			//glUseProgram(vfxFireShaderProgram);
 			//Particle system location, can be changed dynamically if e.g. a torch is wanted
-			
+
 			//defaultX = 536.0f;
 			//defaultY = -6.5f;
 			//defaultZ = 601.0f;
@@ -655,16 +655,16 @@ void RenderManager::Render() {
 					}
 				}
 
-		particleCount = 0;
-		//Movement of the new particles
-		for (int i = 0; i < MAX_PARTICLES; i++)
-		{
-			fireParticleContainer[i].life -= 0.016f / 2.0f;
-			if (fireParticleContainer[i].life > 0.0f)
-			{
-				fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//Test with 0.016 as a universal "fake" DT
-				fireParticleContainer[i].pos += fireParticleContainer[i].speed / 30.0f;
-				fireParticleContainer[i].cameraDistance = glm::length(fireParticleContainer[i].pos - cameraPosition);
+				particleCount = 0;
+				//Movement of the new particles
+				for (int i = 0; i < MAX_PARTICLES; i++)
+				{
+					fireParticleContainer[i].life -= 0.016f / 2.0f;
+					if (fireParticleContainer[i].life > 0.0f)
+					{
+						fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//Test with 0.016 as a universal "fake" DT
+						fireParticleContainer[i].pos += fireParticleContainer[i].speed / 30.0f;
+						fireParticleContainer[i].cameraDistance = glm::length(fireParticleContainer[i].pos - cameraPosition);
 
 						//Set Positions
 						fireParticlePositionData[4 * particleCount + 0] = fireParticleContainer[i].pos.x;

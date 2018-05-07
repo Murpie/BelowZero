@@ -554,7 +554,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		Transformable::transform.position.y = currentY;
 }
 
-void Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
+int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 {
 	// Check ObjectType ID
 	// Set isAlive to false if you want to delete the interacted item from the world.
@@ -568,6 +568,10 @@ void Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	{
 		isAlive = false;
 	}
+	if (id == ObjectType::ID::Campfire && checkInventory("InventoryLighterIcon"))
+	{
+		return 3;
+	}
 	/*
 	if(id == fallenTree && axeIsEquiped)
 	{
@@ -575,6 +579,7 @@ void Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		isAlive = false;
 	}
 	*/
+	return -1;
 }
 
 void Player::findY()
