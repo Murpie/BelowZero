@@ -170,7 +170,7 @@ void Game::runState()
 	else if (stateOfGame.state == Gamestate::ID::LOAD_LEVEL || stateOfGame.state == Gamestate::ID::RUN_LEVEL || stateOfGame.state == Gamestate::ID::CLEAR_LEVEL)
 	{
 		levelState();
-		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		//glfwDisable(GLFW_MOUSE_CURSOR);
 	}
 	else if (stateOfGame.state == Gamestate::ID::CLOSE_GAME)
