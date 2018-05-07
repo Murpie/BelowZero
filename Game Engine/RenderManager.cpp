@@ -907,7 +907,7 @@ void RenderManager::Render() {
 	{
 		//position
 		std::string lightUniform = "lights[" + std::to_string(i) + "].Position";
-		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(lightsToRender.at(i)->transform.position));
+		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(glm::vec3(lightsToRender.at(i)->transform.position.x, lightsToRender.at(i)->transform.position.y + 2, lightsToRender.at(i)->transform.position.z)));
 
 		//Color
 		lightUniform = "lights[" + std::to_string(i) + "].Color";
@@ -1244,9 +1244,9 @@ void RenderManager::renderSnowParticles()
 
 void RenderManager::dayNightCycle()
 {
-	if (time > 300 && dayOrNight)
+	if (time > 10 && dayOrNight)
 	{
-		daylight -= deltaTime * 0.02;
+		daylight -= deltaTime * 0.1;
 		if (daylight < 0.1)
 		{
 			daylight = 0.1;
@@ -1254,7 +1254,7 @@ void RenderManager::dayNightCycle()
 			time = 0;
 		}
 	}
-	else if(time > 120 && !dayOrNight)
+	else if(time > 10 && !dayOrNight)
 	{
 		daylight += deltaTime * 0.02;
 		if (daylight > 1)
