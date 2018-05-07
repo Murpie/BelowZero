@@ -22,6 +22,9 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->mainMenuShaderProgram = shaderProgram->getShader<MainMenuShader>()->MainMenuShaderProgram;
 	//createBuffers();
 	vao = 0;
+	daylight = 1;
+	time = 0;
+	dayOrNight = true;
 	//createBuffers();
 
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
@@ -43,6 +46,7 @@ void RenderManager::FindObjectsToRender() {
 		}
 
 		if (gameScene->gameObjects[i]->hasLight == true) {
+			gameScene->gameObjects[i]->lightComponent->color = glm::vec4(0.85, 0.85, 1.0, 1)*daylight;
 			lightsToRender.push_back(gameScene->gameObjects[i]->lightComponent);
 			//rework this
 		}
@@ -411,6 +415,7 @@ void RenderManager::createButtonQuads()
 
 void RenderManager::Render() {
 	FindObjectsToRender();
+	dayNightCycle();
 
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
@@ -443,7 +448,7 @@ void RenderManager::Render() {
 	//... Clear Back Buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, display_w, display_h);
-	glClearColor(0.749, 0.843, 0.823, 1.0f);
+	glClearColor(0.749 * daylight, 0.843 * daylight, 0.823 * daylight, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//... Clear finalFBO
@@ -511,7 +516,9 @@ void RenderManager::Render() {
 	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
 
 	glUseProgram(geometryShaderProgram);
-	
+
+
+
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	//glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
@@ -528,13 +535,25 @@ void RenderManager::Render() {
 		tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
 		//... Rotation, not sure if this works (probably not)
 		// need to calculate radians from rotation vector from maya
-		float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0, 0, 0));
-		float F = glm::pow(oneMinusDot, 5.0);
-		tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
+		if (i == 0)
+		{
+			float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0, 0, 0));
+			float F = glm::pow(oneMinusDot, 5.0);
+			tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
+			tempMatrix *= glm::vec4(gameObjectsToRender[i]->transform->forward, 0);
+		}
+		else
+		{
+			float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0, 0, 0));
+			float F = glm::pow(oneMinusDot, 5.0);
+			tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
+		}
+
 		//...
 		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
+	//printf("%f\n", gameObjectsToRender[0]->transform->position.y + gameObjectsToRender[0]->transform->forward.y);
 
 	//... VFX--------------------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
@@ -899,6 +918,9 @@ void RenderManager::Render() {
 		lightUniform = "lights[" + std::to_string(i) + "].Quadratic";
 		glUniform1f(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), lightsToRender.at(i)->Quadratic);
 	}
+
+	glUniform1f(glGetUniformLocation(lightpassShaderProgram, "daylight"), daylight);
+
 	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gPosition"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
@@ -1215,6 +1237,34 @@ void RenderManager::renderSnowParticles()
 	glVertexAttribDivisor(0, 0);
 	glVertexAttribDivisor(1, 1);
 	glVertexAttribDivisor(2, 1);
+}
+
+void RenderManager::dayNightCycle()
+{
+	if (time > 300 && dayOrNight)
+	{
+		daylight -= deltaTime * 0.02;
+		if (daylight < 0.1)
+		{
+			daylight = 0.1;
+			dayOrNight = false;
+			time = 0;
+		}
+	}
+	else if(time > 120 && !dayOrNight)
+	{
+		daylight += deltaTime * 0.02;
+		if (daylight > 1)
+		{
+			daylight = 1;
+			dayOrNight = true;
+			time = 0;
+		}
+	}
+	else
+	{
+		time += deltaTime;
+	}
 }
 
 void RenderManager::ParticleLinearSort(Particle* arr, int size)

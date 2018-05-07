@@ -15,13 +15,15 @@ struct Light {
 const int NR_LIGHTS = 32;
 uniform Light lights[NR_LIGHTS];
 
+uniform float daylight;
+
 uniform sampler2D gPosition;
 uniform sampler2D gAlbedo;
 uniform sampler2D gNormal;
 uniform sampler2D depthMap;
 uniform mat4 LightSpaceMatrix;
 
-vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
+vec3 drColor = vec3(0.9f, 1.0f, 0.84f) * daylight;
 vec3 drPosition = vec3(lights[0].Position);
 
 vec3 gridSamplingDisk[20] = vec3[]
@@ -115,6 +117,6 @@ void main()
 		shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal, lights[1].Position);
 
 	FragColor = lighting * (1.0f - shadowFactor);
-	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5, visibility);
+	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, FragColor / 1.5, visibility);
 	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
 }

@@ -60,6 +60,7 @@ public:
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
 	void renderFireParticles();
 	void renderSnowParticles();
+	void dayNightCycle();
 
 	struct Particle {
 		glm::vec3 pos, speed;
@@ -91,6 +92,9 @@ private:
 	float deltaTime;
 	float seconds;
 	int count;
+	float daylight;
+	float time;
+	bool dayOrNight;
 
 	//Buffer Objects
 	unsigned int finalMainMenuFBO;

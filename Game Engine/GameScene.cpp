@@ -128,7 +128,7 @@ void GameScene::addPlayer(MeshLib & meshLibrary)
 	Player* player = new Player(*playerObject->transform);
 	playerObject->addComponent(player);
 	//Add Equipment Meshes
-	int equipmenID[] = { 3, 4 };
+	int equipmenID[] = { 33, 34 };
 	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++) {
 		MeshFilter* meshFilter = new MeshFilter(
 			meshLibrary.getMesh(equipmenID[i])->gVertexBuffer,
