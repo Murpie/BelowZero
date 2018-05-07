@@ -35,7 +35,7 @@ RenderManager::~RenderManager()
 
 void RenderManager::FindObjectsToRender() {
 	for (unsigned int i = 0; i < gameScene->gameObjects.size(); i++) {
-	glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
+		glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
 
 		float distance = length(vectorToObject);
 
@@ -45,7 +45,10 @@ void RenderManager::FindObjectsToRender() {
 
 		if (gameScene->gameObjects[i]->hasLight == true) {
 			lightsToRender.push_back(gameScene->gameObjects[i]->lightComponent);
-			//rework this
+		}
+		if (gameScene->gameObjects[i]->fireComponent != nullptr)
+		{
+			lightsToRender.push_back(gameScene->gameObjects[i]->fireComponent);
 		}
 	}
 }

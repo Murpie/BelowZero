@@ -13,6 +13,7 @@ GameObject::GameObject()
 	timeToBurn = 10.f;
 	modelMatrix = glm::mat4();
 	objectID = ObjectType::ID::Stone_1;
+	fireComponent = nullptr;
 }
 
 GameObject::~GameObject()
@@ -23,6 +24,11 @@ GameObject::~GameObject()
 	for (bBox* bbox_ptr : bbox)
 		delete bbox_ptr;
 	bbox.clear();
+
+	if (fireComponent != nullptr)
+	{
+		delete fireComponent;
+	}
 }
 
 void GameObject::update(float deltaTime, float seconds)
@@ -33,6 +39,11 @@ void GameObject::update(float deltaTime, float seconds)
 		if (timeAlive >= timeToBurn)
 		{
 			isBurning = false;
+			if (fireComponent != nullptr)
+			{
+				delete fireComponent;
+				fireComponent = nullptr;
+			}
 		}
 	}
 
@@ -167,6 +178,16 @@ void GameObject::setIsBurning(float timeToBurn)
 {
 	this->timeToBurn = timeToBurn;
 	timeAlive = 0.0f;
+
+	if (fireComponent == nullptr)
+	{
+		fireComponent = new Light(*transform);
+		fireComponent->lightType = 1;
+		fireComponent->color = glm::vec4(.5, .2, 0, .1);
+		fireComponent->Linear = 0;
+		fireComponent->Quadratic = 0.1;
+	}
+
 	isBurning = true;
 }
 

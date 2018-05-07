@@ -41,7 +41,8 @@ public:
 
     Material *materialComponent;
     MeshFilter *meshFilterComponent; 
-	Light *lightComponent; 
+	Light *lightComponent;
+	Light *fireComponent;
 
     void updateMaterialAndMeshFilterPointers();
     void updateHasLight();

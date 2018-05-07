@@ -354,6 +354,8 @@ void GameScene::makeObjectsInteractable()
 	for (GameObject* gameObject_ptr : gameObjects)
 	{
 		if (gameObject_ptr->objectID == ObjectType::ID::Campfire)
+		{
 			gameObject_ptr->isInteractable = 1;
+		}
 	}
 }
