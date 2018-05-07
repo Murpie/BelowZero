@@ -45,6 +45,11 @@ Player::Player(Transform& transform) : Transformable(transform)
 	xoffset = 0;
 	yoffset = 0;
 	sensitivity = 0.002f;
+	
+	for (int i = 0; i < sizeof(inInventory); i++)
+	{
+		inInventory[i] = false;
+	}
 
 	equip("EmptyImage");
 	for (int i = 0; i < 5; i++)
@@ -410,30 +415,35 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		equip("AxeIcon");
 		this->currentlyEquipedItem = 0;
 		addImageToInventory("InventoryAxeIcon", 0);
+		inInventory[0] = true;
 	}
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 	{
 		equip("LighterIcon");
 		this->currentlyEquipedItem = 1;
 		addImageToInventory("InventoryLighterIcon", 1);
+		inInventory[1] = true;
 	}
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 	{
-		equip("WoodIcon");
-		this->currentlyEquipedItem = 2;
-		addImageToInventory("InventoryWoodIcon", 2);
+		if (inInventory[2] == true)
+		{
+			equip("WoodIcon");
+		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 	{
 		equip("FoodIcon");
 		this->currentlyEquipedItem = 3;
 		addImageToInventory("InventoryFoodIcon", 3);
+		inInventory[3] = true;
 	}
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
 	{
 		equip("BucketIcon");
 		this->currentlyEquipedItem = 4;
 		addImageToInventory("InventoryBucketIcon", 4);
+		inInventory[4] = true;
 	}
 
 
@@ -616,6 +626,23 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
 	{
 		return 3;
+	}
+	if ((  id == ObjectType::ID::BrokenTree   || id == ObjectType::ID::BrokenTree_Snow    || id == ObjectType::ID::DeadTree
+		|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
+		|| id == ObjectType::ID::Pine_Tree    || id == ObjectType::ID::Pine_Tree_Snow     || id == ObjectType::ID::Tree 
+		|| id == ObjectType::ID::TreeWithSnow || id == ObjectType::ID::Tree_Small         || id == ObjectType::ID::Tree_Small_Snow)
+		&& currentlyEquipedItem == 0)
+	{
+		if (inInventory[2] == false)
+		{
+			isAlive = false;
+			equip("WoodIcon");
+			this->currentlyEquipedItem = 2;
+			addImageToInventory("InventoryWoodIcon", 2);
+			inInventory[2] = true;
+		}
+		else
+			addTextToScreen("Text-ItemAlreadyEquipped");
 	}
 	/*
 	if(id == fallenTree && axeIsEquiped)

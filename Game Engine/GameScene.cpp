@@ -275,6 +275,14 @@ void GameScene::addMainMenu()
 	gameObjects.push_back(MainMenuObject);
 }
 
+void GameScene::checkInteractionResponse(GameObject & other, int objectID)
+{
+	if (objectID == (int)ObjectType::ID::Campfire)
+	{
+		other.setIsBurning();
+	}
+}
+
 void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 {
 	for (GameObject* gameObject_ptr : gameObjects)
@@ -297,10 +305,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 					{
 						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
 						{
-							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == (int)other.objectID)
-							{
-								other.setIsBurning();
-							}
+							checkInteractionResponse(other, gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive));
 						}
 					}
 				}
