@@ -592,6 +592,18 @@ int Player::collisionResponse(const ObjectType::ID)
 	return -1;
 }
 
+void Player::heatResponse()
+{
+	cold += .1f; 
+	if (this->cold > 100)
+		this->cold = 100;
+}
+
+void Player::takeDamange(float damage)
+{
+	hp -= damage;
+}
+
 void Player::findY()
 {
 	//float frontTemp = glm::mix(currentY, frontVertexHeight);

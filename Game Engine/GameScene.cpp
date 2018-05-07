@@ -25,6 +25,9 @@ void GameScene::update(float deltaTime, float seconds)
 
 		if (gameObjects[i]->getPlayer() != nullptr)
 		{
+			if (gameObjects[i]->getIsBurning())
+				gameObjects[i]->getPlayer()->takeDamange(0.05f);
+
 			for (int j = 0; j < gameObjects.size(); j++)
 			{
 				glm::vec2 UVS = gameObjects[i]->getPlayer()->setXZ();
@@ -55,6 +58,7 @@ void GameScene::update(float deltaTime, float seconds)
 	//		it = gameObjects.erase(it);
 	//	}
 	//}
+
 }
 
 void GameScene::processEvents(GLFWwindow * window, float deltaTime)
@@ -336,6 +340,10 @@ void GameScene::collisionTest(GameObject & other)
 						}
 					}
 				}
+			}
+			if (distance < 15 && other.getIsBurning())
+			{
+				gameObject_ptr->getPlayer()->heatResponse();
 			}
 		}
 	}
