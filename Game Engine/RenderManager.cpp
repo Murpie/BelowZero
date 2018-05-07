@@ -753,7 +753,7 @@ void RenderManager::Render() {
 	tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
 	distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
 
-	//Create a randomizer so it doesn't spawn all the particles on every frame
+	//Create a randomizer so it doesn't spawn all the particles on every frame, if needed
 	randomizer = 1;
 
 	if (randomizer == 1)

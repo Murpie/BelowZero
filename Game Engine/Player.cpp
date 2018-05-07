@@ -5,6 +5,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	Component::id = ComponentType::ID::PLAYER;
 
 	click = false;
+	this->currentlyEquipedItem = -1;
 
 	this->hp = 50;
 	this->cold = 100;
@@ -186,6 +187,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 	}
 	else
 	{
+		this->currentlyEquipedItem = inventorySlot;
 		std::string texturePNG = "Texture.png";
 		std::string filePath = item + texturePNG;
 		int width, height, nrOfChannels;
@@ -406,31 +408,32 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 	{
 		equip("AxeIcon");
+		this->currentlyEquipedItem = 0;
 		addImageToInventory("InventoryAxeIcon", 0);
 	}
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 	{
 		equip("LighterIcon");
+		this->currentlyEquipedItem = 1;
 		addImageToInventory("InventoryLighterIcon", 1);
 	}
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 	{
 		equip("WoodIcon");
+		this->currentlyEquipedItem = 2;
 		addImageToInventory("InventoryWoodIcon", 2);
 	}
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 	{
 		equip("FoodIcon");
+		this->currentlyEquipedItem = 3;
 		addImageToInventory("InventoryFoodIcon", 3);
 	}
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
 	{
 		equip("BucketIcon");
+		this->currentlyEquipedItem = 4;
 		addImageToInventory("InventoryBucketIcon", 4);
-	}
-	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
-	{
-		equip("MainMenuConcept1");
 	}
 
 
@@ -610,7 +613,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	{
 		isAlive = false;
 	}
-	if (id == ObjectType::ID::Campfire && checkInventory("InventoryLighterIcon"))
+	if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
 	{
 		return 3;
 	}

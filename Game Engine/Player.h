@@ -37,7 +37,8 @@ public:
 
 	bool startGame;
 	bool textOnScreen;
-
+	
+	int currentlyEquipedItem;
 	int initializer;
 	int textInitializer;
 	int inventory[5];
