@@ -645,10 +645,10 @@ void RenderManager::Render() {
 		//Movement of the new particles
 		for (int i = 0; i < MAX_PARTICLES; i++)
 		{
-			fireParticleContainer[i].life -= deltaTime / 2.0f;
+			fireParticleContainer[i].life -= 0.016f / 2.0f;
 			if (fireParticleContainer[i].life > 0.0f)
 			{
-				fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * deltaTime * 0.5f;
+				fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//Test with 0.016 as a universal "fake" DT
 				fireParticleContainer[i].pos += fireParticleContainer[i].speed / 30.0f;
 				fireParticleContainer[i].cameraDistance = glm::length(fireParticleContainer[i].pos - cameraPosition);
 
