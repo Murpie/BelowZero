@@ -386,7 +386,6 @@ void Player::update(float deltaTime, float seconds)
 
 	if (this->hp <= 0 && this->fade < 1)
 		this->fade += deltaTime;
-	//else if (fade > 1.0f)				//Enter main menu(?)
 		
 
 	// Text Fade

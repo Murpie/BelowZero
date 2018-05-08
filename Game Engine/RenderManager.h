@@ -134,7 +134,7 @@ private:
 	unsigned int lastUsedParticle = 0;
 	unsigned int particleCount;
 	unsigned int fireParticles = 1;
-	unsigned int snowParticles = 10;
+	unsigned int snowParticles = 100;
 	unsigned int randomizer = 0;
 	float randomX;
 	float randomY;

@@ -570,9 +570,6 @@ void RenderManager::Render() {
 			offset = 40.0f;
 
 			//Randomizer for the spawn location
-			//randomX = defaultX + (rand() % 3000 - 1500.0f) / 1000.0f;
-			//randomZ = defaultZ + (rand() % 3000 - 1500.0f) / 1000.0f;
-
 			randomX = gameObject_ptr->transform->position.x + (rand() % 5000 - 2500.0f) / 1000.0f;
 			randomZ = gameObject_ptr->transform->position.z + (rand() % 5000 - 2500.0f) / 1000.0f;
 
@@ -633,20 +630,10 @@ void RenderManager::Render() {
 
 							//Set the new direction for the particle
 							fireParticleContainer[particleIndex].speed = mainDir + directionVec / 5.0f;
-							//fireParticleContainer[particleIndex].speed = mainDir + randomDir * spread;
 
-							//Set a "fire looking" colour to the particle
-							//Test 1
-							/*do
-							{
-								fireParticleContainer[particleIndex].r = rand() % 220;	//256 highest
-							} while (fireParticleContainer[particleIndex].r < 140);
-							fireParticleContainer[particleIndex].g = rand() % 60;*/
-
-							//Test 2
+							//Set colors
 							fireParticleContainer[particleIndex].r = 255.0f;
 							fireParticleContainer[particleIndex].g = 255.0f;
-
 							fireParticleContainer[particleIndex].b = 0;
 							fireParticleContainer[particleIndex].a = (rand() % 256) / 3;
 
@@ -659,10 +646,22 @@ void RenderManager::Render() {
 				//Movement of the new particles
 				for (int i = 0; i < MAX_PARTICLES; i++)
 				{
-					fireParticleContainer[i].life -= 0.016f / 2.0f;
+					fireParticleContainer[i].life -= 0.016f / 1.8f;
 					if (fireParticleContainer[i].life > 0.0f)
 					{
-						fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//Test with 0.016 as a universal "fake" DT
+						//Control the movement with the wind
+						if (fireParticleContainer[i].life > 0.6f)
+						{
+							fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//Test with 0.016 as a universal "fake" DT
+						}
+						else if (fireParticleContainer[i].life > 0.4f)
+						{
+							fireParticleContainer[i].speed += glm::vec3(5.0f, -0.1f, 2.5f) * 0.5f * 0.016f;
+						}
+						else
+						{
+							fireParticleContainer[i].speed += glm::vec3(10.0f, -0.1f, 5.0f) * 0.5f * 0.016f;
+						}
 						fireParticleContainer[i].pos += fireParticleContainer[i].speed / 30.0f;
 						fireParticleContainer[i].cameraDistance = glm::length(fireParticleContainer[i].pos - cameraPosition);
 
@@ -725,6 +724,7 @@ void RenderManager::Render() {
 			}
 		}
 	}
+
 	//... SNOW
 	glUseProgram(vfxSnowShaderProgram);
 	//Particle system location, can be changed dynamically if e.g. a torch is wanted
@@ -771,14 +771,15 @@ void RenderManager::Render() {
 				int particleIndex = lastUsedParticle;
 
 				snowParticleContainer[particleIndex].life = rand() % 3 + 1;
-				snowParticleContainer[particleIndex].pos = glm::vec3(randomX, randomY, randomZ);
+				snowParticleContainer[particleIndex].pos = glm::vec3(randomX, randomY + 5.0f, randomZ);
 
-				//Fix the rest constants that's needed for a "living" looking fire.
 				//First, create a spread with values from 0.00 -> 1.00
 				float spread = (rand() % 100) / 100.0f;
-				glm::vec3 mainDir = glm::vec3(0.0f, -0.1f, 0.0f);
 
-				//Complete random
+				//Start direction
+				glm::vec3 mainDir = glm::vec3(10.0f, -4.5f, 5.0f);					//Change to (0.0f, -0.1f, 0.0f) for straight falling snow 
+
+				//Complete random in X- and Z-axis
 				glm::vec3 randomDir = glm::vec3(
 					(sin(rand() % 10 - 10.0f) / 5.0f),
 					0,
@@ -786,18 +787,9 @@ void RenderManager::Render() {
 				);
 
 				//Set the new direction for the particle
-				//fireParticleContainer[particleIndex].speed = mainDir + directionVec / 5.0f;
 				snowParticleContainer[particleIndex].speed = mainDir + randomDir * spread;
 
-				//Set a "fire looking" colour to the particle
-				//Test 1
-				/*do
-				{
-				fireParticleContainer[particleIndex].r = rand() % 220;	//256 highest
-				} while (fireParticleContainer[particleIndex].r < 140);
-				fireParticleContainer[particleIndex].g = rand() % 60;*/
-
-				//Test 2
+				//Set colors, if you want color from texture, don't change the color
 				/*fireParticleContainer[particleIndex].r = 150.0f;
 				fireParticleContainer[particleIndex].g = 150.0f;
 				fireParticleContainer[particleIndex].b = 150.0f;*/
@@ -815,7 +807,7 @@ void RenderManager::Render() {
 		snowParticleContainer[i].life -= deltaTime / 2.0f;
 		if (snowParticleContainer[i].life > 0.0f)
 		{
-			snowParticleContainer[i].speed += glm::vec3(0.0f, -0.3f, 0.0f) * deltaTime * 0.5f;
+			snowParticleContainer[i].speed += glm::vec3(20.0f, -6.0f, 10.0f) * deltaTime * 0.5f;
 			snowParticleContainer[i].pos += snowParticleContainer[i].speed / 30.0f;
 			snowParticleContainer[i].cameraDistance = glm::length(snowParticleContainer[i].pos - cameraPosition);
 
