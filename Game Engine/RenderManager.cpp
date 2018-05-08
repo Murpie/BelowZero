@@ -600,9 +600,8 @@ void RenderManager::Render() {
 			// if player
 			tempDistance = particlePivot - gameScene->gameObjects[0]->transform->position;
 			distanceToParticles = abs((int)tempDistance.x + (int)tempDistance.z);
-			//printf("Distance to particles: %d\n", distanceToParticles);
 
-			if (distanceToParticles <= 50)
+			if (distanceToParticles <= 100)
 			{
 				//Create a randomizer so it doesn't spawn all the particles on every frame, if needed
 				randomizer = 1;
