@@ -28,7 +28,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
 	this->inventoryCount = 0;
-
+	this->press = false;
 	/**/
 	assetName = "CharacterMovement";
 	cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -647,6 +647,11 @@ void Player::heatResponse()
 void Player::takeDamange(float damage, float deltaTime)
 {
 	hp -= damage * deltaTime;
+}
+
+int Player::getEquipedItem()
+{
+	return currentlyEquipedItem;
 }
 
 void Player::findY()

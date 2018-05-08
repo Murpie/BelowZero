@@ -23,7 +23,7 @@ public:
 	void update(float deltaTime, float seconds); // Updates all the objects in the scene
 	void processEvents(GLFWwindow *window, float deltaTime); // Updates objects if a evenet occurs, mouse press, button press etc. 
 
-	void initScene(MeshLib& meshLibrary, MaterialLib& matertialLibrary, ShaderProgramLib& shader, Scene::ID typeOfScene);
+	void initScene(MeshLib* meshLibrary, MaterialLib* matertialLibrary, ShaderProgramLib& shader, Scene::ID typeOfScene);
 
 private:
 	int camerasInScene; //player 
@@ -39,4 +39,9 @@ private:
 	void collisionTest(GameObject & other); // Collision test when two AABB overlap
 
 	void makeObjectsInteractable();
+
+	void addGameObject(const glm::vec3 position);
+	bool addObject;
+	MaterialLib* material;
+	MeshLib* meshes;
 };
