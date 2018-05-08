@@ -84,6 +84,7 @@ private:
 	bool backCollision = false;
 	bool topCollision = false;
 	bool inInventory[5];
+	bool isPressed;
 
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;

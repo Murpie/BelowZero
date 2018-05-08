@@ -385,7 +385,7 @@ void Game::readMeshName(GameScene &scene)
 	if (!texturesLoaded)
 	{
 		materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
-		textureLibrary.addAlbedo("Colors.png");
+		textureLibrary.addAlbedo("Colors_2k.png");
 		materialLibrary.getMaterial(0)->addAlbedo(textureLibrary.getAlbedo(0)->gTexture);
 		texturesLoaded = true;
 	}

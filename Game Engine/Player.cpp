@@ -25,6 +25,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->fade = 1;
 	this->textFade = 1;
 	this->startGame = true;
+	this->isPressed = false;
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
 	this->inventoryCount = 0;
@@ -372,7 +373,7 @@ void Player::update(float deltaTime, float seconds)
 	// HP DMG / REG
 	if (this->hp <= 100 && this->hp > 0)
 		this->hp = this->hp - (this->damage * deltaTime);
-	else
+	else if (this->hp > 100)
 		this->hp = 100;
 
 	// SPAWN & GAME OVER FADE
@@ -385,6 +386,8 @@ void Player::update(float deltaTime, float seconds)
 
 	if (this->hp <= 0 && this->fade < 1)
 		this->fade += deltaTime;
+	//else if (fade > 1.0f)				//Enter main menu(?)
+		
 
 	// Text Fade
 	if (this->textOnScreen == true)
@@ -410,6 +413,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		setWater(-10);
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
 		setFood(-10);
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+		hp -= 10;
 
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 	{
@@ -418,42 +423,52 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			addImageToInventory("EmptyImage", i);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !isPressed)
 	{
 		equip("AxeIcon");
 		this->currentlyEquipedItem = 0;
 		addImageToInventory("InventoryAxeIcon", 0);
 		inInventory[0] = true;
+		isPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !isPressed)
 	{
 		equip("LighterIcon");
 		this->currentlyEquipedItem = 1;
 		addImageToInventory("InventoryLighterIcon", 1);
 		inInventory[1] = true;
+		isPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !isPressed)
 	{
 		if (inInventory[2] == true)
 		{
 			equip("WoodIcon");
+			isPressed = true;
 		}
 	}
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && !isPressed)
 	{
 		equip("FoodIcon");
 		this->currentlyEquipedItem = 3;
 		addImageToInventory("InventoryFoodIcon", 3);
 		inInventory[3] = true;
+		isPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && !isPressed)
 	{
 		equip("BucketIcon");
 		this->currentlyEquipedItem = 4;
 		addImageToInventory("InventoryBucketIcon", 4);
 		inInventory[4] = true;
+		isPressed = true;
 	}
-
+	else if (  glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE
+			&& glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_4) == GLFW_RELEASE
+			&& glfwGetKey(window, GLFW_KEY_5) == GLFW_RELEASE)
+	{
+		isPressed = false;
+	}
 
 	//... Mouse Movement
 	glfwGetCursorPos(window, &xpos, &ypos);
@@ -508,7 +523,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
 		shift = true;
-		SnowCrunch.setPitch(1.5f);
+		SnowCrunch.setPitch(2.5f);
 	}
 	else
 		SnowCrunch.setPitch(1.0);
