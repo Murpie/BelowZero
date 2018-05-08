@@ -73,6 +73,9 @@ public:
 
 	//glm::mat4 getViewMatrix()const;
 	int interactionResponse(const ObjectType::ID id, bool & isAlive);
+	int collisionResponse(const ObjectType::ID);
+	void heatResponse();
+	void takeDamange(float damage, float deltaTime);
 
 private:
 
