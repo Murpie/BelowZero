@@ -523,7 +523,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
 		shift = true;
-		SnowCrunch.setPitch(2.5f);
+		SnowCrunch.setPitch(1.5f);
+		setWater(-0.01);
 	}
 	else
 		SnowCrunch.setPitch(1.0);
