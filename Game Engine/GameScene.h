@@ -42,6 +42,7 @@ private:
 	void makeObjectsInteractable();
 
 	void addGameObject(const glm::vec3 position, const int key);
+	void addNewObjectTest(GLFWwindow * window);
 	bool addObject;
 	MaterialLib* material;
 	MeshLib* meshes;

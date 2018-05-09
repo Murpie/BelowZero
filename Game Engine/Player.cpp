@@ -29,7 +29,6 @@ Player::Player(Transform& transform) : Transformable(transform)
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
 	this->inventoryCount = 0;
-	this->press = false;
 	/**/
 	assetName = "CharacterMovement";
 	cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -642,15 +641,15 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		addImageToInventory("InventoryBucketIcon", 4);
 		isAlive = false;
 	}
-	if (id == ObjectType::ID::Jacket)
+	else if (id == ObjectType::ID::Jacket)
 	{
 		isAlive = false;
 	}
-	if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
+	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
 	{
 		return 3;
 	}
-	if ((  id == ObjectType::ID::BrokenTree   || id == ObjectType::ID::BrokenTree_Snow    || id == ObjectType::ID::DeadTree
+	else if ((  id == ObjectType::ID::BrokenTree   || id == ObjectType::ID::BrokenTree_Snow    || id == ObjectType::ID::DeadTree
 		|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
 		|| id == ObjectType::ID::Pine_Tree    || id == ObjectType::ID::Pine_Tree_Snow     || id == ObjectType::ID::Tree 
 		|| id == ObjectType::ID::TreeWithSnow || id == ObjectType::ID::Tree_Small         || id == ObjectType::ID::Tree_Small_Snow)
@@ -701,8 +700,20 @@ void Player::takeDamange(float damage, float deltaTime)
 
 int Player::getEquipedItem()
 {
-	if ()
-		return -1;
+	if(inInventory[0] == true)
+		return 0;
+	else if (inInventory[1] == true)
+		return 1;
+	else if (inInventory[2] == true && click == true) {
+		addImageToInventory("EmptyImage", 2);
+		return 2;
+	}
+	else if (inInventory[2] == true)
+		return 3;
+	else if (inInventory[3] == true)
+		return 4;
+
+	return -1;
 }
 
 void Player::findY()

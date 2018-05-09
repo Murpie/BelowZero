@@ -82,6 +82,7 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		gameObjects[i]->processEvents(window, deltaTime);
 		interactionTest(*gameObjects[i], window);
+		addNewObjectTest(window);
 	}
 }
 
@@ -389,6 +390,7 @@ void GameScene::makeObjectsInteractable()
 	}
 }
 
+
 void GameScene::addGameObject(const glm::vec3 position, const int key)
 {
 	Terrain* terrain;
@@ -444,5 +446,26 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	meshObject->setIsRenderable(true);
 	//Add to scene
 	gameObjects.push_back(meshObject);
+
+}
+
+void GameScene::addNewObjectTest(GLFWwindow * window)
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->getPlayer() != nullptr)
+		{
+			if (gameObject_ptr->getPlayer()->click == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
+			{
+				gameObject_ptr->getPlayer()->click = true;
+				if (gameObject_ptr->getPlayer()->getEquipedItem() == 2)
+				{
+					addGameObject(gameObject_ptr->transform->position, 3);
+				}
+			}
+			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) && gameObject_ptr->getPlayer()->click == true)
+				gameObject_ptr->getPlayer()->click = false;
+		}
+	}
 
 }
