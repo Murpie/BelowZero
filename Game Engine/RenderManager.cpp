@@ -686,7 +686,7 @@ void RenderManager::Render() {
 
 						if (fireParticleContainer[i].life <= 0.3f)
 						{
-							fireParticleColorData[4 * particleCount + 0] = (fireParticleContainer[i].r * (fireParticleContainer[i].life * 3.0f)) * 255.0f;		//Fix this red stopid color
+							fireParticleColorData[4 * particleCount + 0] = (fireParticleContainer[i].r * (fireParticleContainer[i].life * 3.0f)) * 255.0f;
 						}
 						else
 						{
