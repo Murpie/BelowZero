@@ -5,6 +5,8 @@ Player::Player(Transform& transform) : Transformable(transform)
 	Component::id = ComponentType::ID::PLAYER;
 
 	click = false;
+	addClick = false;
+
 	this->currentlyEquipedItem = -1;
 
 	this->hp = 80;
@@ -700,18 +702,12 @@ void Player::takeDamange(float damage, float deltaTime)
 
 int Player::getEquipedItem()
 {
-	if(inInventory[0] == true)
-		return 0;
-	else if (inInventory[1] == true)
-		return 1;
-	else if (inInventory[2] == true && click == true) {
+	if (inInventory[2] == true) 
+	{
 		addImageToInventory("EmptyImage", 2);
+		inInventory[2] = false;
 		return 2;
 	}
-	else if (inInventory[2] == true)
-		return 3;
-	else if (inInventory[3] == true)
-		return 4;
 
 	return -1;
 }
