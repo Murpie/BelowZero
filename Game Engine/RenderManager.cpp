@@ -634,8 +634,8 @@ void RenderManager::Render() {
 							fireParticleContainer[particleIndex].speed = mainDir + directionVec / 5.0f;
 
 							//Set colors
-							fireParticleContainer[particleIndex].r = 255.0f;
-							fireParticleContainer[particleIndex].g = 255.0f;
+							fireParticleContainer[particleIndex].r = 1.0f;
+							fireParticleContainer[particleIndex].g = 1.0f;
 							fireParticleContainer[particleIndex].b = 0;
 							fireParticleContainer[particleIndex].a = (rand() % 256) / 3;
 
@@ -654,7 +654,7 @@ void RenderManager::Render() {
 						//Control the movement with the wind
 						if (fireParticleContainer[i].life > 0.6f)
 						{
-							fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//Test with 0.016 as a universal "fake" DT
+							fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//0.016 as a universal "fake" DT
 						}
 						else if (fireParticleContainer[i].life > 0.4f)
 						{
@@ -674,17 +674,26 @@ void RenderManager::Render() {
 						fireParticlePositionData[4 * particleCount + 3] = fireParticleContainer[i].size;
 
 						//Set Colors
-						fireParticleColorData[4 * particleCount + 0] = fireParticleContainer[i].life * fireParticleContainer[i].r;
 
 						if (fireParticleContainer[i].life > 0.7f)
 						{
-							fireParticleColorData[4 * particleCount + 1] = (fireParticleContainer[i].life * fireParticleContainer[i].g) / 3.0f;
+							fireParticleColorData[4 * particleCount + 1] = ((fireParticleContainer[i].life * fireParticleContainer[i].g) / 3.0f) * 255.0f;
 						}
 						else
 						{
-							fireParticleColorData[4 * particleCount + 1] = (fireParticleContainer[i].life * fireParticleContainer[i].g) / 4.0f;
+							fireParticleColorData[4 * particleCount + 1] = ((fireParticleContainer[i].life * fireParticleContainer[i].g) / 4.0f) * 255.0f;
 						}
 
+						if (fireParticleContainer[i].life <= 0.3f)
+						{
+							fireParticleColorData[4 * particleCount + 0] = (fireParticleContainer[i].r * (fireParticleContainer[i].life * 3.0f)) * 255.0f;		//Fix this red stopid color
+						}
+						else
+						{
+							fireParticleColorData[4 * particleCount + 0] = fireParticleContainer[i].r * 255.0f;
+
+						}
+						
 						fireParticleColorData[4 * particleCount + 2] = fireParticleContainer[i].life * fireParticleContainer[i].b;
 						fireParticleColorData[4 * particleCount + 3] = (fireParticleContainer[i].a * fireParticleContainer[i].life) * 3.0f;
 					}
