@@ -215,6 +215,14 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 			meshObject->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
 			meshObject->transform->rotation = glm::vec3(level->levelObjects[i]->rotationX, level->levelObjects[i]->rotationY, level->levelObjects[i]->rotationZ);
 			//Calculate new world Y-position from height map and update value
+
+			/*
+			if (level->levelObjects[i]->id == (int)ObjectType::ID::Cliffside_1)
+			{
+				//do nothing or change position y
+			}
+			else: all this below*/
+
 			float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z) - 2;
 			meshObject->transform->position.y = newPositionY;
 			//Add new mesh component with data from mesh library
