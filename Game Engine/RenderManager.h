@@ -28,7 +28,7 @@
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
 
-#define MAX_PARTICLES 10000					//Lower to increase FPS. Small increase in FPS. Minimum value: 1000
+#define MAX_PARTICLES 1000					//Maximum: 1000, Intel NUC can't handle more stack than this
 
 struct QuadVertex
 {
@@ -71,6 +71,7 @@ public:
 
 	Particle fireParticleContainer[MAX_PARTICLES];
 	Particle snowParticleContainer[MAX_PARTICLES];
+	Particle flareParticleContainer[MAX_PARTICLES];
 
 	int FindUnusedParticle(Particle* container, int lastUsedParticle);
 	void ParticleLinearSort(Particle* arr, int size);
@@ -127,8 +128,10 @@ private:
 	unsigned int snowVBO;
 	unsigned int fireParticlePositionBuffer;
 	unsigned int snowParticlePositionBuffer;
+	unsigned int flareParticlePositionBuffer;
 	unsigned int fireParticleColorBuffer;
 	unsigned int snowParticleColorBuffer;
+	unsigned int flareParticleColorBuffer;
 
 	//VFX
 	unsigned int lastUsedParticle = 0;
@@ -158,8 +161,10 @@ private:
 
 	GLfloat* fireParticlePositionData = 0;
 	GLfloat* snowParticlePositionData = 0;
+	GLfloat* flareParticlePositionData = 0;
 	GLubyte* fireParticleColorData = 0;
 	GLubyte* snowParticleColorData = 0;
+	GLubyte* flareParticleColorData = 0;
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
