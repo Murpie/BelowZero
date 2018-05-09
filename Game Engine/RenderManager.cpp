@@ -542,9 +542,9 @@ void RenderManager::Render() {
 		tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
 		//... Rotation, not sure if this works (probably not)
 		// need to calculate radians from rotation vector from maya
-		float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0,0,0));
-		float F = glm::pow(oneMinusDot, 5.0);
-		tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
+		//float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0,0,0));
+		//float F = glm::pow(oneMinusDot, 5.0);
+		//tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
 		//...
 		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);

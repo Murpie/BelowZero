@@ -279,7 +279,7 @@ void Game::initScene(GameScene & scene)
 		meshesLoaded = true;
 	}
 	//...
-	scene.initScene(meshLibrary, materialLibrary, shaderProgramLibrary, scene.typeOfScene);
+	scene.initScene(&meshLibrary, &materialLibrary, shaderProgramLibrary, scene.typeOfScene);
 }
 
 void Game::clearScene(GameScene & scene)

@@ -77,6 +77,8 @@ public:
 	int collisionResponse(const ObjectType::ID);
 	void heatResponse();
 	void takeDamange(float damage, float deltaTime);
+	int getEquipedItem();
+	bool addClick;
 
 private:
 
