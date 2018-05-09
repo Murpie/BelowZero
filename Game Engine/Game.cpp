@@ -297,6 +297,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addUIShaders();
 	shaderProgramLibrary.addVFXFireShaders();
 	shaderProgramLibrary.addVFXSnowShaders();
+	shaderProgramLibrary.addVFXFlareShaders();
 	shaderProgramLibrary.addTerrainShaders();
 	shaderProgramLibrary.addMainMenuShaders();
 }

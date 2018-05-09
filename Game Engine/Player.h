@@ -31,6 +31,7 @@ public:
 	float foodTick;
 	float damage;
 	float fade;
+	float winFade;
 	float textFade;
 
 	bool startGame;
@@ -88,6 +89,7 @@ private:
 	bool topCollision = false;
 	bool inInventory[5];
 	bool isPressed;
+	bool win;
 
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
