@@ -17,8 +17,6 @@ public:
 	SoundMasterSFML AmbientWind;
 	SoundMasterSFML Swing;
 
-
-
 	bool click;
 
 	float hp;
@@ -90,6 +88,8 @@ private:
 	bool rightCollision = false;
 	bool backCollision = false;
 	bool topCollision = false;
+	bool inInventory[5];
+	bool isPressed;
 
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;

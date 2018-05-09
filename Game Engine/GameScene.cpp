@@ -297,6 +297,14 @@ void GameScene::addMainMenu()
 	gameObjects.push_back(MainMenuObject);
 }
 
+void GameScene::checkInteractionResponse(GameObject & other, int objectID)
+{
+	if (objectID == (int)ObjectType::ID::Campfire)
+	{
+		other.setIsBurning(60.0f);
+	}
+}
+
 void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 {
 	for (GameObject* gameObject_ptr : gameObjects)
