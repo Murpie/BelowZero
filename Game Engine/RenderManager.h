@@ -185,6 +185,7 @@ private:
 	GLuint terrainShaderProgram;
 	GLuint vfxFireShaderProgram;
 	GLuint vfxSnowShaderProgram;
+	GLuint vfxFlareShaderProgram;
 	GLuint mainMenuShaderProgram;
 
 	int display_w, display_h;

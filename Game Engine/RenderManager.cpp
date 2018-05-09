@@ -18,6 +18,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->UIShaderProgram = shaderProgram->getShader<UIShaders>()->UIShaderProgram;
 	this->vfxFireShaderProgram = shaderProgram->getShader<VFXFireShaders>()->vfxFireShaderProgram;
 	this->vfxSnowShaderProgram = shaderProgram->getShader<VFXSnowShaders>()->vfxSnowShaderProgram;
+	this->vfxFlareShaderProgram = shaderProgram->getShader<VFXFlareShaders>()->vfxFlareShaderProgram;
 	this->terrainShaderProgram = shaderProgram->getShader<TerrainShaders>()->TerrainShaderProgram;
 	this->mainMenuShaderProgram = shaderProgram->getShader<MainMenuShader>()->MainMenuShaderProgram;
 	//createBuffers();
@@ -982,6 +983,7 @@ void RenderManager::Render() {
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0]->getPlayer()->food);
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0]->getPlayer()->fade);
+			glUniform1f(glGetUniformLocation(UIShaderProgram, "winFade"), gameScene->gameObjects[0]->getPlayer()->winFade);
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0]->getPlayer()->textFade);
 
 			glBindTexture(GL_TEXTURE_2D, finalColorBuffer);

@@ -23,9 +23,11 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->inventoryCount = 0;
 	this->maxAmountOfItems = 5;
 	this->fade = 1;
+	this->winFade = 0;
 	this->textFade = 1;
 	this->startGame = true;
 	this->isPressed = false;
+	this->win = false;
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
 	this->inventoryCount = 0;
@@ -387,6 +389,16 @@ void Player::update(float deltaTime, float seconds)
 	if (this->hp <= 0 && this->fade < 1)
 		this->fade += deltaTime;
 		
+	//Winning
+	if (this->startGame && this->winFade > 0)
+	{
+		this->winFade -= 0.005;
+		if (this->winFade <= 0)
+			this->startGame = false;
+	}
+
+	if (this->win == true && this->winFade < 1)
+		this->winFade += deltaTime;
 
 	// Text Fade
 	if (this->textOnScreen == true)
@@ -666,6 +678,10 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		}
 		else
 			addTextToScreen("Text-ItemAlreadyEquipped");
+	}
+	if (id == ObjectType::ID::FlareGun)
+	{
+		this->win = true;
 	}
 	/*
 	if(id == fallenTree && axeIsEquiped)
