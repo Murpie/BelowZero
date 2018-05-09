@@ -25,6 +25,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	daylight = 1;
 	time = 0;
 	dayOrNight = true;
+	fireFlicker = true;
 	//createBuffers();
 
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
@@ -533,20 +534,25 @@ void RenderManager::Render() {
 	{
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-		//... Position
 		glm::mat4 tempMatrix = glm::mat4(1);
-		tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
 		//... Rotation, not sure if this works (probably not)
 		// need to calculate radians from rotation vector from maya
-		if (i == 0)
+		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
 		{
-			float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0, 0, 0));
+
+			glm::vec3 position = glm::vec3(gameScene->gameObjects[0]->transform->position);
+			gameObjectsToRender[i]->transform->position = position;
+
+			tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
+			float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation * glm::mat3(view_matrix), glm::vec3(0, 0, 0));
 			float F = glm::pow(oneMinusDot, 5.0);
 			tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
-			tempMatrix *= glm::vec4(gameObjectsToRender[i]->transform->forward, 0);
 		}
+
 		else
 		{
+			//... Position
+			tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
 			float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0, 0, 0));
 			float F = glm::pow(oneMinusDot, 5.0);
 			tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
@@ -580,6 +586,25 @@ void RenderManager::Render() {
 			//defaultY = -6.5f;
 			//defaultZ = 601.0f;
 			offset = 40.0f;
+
+			float flickerSpeed = (rand() % 1000) / 100000.0f;
+
+			if (gameObject_ptr->fireComponent->intensity < 1.0 && fireFlicker)
+			{
+				gameObject_ptr->fireComponent->intensity += flickerSpeed;
+				if (gameObject_ptr->fireComponent->intensity >= 1.0)
+				{
+					fireFlicker = false;
+				}
+			}
+			else if (gameObject_ptr->fireComponent->intensity > 0.8 && !fireFlicker)
+			{
+				gameObject_ptr->fireComponent->intensity -= flickerSpeed;
+				if (gameObject_ptr->fireComponent->intensity <= 0.8)
+				{
+					fireFlicker = true;
+				}
+			}
 
 			//Randomizer for the spawn location
 			//randomX = defaultX + (rand() % 3000 - 1500.0f) / 1000.0f;
@@ -907,11 +932,19 @@ void RenderManager::Render() {
 	{
 		//position
 		std::string lightUniform = "lights[" + std::to_string(i) + "].Position";
-		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(glm::vec3(lightsToRender.at(i)->transform.position.x, lightsToRender.at(i)->transform.position.y + 2, lightsToRender.at(i)->transform.position.z)));
+		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(glm::vec3(lightsToRender.at(i)->transform.position.x, lightsToRender.at(i)->transform.position.y + lightsToRender.at(i)->offset, lightsToRender.at(i)->transform.position.z)));
 
 		//Color
 		lightUniform = "lights[" + std::to_string(i) + "].Color";
 		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(lightsToRender.at(i)->color));
+
+		//Attenuation lightType
+		lightUniform = "lights[" + std::to_string(i) + "].lightType";
+		glUniform1i(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), lightsToRender.at(i)->lightType);
+
+		//Attenuation intensity
+		lightUniform = "lights[" + std::to_string(i) + "].intensity";
+		glUniform1f(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), lightsToRender.at(i)->intensity);
 
 		//Attenuation linear
 		lightUniform = "lights[" + std::to_string(i) + "].Linear";
@@ -920,6 +953,7 @@ void RenderManager::Render() {
 		//Attenuation quadratic
 		lightUniform = "lights[" + std::to_string(i) + "].Quadratic";
 		glUniform1f(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), lightsToRender.at(i)->Quadratic);
+
 	}
 
 	glUniform1f(glGetUniformLocation(lightpassShaderProgram, "daylight"), daylight);
@@ -1244,9 +1278,9 @@ void RenderManager::renderSnowParticles()
 
 void RenderManager::dayNightCycle()
 {
-	if (time > 10 && dayOrNight)
+	if (time > 300 && dayOrNight)
 	{
-		daylight -= deltaTime * 0.1;
+		daylight -= deltaTime * 0.02;
 		if (daylight < 0.1)
 		{
 			daylight = 0.1;
@@ -1254,7 +1288,7 @@ void RenderManager::dayNightCycle()
 			time = 0;
 		}
 	}
-	else if(time > 10 && !dayOrNight)
+	else if(time > 120 && !dayOrNight)
 	{
 		daylight += deltaTime * 0.02;
 		if (daylight > 1)

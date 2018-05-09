@@ -19,6 +19,7 @@ GameObject::GameObject()
 GameObject::~GameObject()
 {
 	deleteAllComponents();
+	
 	delete transform;
 
 	for (bBox* bbox_ptr : bbox)
@@ -198,9 +199,11 @@ void GameObject::setIsBurning(float timeToBurn)
 	{
 		fireComponent = new Light(*transform);
 		fireComponent->lightType = 1;
-		fireComponent->color = glm::vec4(.5, .2, 0, .1);
-		fireComponent->Linear = 0;
-		fireComponent->Quadratic = 0.1;
+		fireComponent->color = glm::vec4(0.9, 0.2, 0, .5);
+		fireComponent->Linear = 25;
+		fireComponent->Quadratic = 0.15;
+		fireComponent->offset = 9;
+		fireComponent->intensity = 0.9;
 	}
 
 	isBurning = true;

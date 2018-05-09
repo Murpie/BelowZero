@@ -95,6 +95,7 @@ private:
 	float daylight;
 	float time;
 	bool dayOrNight;
+	bool fireFlicker;
 
 	//Buffer Objects
 	unsigned int finalMainMenuFBO;

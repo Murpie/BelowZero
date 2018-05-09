@@ -17,7 +17,7 @@ public:
 	GameScene(Scene::ID typeOfScene);
 	~GameScene();
 
-	std::vector<GameObject*> gameObjects; 
+	std::vector<GameObject*> gameObjects;
 
 	void clearGameObjects();
 	void update(float deltaTime, float seconds); // Updates all the objects in the scene
@@ -31,6 +31,7 @@ private:
 
 	void addLight(glm::vec3 transform, int lightType);
 	void addPlayer(MeshLib& meshLibrary);
+	void addEquipment(MeshLib & meshLibrary, MaterialLib& materialLibrary);
 	void addLevelObjects(MeshLib& meshLibrary, MaterialLib& matertialLibrary, LeapLevel* level);
 	void addTerrain(const std::string & heightMap, GLuint shader);
 	void addMainMenu();

@@ -8,6 +8,7 @@ struct Light {
 	vec3 Position;
 	vec3 Color;
 	int lightType;
+	float intensity;
 	float Linear;
 	float Quadratic;
 };
@@ -82,18 +83,34 @@ void main()
 
 	for (int i = 0; i < NR_LIGHTS; ++i)
 	{
-		// diffuse
-		vec3 lightDir = normalize(lights[i].Position - FragPos);
-		vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color;
-		//diffuse = Albedo;
+		//dir
+		if (lights[i].lightType == 0) {
+			// diffuse
+			vec3 lightDir = normalize(lights[i].Position - FragPos);
+			vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color;
+			//diffuse = Albedo;
 
-		vec3 halfwayDir = normalize(lightDir + viewDir);
-		float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
+			vec3 halfwayDir = normalize(lightDir + viewDir);
+			float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
 
-		// attenuation
-		float distance = length(lights[i].Position - FragPos);
-		float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
-		lighting += diffuse;
+			// attenuation
+			float distance = length(lights[i].Position - FragPos);
+			float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
+			lighting += diffuse;
+		}
+
+		//point
+		if (lights[i].lightType == 1) {
+			// diffuse
+			vec3 lightDir = normalize(lights[i].Position - FragPos);
+			vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Albedo * lights[i].Color;
+			// attenuation
+			float distance = length(lights[i].Position - FragPos);
+			float attenuation = 1.0 / ((distance * distance) / (lights[i].Linear * lights[i].Linear));
+			//diffuse *= attenuation;
+
+			lighting += (diffuse * attenuation) * lights[i].intensity;
+		}
 	}
 
 	//Test Directional Light

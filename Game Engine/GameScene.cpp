@@ -78,7 +78,6 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		addPlayer(meshLibrary);
 		// Lights - (add lights with level file?)
 		addLight(glm::vec3(7, 9, -4), 0);
-		addLight(glm::vec3(4, 0.4, -2), 1);
 		// Terrain
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
@@ -86,6 +85,8 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		LeapLevel* level = new LeapLevel("ValleyPropsTest.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
+
+		addEquipment(meshLibrary, matertialLibrary);
 		makeObjectsInteractable();
 	}
 	else if (typeOfScene == Scene::ID::MENU)
@@ -132,21 +133,37 @@ void GameScene::addPlayer(MeshLib & meshLibrary)
 	//Add player component
 	Player* player = new Player(*playerObject->transform);
 	playerObject->addComponent(player);
+
+	//Add to scene
+	gameObjects.push_back(playerObject);
+	camerasInScene++;
+}
+
+void GameScene::addEquipment(MeshLib & meshLibrary, MaterialLib& materialLibrary)
+{
 	//Add Equipment Meshes
-	int equipmenID[] = { 33, 34 };
-	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++) {
+	int equipmenID[] = { 33 };
+
+	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++)
+	{
+		GameObject* gameObject_ptr = new GameObject();
 		MeshFilter* meshFilter = new MeshFilter(
 			meshLibrary.getMesh(equipmenID[i])->gVertexBuffer,
 			meshLibrary.getMesh(equipmenID[i])->gVertexAttribute,
 			meshLibrary.getMesh(equipmenID[i])->leapMesh->getVertexCount(),
 			meshLibrary.getMesh(equipmenID[i])->meshType,
 			equipmenID[i]);
-		playerObject->addComponent(meshFilter);
+		gameObject_ptr->name = "Axe";
+		gameObject_ptr->addComponent(meshFilter);
+		gameObject_ptr->setIsRenderable(true);
+		gameObject_ptr->addComponent(materialLibrary.getMaterial(0));
+		gameObject_ptr->objectID = (ObjectType::ID)equipmenID[i];
+		glm::vec3 position = glm::vec3(gameObjects[0]->transform->position);
+		gameObject_ptr->transform->position = position;
+		glm::vec3 rotation = glm::vec3(gameObjects[0]->transform->rotation);
+		gameObject_ptr->transform->rotation = rotation;
+		gameObjects.push_back(gameObject_ptr);
 	}
-
-	//Add to scene
-	gameObjects.push_back(playerObject);
-	camerasInScene++;
 }
 
 void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibrary, LeapLevel* level)
