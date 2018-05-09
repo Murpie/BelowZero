@@ -40,7 +40,7 @@ private:
 
 	void makeObjectsInteractable();
 
-	void addGameObject(const glm::vec3 position);
+	void addGameObject(const glm::vec3 position, const int key);
 	bool addObject;
 	MaterialLib* material;
 	MeshLib* meshes;

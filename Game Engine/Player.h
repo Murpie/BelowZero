@@ -80,7 +80,6 @@ public:
 	void takeDamange(float damage, float deltaTime);
 
 	int getEquipedItem();
-	bool press; // used in gamescene for creating items
 
 private:
 

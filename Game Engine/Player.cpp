@@ -651,7 +651,8 @@ void Player::takeDamange(float damage, float deltaTime)
 
 int Player::getEquipedItem()
 {
-	return currentlyEquipedItem;
+	if ()
+		return -1;
 }
 
 void Player::findY()
