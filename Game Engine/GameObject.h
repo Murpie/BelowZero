@@ -31,6 +31,7 @@ public:
     bool isActive;
     bool hasLight;
 	bool isInteractable;
+	bool gameEnd;
 	float timeAlive;
 	ObjectType::ID objectID;
 	std::string name;
@@ -54,8 +55,10 @@ public:
     const bool getIsRenderable();
 	void setIsRenderable(bool isRenderable);
 	void setIsBurning(float timeToBurn);
+	void setGameEnd();
 
 	const bool getIsBurning();
+	const bool getGameEnd();
 	
 	Player* getPlayer();
 	glm::mat4 getModelMatrix();

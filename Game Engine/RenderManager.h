@@ -60,6 +60,7 @@ public:
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
 	void renderFireParticles();
 	void renderSnowParticles();
+	void renderFlareParticles();
 
 	struct Particle {
 		glm::vec3 pos, speed;
@@ -122,10 +123,13 @@ private:
 	unsigned int finalDepthStensil;
 	unsigned int fireTexture;
 	unsigned int snowTexture;
+	unsigned int flareTexture;
 	unsigned int fireVAO;
 	unsigned int snowVAO;
+	unsigned int flareVAO;
 	unsigned int fireVBO;
 	unsigned int snowVBO;
+	unsigned int flareVBO;
 	unsigned int fireParticlePositionBuffer;
 	unsigned int snowParticlePositionBuffer;
 	unsigned int flareParticlePositionBuffer;
@@ -138,6 +142,7 @@ private:
 	unsigned int particleCount;
 	unsigned int fireParticles = 1;
 	unsigned int snowParticles = 100;
+	unsigned int flareParticles = 1;
 	unsigned int randomizer = 0;
 	float randomX;
 	float randomY;
@@ -149,6 +154,7 @@ private:
 	float defaultZ;
 	float offset;
 	int distanceToParticles = 0;
+	bool flareAlive = false;
 	glm::mat4 viewProjectionMatrix;
 	glm::vec3 startPoint;
 	glm::vec3 randomStartPoint;

@@ -309,9 +309,13 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 					{
 						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
 						{
-							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == (int)other.objectID)
+							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::Campfire)
 							{
 								other.setIsBurning(60.0f);
+							}
+							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::FlareGun)
+							{
+								other.setGameEnd();
 							}
 						}
 					}
