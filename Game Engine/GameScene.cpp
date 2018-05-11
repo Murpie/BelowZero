@@ -83,7 +83,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("Lvl0.leap");
+		LeapLevel* level = new LeapLevel("Lvl2.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
 		makeObjectsInteractable();
@@ -97,7 +97,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 
-		LeapLevel* level = new LeapLevel("Lvl0.leap");
+		LeapLevel* level = new LeapLevel("Lvl2.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
 	}
@@ -215,16 +215,19 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 			meshObject->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
 			meshObject->transform->rotation = glm::vec3(level->levelObjects[i]->rotationX, level->levelObjects[i]->rotationY, level->levelObjects[i]->rotationZ);
 			//Calculate new world Y-position from height map and update value
-
-			/*
-			if (level->levelObjects[i]->id == (int)ObjectType::ID::Cliffside_1)
+			
+			if (level->levelObjects[i]->id == ObjectType::ID::Cliffside_1
+				|| level->levelObjects[i]->id == ObjectType::ID::Cliffside_2
+				|| level->levelObjects[i]->id == ObjectType::ID::Cliffside_3
+				|| level->levelObjects[i]->id == ObjectType::ID::Cliffside_4)
 			{
-				//do nothing or change position y
+				meshObject->transform->position.y = -10;
 			}
-			else: all this below*/
-
-			float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z) - 2;
-			meshObject->transform->position.y = newPositionY;
+			else
+			{
+				float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z) - 2;
+				meshObject->transform->position.y = newPositionY;
+			}
 			//Add new mesh component with data from mesh library
 			MeshFilter* meshFilter = new MeshFilter(
 				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer,
