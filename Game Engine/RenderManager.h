@@ -85,7 +85,10 @@ private:
 	glm::mat4x4 fpsView_matrix;
 	glm::mat4x4 projection_matrix;
 	glm::mat4x4 currentCubeMapView;
-
+	glm::mat4 tempMatrix;
+	glm::mat4 oldrotation;
+	float oldPitch;
+	float oldYaw;
 	GLuint finalMainMenuFBOTexture;
 
 	//Time constants

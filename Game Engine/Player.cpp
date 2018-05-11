@@ -446,10 +446,10 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	yaw = xoffset;
 	pitch = yoffset;
 
-	if (pitch > 90.f)
-		pitch = 90.0f;
-	if (pitch < -90.0f)
-		pitch = -90.0f;
+	if (pitch > 45.f)
+		pitch = 45.0f;
+	if (pitch < -45.0f)
+		pitch = -45.0f;
 
 	glm::mat4 matrix = glm::mat4(1);
 

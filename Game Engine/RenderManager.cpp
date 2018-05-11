@@ -26,6 +26,8 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	time = 0;
 	dayOrNight = true;
 	fireFlicker = true;
+	oldPitch = 0;
+	oldYaw = 0;
 	//createBuffers();
 
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
@@ -534,7 +536,6 @@ void RenderManager::Render() {
 	{
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-		glm::mat4 tempMatrix = glm::mat4(1);
 		//... Rotation, not sure if this works (probably not)
 		// need to calculate radians from rotation vector from maya
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
@@ -542,29 +543,42 @@ void RenderManager::Render() {
 			glm::vec3 position = glm::vec3(gameScene->gameObjects[0]->transform->position);
 			gameObjectsToRender[i]->transform->position = position;
 
-			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
-
-			float d = glm::dot(gameScene->gameObjects[0]->getPlayer()->transform.forward, glm::vec3(1, 0, 0));
-			glm::vec3 c = glm::cross(gameScene->gameObjects[0]->getPlayer()->transform.forward, glm::vec3(1, 0, 0));
-			float angleF = acos(d) * 60;
-			float dir = glm::dot(c, gameScene->gameObjects[0]->getPlayer()->transform.forward);
-			if (dir < 0)
-				angleF = -angleF;
-
-			d = glm::dot(gameScene->gameObjects[0]->getPlayer()->transform.right, glm::vec3(1, 0, 0));
-			c = glm::cross(gameScene->gameObjects[0]->getPlayer()->transform.right, glm::vec3(1, 0, 0));
-			float angleR = acos(d);
-			if (d <= -0.00000000000000001)
-				angleF = 180 + (180 - angleF);
-
-
-
-			/*float oneMinusDot = glm::dot(gameScene->gameObjects[0]->transform->forward, glm::vec3(1, 0, 0));
-			float F = glm::pow(oneMinusDot, 5.0);*/
-			tempMatrix = glm::rotate(tempMatrix, glm::radians(angleF), gameScene->gameObjects[0]->transform->up);
 			
-			printf("%f, %f, %f\n", gameScene->gameObjects[0]->transform->forward.x, gameScene->gameObjects[0]->transform->forward.y, gameScene->gameObjects[0]->transform->forward.z);
-			printf("%f\n", d);
+
+			//tempMatrix = tempMatrix * rotationMatrix;
+
+			//float d = glm::dot(gameScene->gameObjects[0]->getPlayer()->transform.forward, glm::vec3(1, 0, 0));
+			//glm::vec3 c = glm::cross(gameScene->gameObjects[0]->getPlayer()->transform.forward, glm::vec3(1, 0, 0));
+			//float angleF = acos(d) * 60;
+			//float dir = glm::dot(c, gameScene->gameObjects[0]->getPlayer()->transform.forward);
+			//if (dir < 0)
+			//	angleF = -angleF;
+
+			//d = glm::dot(gameScene->gameObjects[0]->getPlayer()->transform.right, glm::vec3(1, 0, 0));
+			//c = glm::cross(gameScene->gameObjects[0]->getPlayer()->transform.right, glm::vec3(1, 0, 0));
+			//float angleR = acos(d);
+			//if (d <= -0.00000000000000001)
+			//	angleF = 180 + (180 - angleF);
+
+
+			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
+			oldYaw = oldYaw - gameScene->gameObjects[0]->getPlayer()->yaw;
+			oldPitch = oldPitch + (gameScene->gameObjects[0]->getPlayer()->pitch * 2.0f);
+			//tempMatrix = glm::translate(tempMatrix, gameObjectsToRender[i]->transform->position);
+			tempMatrix = glm::rotate(tempMatrix, oldYaw, gameScene->gameObjects[0]->transform->up);
+			tempMatrix = glm::rotate(tempMatrix, oldPitch, gameObjectsToRender[i]->transform->right);
+	//		tempMatrix = glm::translate(tempMatrix, gameObjectsToRender[i]->transform->position);
+			///*float oneMinusDot = glm::dot(gameScene->gameObjects[0]->transform->forward, glm::vec3(1, 0, 0));
+			//float F = glm::pow(oneMinusDot, 5.0);*/
+		//	tempMatrix *= glm::scale(glm::mat4(1), glm::vec3(1, 1, 1));
+		//	tempMatrix *= glm::rotate(tempMatrix, glm::radians(-oldpitch), gameScene->gameObjects[0]->transform->up);
+		//	oldpitch = 0.0001 + oldpitch;
+		//	tempMatrix *= gameScene->gameObjects[0]->getModelMatrix();
+			//tempMatrix=  glm::rotate(tempMatrix, glm::radians(oldpitch), gameScene->gameObjects[0]->transform->up) * gameObjectsToRender[i]->getModelMatrix();
+			
+		//
+			//printf("%f, %f, %f\n", gameObjectsToRender[i]->transform->forward.x, gameObjectsToRender[i]->transform->forward.y, gameObjectsToRender[i]->transform->forward.z);
+			//printf("%f\n", d);
 		}
 		else
 		{
