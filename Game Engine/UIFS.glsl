@@ -18,6 +18,7 @@ uniform float cold;
 uniform float water;
 uniform float food;
 uniform float fade;
+uniform float winFade;
 uniform float textFade;
 
 void main()
@@ -107,4 +108,9 @@ void main()
 		color.xyz = color.xyz + fade;
 	else if (fade >= 1)
 		color.xyz = vec3(1.0, 1.0, 1.0);
+
+	if (winFade > 0)
+	{
+		color.xyz = vec3(winFade, 0.0, 0.0);
+	}
 }

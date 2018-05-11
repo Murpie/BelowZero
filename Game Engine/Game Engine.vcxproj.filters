@@ -165,6 +165,9 @@
     <ClCompile Include="SoundMaster.cpp">
       <Filter>Source Files\Data Types</Filter>
     </ClCompile>
+    <ClCompile Include="VFXFlareShaders.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
     <ClCompile Include="RefractionShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -299,6 +302,9 @@
     <ClInclude Include="RefractionShader.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="VFXFlareShaders.h">
+      <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="lightpassFS.glsl">
@@ -362,6 +368,12 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="refractionShaderVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXFlareFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXFlareVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>

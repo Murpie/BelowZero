@@ -73,3 +73,9 @@ void ShaderProgramLib::addVFXSnowShaders()
 	VFXSnowShaders* newShaderProgram = new VFXSnowShaders();
 	shaders.push_back(newShaderProgram);
 }
+
+void ShaderProgramLib::addVFXFlareShaders()
+{
+	VFXFlareShaders* newShaderProgram = new VFXFlareShaders();
+	shaders.push_back(newShaderProgram);
+}

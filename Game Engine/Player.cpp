@@ -5,8 +5,11 @@ Player::Player(Transform& transform) : Transformable(transform)
 	Component::id = ComponentType::ID::PLAYER;
 
 	click = false;
+	addClick = false;
 
-	this->hp = 50;
+	this->currentlyEquipedItem = -1;
+
+	this->hp = 80;
 	this->cold = 100;
 	this->coldMeter = 0;
 	this->water = 100;
@@ -22,12 +25,14 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->inventoryCount = 0;
 	this->maxAmountOfItems = 5;
 	this->fade = 1;
+	this->winFade = 0;
 	this->textFade = 1;
 	this->startGame = true;
+	this->isPressed = false;
+	this->win = false;
 	for (int i = 0; i < 5; i++)
 		this->inventory[i] = 0;
 	this->inventoryCount = 0;
-
 	/**/
 	assetName = "CharacterMovement";
 	cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -44,6 +49,11 @@ Player::Player(Transform& transform) : Transformable(transform)
 	xoffset = 0;
 	yoffset = 0;
 	sensitivity = 0.002f;
+	
+	for (int i = 0; i < sizeof(inInventory); i++)
+	{
+		inInventory[i] = false;
+	}
 
 	equip("EmptyImage");
 	for (int i = 0; i < 5; i++)
@@ -185,6 +195,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 	}
 	else
 	{
+		this->currentlyEquipedItem = inventorySlot;
 		std::string texturePNG = "Texture.png";
 		std::string filePath = item + texturePNG;
 		int width, height, nrOfChannels;
@@ -363,8 +374,10 @@ void Player::update(float deltaTime, float seconds)
 	this->damage = this->coldMeter + this->waterMeter + this->foodMeter;
 
 	// HP DMG / REG
-	if (this->hp < 100 && this->hp > 0)
+	if (this->hp <= 100 && this->hp > 0)
 		this->hp = this->hp - (this->damage * deltaTime);
+	else if (this->hp > 100)
+		this->hp = 100;
 
 	// SPAWN & GAME OVER FADE
 	if (this->startGame && this->fade > 0)
@@ -376,6 +389,17 @@ void Player::update(float deltaTime, float seconds)
 
 	if (this->hp <= 0 && this->fade < 1)
 		this->fade += deltaTime;
+		
+	//Winning
+	if (this->startGame && this->winFade > 0)
+	{
+		this->winFade -= 0.005;
+		if (this->winFade <= 0)
+			this->startGame = false;
+	}
+
+	if (this->win == true && this->winFade < 1)
+		this->winFade += deltaTime;
 
 	// Text Fade
 	if (this->textOnScreen == true)
@@ -397,6 +421,12 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		setFood(10);
 	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
 		setCold(-10);
+	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+		setWater(-10);
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+		setFood(-10);
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+		hp -= 10;
 
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 	{
@@ -405,36 +435,52 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			addImageToInventory("EmptyImage", i);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !isPressed)
 	{
 		equip("AxeIcon");
+		this->currentlyEquipedItem = 0;
 		addImageToInventory("InventoryAxeIcon", 0);
+		inInventory[0] = true;
+		isPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !isPressed)
 	{
 		equip("LighterIcon");
+		this->currentlyEquipedItem = 1;
 		addImageToInventory("InventoryLighterIcon", 1);
+		inInventory[1] = true;
+		isPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !isPressed)
 	{
-		equip("WoodIcon");
-		addImageToInventory("InventoryWoodIcon", 2);
+		if (inInventory[2] == true)
+		{
+			equip("WoodIcon");
+			isPressed = true;
+		}
 	}
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && !isPressed)
 	{
 		equip("FoodIcon");
+		this->currentlyEquipedItem = 3;
 		addImageToInventory("InventoryFoodIcon", 3);
+		inInventory[3] = true;
+		isPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && !isPressed)
 	{
 		equip("BucketIcon");
+		this->currentlyEquipedItem = 4;
 		addImageToInventory("InventoryBucketIcon", 4);
+		inInventory[4] = true;
+		isPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+	else if (  glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE
+			&& glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_4) == GLFW_RELEASE
+			&& glfwGetKey(window, GLFW_KEY_5) == GLFW_RELEASE)
 	{
-		equip("MainMenuConcept1");
+		isPressed = false;
 	}
-
 
 	//... Mouse Movement
 	glfwGetCursorPos(window, &xpos, &ypos);
@@ -490,6 +536,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		shift = true;
 		SnowCrunch.setPitch(1.5f);
+		setWater(-0.01);
 	}
 	else
 		SnowCrunch.setPitch(1.0);
@@ -608,13 +655,34 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		addImageToInventory("InventoryBucketIcon", 4);
 		isAlive = false;
 	}
-	if (id == ObjectType::ID::Jacket)
+	else if (id == ObjectType::ID::Jacket)
 	{
 		isAlive = false;
 	}
-	if (id == ObjectType::ID::Campfire && checkInventory("InventoryLighterIcon"))
+	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
 	{
 		return 3;
+	}
+	else if ((  id == ObjectType::ID::BrokenTree   || id == ObjectType::ID::BrokenTree_Snow    || id == ObjectType::ID::DeadTree
+		|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
+		|| id == ObjectType::ID::Pine_Tree    || id == ObjectType::ID::Pine_Tree_Snow     || id == ObjectType::ID::Tree 
+		|| id == ObjectType::ID::TreeWithSnow || id == ObjectType::ID::Tree_Small         || id == ObjectType::ID::Tree_Small_Snow)
+		&& currentlyEquipedItem == 0)
+	{
+		if (inInventory[2] == false)
+		{
+			isAlive = false;
+			equip("WoodIcon");
+			this->currentlyEquipedItem = 2;
+			addImageToInventory("InventoryWoodIcon", 2);
+			inInventory[2] = true;
+		}
+		else
+			addTextToScreen("Text-ItemAlreadyEquipped");
+	}
+	if (id == ObjectType::ID::FlareGun)
+	{
+		this->win = true;
 	}
 	/*
 	if(id == fallenTree && axeIsEquiped)
@@ -623,6 +691,40 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		isAlive = false;
 	}
 	*/
+	return -1;
+}
+
+int Player::collisionResponse(const ObjectType::ID)
+{
+	if (id == ObjectType::ID::Campfire)
+	{
+		return 3;
+	}
+
+	return -1;
+}
+
+void Player::heatResponse()
+{
+	cold += .1f; 
+	if (this->cold > 100)
+		this->cold = 100;
+}
+
+void Player::takeDamange(float damage, float deltaTime)
+{
+	hp -= damage * deltaTime;
+}
+
+int Player::getEquipedItem()
+{
+	if (inInventory[2] == true) 
+	{
+		addImageToInventory("EmptyImage", 2);
+		inInventory[2] = false;
+		return 2;
+	}
+
 	return -1;
 }
 
