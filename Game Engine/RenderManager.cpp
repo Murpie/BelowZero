@@ -539,16 +539,33 @@ void RenderManager::Render() {
 		// need to calculate radians from rotation vector from maya
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
 		{
-
 			glm::vec3 position = glm::vec3(gameScene->gameObjects[0]->transform->position);
 			gameObjectsToRender[i]->transform->position = position;
 
-			tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
-			float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation * glm::mat3(view_matrix), glm::vec3(0, 0, 0));
-			float F = glm::pow(oneMinusDot, 5.0);
-			tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
-		}
+			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
 
+			float d = glm::dot(gameScene->gameObjects[0]->getPlayer()->transform.forward, glm::vec3(1, 0, 0));
+			glm::vec3 c = glm::cross(gameScene->gameObjects[0]->getPlayer()->transform.forward, glm::vec3(1, 0, 0));
+			float angleF = acos(d) * 60;
+			float dir = glm::dot(c, gameScene->gameObjects[0]->getPlayer()->transform.forward);
+			if (dir < 0)
+				angleF = -angleF;
+
+			d = glm::dot(gameScene->gameObjects[0]->getPlayer()->transform.right, glm::vec3(1, 0, 0));
+			c = glm::cross(gameScene->gameObjects[0]->getPlayer()->transform.right, glm::vec3(1, 0, 0));
+			float angleR = acos(d);
+			if (d <= -0.00000000000000001)
+				angleF = 180 + (180 - angleF);
+
+
+
+			/*float oneMinusDot = glm::dot(gameScene->gameObjects[0]->transform->forward, glm::vec3(1, 0, 0));
+			float F = glm::pow(oneMinusDot, 5.0);*/
+			tempMatrix = glm::rotate(tempMatrix, glm::radians(angleF), gameScene->gameObjects[0]->transform->up);
+			
+			printf("%f, %f, %f\n", gameScene->gameObjects[0]->transform->forward.x, gameScene->gameObjects[0]->transform->forward.y, gameScene->gameObjects[0]->transform->forward.z);
+			printf("%f\n", d);
+		}
 		else
 		{
 			//... Position

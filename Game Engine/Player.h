@@ -79,6 +79,9 @@ public:
 	void heatResponse();
 	void takeDamange(float damage);
 
+	float pitch;
+	float yaw;
+
 private:
 
 
@@ -92,8 +95,7 @@ private:
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
-	float pitch;
-	float yaw;
+
 	bool firstMouse;
 	float lastX, lastY;
 	double xpos, ypos;
