@@ -1,7 +1,8 @@
 #include "GameScene.h"
 
 GameScene::GameScene(Scene::ID typeOfScene) :
-	camerasInScene(0), lightsInScene(0)
+	camerasInScene(0), lightsInScene(0),
+	addObject(false)
 {
 	this->typeOfScene = typeOfScene;
 }
@@ -20,6 +21,20 @@ void GameScene::clearGameObjects()
 
 void GameScene::update(float deltaTime, float seconds)
 {
+	if (addObject)
+	{
+		for (unsigned int i = 0; i < gameObjects.size(); i++)
+		{
+
+			if (gameObjects[i]->getPlayer() != nullptr)
+			{
+				addGameObject(gameObjects[i]->transform->position, 3);
+				addObject = false;
+				break;
+			}
+		}
+	}
+
 	for (unsigned int i = 0; i < gameObjects.size(); i++)
 	{
 
@@ -67,11 +82,15 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		gameObjects[i]->processEvents(window, deltaTime);
 		interactionTest(*gameObjects[i], window);
+		addNewObjectTest(window);
 	}
 }
 
-void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary, ShaderProgramLib & shader, Scene::ID typeOfScene)
+void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary, ShaderProgramLib & shader, Scene::ID typeOfScene)
 {
+	material = matertialLibrary;
+	meshes = meshLibrary;
+
 	if (typeOfScene == Scene::ID::LEVEL_1)
 	{
 		// Camera - (modify position with level file?)
@@ -187,17 +206,17 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 					{
 						bBox* box = new bBox();
 						//add center
-						box->center.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[0];
-						box->center.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[1];
-						box->center.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->center[2];
+						box->center.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[0];
+						box->center.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[1];
+						box->center.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[2];
 						//add max vector
-						box->vMax.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[0];
-						box->vMax.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[1];
-						box->vMax.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[2];
+						box->vMax.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[0];
+						box->vMax.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[1];
+						box->vMax.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[2];
 						//add min vector
-						box->vMin.x = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[0];
-						box->vMin.y = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[1];
-						box->vMin.z = meshLibrary.getMesh(i)->leapMesh->boundingBoxes[i]->minVector[2];
+						box->vMin.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[0];
+						box->vMin.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[1];
+						box->vMin.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[2];
 						//push into gameobject
 						gameObject_ptr->bbox.push_back(box);
 					}
@@ -307,7 +326,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 			if (gameObject_ptr->getPlayer()->click == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
 			{
 				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-				if (distance < 10 && other.isInteractable == true)
+				if (distance < 15 && other.isInteractable == true)
 				{
 					gameObject_ptr->getPlayer()->click = true;
 					RayData ray = Ray::getWorldRay(
@@ -380,4 +399,83 @@ void GameScene::makeObjectsInteractable()
 			gameObject_ptr->isInteractable = 1;
 		}
 	}
+}
+
+
+void GameScene::addGameObject(const glm::vec3 position, const int key)
+{
+	Terrain* terrain;
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->getTerrain() != nullptr)
+			terrain = gameObject_ptr->getTerrain();
+	}
+	//Create new mesh object
+	GameObject* meshObject = new GameObject();
+	//Set mesh object position in world
+	meshObject->transform->position = position;
+	//Calculate new world Y-position from height map and update value
+	float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z) - 2;
+	meshObject->transform->position.y = newPositionY;
+	//Add new mesh component with data from mesh library
+	MeshFilter* meshFilter = new MeshFilter(
+		meshes->getMesh(key)->gVertexBuffer,
+		meshes->getMesh(key)->gVertexAttribute,
+		meshes->getMesh(key)->leapMesh->getVertexCount(),
+		meshes->getMesh(key)->leapMesh->customMayaAttribute->meshType);
+	meshObject->addComponent(meshFilter);
+	meshObject->meshFilterComponent = meshFilter;
+
+	//Add material to gameObject from materialLibrary
+	meshObject->addComponent(material->getMaterial(0));
+	//Set customAttribute ID from Enum.H
+	meshObject->objectID = (ObjectType::ID)key;
+	//Set customAttribute interactable
+//	if ((int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 1)
+	meshObject->isInteractable = true;
+	//Add BBox from leapmesh to gameObject
+
+	for (int i = 0; i < meshes->getMesh(key)->leapMesh->boundingBoxes.size(); i++)
+	{
+		bBox* box = new bBox();
+		//add center
+		box->center.x = meshes->getMesh(i)->leapMesh->boundingBoxes[i]->center[0];
+		box->center.y = meshes->getMesh(i)->leapMesh->boundingBoxes[i]->center[1];
+		box->center.z = meshes->getMesh(i)->leapMesh->boundingBoxes[i]->center[2];
+		//add max vector
+		box->vMax.x = meshes->getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[0];
+		box->vMax.y = meshes->getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[1];
+		box->vMax.z = meshes->getMesh(i)->leapMesh->boundingBoxes[i]->maxVector[2];
+		//add min vector
+		box->vMin.x = meshes->getMesh(i)->leapMesh->boundingBoxes[i]->minVector[0];
+		box->vMin.y = meshes->getMesh(i)->leapMesh->boundingBoxes[i]->minVector[1];
+		box->vMin.z = meshes->getMesh(i)->leapMesh->boundingBoxes[i]->minVector[2];
+		//push into gameobject
+		meshObject->bbox.push_back(box);
+	}
+	meshObject->setIsRenderable(true);
+	//Add to scene
+	gameObjects.push_back(meshObject);
+
+}
+
+void GameScene::addNewObjectTest(GLFWwindow * window)
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->getPlayer() != nullptr)
+		{
+			if (gameObject_ptr->getPlayer()->addClick == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS))
+			{
+				gameObject_ptr->getPlayer()->addClick = true;
+				if (gameObject_ptr->getPlayer()->getEquipedItem() == 2)
+				{
+					addObject = true;
+				}
+			}
+			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) && gameObject_ptr->getPlayer()->addClick == true)
+				gameObject_ptr->getPlayer()->addClick = false;
+		}
+	}
+
 }
