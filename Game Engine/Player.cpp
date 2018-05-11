@@ -66,7 +66,6 @@ Player::Player(Transform& transform) : Transformable(transform)
 
 Player::~Player()
 {
-
 }
 
 void Player::setCold(float value)
@@ -298,7 +297,8 @@ void Player::recieveTerrainInformation(float currentHeight, float frontV, float 
 
 void Player::setCurrentHeight(float height)
 {
-	this->currentY = height + 5.0;
+	if (height + 7.001 < currentY + 7.002);
+		this->currentY = height + 7.0;
 }
 
 glm::vec2 Player::setXZ()
@@ -395,6 +395,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		setWater(10);
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		setFood(10);
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+		setCold(-10);
 
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 	{

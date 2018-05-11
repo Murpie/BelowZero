@@ -43,6 +43,7 @@ public:
 	~RenderManager();
 
 	GameScene *gameScene;
+	Texture shatteredIce;
 	
 	void FindObjectsToRender();
 	void clearObjectsToRender();
@@ -54,6 +55,7 @@ public:
 	void createButtonQuads();
 	void deleteData();
 	void renderQuad();
+	void renderPPQuad();
 	void Update();
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
@@ -129,6 +131,8 @@ private:
 	unsigned int snowParticlePositionBuffer;
 	unsigned int fireParticleColorBuffer;
 	unsigned int snowParticleColorBuffer;
+	unsigned int PPFBO;
+	unsigned int finalPPFBO;
 
 	//VFX
 	unsigned int lastUsedParticle = 0;
@@ -186,6 +190,7 @@ private:
 	GLuint vfxFireShaderProgram;
 	GLuint vfxSnowShaderProgram;
 	GLuint mainMenuShaderProgram;
+	GLuint refractionShaderProgram;
 
 	int display_w, display_h;
 	unsigned int vertexPos;

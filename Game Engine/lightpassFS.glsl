@@ -20,6 +20,8 @@ uniform sampler2D gAlbedo;
 uniform sampler2D gNormal;
 uniform sampler2D depthMap;
 uniform mat4 LightSpaceMatrix;
+uniform int ScreenX;
+uniform int ScreenY;
 
 vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
 vec3 drPosition = vec3(lights[0].Position);
@@ -32,6 +34,7 @@ vec3 gridSamplingDisk[20] = vec3[]
 	vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
 	vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
 	);
+
 
 // ----------========== DIRECTIONAL LIGHT SHADOW CALCULATION ==========----------
 float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
@@ -67,6 +70,8 @@ float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 
 void main()
 {
+
+
 	// retrieve data from G-buffer
 	vec3 FragPos = texture(gPosition, TexCoords).rgb;
 	vec3 Albedo = texture(gAlbedo, TexCoords).rgb;
@@ -114,7 +119,10 @@ void main()
 	if (lights[1].lightType == 0)
 		shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal, lights[1].Position);
 
+
+
+
 	FragColor = lighting * (1.0f - shadowFactor);
 	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5, visibility);
-	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
+
 }

@@ -13,6 +13,7 @@
 #include "MainMenuShaders.h"
 #include "VFXFireShaders.h"
 #include "VFXSnowShaders.h"
+#include "RefractionShader.h"
 
 class ShaderProgramLib
 {
@@ -29,6 +30,7 @@ public:
 	void addVFXSnowShaders();
 	void addTerrainShaders();
 	void addMainMenuShaders();
+	void addRefractionShaders();
 
 	template <class T>
 	T* getShader() {

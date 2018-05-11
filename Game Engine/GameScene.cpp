@@ -164,10 +164,10 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 						meshLibrary.getMesh(level->levelObjects[i]->id)->meshType);
 					gameObject_ptr->addComponent(meshFilter);
 					//Set player object position in world
-					gameObject_ptr->transform->position = glm::vec3(level->levelObjects[i]->x + 20, level->levelObjects[i]->y, level->levelObjects[i]->z + 20);
+					gameObject_ptr->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
 					gameObject_ptr->transform->rotation = glm::vec3(level->levelObjects[i]->rotationX, level->levelObjects[i]->rotationY, level->levelObjects[i]->rotationZ);
 					//Calculate new world Y-position from height map and update value
-					float newPositionY = terrain->calculateY(gameObject_ptr->transform->position.x + 20, gameObject_ptr->transform->position.z + 20) - 2;
+					float newPositionY = terrain->calculateY(gameObject_ptr->transform->position.x, gameObject_ptr->transform->position.z);
 					gameObject_ptr->transform->position.y = newPositionY;
 					//Add material to gameObject from materialLibrary
 					gameObject_ptr->addComponent(materialLibrary.getMaterial(0));
@@ -211,7 +211,7 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 			meshObject->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
 			meshObject->transform->rotation = glm::vec3(level->levelObjects[i]->rotationX, level->levelObjects[i]->rotationY, level->levelObjects[i]->rotationZ);
 			//Calculate new world Y-position from height map and update value
-			float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z) - 2;
+			float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z);
 			meshObject->transform->position.y = newPositionY;
 			//Add new mesh component with data from mesh library
 			MeshFilter* meshFilter = new MeshFilter(

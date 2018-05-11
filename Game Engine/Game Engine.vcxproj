@@ -181,6 +181,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="MainMenuShaders.cpp" />
+    <ClCompile Include="RefractionShader.cpp" />
     <ClCompile Include="SoundMaster.cpp" />
     <ClCompile Include="TerrainShaders.cpp" />
     <ClCompile Include="UIShaders.cpp" />
@@ -226,6 +227,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="MainMenuShaders.h" />
+    <ClInclude Include="RefractionShader.h" />
     <ClInclude Include="SoundMaster.h" />
     <ClInclude Include="UIShaders.h" />
     <ClInclude Include="Material.h" />
@@ -259,6 +261,8 @@
     <None Include="lightpassVS.glsl" />
     <None Include="MainMenuFS.glsl" />
     <None Include="MainMenuVS.glsl" />
+    <None Include="refractionShaderFS.glsl" />
+    <None Include="refractionShaderVS.glsl" />
     <None Include="TerrainFS.glsl" />
     <None Include="TerrainVS.glsl" />
     <None Include="UIFS.glsl" />

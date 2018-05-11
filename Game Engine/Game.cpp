@@ -297,6 +297,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addVFXSnowShaders();
 	shaderProgramLibrary.addTerrainShaders();
 	shaderProgramLibrary.addMainMenuShaders();
+	shaderProgramLibrary.addRefractionShaders();
 }
 
 void Game::initInputOptions()

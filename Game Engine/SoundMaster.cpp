@@ -12,17 +12,14 @@ SoundMasterSFML::SoundMasterSFML(const std::string & filePath)
 
 SoundMasterSFML::~SoundMasterSFML()
 {
+	//delete &this->Buffer;
+	//delete &this->Sound;
 }
 
 void SoundMasterSFML::addSound(const std::string & filePath)
 {
 	if (!this->Buffer.loadFromFile(filePath))
 		std::cout << "Cant Load File" << std::endl;
-
-	this->SampleRate = this->Buffer.getSampleRate();
-	this->Channels = this->Buffer.getChannelCount();
-	this->Duration = this->Buffer.getDuration();
-	this->Samples = this->Buffer.getSamples();
 
 	Sound.setBuffer(Buffer);
 }

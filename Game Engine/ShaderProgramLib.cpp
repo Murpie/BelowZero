@@ -50,6 +50,12 @@ void ShaderProgramLib::addMainMenuShaders()
 	shaders.push_back(newShaderProgram);
 }
 
+void ShaderProgramLib::addRefractionShaders()
+{
+	RefractionShader* newShaderProgram = new RefractionShader();
+	shaders.push_back(newShaderProgram);
+}
+
 void ShaderProgramLib::addUIShaders()
 {
 	UIShaders* newShaderProgram = new UIShaders();

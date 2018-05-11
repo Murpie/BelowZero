@@ -20,12 +20,16 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->vfxSnowShaderProgram = shaderProgram->getShader<VFXSnowShaders>()->vfxSnowShaderProgram;
 	this->terrainShaderProgram = shaderProgram->getShader<TerrainShaders>()->TerrainShaderProgram;
 	this->mainMenuShaderProgram = shaderProgram->getShader<MainMenuShader>()->MainMenuShaderProgram;
+	this->refractionShaderProgram = shaderProgram->getShader<RefractionShader>()->RefractionShaderProgram;
 	//createBuffers();
 	vao = 0;
 	//createBuffers();
 
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
 	//createMainMenuBuffer();
+
+	shatteredIce.CreateTextureData("glassNormalTangent.jpg");
+
 
 }
 
@@ -243,6 +247,22 @@ void RenderManager::createBuffers()
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "SSAO Framebuffer not complete!" << std::endl;
 
+	//... Create PostProccessingbuffer
+	glGenFramebuffers(1, &PPFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
+	glGenTextures(1, &finalPPFBO);
+	glBindTexture(GL_TEXTURE_2D, finalPPFBO);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalPPFBO, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "SSAO Framebuffer not complete!" << std::endl;
+
+
 	//... Create and attach depth and stencil buffer
 	glGenRenderbuffers(1, &finalDepthStensil);
 	glBindRenderbuffer(GL_RENDERBUFFER, finalDepthStensil);
@@ -449,6 +469,11 @@ void RenderManager::Render() {
 
 	//... Clear finalFBO
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	//... Clear PPFBO
+	//... Clear finalFBO
+	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//DIRECTIONAL LIGHT SHADOWMAP PASS-----------------------------------------------------------------------------------------------------------------------
@@ -890,6 +915,9 @@ void RenderManager::Render() {
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
 
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ScreenX"), SCREEN_WIDTH);
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ScreenY"), SCREEN_HEIGHT);
+
 	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)
 	{
@@ -909,6 +937,7 @@ void RenderManager::Render() {
 		lightUniform = "lights[" + std::to_string(i) + "].Quadratic";
 		glUniform1f(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), lightsToRender.at(i)->Quadratic);
 	}
+
 	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gPosition"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
@@ -925,6 +954,7 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, shadowMap);
 
+
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_EQUAL, 1, 0xFF);
 	glStencilMask(0x00); // disable writing to the stencil buffer
@@ -936,11 +966,51 @@ void RenderManager::Render() {
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
 
+	//-----------=====POST PROCESSING====----------------------
+	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
+	glUseProgram(refractionShaderProgram);
+
+
+	glUniform3fv(glGetUniformLocation(refractionShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
+
+	glUniform1i(glGetUniformLocation(refractionShaderProgram, "gPosition"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+
+	glUniform1i(glGetUniformLocation(refractionShaderProgram, "gNormal"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+
+	glUniform1i(glGetUniformLocation(refractionShaderProgram, "iceNormal"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, shatteredIce.gTexture);
+
+	glUniform1i(glGetUniformLocation(refractionShaderProgram, "SceneTexture"), 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
+
+	
+	glUniform1f(glGetUniformLocation(refractionShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
+	glUniform1f(glGetUniformLocation(refractionShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
+	glUniform1f(glGetUniformLocation(refractionShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
+	glUniform1f(glGetUniformLocation(refractionShaderProgram, "food"), gameScene->gameObjects[0]->getPlayer()->food);
+	glUniform1f(glGetUniformLocation(refractionShaderProgram, "fade"), gameScene->gameObjects[0]->getPlayer()->fade);
+
+	glUniform1i(glGetUniformLocation(refractionShaderProgram, "ScreenX"), SCREEN_WIDTH);
+	glUniform1i(glGetUniformLocation(refractionShaderProgram, "ScreenY"), SCREEN_HEIGHT);
+
+	//glBindFramebuffer(GL_READ_FRAMEBUFFER, finalFBO);
+	//glBindFramebuffer(GL_TEXTURE_2D, PPFBO);
+	//glBlitFramebuffer(0, 0, display_w, display_h, 0, 0, display_w, display_h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	//
+	//glBindFramebuffer(GL_READ_FRAMEBUFFER, PPFBO);
+	//glBindTexture(GL_TEXTURE_2D, PPFBO);
+
+	renderQuad();
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 	//... UI -----------------------------------------------------------------------------------------------------------------------------------
-	for (int i = 0; i < gameScene->gameObjects.size(); i++)
-	{
-		if (gameScene->gameObjects[i]->getPlayer() != nullptr)
-		{
+
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glUseProgram(UIShaderProgram);
 
@@ -972,7 +1042,7 @@ void RenderManager::Render() {
 
 			glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 8);
 			glActiveTexture(GL_TEXTURE8);
-			glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
+			glBindTexture(GL_TEXTURE_2D, finalPPFBO);
 
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
@@ -981,13 +1051,11 @@ void RenderManager::Render() {
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0]->getPlayer()->fade);
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0]->getPlayer()->textFade);
 
-			glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
+			//glBindTexture(GL_TEXTURE_2D, finalPPFBO);
 			renderQuad();
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-			break;
-		}
-	}
+
 	clearObjectsToRender();
 	Update();
 }
@@ -1074,6 +1142,76 @@ void RenderManager::renderQuad()
 			{ 1, -1, 1.0f, 0.0f },
 			{ -1, -1, 0.0f, 0.0f },
 			{ -1,  1, 0.0f, 1.0f },
+		};
+
+		unsigned int indices[] = {
+			0,1,3,
+			1,2,3,
+		};
+
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+
+		glEnableVertexAttribArray(0);
+
+		if (vertexPos == -1) {
+			OutputDebugStringA("Error, can't find aPos attribute in vertex shader\n");
+			return;
+		}
+
+		glVertexAttribPointer(
+			0,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(QuadVertex),
+			BUFFER_OFFSET(0)
+		);
+
+		glEnableVertexAttribArray(1);
+
+		if (uvPos == -1) {
+			OutputDebugStringA("Error, cannt find aTexCoords attribute in vertex shader\n");
+			return;
+		}
+
+		glVertexAttribPointer(
+			1,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(QuadVertex),
+			BUFFER_OFFSET(sizeof(float) * 2)
+		);
+
+		//ebo
+		glGenBuffers(1, &ebo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	}
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+}
+
+void RenderManager::renderPPQuad()
+{
+	if (vao == 0)
+	{
+		vertexPos = glGetAttribLocation(refractionShaderProgram, "aPos");
+		uvPos = glGetAttribLocation(refractionShaderProgram, "aTexCoords");
+
+		//create vertices
+		QuadVertex vertices[] = {
+			// pos and normal and uv for each vertex
+		{ 1,  1, 1.0f, 1.0f },
+		{ 1, -1, 1.0f, 0.0f },
+		{ -1, -1, 0.0f, 0.0f },
+		{ -1,  1, 0.0f, 1.0f },
 		};
 
 		unsigned int indices[] = {
