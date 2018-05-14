@@ -28,7 +28,7 @@
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
 
-#define MAX_PARTICLES 10000					//Lower to increase FPS. Small increase in FPS. Minimum value: 1000
+#define MAX_PARTICLES 1000					//Maximum: 1000, Intel NUC can't handle more stack than this
 
 struct QuadVertex
 {
@@ -61,6 +61,7 @@ public:
 	void renderFireParticles();
 	void renderSnowParticles();
 	void dayNightCycle();
+	void renderFlareParticles();
 
 	struct Particle {
 		glm::vec3 pos, speed;
@@ -72,6 +73,7 @@ public:
 
 	Particle fireParticleContainer[MAX_PARTICLES];
 	Particle snowParticleContainer[MAX_PARTICLES];
+	Particle flareParticleContainer[MAX_PARTICLES];
 
 	int FindUnusedParticle(Particle* container, int lastUsedParticle);
 	void ParticleLinearSort(Particle* arr, int size);
@@ -129,20 +131,26 @@ private:
 	unsigned int finalDepthStensil;
 	unsigned int fireTexture;
 	unsigned int snowTexture;
+	unsigned int flareTexture;
 	unsigned int fireVAO;
 	unsigned int snowVAO;
+	unsigned int flareVAO;
 	unsigned int fireVBO;
 	unsigned int snowVBO;
+	unsigned int flareVBO;
 	unsigned int fireParticlePositionBuffer;
 	unsigned int snowParticlePositionBuffer;
+	unsigned int flareParticlePositionBuffer;
 	unsigned int fireParticleColorBuffer;
 	unsigned int snowParticleColorBuffer;
+	unsigned int flareParticleColorBuffer;
 
 	//VFX
 	unsigned int lastUsedParticle = 0;
 	unsigned int particleCount;
 	unsigned int fireParticles = 1;
 	unsigned int snowParticles = 10;
+	unsigned int flareParticles = 1;
 	unsigned int randomizer = 0;
 	float randomX;
 	float randomY;
@@ -154,6 +162,7 @@ private:
 	float defaultZ;
 	float offset;
 	int distanceToParticles = 0;
+	bool flareAlive = false;
 	glm::mat4 viewProjectionMatrix;
 	glm::vec3 startPoint;
 	glm::vec3 randomStartPoint;
@@ -166,8 +175,10 @@ private:
 
 	GLfloat* fireParticlePositionData = 0;
 	GLfloat* snowParticlePositionData = 0;
+	GLfloat* flareParticlePositionData = 0;
 	GLubyte* fireParticleColorData = 0;
 	GLubyte* snowParticleColorData = 0;
+	GLubyte* flareParticleColorData = 0;
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
@@ -193,6 +204,7 @@ private:
 	GLuint terrainShaderProgram;
 	GLuint vfxFireShaderProgram;
 	GLuint vfxSnowShaderProgram;
+	GLuint vfxFlareShaderProgram;
 	GLuint mainMenuShaderProgram;
 
 	int display_w, display_h;

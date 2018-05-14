@@ -13,6 +13,7 @@
 #include "MainMenuShaders.h"
 #include "VFXFireShaders.h"
 #include "VFXSnowShaders.h"
+#include "VFXFlareShaders.h"
 
 class ShaderProgramLib
 {
@@ -27,6 +28,7 @@ public:
 	void addUIShaders();
 	void addVFXFireShaders();
 	void addVFXSnowShaders();
+	void addVFXFlareShaders();
 	void addTerrainShaders();
 	void addMainMenuShaders();
 

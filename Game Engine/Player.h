@@ -17,8 +17,6 @@ public:
 	SoundMasterSFML AmbientWind;
 	SoundMasterSFML Swing;
 
-
-
 	bool click;
 
 	float hp;
@@ -33,10 +31,13 @@ public:
 	float foodTick;
 	float damage;
 	float fade;
+	float winFade;
 	float textFade;
+	float flareTimer;
 
 	bool startGame;
 	bool textOnScreen;
+	bool win;
 	
 	int currentlyEquipedItem;
 	int initializer;
@@ -77,7 +78,7 @@ public:
 	int interactionResponse(const ObjectType::ID id, bool & isAlive);
 	int collisionResponse(const ObjectType::ID);
 	void heatResponse();
-	void takeDamange(float damage);
+	void takeDamange(float damage, float deltaTime);
 
 	float pitch;
 	float yaw;
@@ -91,6 +92,8 @@ private:
 	bool rightCollision = false;
 	bool backCollision = false;
 	bool topCollision = false;
+	bool inInventory[5];
+	bool isPressed;
 
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;

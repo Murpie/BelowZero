@@ -35,6 +35,7 @@ private:
 	void addLevelObjects(MeshLib& meshLibrary, MaterialLib& matertialLibrary, LeapLevel* level);
 	void addTerrain(const std::string & heightMap, GLuint shader);
 	void addMainMenu();
+	void checkInteractionResponse(GameObject & other, int objectID);
 
 	void interactionTest(GameObject & other, GLFWwindow * window); // Intersection test on mouse click
 	void collisionTest(GameObject & other); // Collision test when two AABB overlap

@@ -92,6 +92,7 @@ namespace ObjectType
 		DeadTree_Small,
 		DeadTreeSnow,
 		DeadTreeSnow_Small,
-		Tree_Small_Snow
+		Tree_Small_Snow,
+		FlareGun
 	};
 }

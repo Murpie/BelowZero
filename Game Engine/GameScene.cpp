@@ -26,7 +26,7 @@ void GameScene::update(float deltaTime, float seconds)
 		if (gameObjects[i]->getPlayer() != nullptr)
 		{
 			if (gameObjects[i]->getIsBurning())
-				gameObjects[i]->getPlayer()->takeDamange(0.05f);
+				gameObjects[i]->getPlayer()->takeDamange(5.f, deltaTime);
 
 			for (int j = 0; j < gameObjects.size(); j++)
 			{
@@ -82,7 +82,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("ValleyPropsTest.leap");
+		LeapLevel* level = new LeapLevel("Lvl0.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
 
@@ -98,7 +98,7 @@ void GameScene::initScene(MeshLib & meshLibrary, MaterialLib & matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 
-		LeapLevel* level = new LeapLevel("ValleyProps.leap");
+		LeapLevel* level = new LeapLevel("Lvl0.leap");
 		addLevelObjects(meshLibrary, matertialLibrary, level);
 		delete level;
 	}
@@ -311,6 +311,14 @@ void GameScene::addMainMenu()
 	gameObjects.push_back(MainMenuObject);
 }
 
+void GameScene::checkInteractionResponse(GameObject & other, int objectID)
+{
+	if (objectID == (int)ObjectType::ID::Campfire)
+	{
+		other.setIsBurning(60.0f);
+	}
+}
+
 void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 {
 	for (GameObject* gameObject_ptr : gameObjects)
@@ -333,9 +341,13 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 					{
 						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
 						{
-							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == (int)other.objectID)
+							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::Campfire)
 							{
 								other.setIsBurning(60.0f);
+							}
+							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::FlareGun)
+							{
+								other.setGameEnd();
 							}
 						}
 					}
@@ -366,9 +378,12 @@ void GameScene::collisionTest(GameObject & other)
 							Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
 							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
 							
-							if((int)other.objectID == 3 && other.getIsBurning())
+							if(other.getIsBurning())
 									gameObject_ptr->setIsBurning(5.f);
 							int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
+
+							if (gameObject_ptr->getIsBurning() && !other.getIsBurning())
+								other.setIsBurning(10.f);
 						}
 					}
 				}

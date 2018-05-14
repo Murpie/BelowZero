@@ -9,6 +9,7 @@ GameObject::GameObject()
     hasLight = false;
 	isInteractable = false;
 	isBurning = false;
+	gameEnd = false;
 	timeAlive = 0.0f;
 	timeToBurn = 10.f;
 	modelMatrix = glm::mat4();
@@ -207,6 +208,11 @@ void GameObject::setIsBurning(float timeToBurn)
 	}
 
 	isBurning = true;
+}
+
+void GameObject::setGameEnd()
+{
+	gameEnd = true;
 }
 
 const bool GameObject::getIsBurning()

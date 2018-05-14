@@ -165,6 +165,8 @@ void Game::runState()
 	if (stateOfGame.state == Gamestate::ID::LOAD_MENU || stateOfGame.state == Gamestate::ID::SHOW_MENU || stateOfGame.state == Gamestate::ID::CLEAR_MENU)
 	{
 		menuState();
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
 	}
 	//... Level
 	else if (stateOfGame.state == Gamestate::ID::LOAD_LEVEL || stateOfGame.state == Gamestate::ID::RUN_LEVEL || stateOfGame.state == Gamestate::ID::CLEAR_LEVEL)
@@ -295,6 +297,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addUIShaders();
 	shaderProgramLibrary.addVFXFireShaders();
 	shaderProgramLibrary.addVFXSnowShaders();
+	shaderProgramLibrary.addVFXFlareShaders();
 	shaderProgramLibrary.addTerrainShaders();
 	shaderProgramLibrary.addMainMenuShaders();
 }
@@ -330,7 +333,7 @@ void Game::addMeshName()
 		"Campfire_NoSnow.leap",
 		"WoodenSign.leap",
 		"PineTree.leap",
-		"Pine_Tree_Snow.leap",
+		"PineTree_Snow.leap",
 		"BrokenTree.leap",
 		"BrokenTree_Snow.leap",
 		"IceTaps_1.leap",
@@ -360,7 +363,8 @@ void Game::addMeshName()
 		"DeadTree_Small.leap",
 		"DeadTreeSnow.leap",
 		"DeadTreeSnow_Small.leap",
-		"Tree_Small_Snow.leap"
+		"Tree_Small_Snow.leap",
+		"FlareGun.leap"
 	};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
@@ -385,7 +389,7 @@ void Game::readMeshName(GameScene &scene)
 	if (!texturesLoaded)
 	{
 		materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
-		textureLibrary.addAlbedo("Colors.png");
+		textureLibrary.addAlbedo("Colors_2k.png");
 		materialLibrary.getMaterial(0)->addAlbedo(textureLibrary.getAlbedo(0)->gTexture);
 		texturesLoaded = true;
 	}
