@@ -8,6 +8,8 @@ Light::Light(Transform& transform): Transformable(transform)
 	Linear=0.05;
 	Quadratic=0.15;
 	lightType = -1;
+	offset = 0;
+	intensity = 1;
 }
 
 Light::~Light()

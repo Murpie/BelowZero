@@ -20,6 +20,7 @@ GameObject::GameObject()
 GameObject::~GameObject()
 {
 	deleteAllComponents();
+	
 	delete transform;
 
 	for (bBox* bbox_ptr : bbox)
@@ -132,6 +133,21 @@ void GameObject::addComponent(Component* otherComponent)
  //   updateHasLight();
 }
 
+void GameObject::updateMeshFilter(int id)
+{
+	for (Component* component_ptr : components)
+	{
+		if (component_ptr->id == ComponentType::ID::MESHFILTER)
+		{
+			MeshFilter* meshFilter = static_cast<MeshFilter*>(component_ptr);
+			if (meshFilter->typeID == id)
+			{
+				meshFilterComponent = meshFilter;
+			}
+		}
+	}
+}
+
 /*
 void GameObject::addComponent(Component* otherComponent)
 {
@@ -184,9 +200,11 @@ void GameObject::setIsBurning(float timeToBurn)
 	{
 		fireComponent = new Light(*transform);
 		fireComponent->lightType = 1;
-		fireComponent->color = glm::vec4(.5, .2, 0, .1);
-		fireComponent->Linear = 0;
-		fireComponent->Quadratic = 0.1;
+		fireComponent->color = glm::vec4(0.9, 0.2, 0, .5);
+		fireComponent->Linear = 25;
+		fireComponent->Quadratic = 0.15;
+		fireComponent->offset = 9;
+		fireComponent->intensity = 0.9;
 	}
 
 	isBurning = true;
@@ -238,7 +256,6 @@ glm::mat4 GameObject::getModelMatrix()
 glm::mat4 GameObject::getViewMatrix()
 {
 	return glm::lookAt(transform->position, transform->position + transform->forward, transform->up);
-
 }
 
 Terrain * GameObject::getTerrain()

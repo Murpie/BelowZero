@@ -8,12 +8,15 @@ struct Light {
 	vec3 Position;
 	vec3 Color;
 	int lightType;
+	float intensity;
 	float Linear;
 	float Quadratic;
 };
 
 const int NR_LIGHTS = 32;
 uniform Light lights[NR_LIGHTS];
+
+uniform float daylight;
 
 uniform sampler2D gPosition;
 uniform sampler2D gAlbedo;
@@ -24,7 +27,7 @@ uniform int ScreenX;
 uniform int ScreenY;
 uniform float water;
 
-vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
+vec3 drColor = vec3(0.9f, 1.0f, 0.84f) * daylight;
 vec3 drPosition = vec3(lights[0].Position);
 
 vec3 gridSamplingDisk[20] = vec3[]
@@ -128,18 +131,34 @@ void main()
 
 	for (int i = 0; i < NR_LIGHTS; ++i)
 	{
-		// diffuse
-		vec3 lightDir = normalize(lights[i].Position - FragPos);
-		vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color;
-		//diffuse = Albedo;
+		//dir
+		if (lights[i].lightType == 0) {
+			// diffuse
+			vec3 lightDir = normalize(lights[i].Position - FragPos);
+			vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color;
+			//diffuse = Albedo;
 
-		vec3 halfwayDir = normalize(lightDir + viewDir);
-		float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
+			vec3 halfwayDir = normalize(lightDir + viewDir);
+			float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
 
-		// attenuation
-		float distance = length(lights[i].Position - FragPos);
-		float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
-		lighting += diffuse;
+			// attenuation
+			float distance = length(lights[i].Position - FragPos);
+			float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
+			lighting += diffuse;
+		}
+
+		//point
+		if (lights[i].lightType == 1) {
+			// diffuse
+			vec3 lightDir = normalize(lights[i].Position - FragPos);
+			vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Albedo * lights[i].Color;
+			// attenuation
+			float distance = length(lights[i].Position - FragPos);
+			float attenuation = 1.0 / ((distance * distance) / (lights[i].Linear * lights[i].Linear));
+			//diffuse *= attenuation;
+
+			lighting += (diffuse * attenuation) * lights[i].intensity;
+		}
 	}
 
 	//Test Directional Light
@@ -166,6 +185,6 @@ void main()
 
 
 	FragColor = lighting * (1.0f - shadowFactor);
-	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5, visibility);
-
+	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, FragColor / 1.5, visibility);
+	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
 }

@@ -502,11 +502,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	yaw = xoffset;
 	pitch = yoffset;
 
-	if (pitch > 90.f)
-		pitch = 90.0f;
-	if (pitch < -90.0f)
-		pitch = -90.0f;
-
 	glm::mat4 matrix = glm::mat4(1);
 
 	glm::vec4 forward = glm::vec4(Transformable::transform.forward, 0);
@@ -520,13 +515,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	up = matrix * up;
 	right = matrix * right;
 
-	Transformable::transform.forward.x = forward.x;
-	Transformable::transform.forward.y = forward.y;
-	Transformable::transform.forward.z = forward.z;
+	Transformable::transform.forward = forward;
+	Transformable::transform.right = right;
 
-	Transformable::transform.right.x = right.x;
-	Transformable::transform.right.y = right.y;
-	Transformable::transform.right.z = right.z;
 
 	if (firstMouse) {
 		lastX = (float)xpos;

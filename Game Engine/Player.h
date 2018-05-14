@@ -35,6 +35,8 @@ public:
 	float textFade;
 	float flareTimer;
 
+	std::string equipedItem;
+
 	bool startGame;
 	bool textOnScreen;
 	bool win;
@@ -82,6 +84,9 @@ public:
 	int getEquipedItem();
 	bool addClick;
 
+	float pitch;
+	float yaw;
+
 private:
 
 
@@ -97,8 +102,7 @@ private:
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
-	float pitch;
-	float yaw;
+
 	bool firstMouse;
 	float lastX, lastY;
 	double xpos, ypos;

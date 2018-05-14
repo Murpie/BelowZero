@@ -24,6 +24,12 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->refractionShaderProgram = shaderProgram->getShader<RefractionShader>()->RefractionShaderProgram;
 	//createBuffers();
 	vao = 0;
+	daylight = 1;
+	time = 0;
+	dayOrNight = true;
+	fireFlicker = true;
+	oldPitch = 0;
+	oldYaw = 0;
 	//createBuffers();
 
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
@@ -41,7 +47,6 @@ RenderManager::~RenderManager()
 void RenderManager::FindObjectsToRender() {
 	for (unsigned int i = 0; i < gameScene->gameObjects.size(); i++) {
 		glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
-
 		float distance = length(vectorToObject);
 
 		if (gameScene->gameObjects[i]->getIsRenderable() == true && distance < 83) {
@@ -49,6 +54,7 @@ void RenderManager::FindObjectsToRender() {
 		}
 
 		if (gameScene->gameObjects[i]->hasLight == true) {
+			gameScene->gameObjects[i]->lightComponent->color = glm::vec4(0.85, 0.85, 1.0, 1)*daylight;
 			lightsToRender.push_back(gameScene->gameObjects[i]->lightComponent);
 		}
 		if (gameScene->gameObjects[i]->fireComponent != nullptr)
@@ -486,6 +492,7 @@ void RenderManager::createButtonQuads()
 
 void RenderManager::Render() {
 	FindObjectsToRender();
+	dayNightCycle();
 
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
@@ -518,7 +525,7 @@ void RenderManager::Render() {
 	//... Clear Back Buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, display_w, display_h);
-	glClearColor(0.749, 0.843, 0.823, 1.0f);
+	glClearColor(0.749 * daylight, 0.843 * daylight, 0.823 * daylight, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//... Clear finalFBO
@@ -544,7 +551,6 @@ void RenderManager::Render() {
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
@@ -592,7 +598,9 @@ void RenderManager::Render() {
 	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
 
 	glUseProgram(geometryShaderProgram);
-	
+
+
+
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	//glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
@@ -602,28 +610,36 @@ void RenderManager::Render() {
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
-		//glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "model_matrix"), 1, GL_FALSE, glm::value_ptr(gameObjectsToRender[i]->transform->position));
-
-		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 3)
-			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 1);
-		else
-			glUniform1i(glGetUniformLocation(geometryShaderProgram, "followCamera"), 0);
-
-		
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-		//... Position
-		glm::mat4 tempMatrix = glm::mat4(1);
-		tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
 		//... Rotation, not sure if this works (probably not)
 		// need to calculate radians from rotation vector from maya
-		//float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0,0,0));
-		//float F = glm::pow(oneMinusDot, 5.0);
-		//tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
+		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
+		{
+			glm::vec3 position = glm::vec3(gameScene->gameObjects[0]->transform->position);
+			gameObjectsToRender[i]->transform->position = position;
+
+			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
+			oldYaw = oldYaw - gameScene->gameObjects[0]->getPlayer()->yaw;
+			oldPitch = oldPitch + (gameScene->gameObjects[0]->getPlayer()->pitch * 2.0f);
+			tempMatrix = glm::rotate(tempMatrix, oldYaw, gameScene->gameObjects[0]->transform->up);
+			tempMatrix = glm::rotate(tempMatrix, oldPitch, gameObjectsToRender[i]->transform->right);
+
+		}
+		else
+		{
+			//... Position
+			tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
+			float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0, 0, 0));
+			float F = glm::pow(oneMinusDot, 5.0);
+			tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[i]->transform->rotation);
+		}
+
 		//...
 		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
+	//printf("%f\n", gameObjectsToRender[0]->transform->position.y + gameObjectsToRender[0]->transform->forward.y);
 
 	//... VFX--------------------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
@@ -646,6 +662,25 @@ void RenderManager::Render() {
 			//defaultY = -6.5f;
 			//defaultZ = 601.0f;
 			offset = 40.0f;
+
+			float flickerSpeed = (rand() % 1000) / 100000.0f;
+
+			if (gameObject_ptr->fireComponent->intensity < 1.0 && fireFlicker)
+			{
+				gameObject_ptr->fireComponent->intensity += flickerSpeed;
+				if (gameObject_ptr->fireComponent->intensity >= 1.0)
+				{
+					fireFlicker = false;
+				}
+			}
+			else if (gameObject_ptr->fireComponent->intensity > 0.8 && !fireFlicker)
+			{
+				gameObject_ptr->fireComponent->intensity -= flickerSpeed;
+				if (gameObject_ptr->fireComponent->intensity <= 0.8)
+				{
+					fireFlicker = true;
+				}
+			}
 
 			//Randomizer for the spawn location
 			randomX = gameObject_ptr->transform->position.x + (rand() % 5000 - 2500.0f) / 1000.0f;
@@ -1117,11 +1152,19 @@ void RenderManager::Render() {
 	{
 		//position
 		std::string lightUniform = "lights[" + std::to_string(i) + "].Position";
-		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(lightsToRender.at(i)->transform.position));
+		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(glm::vec3(lightsToRender.at(i)->transform.position.x, lightsToRender.at(i)->transform.position.y + lightsToRender.at(i)->offset, lightsToRender.at(i)->transform.position.z)));
 
 		//Color
 		lightUniform = "lights[" + std::to_string(i) + "].Color";
 		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(lightsToRender.at(i)->color));
+
+		//Attenuation lightType
+		lightUniform = "lights[" + std::to_string(i) + "].lightType";
+		glUniform1i(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), lightsToRender.at(i)->lightType);
+
+		//Attenuation intensity
+		lightUniform = "lights[" + std::to_string(i) + "].intensity";
+		glUniform1f(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), lightsToRender.at(i)->intensity);
 
 		//Attenuation linear
 		lightUniform = "lights[" + std::to_string(i) + "].Linear";
@@ -1130,7 +1173,10 @@ void RenderManager::Render() {
 		//Attenuation quadratic
 		lightUniform = "lights[" + std::to_string(i) + "].Quadratic";
 		glUniform1f(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), lightsToRender.at(i)->Quadratic);
+
 	}
+
+	glUniform1f(glGetUniformLocation(lightpassShaderProgram, "daylight"), daylight);
 
 	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "gPosition"), 0);
 	glActiveTexture(GL_TEXTURE0);
@@ -1606,6 +1652,34 @@ void RenderManager::renderFlareParticles()
 	glVertexAttribDivisor(0, 0);
 	glVertexAttribDivisor(1, 1);
 	glVertexAttribDivisor(2, 1);
+}
+
+void RenderManager::dayNightCycle()
+{
+	if (time > 15 && dayOrNight)
+	{
+		daylight -= deltaTime * 0.02;
+		if (daylight < 0.1)
+		{
+			daylight = 0.1;
+			dayOrNight = false;
+			time = 0;
+		}
+	}
+	else if(time > 15 && !dayOrNight)
+	{
+		daylight += deltaTime * 0.02;
+		if (daylight > 1)
+		{
+			daylight = 1;
+			dayOrNight = true;
+			time = 0;
+		}
+	}
+	else
+	{
+		time += deltaTime;
+	}
 }
 
 void RenderManager::ParticleLinearSort(Particle* arr, int size)
