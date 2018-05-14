@@ -1230,6 +1230,8 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
+	glUniform4fv(glGetUniformLocation(refractionShaderProgram, "vMatrix"), 1, glm::value_ptr(view_matrix));
+
 	
 	glUniform1f(glGetUniformLocation(refractionShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
 	glUniform1f(glGetUniformLocation(refractionShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
