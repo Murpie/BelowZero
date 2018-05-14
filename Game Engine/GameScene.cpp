@@ -94,7 +94,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 	if (typeOfScene == Scene::ID::LEVEL_1)
 	{
 		// Camera - (modify position with level file?)
-		addPlayer(meshLibrary);
+		addPlayer(*meshLibrary);
 		// Lights - (add lights with level file?)
 		addLight(glm::vec3(7, 9, -4), 0);
 		// Terrain
@@ -105,7 +105,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
 
-		addEquipment(meshLibrary, matertialLibrary);
+		addEquipment(*meshLibrary, *matertialLibrary);
 		makeObjectsInteractable();
 	}
 	else if (typeOfScene == Scene::ID::MENU)
@@ -451,14 +451,15 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	//Set mesh object position in world
 	meshObject->transform->position = position;
 	//Calculate new world Y-position from height map and update value
-	float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z) - 2;
+	float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z);
 	meshObject->transform->position.y = newPositionY;
 	//Add new mesh component with data from mesh library
 	MeshFilter* meshFilter = new MeshFilter(
 		meshes->getMesh(key)->gVertexBuffer,
 		meshes->getMesh(key)->gVertexAttribute,
 		meshes->getMesh(key)->leapMesh->getVertexCount(),
-		meshes->getMesh(key)->leapMesh->customMayaAttribute->meshType);
+		meshes->getMesh(key)->leapMesh->customMayaAttribute->meshType,
+		0);
 	meshObject->addComponent(meshFilter);
 	meshObject->meshFilterComponent = meshFilter;
 
