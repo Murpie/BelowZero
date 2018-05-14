@@ -156,7 +156,7 @@ void GameScene::addEquipment(MeshLib & meshLibrary, MaterialLib& materialLibrary
 		gameObject_ptr->name = "Equipment";
 		gameObject_ptr->addComponent(meshFilter);
 		gameObject_ptr->addComponent(materialLibrary.getMaterial(0));
-		if ( i == 0 )
+		if ( i == 1 )
 			gameObject_ptr->setIsRenderable(false);
 		gameObject_ptr->objectID = (ObjectType::ID)equipmenID[i];
 		glm::vec3 position = glm::vec3(gameObjects[0]->transform->position);

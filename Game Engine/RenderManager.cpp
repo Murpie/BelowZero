@@ -33,7 +33,6 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
 	//createMainMenuBuffer();
-
 }
 
 RenderManager::~RenderManager()
@@ -43,8 +42,8 @@ RenderManager::~RenderManager()
 void RenderManager::FindObjectsToRender() {
 	for (unsigned int i = 0; i < gameScene->gameObjects.size(); i++) {
 		glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
-
 		float distance = length(vectorToObject);
+
 		if (gameScene->gameObjects[i]->getIsRenderable() == true && distance < 83) {
 			gameObjectsToRender.push_back(gameScene->gameObjects[i]);
 		}

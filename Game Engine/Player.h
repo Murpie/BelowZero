@@ -35,6 +35,8 @@ public:
 	float textFade;
 	float flareTimer;
 
+	std::string equipedItem;
+
 	bool startGame;
 	bool textOnScreen;
 	bool win;
