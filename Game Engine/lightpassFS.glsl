@@ -22,6 +22,7 @@ uniform sampler2D depthMap;
 uniform mat4 LightSpaceMatrix;
 uniform int ScreenX;
 uniform int ScreenY;
+uniform float water;
 
 vec3 drColor = vec3(0.9f, 1.0f, 0.84f);
 vec3 drPosition = vec3(lights[0].Position);
@@ -35,6 +36,39 @@ vec3 gridSamplingDisk[20] = vec3[]
 	vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
 	);
 
+vec3 getBlur()
+{
+	const float offset = 1.0 / 300.0;
+
+	vec2 blurOffsets[9] = vec2[](
+		vec2(-offset, offset),
+		vec2(0.0f, offset),
+		vec2(offset, offset),
+		vec2(-offset, 0.0f),
+		vec2(0.0f, 0.0f),
+		vec2(offset, 0.0f),
+		vec2(-offset, -offset),
+		vec2(0.0f, -offset),
+		vec2(offset, -offset)
+		);
+
+	float blurKernel[9] = float[](
+		1.0 / 16, 2.0 / 16, 1.0 / 16,
+		2.0 / 16, 4.0 / 16, 2.0 / 16,
+		1.0 / 16, 2.0 / 16, 1.0 / 16
+		);
+
+	vec3 blurSampleTex[9];
+	vec3 blurColor = vec3(0.0);
+
+	for (int i = 0; i < 9; i++)
+		blurSampleTex[i] = vec3(texture(gAlbedo, TexCoords + blurOffsets[i]));
+
+	for (int i = 0; i < 9; i++)
+		blurColor += blurSampleTex[i] * blurKernel[i];
+
+	return blurColor;
+}
 
 // ----------========== DIRECTIONAL LIGHT SHADOW CALCULATION ==========----------
 float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
@@ -70,12 +104,21 @@ float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 
 void main()
 {
-
-
 	// retrieve data from G-buffer
 	vec3 FragPos = texture(gPosition, TexCoords).rgb;
 	vec3 Albedo = texture(gAlbedo, TexCoords).rgb;
 	vec3 Normal = texture(gNormal, TexCoords).rgb;
+
+	float Thirst = water;
+	float thirstVariable = 1.0;
+	if (Thirst <= 50)
+	{
+		thirstVariable = Thirst / 100;
+	}
+	Albedo = mix(getBlur(), Albedo, thirstVariable);
+
+
+
 
 	// then calculate lighting as usual
 	vec3 lighting = vec3(0.0, 0.0, 0.0);

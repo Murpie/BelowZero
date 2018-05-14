@@ -958,6 +958,7 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, shadowMap);
 
+	glUniform1f(glGetUniformLocation(lightpassShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
 
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_EQUAL, 1, 0xFF);

@@ -29,9 +29,12 @@ vec3 gridSamplingDisk[20] = vec3[]
 	);
 
 
+
 void main()
 {
 	float Cold = cold;
+	float Hunger = food;
+	float Thirst = water;
 
 	vec2 texCoords = vec2((gl_FragCoord.x / ScreenX), (gl_FragCoord.y / ScreenY));
 
@@ -49,15 +52,15 @@ void main()
 
 	float _Refraction = 1.3;
 	float _Frensel = 2.0;
-	float _Reflectance  = 1.0;
-	
+	float _Reflectance = 1.0;
+
 	vec3 n = normalize(ice);
 	vec3 v = viewDir;
-	
+
 	float fr = pow(1.0f - dot(v, n), _Frensel) * _Reflectance;
 	vec3 reflectDir = reflect(-v, n);
 	vec3 refractDir = refract(-v, n, _Refraction);
-	
+
 	vec3 reflectColor = texture(SceneTexture, reflectDir.xy).rgb;
 	vec3 refractColor = texture(SceneTexture, refractDir.xy).rgb;
 
@@ -65,18 +68,12 @@ void main()
 	vec3 Mix2 = mix(finalColor, Albedo, 0.8);
 
 
-	//mat4 testMatrix = mat4(1) * projMatrix;
-
-	//ice = vec4(projMatrix * vec4(ice, 1.0)).xyz;
-	//vec3 normalDir = vec4(mat4(1) * normalize(vec4(viewDir, 1.0))).xyz;
-	//ice = normalDir * ice;
 	vec3 bumpTex = 2.0 * texture(iceNormal, texCoords).rgb - 1.0;
 	vec2 newUV = vec2(texCoords.x + bumpTex.x, texCoords.y + bumpTex.y);
 
 	vec3 posDir = normalize(view_position - FragPos);
 	bump = normalize(-viewDir * ice);
 
-	//FragColor = ice;//RefractionVariable * FragColor;
 
 	vec3 Refract = normalize(refract(-viewDir, -bumpTex, 1.75));
 	vec3 Reflect = normalize(reflect(-viewDir, -bumpTex));
@@ -86,7 +83,7 @@ void main()
 	vec3 testAlbedo = (testAlbedo2 * testAlbedo1);
 	vec3 Mix = mix(testAlbedo, Albedo, 0.8);
 	Mix *= vec3(0.33, 0.9, 1.0);
-	
+
 	vec3 itsagoodashow = texture(SceneTexture, newUV).rgb;
 
 
@@ -95,11 +92,26 @@ void main()
 	{
 		coldVariable = Cold / 100;
 	}
-	if (Cold <= 0)
-		Cold = 0;
+
+	float hungerVariable = 1.0;
+	if (Hunger <= 50)
+	{
+		hungerVariable = Hunger / 100;
+	}
+
+	
 
 	vec3 coldTexture = mix(Mix, Albedo, coldVariable);
 
-	FragColor = coldTexture;
+	float grayScale = dot(coldTexture, vec3(0.299, 0.587, 0.114));
+	vec3 grayScaleTexture = vec3(grayScale);
+
+	grayScaleTexture = mix(grayScaleTexture, coldTexture, hungerVariable);
+
+
+
+	//vec3 finalTexture = mix(blurTexture, grayScaleTexture, thirstVariable);
+
+	FragColor = grayScaleTexture;
 
 }

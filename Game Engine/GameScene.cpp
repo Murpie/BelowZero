@@ -103,7 +103,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
 		LeapLevel* level = new LeapLevel("Lvl2.leap");
-		addLevelObjects(meshLibrary, matertialLibrary, level);
+		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
 		makeObjectsInteractable();
 	}
@@ -117,7 +117,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 
 		LeapLevel* level = new LeapLevel("Lvl2.leap");
-		addLevelObjects(meshLibrary, matertialLibrary, level);
+		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
 	}
 	else
