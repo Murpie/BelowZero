@@ -19,6 +19,7 @@ uniform float water;
 uniform float food;
 uniform float fade;
 uniform float winFade;
+uniform float flareTimer;
 uniform float textFade;
 
 void main()
@@ -109,8 +110,8 @@ void main()
 	else if (fade >= 1)
 		color.xyz = vec3(1.0, 1.0, 1.0);
 
-	if (winFade > 0)
+	if (flareTimer > 0)
 	{
-		color.xyz = vec3(winFade, 0.0, 0.0);
+		color.xyz = color.xyz + vec3(winFade, 0.0, 0.0);
 	}
 }

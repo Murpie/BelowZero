@@ -33,9 +33,11 @@ public:
 	float fade;
 	float winFade;
 	float textFade;
+	float flareTimer;
 
 	bool startGame;
 	bool textOnScreen;
+	bool win;
 	
 	int currentlyEquipedItem;
 	int initializer;
@@ -91,7 +93,6 @@ private:
 	bool topCollision = false;
 	bool inInventory[5];
 	bool isPressed;
-	bool win;
 
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;

@@ -26,6 +26,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->maxAmountOfItems = 5;
 	this->fade = 1;
 	this->winFade = 0;
+	this->flareTimer = 0;
 	this->textFade = 1;
 	this->startGame = true;
 	this->isPressed = false;
@@ -391,15 +392,12 @@ void Player::update(float deltaTime, float seconds)
 		this->fade += deltaTime;
 		
 	//Winning
-	if (this->startGame && this->winFade > 0)
-	{
-		this->winFade -= 0.005;
-		if (this->winFade <= 0)
-			this->startGame = false;
-	}
 
-	if (this->win == true && this->winFade < 1)
-		this->winFade += deltaTime;
+	if (this->win == true && this->flareTimer <= 10.0f)
+	{
+		this->flareTimer += deltaTime;
+		this->winFade += deltaTime / 10.0f;
+	}
 
 	// Text Fade
 	if (this->textOnScreen == true)
@@ -696,6 +694,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	if (id == ObjectType::ID::FlareGun)
 	{
 		this->win = true;
+		return 42;
 	}
 	/*
 	if(id == fallenTree && axeIsEquiped)
