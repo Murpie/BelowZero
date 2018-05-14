@@ -251,6 +251,16 @@ void RenderManager::createBuffers()
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "SSAO Framebuffer not complete!" << std::endl;
 
+	//... Create and attach depth and stencil buffer
+	glGenRenderbuffers(1, &finalDepthStensil);
+	glBindRenderbuffer(GL_RENDERBUFFER, finalDepthStensil);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, display_w, display_h);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, finalDepthStensil);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, finalDepthStensil);
+	// finally check if framebuffer is complete
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer not complete!" << std::endl;
+
 	//... Create PostProccessingbuffer
 	glGenFramebuffers(1, &PPFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
@@ -265,17 +275,6 @@ void RenderManager::createBuffers()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalPPFBO, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "SSAO Framebuffer not complete!" << std::endl;
-
-
-	//... Create and attach depth and stencil buffer
-	glGenRenderbuffers(1, &finalDepthStensil);
-	glBindRenderbuffer(GL_RENDERBUFFER, finalDepthStensil);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, display_w, display_h);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, finalDepthStensil);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, finalDepthStensil);
-	// finally check if framebuffer is complete
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "Framebuffer not complete!" << std::endl;
 
 	//.. Create UI Frame Buffer with UI Texture
 	width = 0;
@@ -478,7 +477,7 @@ void RenderManager::Render() {
 	//... Clear PPFBO
 	//... Clear finalFBO
 	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	//DIRECTIONAL LIGHT SHADOWMAP PASS-----------------------------------------------------------------------------------------------------------------------
 	glEnable(GL_CULL_FACE);
@@ -972,9 +971,12 @@ void RenderManager::Render() {
 	glDisable(GL_STENCIL_TEST);
 
 	//-----------=====POST PROCESSING====----------------------
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, finalFBO);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, PPFBO);
+	glBlitFramebuffer(0, 0, display_w, display_h, 0, 0, display_w, display_h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
 	glUseProgram(refractionShaderProgram);
-
 
 	glUniform3fv(glGetUniformLocation(refractionShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
 
