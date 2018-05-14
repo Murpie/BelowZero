@@ -406,6 +406,19 @@ void Player::update(float deltaTime, float seconds)
 		this->textFade -= 0.05;
 	//else if (this->textOnScreen == false)
 	//this->textFade = 1.0;
+
+	if (cold <= 0.0f)
+	{
+		cold = 0.0f;
+	}
+	if (water <= 0.0f)
+	{
+		water = 0.0f;
+	}
+	if (food <= 0.0f)
+	{
+		food = 0.0f;
+	}
 }
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
