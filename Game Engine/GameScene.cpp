@@ -63,6 +63,8 @@ void GameScene::update(float deltaTime, float seconds)
 			gameObjects.erase(gameObjects.begin() + i);
 			//gameObjects[i] = gameObjects.erase(gameObjects[i]);
 		}
+
+		setBurningByDistance(5.f, *gameObjects[i]);
 	}
 
 	//for (auto it = gameObjects.begin(); it != gameObjects.end();)
@@ -516,3 +518,38 @@ void GameScene::addNewObjectTest(GLFWwindow * window)
 	}
 
 }
+
+void GameScene::setBurningByDistance(const float distance, GameObject & other)
+{
+	//todo add timer to start burning
+	//? add objects to a list and check timers each loop if size is bigger than 0;
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->objectID == ObjectType::ID::Campfire &&
+			other.objectID == ObjectType::ID::Campfire &&
+			glm::distance(gameObject_ptr->transform->position, other.transform->position) < distance)
+		{
+			if(gameObject_ptr->getIsBurning())
+				other.setIsBurning(60);
+		}
+	}
+}
+
+void GameScene::meltIceWall(GameObject & other)
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		/*
+		if (gameObject_ptr->objectID == ObjectType::ID::IceWall && other.objectID == ObjectType::ID::Campfire)
+		{
+			if (glm::distance(gameObject_ptr->transform->position, other.transform->position) < 10)
+			{
+				gameObject_ptr->isActive = false;
+				break;
+			}
+		}
+		*/
+	}
+}
+
+
