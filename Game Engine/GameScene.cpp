@@ -142,7 +142,7 @@ void GameScene::addPlayer(MeshLib & meshLibrary)
 void GameScene::addEquipment(MeshLib & meshLibrary, MaterialLib& materialLibrary)
 {
 	//Add Equipment Meshes
-	int equipmenID[] = { 33 };
+	int equipmenID[] = { 33, 34 };
 
 	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++)
 	{
@@ -153,10 +153,11 @@ void GameScene::addEquipment(MeshLib & meshLibrary, MaterialLib& materialLibrary
 			meshLibrary.getMesh(equipmenID[i])->leapMesh->getVertexCount(),
 			meshLibrary.getMesh(equipmenID[i])->meshType,
 			equipmenID[i]);
-		gameObject_ptr->name = "Axe";
+		gameObject_ptr->name = "Equipment";
 		gameObject_ptr->addComponent(meshFilter);
-		gameObject_ptr->setIsRenderable(true);
 		gameObject_ptr->addComponent(materialLibrary.getMaterial(0));
+		if ( i == 0 )
+			gameObject_ptr->setIsRenderable(false);
 		gameObject_ptr->objectID = (ObjectType::ID)equipmenID[i];
 		glm::vec3 position = glm::vec3(gameObjects[0]->transform->position);
 		gameObject_ptr->transform->position = position;
