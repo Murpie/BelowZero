@@ -102,7 +102,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("Lvl2.leap");
+		LeapLevel* level = new LeapLevel("Lvl0.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
 		makeObjectsInteractable();
@@ -244,7 +244,7 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 			}
 			else
 			{
-				float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z) - 2;
+				float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z);
 				meshObject->transform->position.y = newPositionY;
 			}
 			//Add new mesh component with data from mesh library
