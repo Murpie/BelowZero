@@ -24,7 +24,7 @@ void Mesh::CreateMeshData(std::string filePath, GLuint gShaderProgram)
 	//leapMesh = importer.getMesh(filePath.c_str());
 	leapMesh = new LeapMesh(filePath.c_str());
 
-	this->meshType = (int)leapMesh->customMayaAttribute;
+	this->meshType = (int)leapMesh->customMayaAttribute->meshType;
 
 	//vertexCount = leapMesh->getVertexCount();
 

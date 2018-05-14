@@ -26,6 +26,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->maxAmountOfItems = 5;
 	this->fade = 1;
 	this->winFade = 0;
+	this->flareTimer = 0;
 	this->textFade = 1;
 	this->startGame = true;
 	this->isPressed = false;
@@ -391,21 +392,31 @@ void Player::update(float deltaTime, float seconds)
 		this->fade += deltaTime;
 		
 	//Winning
-	if (this->startGame && this->winFade > 0)
-	{
-		this->winFade -= 0.005;
-		if (this->winFade <= 0)
-			this->startGame = false;
-	}
 
-	if (this->win == true && this->winFade < 1)
-		this->winFade += deltaTime;
+	if (this->win == true && this->flareTimer <= 10.0f)
+	{
+		this->flareTimer += deltaTime;
+		this->winFade += deltaTime / 10.0f;
+	}
 
 	// Text Fade
 	if (this->textOnScreen == true)
 		this->textFade -= 0.05;
 	//else if (this->textOnScreen == false)
 	//this->textFade = 1.0;
+
+	if (cold <= 0.0f)
+	{
+		cold = 0.0f;
+	}
+	if (water <= 0.0f)
+	{
+		water = 0.0f;
+	}
+	if (food <= 0.0f)
+	{
+		food = 0.0f;
+	}
 }
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
@@ -491,11 +502,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	yaw = xoffset;
 	pitch = yoffset;
 
-	if (pitch > 90.f)
-		pitch = 90.0f;
-	if (pitch < -90.0f)
-		pitch = -90.0f;
-
 	glm::mat4 matrix = glm::mat4(1);
 
 	glm::vec4 forward = glm::vec4(Transformable::transform.forward, 0);
@@ -509,13 +515,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	up = matrix * up;
 	right = matrix * right;
 
-	Transformable::transform.forward.x = forward.x;
-	Transformable::transform.forward.y = forward.y;
-	Transformable::transform.forward.z = forward.z;
+	Transformable::transform.forward = forward;
+	Transformable::transform.right = right;
 
-	Transformable::transform.right.x = right.x;
-	Transformable::transform.right.y = right.y;
-	Transformable::transform.right.z = right.z;
 
 	if (firstMouse) {
 		lastX = (float)xpos;
@@ -683,6 +685,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	if (id == ObjectType::ID::FlareGun)
 	{
 		this->win = true;
+		return 42;
 	}
 	/*
 	if(id == fallenTree && axeIsEquiped)

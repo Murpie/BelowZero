@@ -94,17 +94,18 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 	if (typeOfScene == Scene::ID::LEVEL_1)
 	{
 		// Camera - (modify position with level file?)
-		addPlayer();
+		addPlayer(*meshLibrary);
 		// Lights - (add lights with level file?)
 		addLight(glm::vec3(7, 9, -4), 0);
-		addLight(glm::vec3(4, 0.4, -2), 1);
 		// Terrain
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("Lvl2.leap");
+		LeapLevel* level = new LeapLevel("Lvl0.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
+
+		addEquipment(*meshLibrary, *matertialLibrary);
 		makeObjectsInteractable();
 	}
 	else if (typeOfScene == Scene::ID::MENU)
@@ -141,7 +142,7 @@ void GameScene::addLight(glm::vec3 transform, int lightType)
 	lightsInScene++;
 }
 
-void GameScene::addPlayer()
+void GameScene::addPlayer(MeshLib & meshLibrary)
 {
 	//Create player object
 	GameObject* playerObject = new GameObject();
@@ -151,9 +152,38 @@ void GameScene::addPlayer()
 	//Add player component
 	Player* player = new Player(*playerObject->transform);
 	playerObject->addComponent(player);
+
 	//Add to scene
 	gameObjects.push_back(playerObject);
 	camerasInScene++;
+}
+
+void GameScene::addEquipment(MeshLib & meshLibrary, MaterialLib& materialLibrary)
+{
+	//Add Equipment Meshes
+	int equipmenID[] = { 33, 34 };
+
+	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++)
+	{
+		GameObject* gameObject_ptr = new GameObject();
+		MeshFilter* meshFilter = new MeshFilter(
+			meshLibrary.getMesh(equipmenID[i])->gVertexBuffer,
+			meshLibrary.getMesh(equipmenID[i])->gVertexAttribute,
+			meshLibrary.getMesh(equipmenID[i])->leapMesh->getVertexCount(),
+			meshLibrary.getMesh(equipmenID[i])->meshType,
+			equipmenID[i]);
+		gameObject_ptr->name = "Equipment";
+		gameObject_ptr->addComponent(meshFilter);
+		gameObject_ptr->addComponent(materialLibrary.getMaterial(0));
+		if ( i == 1 )
+			gameObject_ptr->setIsRenderable(false);
+		gameObject_ptr->objectID = (ObjectType::ID)equipmenID[i];
+		glm::vec3 position = glm::vec3(gameObjects[0]->transform->position);
+		gameObject_ptr->transform->position = position;
+		glm::vec3 rotation = glm::vec3(gameObjects[0]->transform->rotation);
+		gameObject_ptr->transform->rotation = rotation;
+		gameObjects.push_back(gameObject_ptr);
+	}
 }
 
 void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibrary, LeapLevel* level)
@@ -184,7 +214,8 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 						meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer,
 						meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexAttribute,
 						meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->getVertexCount(),
-						meshLibrary.getMesh(level->levelObjects[i]->id)->meshType);
+						meshLibrary.getMesh(level->levelObjects[i]->id)->meshType,
+						level->levelObjects[i]->id);
 					gameObject_ptr->addComponent(meshFilter);
 					//Set player object position in world
 					gameObject_ptr->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
@@ -244,7 +275,7 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 			}
 			else
 			{
-				float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z) - 2;
+				float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z);
 				meshObject->transform->position.y = newPositionY;
 			}
 			//Add new mesh component with data from mesh library
@@ -252,7 +283,8 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer,
 				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexAttribute,
 				meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->getVertexCount(),
-				meshLibrary.getMesh(level->levelObjects[i]->id)->meshType);
+				meshLibrary.getMesh(level->levelObjects[i]->id)->meshType,
+				level->levelObjects[i]->id);
 			meshObject->addComponent(meshFilter);
 			//Add material to gameObject from materialLibrary
 			meshObject->addComponent(materialLibrary.getMaterial(0));
@@ -339,9 +371,13 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 					{
 						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
 						{
-							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == (int)other.objectID)
+							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::Campfire)
 							{
 								other.setIsBurning(60.0f);
+							}
+							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::FlareGun)
+							{
+								other.setGameEnd();
 							}
 						}
 					}
@@ -415,14 +451,15 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	//Set mesh object position in world
 	meshObject->transform->position = position;
 	//Calculate new world Y-position from height map and update value
-	float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z) - 2;
+	float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z);
 	meshObject->transform->position.y = newPositionY;
 	//Add new mesh component with data from mesh library
 	MeshFilter* meshFilter = new MeshFilter(
 		meshes->getMesh(key)->gVertexBuffer,
 		meshes->getMesh(key)->gVertexAttribute,
 		meshes->getMesh(key)->leapMesh->getVertexCount(),
-		meshes->getMesh(key)->leapMesh->customMayaAttribute->meshType);
+		meshes->getMesh(key)->leapMesh->customMayaAttribute->meshType,
+		0);
 	meshObject->addComponent(meshFilter);
 	meshObject->meshFilterComponent = meshFilter;
 

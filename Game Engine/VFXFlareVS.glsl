@@ -28,7 +28,7 @@ void main()
 	vec3 particleCenter_worldspace = center.xyz;
 
 	//vec3 vertexPosition_worldspace = particleCenter_wordspace + cameraRight_worldspace * squareVertices.x * billboardSize.x + vec3(0,-0.8,0) * squareVertices.y * billboardSize.y;
-	vec3 vertexPosition_worldspace = particleCenter_worldspace + cameraRight_worldspace * squareVertices.x * particleSize + vec3(0, -1.0, 0) * squareVertices.y * particleSize;
+	vec3 vertexPosition_worldspace = particleCenter_worldspace + (cameraRight_worldspace * squareVertices.x * particleSize) + (cameraUp_worldspace * -squareVertices.y * particleSize);
 
 	// Output position of the vertex test 2
 	gl_Position = vp * vec4(vertexPosition_worldspace, 1.0f);

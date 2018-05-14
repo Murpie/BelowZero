@@ -31,6 +31,7 @@ public:
     bool isActive;
     bool hasLight;
 	bool isInteractable;
+	bool gameEnd;
 	float timeAlive;
 	ObjectType::ID objectID;
 	std::string name;
@@ -47,6 +48,7 @@ public:
     void updateMaterialAndMeshFilterPointers();
     void updateHasLight();
 	void addComponent(Component* otherComponent);
+	void updateMeshFilter(int id);
 	//void addComponent(Component* otherComponent); // Maybe use this one when everthing works as intended
 	void deleteComponent(Component* otherComponent);
 	void deleteAllComponents();
@@ -54,8 +56,10 @@ public:
     const bool getIsRenderable();
 	void setIsRenderable(bool isRenderable);
 	void setIsBurning(float timeToBurn);
+	void setGameEnd();
 
 	const bool getIsBurning();
+	const bool getGameEnd();
 	
 	Player* getPlayer();
 	glm::mat4 getModelMatrix();
