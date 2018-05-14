@@ -83,6 +83,7 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 		gameObjects[i]->processEvents(window, deltaTime);
 		interactionTest(*gameObjects[i], window);
 		addNewObjectTest(window);
+		addEquipment();
 	}
 }
 
@@ -94,7 +95,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 	if (typeOfScene == Scene::ID::LEVEL_1)
 	{
 		// Camera - (modify position with level file?)
-		addPlayer(*meshLibrary);
+		addPlayer(*meshLibrary, *matertialLibrary);
 		// Lights - (add lights with level file?)
 		addLight(glm::vec3(7, 9, -4), 0);
 		// Terrain
@@ -105,7 +106,6 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
 
-		addEquipment(*meshLibrary, *matertialLibrary);
 		makeObjectsInteractable();
 	}
 	else if (typeOfScene == Scene::ID::MENU)
@@ -142,7 +142,7 @@ void GameScene::addLight(glm::vec3 transform, int lightType)
 	lightsInScene++;
 }
 
-void GameScene::addPlayer(MeshLib & meshLibrary)
+void GameScene::addPlayer(MeshLib & meshLibrary, MaterialLib& materialLibrary)
 {
 	//Create player object
 	GameObject* playerObject = new GameObject();
@@ -153,37 +153,31 @@ void GameScene::addPlayer(MeshLib & meshLibrary)
 	Player* player = new Player(*playerObject->transform);
 	playerObject->addComponent(player);
 
-	//Add to scene
-	gameObjects.push_back(playerObject);
-	camerasInScene++;
-}
-
-void GameScene::addEquipment(MeshLib & meshLibrary, MaterialLib& materialLibrary)
-{
 	//Add Equipment Meshes
 	int equipmenID[] = { 33, 34 };
 
 	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++)
 	{
-		GameObject* gameObject_ptr = new GameObject();
 		MeshFilter* meshFilter = new MeshFilter(
 			meshLibrary.getMesh(equipmenID[i])->gVertexBuffer,
 			meshLibrary.getMesh(equipmenID[i])->gVertexAttribute,
 			meshLibrary.getMesh(equipmenID[i])->leapMesh->getVertexCount(),
 			meshLibrary.getMesh(equipmenID[i])->meshType,
 			equipmenID[i]);
-		gameObject_ptr->name = "Equipment";
-		gameObject_ptr->addComponent(meshFilter);
-		gameObject_ptr->addComponent(materialLibrary.getMaterial(0));
-		if ( i == 1 )
-			gameObject_ptr->setIsRenderable(false);
-		gameObject_ptr->objectID = (ObjectType::ID)equipmenID[i];
-		glm::vec3 position = glm::vec3(gameObjects[0]->transform->position);
-		gameObject_ptr->transform->position = position;
-		glm::vec3 rotation = glm::vec3(gameObjects[0]->transform->rotation);
-		gameObject_ptr->transform->rotation = rotation;
-		gameObjects.push_back(gameObject_ptr);
+		playerObject->addComponent(meshFilter);
+		playerObject->addComponent(materialLibrary.getMaterial(0));
 	}
+
+	//Add to scene
+	gameObjects.push_back(playerObject);
+	camerasInScene++;
+}
+
+void GameScene::addEquipment()
+{
+	if( gameObjects[0]->getPlayer() != nullptr )
+		if (gameObjects[0]->getPlayer()->getEquipedID() != -1)
+			gameObjects[0]->updateMeshFilter(gameObjects[0]->getPlayer()->getEquipedID());
 }
 
 void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibrary, LeapLevel* level)

@@ -82,6 +82,7 @@ public:
 	void heatResponse();
 	void takeDamange(float damage, float deltaTime);
 	int getEquipedItem();
+	const int getEquipedID();
 	bool addClick;
 
 	float pitch;
@@ -102,6 +103,8 @@ private:
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
+
+	int equipedID;
 
 	bool firstMouse;
 	float lastX, lastY;
