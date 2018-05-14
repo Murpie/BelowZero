@@ -200,8 +200,8 @@ void RenderManager::createBuffers()
 	height = 0;
 	nrOfChannels = 0;
 	data = stbi_load("Particle.png", &width, &height, &nrOfChannels, 0);
-	glGenTextures(1, &snowTexture);
-	glBindTexture(GL_TEXTURE_2D, snowTexture);
+	glGenTextures(1, &flareTexture);
+	glBindTexture(GL_TEXTURE_2D, flareTexture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -349,6 +349,14 @@ void RenderManager::deleteData()
 	if (snowParticleColorData != nullptr)
 	{
 		delete snowParticleColorData;
+	}
+	if (flareParticlePositionData != nullptr)
+	{
+		delete flareParticlePositionData;
+	}
+	if (flareParticleColorData != nullptr)
+	{
+		delete flareParticleColorData;
 	}
 }
 
@@ -849,7 +857,7 @@ void RenderManager::Render() {
 				fireParticleContainer[particleIndex].b = 150.0f;*/
 				snowParticleContainer[particleIndex].a = (rand() % 256) / 3;
 
-				snowParticleContainer[particleIndex].size = ((rand() % 750) / 2000.0f) / 1.5f;
+				snowParticleContainer[particleIndex].size = ((rand() % 750) / 2000.0f);
 			}
 		}
 	}
