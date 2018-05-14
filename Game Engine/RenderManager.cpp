@@ -476,9 +476,8 @@ void RenderManager::Render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//... Clear PPFBO
-	//... Clear finalFBO
 	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	//DIRECTIONAL LIGHT SHADOWMAP PASS-----------------------------------------------------------------------------------------------------------------------
 	glEnable(GL_CULL_FACE);
@@ -919,8 +918,6 @@ void RenderManager::Render() {
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
 
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ScreenX"), SCREEN_WIDTH);
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ScreenY"), SCREEN_HEIGHT);
 
 	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)
@@ -974,7 +971,6 @@ void RenderManager::Render() {
 	//-----------=====POST PROCESSING====----------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
 	glUseProgram(refractionShaderProgram);
-
 
 	glUniform3fv(glGetUniformLocation(refractionShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
 
