@@ -65,15 +65,22 @@ void GameScene::update(float deltaTime, float seconds)
 	}
 }
 
+void DoWork()
+{
+
+}
+
 void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 {
+	//std::thread test(addEquipment);
+
 	for (int i = 0; i < gameObjects.size(); i++)
 	{
 		gameObjects[i]->processEvents(window, deltaTime);
 		interactionTest(*gameObjects[i], window);
-		addNewObjectTest(window);
-		addEquipment();
 	}
+	addEquipment();
+	addNewObjectTest(window);
 }
 
 void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary, ShaderProgramLib & shader, Scene::ID typeOfScene)
