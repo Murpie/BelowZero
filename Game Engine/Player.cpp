@@ -68,7 +68,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	AmbientWind.playSound();
 	AmbientWind.loop(true);
 
-	AmbientMusic.addSound("AmbientMusic1.wav");
+	//AmbientMusic.addSound("AmbientMusic1.wav");
 	AmbientMusic.setVolume(50.0f);
 	AmbientMusic.playSound();
 	AmbientMusic.loop(true);
