@@ -216,21 +216,21 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 						(int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 3)
 						gameObject_ptr->isInteractable = true;
 					//Add BBox from leapmesh to player object
-					for (int i = 0; i < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); i++)
+					for (int j = 0; j < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); j++)
 					{
 						bBox* box = new bBox();
 						//add center
-						box->center.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[0];
-						box->center.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[1];
-						box->center.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[2];
+						box->center.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->center[0];
+						box->center.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->center[1];
+						box->center.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->center[2];
 						//add max vector
-						box->vMax.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[0];
-						box->vMax.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[1];
-						box->vMax.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[2];
+						box->vMax.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->maxVector[0];
+						box->vMax.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->maxVector[1];
+						box->vMax.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->maxVector[2];
 						//add min vector
-						box->vMin.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[0];
-						box->vMin.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[1];
-						box->vMin.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[2];
+						box->vMin.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->minVector[0];
+						box->vMin.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->minVector[1];
+						box->vMin.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->minVector[2];
 						//push into gameobject
 						gameObject_ptr->bbox.push_back(box);
 					}
