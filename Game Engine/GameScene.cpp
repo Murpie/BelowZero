@@ -61,21 +61,8 @@ void GameScene::update(float deltaTime, float seconds)
 		{
 			delete gameObjects[i];
 			gameObjects.erase(gameObjects.begin() + i);
-			//gameObjects[i] = gameObjects.erase(gameObjects[i]);
 		}
-
-		setBurningByDistance(5.f, *gameObjects[i]);
 	}
-
-	//for (auto it = gameObjects.begin(); it != gameObjects.end();)
-	//{
-	//	if ((*it)->isActive == false)
-	//	{
-	//		delete *it;
-	//		it = gameObjects.erase(it);
-	//	}
-	//}
-
 }
 
 void GameScene::processEvents(GLFWwindow * window, float deltaTime)
@@ -433,7 +420,6 @@ void GameScene::makeObjectsInteractable()
 	}
 }
 
-
 void GameScene::addGameObject(const glm::vec3 position, const int key)
 {
 	Terrain* terrain;
@@ -489,6 +475,13 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	meshObject->setIsRenderable(true);
 	//Add to scene
 	gameObjects.push_back(meshObject);
+	//...
+	//Check if we created a new campfire and makes stuff happen if true
+	if (gameObjects[gameObjects.size() - 1]->objectID == ObjectType::ID::Campfire)
+	{
+		setBurningByDistance(5.f, *gameObjects[gameObjects.size() - 1]);
+		meltIceWall(*gameObjects[gameObjects.size() - 1]);
+	}
 
 }
 
@@ -533,16 +526,17 @@ void GameScene::meltIceWall(GameObject & other)
 {
 	for (GameObject* gameObject_ptr : gameObjects)
 	{
-		/*
 		if (gameObject_ptr->objectID == ObjectType::ID::IceWall && other.objectID == ObjectType::ID::Campfire)
 		{
-			if (glm::distance(gameObject_ptr->transform->position, other.transform->position) < 10)
+			// Check distance between campfire and icewall
+			// todo start timer in game object or similar.
+			// todo move icewall -y until it's under map and then delete it
+			if (glm::distance(gameObject_ptr->transform->position, other.transform->position) < 15)
 			{
 				gameObject_ptr->isActive = false;
 				break;
 			}
 		}
-		*/
 	}
 }
 

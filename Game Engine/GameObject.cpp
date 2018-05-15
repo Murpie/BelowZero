@@ -10,6 +10,8 @@ GameObject::GameObject()
 	isInteractable = false;
 	isBurning = false;
 	gameEnd = false;
+	this->moveBelowTerrain = false;
+	timeLimit = 0.f;
 	timeAlive = 0.0f;
 	timeToBurn = 10.f;
 	modelMatrix = glm::mat4();
@@ -48,6 +50,8 @@ void GameObject::update(float deltaTime, float seconds)
 			}
 		}
 	}
+	if (moveBelowTerrain)
+		moveBelowTerrain(deltaTime);
 
 	for (Component* components_ptr : components)
 	{
@@ -243,6 +247,15 @@ MainMenuScene * GameObject::getMenuScene()
 		}
 	}
 	return nullptr;
+}
+
+void GameObject::moveBelowTerrain(float deltaTime)
+{
+	timeLimit += deltaTime;
+	if (timeLimit > 10)
+		isActive = false;
+
+	transform->position.y -= 1 * deltaTime;
 }
 
 glm::mat4 GameObject::getModelMatrix()
