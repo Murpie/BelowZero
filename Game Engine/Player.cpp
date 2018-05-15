@@ -478,10 +478,10 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		firstMouse = false;
 	}
 
-	if (ypos >= 600.0)
+	/*if (ypos >= 600.0)
 		ypos = 600.0;
 	if (ypos <= 5.0)
-		ypos = 5.0;
+		ypos = 5.0;*/
 
 	xoffset = lastX - (float)xpos;
 	yoffset = lastY - (float)ypos;

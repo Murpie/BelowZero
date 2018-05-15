@@ -27,6 +27,10 @@
 #define LOW_SHADOW 1024
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
+#define SUPER_SHADOW 8192
+#define ULTRA_SHADOW 16384
+
+#define CASCADESPLITS 3
 
 #define MAX_PARTICLES 10000					//Lower to increase FPS. Small increase in FPS. Minimum value: 1000
 
@@ -59,7 +63,8 @@ public:
 	void setSeconds(float seconds);
 	void setupMatrices(unsigned int shaderToUse);
 	void setupMeshY();
-	void calculateShadowLightPos();
+	void calculateOrthoProjectionMatrices(unsigned int shaderToUse);
+	void setOrthoProjectionMatrix(int index);
 	void renderFireParticles();
 	void renderSnowParticles();
 
@@ -76,6 +81,9 @@ public:
 
 	int FindUnusedParticle(Particle* container, int lastUsedParticle);
 	void ParticleLinearSort(Particle* arr, int size);
+
+	void bindForWriting(int cascadeIndex);
+	void bindForReading();
 
 private:
 
@@ -111,7 +119,6 @@ private:
 	//Buffers
 	unsigned int UIFBO;
 	unsigned int UITexture;
-	unsigned int shadowMap;
 	unsigned int shadowFBO;
 	unsigned int animationVAO;
 	unsigned int animationVBO;
@@ -195,4 +202,19 @@ private:
 	int display_w, display_h;
 	unsigned int vertexPos;
 	unsigned int uvPos;
+
+	//Shadow
+	glm::vec4 vView;
+	glm::vec4 vClip;
+
+	glm::mat4 lightProjection;
+	glm::mat4 lightView;
+	glm::mat4 lightSpaceMatrices[3];
+	glm::mat4 inverseViewMatrix;
+
+	float cascadePlaneEnds[4];
+	float cascadesInClipSpace[3];
+	float shadowOrthoProjInfo[3][6];
+	unsigned int shadowMaps[3];
+
 };

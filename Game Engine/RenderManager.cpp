@@ -27,6 +27,11 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
 	//createMainMenuBuffer();
 
+	cascadePlaneEnds[0] = 0.1f;
+	cascadePlaneEnds[1] = 50.0f;
+	cascadePlaneEnds[2] = 100.0f;
+	cascadePlaneEnds[3] = 150.0f;
+
 }
 
 RenderManager::~RenderManager()
@@ -71,10 +76,10 @@ void RenderManager::createBuffers()
 	glfwGetFramebufferSize(window, &display_w, &display_h);
 
 	//----------========== ShadowMap FBO DIRECTIONAL LIGHTS ==========----------
-	glGenFramebuffers(1, &shadowFBO);
+	/*glGenFramebuffers(1, &shadowFBO);
 	glGenTextures(1, &shadowMap);
 	glBindTexture(GL_TEXTURE_2D, shadowMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, HIGH_SHADOW, HIGH_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SUPER_SHADOW, SUPER_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -86,7 +91,29 @@ void RenderManager::createBuffers()
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
+
+	// ----------========== CASCADED SHADOW MAPS ==========----------
+	glGenFramebuffers(1, &shadowFBO);
+	glGenTextures(3, shadowMaps);
+	for (int i = 0; i < 3; i++) {
+		glBindTexture(GL_TEXTURE_2D, shadowMaps[i]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, display_w, display_h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMaps[0], 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Cascaded Shadow Framebuffer not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 	//VFX
 	fireParticlePositionData = new GLfloat[MAX_PARTICLES * 4];
@@ -450,42 +477,44 @@ void RenderManager::Render() {
 	//... Clear finalFBO
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	
+	// CASCADED SHADOWMAP PASS-----------------------------------------------------------------
 
-	//DIRECTIONAL LIGHT SHADOWMAP PASS-----------------------------------------------------------------------------------------------------------------------
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	glUseProgram(shadowMapShaderProgram);
-	setupMatrices(shadowMapShaderProgram); //? what is gameObject[2] supposed to be?
-	glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
+	glUseProgram(shadowMapShaderProgram); //? what is gameObject[2] supposed to be?
+	glViewport(0, 0, display_w, display_h);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+	calculateOrthoProjectionMatrices(shadowMapShaderProgram);
 
-	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
+	for (int i = 0; i < CASCADESPLITS; i++)
 	{
+		bindForWriting(i);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
-		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
-		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
-	}
-	for (int i = 0; i < gameScene->gameObjects.size(); i++)
-	{
-		if (gameScene->gameObjects[i]->getTerrain() != nullptr)
+		setOrthoProjectionMatrix(i);
+
+		for (unsigned int j = 0; j < gameObjectsToRender.size(); j++)
 		{
-			gameScene->gameObjects[i]->getTerrain()->bindVertexArray();
-			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
+			glm::mat4 tempMatrix = glm::mat4(1);
+			tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[j]->transform->position);
+			float oneMinusDot = 1 - glm::dot(gameObjectsToRender[j]->transform->rotation, glm::vec3(0, 0, 0));
+			float F = glm::pow(oneMinusDot, 5.0);
+			tempMatrix = glm::rotate(tempMatrix, glm::radians(F), gameObjectsToRender[j]->transform->rotation);
+			glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
+
+			gameObjectsToRender[j]->meshFilterComponent->bindVertexArray();
+			glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[j]->meshFilterComponent->vertexCount);
 		}
 	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glViewport(0, 0, display_w, display_h);
-
-	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
-	
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	//... Terrain PASS-----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -885,10 +914,11 @@ void RenderManager::Render() {
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glUseProgram(lightpassShaderProgram);
-	setupMatrices(lightpassShaderProgram);
 
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
+	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "player_position"), 1, glm::value_ptr(positionForShadowToLookAt));
+
 
 	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)
@@ -921,9 +951,28 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, gNormal);
 
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "depthMap"), 3);
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "shadowMap0"), 3);
 	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, shadowMap);
+	glBindTexture(GL_TEXTURE_2D, shadowMaps[0]);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "shadowMap1"), 4);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, shadowMaps[1]);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "shadowMap2"), 5);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, shadowMaps[2]);
+	
+	for (int i = 0; i < CASCADESPLITS; i++)
+	{
+		std::string cT = "cascadeEndClipSpace[" + std::to_string(i) + "]";
+		glUniform1i(glGetUniformLocation(lightpassShaderProgram, cT.c_str()), vClip.z);
+	}
+	for (int i = 0; i < CASCADESPLITS; i++)
+	{
+		std::string lT = "lightSpaceMatrix[" + std::to_string(i) + "]";
+		glUniformMatrix4fv(glGetUniformLocation(lightpassShaderProgram, lT.c_str()), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrices[i]));
+	}
 
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_EQUAL, 1, 0xFF);
@@ -988,6 +1037,7 @@ void RenderManager::Render() {
 			break;
 		}
 	}
+
 	clearObjectsToRender();
 	Update();
 }
@@ -1132,25 +1182,100 @@ void RenderManager::renderQuad()
 
 void RenderManager::setupMatrices(unsigned int shaderToUse)
 {
+
+}
+
+void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
+{
+
 	glUseProgram(shaderToUse);
 
-	for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	/*for (int i = 0; i < gameScene->gameObjects.size(); i++)
 	{
 		if (gameScene->gameObjects[i]->getPlayer() != nullptr)
 		{
 			positionForShadowToLookAt = gameScene->gameObjects[i]->getPlayer()->Transformable::transform.position;
-			shadowLightPos.x = positionForShadowToLookAt.x - 2.0;
+			//printf("\n%.2f, %.2f, %.2f\n", gameScene->gameObjects[i]->getPlayer()->Transformable::transform.position.x, gameScene->gameObjects[i]->getPlayer()->Transformable::transform.position.y, gameScene->gameObjects[i]->getPlayer()->Transformable::transform.position.z);
+			shadowLightPos.x = positionForShadowToLookAt.x - 9.0;
 			shadowLightPos.y = positionForShadowToLookAt.y + 5.0;
 			shadowLightPos.z = positionForShadowToLookAt.z;
 			break;
 		}
+	}*/
+
+	//glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+	// ----------========== CASCADED SHADOWS ==========----------
+	view_matrix = gameScene->gameObjects[0]->getViewMatrix();
+	inverseViewMatrix = glm::inverse(view_matrix);
+	lightView = glm::lookAt(glm::vec3(0.0, 8.0, 0.0), glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	float fieldOfView = 45.0f;
+
+
+	float aspectRatio = display_h / display_w;
+	float tanHalfHeightFOV = tanf(glm::radians(fieldOfView / 2.0f));
+	float tanHalfWidthFOV = tanf(glm::radians((fieldOfView * aspectRatio) / 2.0f));
+
+	for (int i = 0; i < CASCADESPLITS; i++)
+	{
+		float xn = cascadePlaneEnds[i] * tanHalfHeightFOV;
+		float xf = cascadePlaneEnds[i + 1] * tanHalfHeightFOV;
+		float yn = cascadePlaneEnds[i] * tanHalfWidthFOV;
+		float yf = cascadePlaneEnds[i + 1] * tanHalfWidthFOV;
+
+		glm::vec4 frustrumCorners[8]
+		{
+			glm::vec4(xn, yn, cascadePlaneEnds[i], 1.0f),
+			glm::vec4(-xn, yn, cascadePlaneEnds[i], 1.0f),
+			glm::vec4(xn, -yn, cascadePlaneEnds[i], 1.0f),
+			glm::vec4(-xn, -yn, cascadePlaneEnds[i], 1.0f),
+
+			glm::vec4(xf, yf, cascadePlaneEnds[i + 1], 1.0f),
+			glm::vec4(-xf, yf, cascadePlaneEnds[i + 1], 1.0f),
+			glm::vec4(xf, -yf, cascadePlaneEnds[i + 1], 1.0f),
+			glm::vec4(-xf, -yf, cascadePlaneEnds[i + 1], 1.0f)
+		};
+
+		glm::vec4 worldSpaceFrustrumCorners[8];
+
+		float minX = std::numeric_limits<float>::max();
+		float maxX = std::numeric_limits<float>::min();
+		float minY = std::numeric_limits<float>::max();
+		float maxY = std::numeric_limits<float>::min();
+		float minZ = std::numeric_limits<float>::max();
+		float maxZ = std::numeric_limits<float>::min();
+
+		for (int j = 0; j < 8; j++)
+		{
+			glm::vec4 vW = inverseViewMatrix * frustrumCorners[j];
+			worldSpaceFrustrumCorners[j] = lightView * vW;
+
+			minX = min(minX, worldSpaceFrustrumCorners[j].x);
+			maxX = max(maxX, worldSpaceFrustrumCorners[j].x);
+			minY = min(minY, worldSpaceFrustrumCorners[j].y);
+			maxY = max(maxY, worldSpaceFrustrumCorners[j].y);
+			minZ = min(minZ, worldSpaceFrustrumCorners[j].z);
+			maxZ = max(maxZ, worldSpaceFrustrumCorners[j].z);
+		}
+
+		shadowOrthoProjInfo[i][0] = maxX;
+		shadowOrthoProjInfo[i][1] = minX;
+		shadowOrthoProjInfo[i][2] = maxY;
+		shadowOrthoProjInfo[i][3] = minY;
+		shadowOrthoProjInfo[i][4] = maxZ;
+		shadowOrthoProjInfo[i][5] = minZ;
+		
+		vView = glm::vec4(0.0f, 0.0f, cascadePlaneEnds[i + 1], 1.0f);
+		vClip = view_matrix * vView;
+		cascadesInClipSpace[i] = vClip.z;
+
 	}
+}
 
-	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 45.0f);
-	glm::mat4 lightView = glm::lookAt(shadowLightPos, positionForShadowToLookAt, glm::vec3(0.0, 1.0, 0.0));
-	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
-	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+void RenderManager::setOrthoProjectionMatrix(int index)
+{
+	lightProjection = glm::ortho(shadowOrthoProjInfo[index][1], shadowOrthoProjInfo[index][0], -shadowOrthoProjInfo[index][3], shadowOrthoProjInfo[index][2], shadowOrthoProjInfo[index][5], shadowOrthoProjInfo[index][4]);
+	lightSpaceMatrices[index] = lightProjection * lightView;
 }
 
 void RenderManager::renderFireParticles()
@@ -1256,6 +1381,13 @@ void RenderManager::ParticleLinearSort(Particle* arr, int size)
 	}
 }
 
+void RenderManager::bindForWriting(int cascadeIndex)
+{
+	assert(cascadeIndex < 3);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, shadowFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMaps[cascadeIndex], 0);
+}
+
 int RenderManager::FindUnusedParticle(Particle* container, int lastUsedParticle)
 {
 	for (int i = lastUsedParticle; i < MAX_PARTICLES; i++)
@@ -1274,12 +1406,6 @@ int RenderManager::FindUnusedParticle(Particle* container, int lastUsedParticle)
 		}
 	}
 	return 0;
-}
-
-void RenderManager::calculateShadowLightPos()
-{
-
-	//glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 }
 
 void RenderManager::Update()
