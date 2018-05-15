@@ -616,15 +616,11 @@ void RenderManager::Render() {
 		// need to calculate radians from rotation vector from maya
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
 		{
-			glm::vec3 position = glm::vec3(gameScene->gameObjects[0]->transform->position);
-			gameObjectsToRender[i]->transform->position = position;
-
 			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
-			oldYaw = oldYaw - gameScene->gameObjects[0]->getPlayer()->yaw;
-			oldPitch = oldPitch + (gameScene->gameObjects[0]->getPlayer()->pitch * 2.0f);
-			tempMatrix = glm::rotate(tempMatrix, oldYaw, gameScene->gameObjects[0]->transform->up);
-			tempMatrix = glm::rotate(tempMatrix, oldPitch, gameObjectsToRender[i]->transform->right);
-
+			oldYaw = oldYaw - gameObjectsToRender[i]->getPlayer()->yaw;
+			oldPitch = oldPitch + (gameObjectsToRender[i]->getPlayer()->pitch);
+			tempMatrix = glm::rotate(tempMatrix, oldYaw, glm::vec3(0,1,0));
+			tempMatrix = glm::rotate(tempMatrix, oldPitch, glm::vec3(0, 0, 1));
 		}
 		else
 		{
@@ -1655,7 +1651,7 @@ void RenderManager::renderFlareParticles()
 
 void RenderManager::dayNightCycle()
 {
-	if (time > 15 && dayOrNight)
+	if (time > 300 && dayOrNight)
 	{
 		daylight -= deltaTime * 0.02;
 		if (daylight < 0.1)
@@ -1665,7 +1661,7 @@ void RenderManager::dayNightCycle()
 			time = 0;
 		}
 	}
-	else if(time > 15 && !dayOrNight)
+	else if(time > 120 && !dayOrNight)
 	{
 		daylight += deltaTime * 0.02;
 		if (daylight > 1)

@@ -346,7 +346,7 @@ void Game::addMeshName()
 		"Can.leap", // Bucket_snow
 		"Stump.leap",
 		"Tree.leap",
-		"TreeWithSnow.leap",
+		"Tree_Snow.leap",
 		"FlareGunBox.leap",
 		"Axe.leap",
 		"Jacket.leap",
