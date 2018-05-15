@@ -41,10 +41,12 @@ Player::Player(Transform& transform) : Transformable(transform)
 	/**/
 	assetName = "CharacterMovement";
 	cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-	cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
 	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	pitch = 0;
 	yaw = 0;
+	oldPitch = 0;
+	oldYaw = 0;
 	firstMouse = true;
 	lastX = 400;
 	lastY = 300;
@@ -551,30 +553,30 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	glm::mat4 matrix = glm::mat4(1);
 
-	glm::vec4 forward = normalize(glm::vec4(Transformable::transform.forward, 0));
-	glm::vec4 right = normalize(glm::vec4(Transformable::transform.right, 0));
-	glm::vec4 up = normalize(glm::vec4(Transformable::transform.up, 0));
 
-	matrix = glm::rotate(matrix, pitch, Transformable::transform.right);
-	matrix = glm::rotate(matrix, -yaw, Transformable::transform.up);
+	oldYaw = oldYaw - yaw;
+	oldPitch = oldPitch + pitch;
 
-	forward = matrix * forward;
-	right = matrix * right;
-
-//	up = glm::vec4(glm::cross(glm::vec3(right), glm::vec3(forward)), 0);
-	//if ((glm::dot(Transformable::transform.forward, Transformable::transform.up) < 0.9f && pitch > 0.0f) || (glm::dot(Transformable::transform.forward, Transformable::transform.up) > -0.9f && pitch < 0.0f))
-	Transformable::transform.forward = forward;
-	//else
-	//	pitch = 0;
-//	Transformable::transform.up = up;
+	matrix = glm::rotate(matrix, -oldYaw, Transformable::transform.up);
+	glm::vec4 right = glm::vec4(matrix[0][0], matrix[1][0], matrix[2][0], 0);
 	Transformable::transform.right = right;
 
+	if (oldPitch < 1.48f && oldPitch > -1.48f)
+	{
+		matrix = glm::rotate(matrix, oldPitch, Transformable::transform.right);
+		glm::vec4 forward = glm::vec4(matrix[0][2], matrix[1][2], matrix[2][2], 0);
+		Transformable::transform.forward = forward;
+	}
+	else if (oldPitch > 1.48f)
+	{
+		oldPitch = 1.48f;
+	}
+	else if (oldPitch < -1.48f)
+	{
+		oldPitch = -1.48f;
+	}
 
-
-	//Transformable::transform.up = up;
-
-	//printf("%f, %f, %f\n", Transformable::transform.right.x, Transformable::transform.right.y, Transformable::transform.right.z);
-	//printf("%f,\n", glm::radians(pitch));
+	printf("%f\n", oldPitch);
 
 	if (firstMouse) {
 		lastX = (float)xpos;
@@ -636,8 +638,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			isWalking = true;
 
 		float tempY = Transformable::transform.position.y;
-		direction -= Transformable::transform.right;
-		Transformable::transform.position -= Transformable::transform.right * cameraSpeed * deltaTime;
+		direction += Transformable::transform.right;
+		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;
@@ -649,8 +651,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			isWalking = true;
 
 		float tempY = Transformable::transform.position.y;
-		direction += Transformable::transform.right;
-		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
+		direction -= Transformable::transform.right;
+		Transformable::transform.position -= Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;

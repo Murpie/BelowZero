@@ -86,8 +86,8 @@ public:
 	const int getEquipedID();
 	bool addClick;
 
-	float pitch;
-	float yaw;
+	float oldPitch;
+	float oldYaw;
 	float pickUp;
 
 private:
@@ -118,6 +118,8 @@ private:
 	float xoffset;
 	float yoffset;
 	float sensitivity;
+	float pitch;
+	float yaw;
 
 	float time = 0.0;
 	float textTimer = 0.0;
