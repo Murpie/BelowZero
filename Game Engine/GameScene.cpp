@@ -156,7 +156,6 @@ void GameScene::addPlayer(MeshLib & meshLibrary, MaterialLib& materialLibrary)
 		playerObject->addComponent(meshFilter);
 		playerObject->addComponent(materialLibrary.getMaterial(0));
 	}
-
 	//Add to scene
 	gameObjects.push_back(playerObject);
 	camerasInScene++;

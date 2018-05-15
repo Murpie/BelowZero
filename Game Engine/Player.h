@@ -68,6 +68,7 @@ public:
 	void addImageToInventory(std::string item, int inventorySlot);
 	bool checkInventory(std::string item);
 	void addTextToScreen(std::string item);
+	void swappingItem(float deltaTime);
 
 	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
 	void setCurrentHeight(float height);
@@ -87,6 +88,7 @@ public:
 
 	float pitch;
 	float yaw;
+	float pickUp;
 
 private:
 
@@ -105,6 +107,9 @@ private:
 	glm::vec3 cameraUp;
 
 	int equipedID;
+	bool swapItem;
+	bool pullDown;
+	int equipItem;
 
 	bool firstMouse;
 	float lastX, lastY;

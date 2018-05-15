@@ -9,6 +9,9 @@ Player::Player(Transform& transform) : Transformable(transform)
 
 	this->currentlyEquipedItem = -1;
 	this->equipedID = -1;
+	this->pickUp = -1;
+	this->swapItem = false;
+	this->pullDown = false;
 
 	this->hp = 80;
 	this->cold = 100;
@@ -296,6 +299,30 @@ void Player::addTextToScreen(std::string item)
 
 }
 
+void Player::swappingItem(float deltaTime)
+{
+	if (swapItem)
+	{
+		if (!pullDown)
+		{
+			if (pickUp >= 0)
+				swapItem = false;
+			else
+				pickUp += deltaTime * 2;
+		}
+		else
+		{
+			if (pickUp <= -1)
+			{
+				pullDown = false;
+				this->equipedID = equipItem;
+			}
+			else
+				pickUp -= deltaTime * 2;
+		}
+	}
+}
+
 void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
 {
 	this->currentY = currentHeight;
@@ -328,6 +355,7 @@ void Player::update(float deltaTime, float seconds)
 	//update velocity
 	//Transformable::transform.velocity = Transformable::transform.forward * deltaTime;
 	//...
+	swappingItem(deltaTime);
 
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
@@ -447,25 +475,29 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			addImageToInventory("EmptyImage", i);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !isPressed)
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 0)
 	{
 		equip("AxeIcon");
 		this->currentlyEquipedItem = 0;
-		this->equipedID = 33;
+		this->equipItem = 33;
 		addImageToInventory("InventoryAxeIcon", 0);
 		inInventory[0] = true;
 		isPressed = true;
+		swapItem = true;
+		pullDown = true;
 	}
-	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !isPressed)
+	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 1)
 	{
 		equip("LighterIcon");
 		this->currentlyEquipedItem = 1;
-		this->equipedID = 44;
+		this->equipItem = 44;
 		addImageToInventory("InventoryLighterIcon", 1);
 		inInventory[1] = true;
 		isPressed = true;
+		swapItem = true;
+		pullDown = true;
 	}
-	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !isPressed)
+	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 2)
 	{
 		if (inInventory[2] == true)
 		{
@@ -473,7 +505,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			isPressed = true;
 		}
 	}
-	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && !isPressed)
+	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 3)
 	{
 		equip("FoodIcon");
 		this->currentlyEquipedItem = 3;
@@ -481,14 +513,16 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		inInventory[3] = true;
 		isPressed = true;
 	}
-	else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && !isPressed)
+	else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 4)
 	{
 		equip("BucketIcon");
 		this->currentlyEquipedItem = 4;
-		this->equipedID = 34;
+		this->equipItem = 34;
 		addImageToInventory("InventoryBucketIcon", 4);
 		inInventory[4] = true;
 		isPressed = true;
+		swapItem = true;
+		pullDown = true;
 	}
 	else if (  glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE
 			&& glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_4) == GLFW_RELEASE

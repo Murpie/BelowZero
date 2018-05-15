@@ -620,7 +620,7 @@ void RenderManager::Render() {
 			oldYaw = oldYaw - gameObjectsToRender[i]->getPlayer()->yaw;
 			oldPitch = oldPitch + (gameObjectsToRender[i]->getPlayer()->pitch);
 			tempMatrix = glm::rotate(tempMatrix, oldYaw, glm::vec3(0,1,0));
-			tempMatrix = glm::rotate(tempMatrix, oldPitch, glm::vec3(0, 0, 1));
+			tempMatrix = glm::rotate(tempMatrix, oldPitch + gameObjectsToRender[i]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
 		}
 		else
 		{
