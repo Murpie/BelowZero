@@ -88,7 +88,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		// Lights - (add lights with level file?)
 		addLight(glm::vec3(7, 9, -4), 0);
 		// Terrain
-		std::string heightMap = "test1234.jpg";
+		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
 		LeapLevel* level = new LeapLevel("IceIceBby.leap");
