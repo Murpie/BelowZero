@@ -252,10 +252,10 @@ MainMenuScene * GameObject::getMenuScene()
 void GameObject::moveDown(float deltaTime)
 {
 	timeLimit += deltaTime;
-	if (timeLimit > 10)
+	if (timeLimit > 20)
 		isActive = false;
 
-	transform->position.y -= 1 * deltaTime;
+	transform->position.y -= 2 * deltaTime;
 }
 
 glm::mat4 GameObject::getModelMatrix()

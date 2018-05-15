@@ -91,7 +91,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("Lvl4.leap");
+		LeapLevel* level = new LeapLevel("IceIceBby.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
 
@@ -357,6 +357,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::Campfire)
 							{
 								other.setIsBurning(60.0f);
+								meltIceWall(other);
 							}
 							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::FlareGun)
 							{
@@ -391,12 +392,16 @@ void GameScene::collisionTest(GameObject & other)
 							Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
 							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
 							
-							if(other.getIsBurning())
+							if (other.getIsBurning())
+							{
 									gameObject_ptr->setIsBurning(5.f);
+							}
 							int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
 
 							if (gameObject_ptr->getIsBurning() && !other.getIsBurning())
+							{
 								other.setIsBurning(10.f);
+							}
 						}
 					}
 				}
@@ -480,7 +485,6 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	if (gameObjects[gameObjects.size() - 1]->objectID == ObjectType::ID::Campfire)
 	{
 		setBurningByDistance(5.f, *gameObjects[gameObjects.size() - 1]);
-		meltIceWall(*gameObjects[gameObjects.size() - 1]);
 	}
 
 }
@@ -531,7 +535,7 @@ void GameScene::meltIceWall(GameObject & other)
 			// Check distance between campfire and icewall
 			// todo start timer in game object or similar.
 			// todo move icewall -y until it's under map and then delete it
-			if (glm::distance(gameObject_ptr->transform->position, other.transform->position) < 15)
+			if (glm::distance(gameObject_ptr->transform->position, other.transform->position) < 40)
 			{
 				gameObject_ptr->moveBelowTerrain = true;
 				//break;
