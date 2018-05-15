@@ -88,6 +88,6 @@ private:
 
 	glm::mat4 modelMatrix;
 
-	void moveBelowTerrain(float deltaTime);
+	void moveDown(float deltaTime);
 	float timeLimit;
 };

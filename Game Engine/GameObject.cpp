@@ -51,7 +51,7 @@ void GameObject::update(float deltaTime, float seconds)
 		}
 	}
 	if (moveBelowTerrain)
-		moveBelowTerrain(deltaTime);
+		moveDown(deltaTime);
 
 	for (Component* components_ptr : components)
 	{
@@ -249,7 +249,7 @@ MainMenuScene * GameObject::getMenuScene()
 	return nullptr;
 }
 
-void GameObject::moveBelowTerrain(float deltaTime)
+void GameObject::moveDown(float deltaTime)
 {
 	timeLimit += deltaTime;
 	if (timeLimit > 10)

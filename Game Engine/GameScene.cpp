@@ -533,8 +533,8 @@ void GameScene::meltIceWall(GameObject & other)
 			// todo move icewall -y until it's under map and then delete it
 			if (glm::distance(gameObject_ptr->transform->position, other.transform->position) < 15)
 			{
-				gameObject_ptr->isActive = false;
-				break;
+				gameObject_ptr->moveBelowTerrain = true;
+				//break;
 			}
 		}
 	}

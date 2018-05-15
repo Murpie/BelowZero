@@ -365,7 +365,8 @@ void Game::addMeshName()
 		"DeadTreeSnow.leap",
 		"DeadTreeSnow_Small.leap",
 		"Tree_Small_Snow.leap",
-		"FlareGun.leap"
+		"FlareGun.leap",
+		"IceWall.leap"
 	};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
