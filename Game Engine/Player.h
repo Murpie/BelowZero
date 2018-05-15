@@ -17,8 +17,6 @@ public:
 	SoundMasterSFML AmbientWind;
 	SoundMasterSFML Swing;
 
-
-
 	bool click;
 
 	float hp;
@@ -33,11 +31,17 @@ public:
 	float foodTick;
 	float damage;
 	float fade;
+	float winFade;
 	float textFade;
+	float flareTimer;
+
+	std::string equipedItem;
 
 	bool startGame;
 	bool textOnScreen;
-
+	bool win;
+	
+	int currentlyEquipedItem;
 	int initializer;
 	int textInitializer;
 	int inventory[5];
@@ -74,6 +78,15 @@ public:
 
 	//glm::mat4 getViewMatrix()const;
 	int interactionResponse(const ObjectType::ID id, bool & isAlive);
+	int collisionResponse(const ObjectType::ID);
+	void heatResponse();
+	void takeDamange(float damage, float deltaTime);
+	int getEquipedItem();
+	const int getEquipedID();
+	bool addClick;
+
+	float pitch;
+	float yaw;
 
 	int test;
 
@@ -86,12 +99,15 @@ private:
 	bool rightCollision = false;
 	bool backCollision = false;
 	bool topCollision = false;
+	bool inInventory[5];
+	bool isPressed;
 
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
-	float pitch;
-	float yaw;
+
+	int equipedID;
+
 	bool firstMouse;
 	float lastX, lastY;
 	double xpos, ypos;

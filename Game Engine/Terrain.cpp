@@ -328,7 +328,7 @@ float Terrain::calculateY(float x, float z)
 			glm::vec2(xCoord, zCoord));
 	}
 
-	answer += 2;
+	answer;
 	return answer;
 
 }

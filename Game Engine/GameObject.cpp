@@ -9,19 +9,30 @@ GameObject::GameObject()
     hasLight = false;
 	isInteractable = false;
 	isBurning = false;
+	gameEnd = false;
+	this->moveBelowTerrain = false;
+	timeLimit = 0.f;
 	timeAlive = 0.0f;
+	timeToBurn = 10.f;
 	modelMatrix = glm::mat4();
 	objectID = ObjectType::ID::Stone_1;
+	fireComponent = nullptr;
 }
 
 GameObject::~GameObject()
 {
 	deleteAllComponents();
+	
 	delete transform;
 
 	for (bBox* bbox_ptr : bbox)
 		delete bbox_ptr;
 	bbox.clear();
+
+	if (fireComponent != nullptr)
+	{
+		delete fireComponent;
+	}
 }
 
 void GameObject::update(float deltaTime, float seconds)
@@ -29,11 +40,18 @@ void GameObject::update(float deltaTime, float seconds)
 	if (isBurning == true)
 	{
 		timeAlive += deltaTime;
-		if (timeAlive >= 60.0f)
+		if (timeAlive >= timeToBurn)
 		{
 			isBurning = false;
+			if (fireComponent != nullptr)
+			{
+				delete fireComponent;
+				fireComponent = nullptr;
+			}
 		}
 	}
+	if (moveBelowTerrain)
+		moveDown(deltaTime);
 
 	for (Component* components_ptr : components)
 	{
@@ -119,6 +137,21 @@ void GameObject::addComponent(Component* otherComponent)
  //   updateHasLight();
 }
 
+void GameObject::updateMeshFilter(int id)
+{
+	for (Component* component_ptr : components)
+	{
+		if (component_ptr->id == ComponentType::ID::MESHFILTER)
+		{
+			MeshFilter* meshFilter = static_cast<MeshFilter*>(component_ptr);
+			if (meshFilter->typeID == id)
+			{
+				meshFilterComponent = meshFilter;
+			}
+		}
+	}
+}
+
 /*
 void GameObject::addComponent(Component* otherComponent)
 {
@@ -162,10 +195,28 @@ void GameObject::setIsRenderable(bool isRenderable)
 	this->isRenderable = isRenderable;
 }
 
-void GameObject::setIsBurning()
+void GameObject::setIsBurning(float timeToBurn)
 {
+	this->timeToBurn = timeToBurn;
 	timeAlive = 0.0f;
+
+	if (fireComponent == nullptr)
+	{
+		fireComponent = new Light(*transform);
+		fireComponent->lightType = 1;
+		fireComponent->color = glm::vec4(0.9, 0.2, 0, .5);
+		fireComponent->Linear = 25;
+		fireComponent->Quadratic = 0.15;
+		fireComponent->offset = 9;
+		fireComponent->intensity = 0.9;
+	}
+
 	isBurning = true;
+}
+
+void GameObject::setGameEnd()
+{
+	gameEnd = true;
 }
 
 const bool GameObject::getIsBurning()
@@ -198,6 +249,15 @@ MainMenuScene * GameObject::getMenuScene()
 	return nullptr;
 }
 
+void GameObject::moveDown(float deltaTime)
+{
+	timeLimit += deltaTime;
+	if (timeLimit > 20)
+		isActive = false;
+
+	transform->position.y -= 2 * deltaTime;
+}
+
 glm::mat4 GameObject::getModelMatrix()
 {
 	modelMatrix = glm::translate(glm::mat4(1), transform->position);
@@ -209,7 +269,6 @@ glm::mat4 GameObject::getModelMatrix()
 glm::mat4 GameObject::getViewMatrix()
 {
 	return glm::lookAt(transform->position, transform->position + transform->forward, transform->up);
-
 }
 
 Terrain * GameObject::getTerrain()

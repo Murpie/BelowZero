@@ -181,6 +181,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="MainMenuShaders.cpp" />
+    <ClCompile Include="RefractionShader.cpp" />
     <ClCompile Include="SoundMaster.cpp" />
     <ClCompile Include="TerrainShaders.cpp" />
     <ClCompile Include="UIShaders.cpp" />
@@ -201,6 +202,7 @@
     <ClCompile Include="Transformable.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="VFXFireShaders.cpp" />
+    <ClCompile Include="VFXFlareShaders.cpp" />
     <ClCompile Include="VFXSnowShaders.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -226,6 +228,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="MainMenuShaders.h" />
+    <ClInclude Include="RefractionShader.h" />
     <ClInclude Include="SoundMaster.h" />
     <ClInclude Include="UIShaders.h" />
     <ClInclude Include="Material.h" />
@@ -247,6 +250,7 @@
     <ClInclude Include="Transformable.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VFXFireShaders.h" />
+    <ClInclude Include="VFXFlareShaders.h" />
     <ClInclude Include="VFXSnowShaders.h" />
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +263,8 @@
     <None Include="lightpassVS.glsl" />
     <None Include="MainMenuFS.glsl" />
     <None Include="MainMenuVS.glsl" />
+    <None Include="refractionShaderFS.glsl" />
+    <None Include="refractionShaderVS.glsl" />
     <None Include="TerrainFS.glsl" />
     <None Include="TerrainVS.glsl" />
     <None Include="UIFS.glsl" />
@@ -267,6 +273,8 @@
     <None Include="ShadowMapVS.glsl" />
     <None Include="VFXFireFS.glsl" />
     <None Include="VFXFireVS.glsl" />
+    <None Include="VFXFlareFS.glsl" />
+    <None Include="VFXFlareVS.glsl" />
     <None Include="VFXSnowFS.glsl" />
     <None Include="VFXSnowVS.glsl" />
   </ItemGroup>

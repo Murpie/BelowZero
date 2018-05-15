@@ -165,6 +165,8 @@ void Game::runState()
 	if (stateOfGame.state == Gamestate::ID::LOAD_MENU || stateOfGame.state == Gamestate::ID::SHOW_MENU || stateOfGame.state == Gamestate::ID::CLEAR_MENU)
 	{
 		menuState();
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
 	}
 	//... Level
 	else if (stateOfGame.state == Gamestate::ID::LOAD_LEVEL || stateOfGame.state == Gamestate::ID::RUN_LEVEL || stateOfGame.state == Gamestate::ID::CLEAR_LEVEL)
@@ -278,7 +280,7 @@ void Game::initScene(GameScene & scene)
 		meshesLoaded = true;
 	}
 	//...
-	scene.initScene(meshLibrary, materialLibrary, shaderProgramLibrary, scene.typeOfScene);
+	scene.initScene(&meshLibrary, &materialLibrary, shaderProgramLibrary, scene.typeOfScene);
 }
 
 void Game::clearScene(GameScene & scene)
@@ -296,8 +298,10 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addUIShaders();
 	shaderProgramLibrary.addVFXFireShaders();
 	shaderProgramLibrary.addVFXSnowShaders();
+	shaderProgramLibrary.addVFXFlareShaders();
 	shaderProgramLibrary.addTerrainShaders();
 	shaderProgramLibrary.addMainMenuShaders();
+	shaderProgramLibrary.addRefractionShaders();
 }
 
 void Game::initInputOptions()
@@ -327,41 +331,44 @@ void Game::addMeshName()
 		"Cliffside_1.leap",				//4
 		"Cliffside_2.leap",				//5
 		"Cliffside_3.leap",				//6
-		"Cliffside_4.leap",
-		"Campfire_NoSnow.leap",
-		"WoodenSign.leap",
-		"PineTree.leap",
-		"Pine_Tree_Snow.leap",
-		"BrokenTree.leap",
-		"BrokenTree_Snow.leap",
-		"IceTaps_1.leap",
-		"IceTaps_2.leap",
-		"WaterBottle.leap",
-		"Flag.leap",
-		"Can.leap",
-		"Can.leap", // Bucket_water
-		"Can.leap", // Bucket_snow
-		"Stump.leap",
-		"Tree.leap",
-		"TreeWithSnow.leap",
-		"FlareGunBox.leap",
-		"Axe.leap",
-		"Jacket.leap",
-		"Stone_2.leap",
-		"Stone_3.leap",
-		"Stone_4.leap",
-		"Stone_5.leap",
-		"Cabin.leap",
-		"DeadTree.leap",
-		"EquipedAxe.leap",
-		"EquipedEmptyBucket.leap",
-		"EquipedEmptyBucketSnow.leap",
-		"EquipedEmptyBucketWater.leap",
-		"Tree_Small.leap",
-		"DeadTree_Small.leap",
-		"DeadTreeSnow.leap",
-		"DeadTreeSnow_Small.leap",
-		"Tree_Small_Snow.leap"
+		"Cliffside_4.leap",				//7
+		"Campfire_NoSnow.leap",			//8
+		"WoodenSign.leap",				//9
+		"PineTree.leap",				//10
+		"PineTree_Snow.leap",			//11
+		"BrokenTree.leap",				//12
+		"BrokenTree_Snow.leap",			//13
+		"IceTaps_1.leap",				//14
+		"IceTaps_2.leap",				//15
+		"WaterBottle.leap",				//16
+		"Flag.leap",					//17
+		"Can.leap",						//18
+		"Can.leap", // Bucket_water		//19
+		"Can.leap", // Bucket_snow		//20
+		"Stump.leap",					//21
+		"Tree.leap",					//22
+		"Tree_Snow.leap",				//23
+		"FlareGunBox.leap",				//24
+		"Axe.leap",						//25
+		"Jacket.leap",					//26
+		"Stone_2.leap",					//27
+		"Stone_3.leap",					//28
+		"Stone_4.leap",					//29
+		"Stone_5.leap",					//30
+		"Cabin.leap",					//31
+		"DeadTree.leap",				//32
+		"EquipedAxe.leap",				//33
+		"EquipedEmptyBucket.leap",		//34
+		"EquipedEmptyBucketSnow.leap",	//35
+		"EquipedEmptyBucketWater.leap",	//36
+		"Tree_Small.leap",				//37
+		"DeadTree_Small.leap",			//38
+		"DeadTreeSnow.leap",			//39
+		"DeadTreeSnow_Small.leap",		//40
+		"Tree_Small_Snow.leap",			//41
+		"FlareGun.leap",				//42
+		"IceWall.leap",					//43
+		"EquipedLighter.leap",			//44
 	};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
@@ -386,7 +393,7 @@ void Game::readMeshName(GameScene &scene)
 	if (!texturesLoaded)
 	{
 		materialLibrary.addMaterial(shaderProgramLibrary.getShader<GeometryShaders>()->geometryShaderProgram);
-		textureLibrary.addAlbedo("Colors.png");
+		textureLibrary.addAlbedo("Colors_2k.png");
 		materialLibrary.getMaterial(0)->addAlbedo(textureLibrary.getAlbedo(0)->gTexture);
 		texturesLoaded = true;
 	}

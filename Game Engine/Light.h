@@ -16,6 +16,8 @@ public:
 	int lightType;
 	float Linear;
 	float Quadratic;
+	float offset;
+	float intensity;
 
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);

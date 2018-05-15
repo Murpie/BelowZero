@@ -29,10 +29,8 @@
 #define HIGH_SHADOW 4096
 #define SUPER_SHADOW 8192
 #define ULTRA_SHADOW 16384
-
 #define CASCADESPLITS 3
-
-#define MAX_PARTICLES 10000					//Lower to increase FPS. Small increase in FPS. Minimum value: 1000
+#define MAX_PARTICLES 1000					//Maximum: 1000, Intel NUC can't handle more stack than this
 
 struct QuadVertex
 {
@@ -47,6 +45,7 @@ public:
 	~RenderManager();
 
 	GameScene *gameScene;
+	Texture shatteredIce;
 	
 	void FindObjectsToRender();
 	void clearObjectsToRender();
@@ -58,6 +57,7 @@ public:
 	void createButtonQuads();
 	void deleteData();
 	void renderQuad();
+	void renderPPQuad();
 	void Update();
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
@@ -67,6 +67,8 @@ public:
 	void setOrthoProjectionMatrix(int index);
 	void renderFireParticles();
 	void renderSnowParticles();
+	void dayNightCycle();
+	void renderFlareParticles();
 
 	struct Particle {
 		glm::vec3 pos, speed;
@@ -78,6 +80,7 @@ public:
 
 	Particle fireParticleContainer[MAX_PARTICLES];
 	Particle snowParticleContainer[MAX_PARTICLES];
+	Particle flareParticleContainer[MAX_PARTICLES];
 
 	int FindUnusedParticle(Particle* container, int lastUsedParticle);
 	void ParticleLinearSort(Particle* arr, int size);
@@ -94,16 +97,20 @@ private:
 	glm::mat4x4 fpsView_matrix;
 	glm::mat4x4 projection_matrix;
 	glm::mat4x4 currentCubeMapView;
-
-	glm::vec3 shadowLightPos;
-	glm::vec3 positionForShadowToLookAt;
-
+	glm::mat4 tempMatrix;
+	glm::mat4 oldrotation;
+	float oldPitch;
+	float oldYaw;
 	GLuint finalMainMenuFBOTexture;
 
 	//Time constants
 	float deltaTime;
 	float seconds;
 	int count;
+	float daylight;
+	float time;
+	bool dayOrNight;
+	bool fireFlicker;
 
 	//Buffer Objects
 	unsigned int finalMainMenuFBO;
@@ -133,20 +140,28 @@ private:
 	unsigned int finalDepthStensil;
 	unsigned int fireTexture;
 	unsigned int snowTexture;
+	unsigned int flareTexture;
 	unsigned int fireVAO;
 	unsigned int snowVAO;
+	unsigned int flareVAO;
 	unsigned int fireVBO;
 	unsigned int snowVBO;
+	unsigned int flareVBO;
 	unsigned int fireParticlePositionBuffer;
 	unsigned int snowParticlePositionBuffer;
+	unsigned int flareParticlePositionBuffer;
 	unsigned int fireParticleColorBuffer;
 	unsigned int snowParticleColorBuffer;
+	unsigned int flareParticleColorBuffer;
+	unsigned int PPFBO;
+	unsigned int finalPPFBO;
 
 	//VFX
 	unsigned int lastUsedParticle = 0;
 	unsigned int particleCount;
 	unsigned int fireParticles = 1;
 	unsigned int snowParticles = 10;
+	unsigned int flareParticles = 1;
 	unsigned int randomizer = 0;
 	float randomX;
 	float randomY;
@@ -158,6 +173,7 @@ private:
 	float defaultZ;
 	float offset;
 	int distanceToParticles = 0;
+	bool flareAlive = false;
 	glm::mat4 viewProjectionMatrix;
 	glm::vec3 startPoint;
 	glm::vec3 randomStartPoint;
@@ -170,8 +186,10 @@ private:
 
 	GLfloat* fireParticlePositionData = 0;
 	GLfloat* snowParticlePositionData = 0;
+	GLfloat* flareParticlePositionData = 0;
 	GLubyte* fireParticleColorData = 0;
 	GLubyte* snowParticleColorData = 0;
+	GLubyte* flareParticleColorData = 0;
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
@@ -197,7 +215,9 @@ private:
 	GLuint terrainShaderProgram;
 	GLuint vfxFireShaderProgram;
 	GLuint vfxSnowShaderProgram;
+	GLuint vfxFlareShaderProgram;
 	GLuint mainMenuShaderProgram;
+	GLuint refractionShaderProgram;
 
 	int display_w, display_h;
 	unsigned int vertexPos;
