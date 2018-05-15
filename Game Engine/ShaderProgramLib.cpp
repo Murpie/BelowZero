@@ -50,14 +50,32 @@ void ShaderProgramLib::addMainMenuShaders()
 	shaders.push_back(newShaderProgram);
 }
 
+void ShaderProgramLib::addRefractionShaders()
+{
+	RefractionShader* newShaderProgram = new RefractionShader();
+	shaders.push_back(newShaderProgram);
+}
+
 void ShaderProgramLib::addUIShaders()
 {
 	UIShaders* newShaderProgram = new UIShaders();
 	shaders.push_back(newShaderProgram);
 }
 
-void ShaderProgramLib::addVFXShaders()
+void ShaderProgramLib::addVFXFireShaders()
 {
-	VFXShaders* newShaderProgram = new VFXShaders();
+	VFXFireShaders* newShaderProgram = new VFXFireShaders();
+	shaders.push_back(newShaderProgram);
+}
+
+void ShaderProgramLib::addVFXSnowShaders()
+{
+	VFXSnowShaders* newShaderProgram = new VFXSnowShaders();
+	shaders.push_back(newShaderProgram);
+}
+
+void ShaderProgramLib::addVFXFlareShaders()
+{
+	VFXFlareShaders* newShaderProgram = new VFXFlareShaders();
 	shaders.push_back(newShaderProgram);
 }

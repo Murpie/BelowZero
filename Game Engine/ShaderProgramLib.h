@@ -11,7 +11,10 @@
 #include "UIShaders.h"
 #include "TerrainShaders.h"
 #include "MainMenuShaders.h"
-#include "VFXShaders.h"
+#include "VFXFireShaders.h"
+#include "VFXSnowShaders.h"
+#include "VFXFlareShaders.h"
+#include "RefractionShader.h"
 
 class ShaderProgramLib
 {
@@ -24,9 +27,12 @@ public:
 	void addShadowMapShaders();
 	void addAnimationShaders();
 	void addUIShaders();
-	void addVFXShaders();
+	void addVFXFireShaders();
+	void addVFXSnowShaders();
+	void addVFXFlareShaders();
 	void addTerrainShaders();
 	void addMainMenuShaders();
+	void addRefractionShaders();
 
 	template <class T>
 	T* getShader() {

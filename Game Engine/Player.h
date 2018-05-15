@@ -4,12 +4,18 @@
 #include "stb_image.h"
 #include <GL/gl3w.h>
 #include "Transformable.h"
+#include "SoundMaster.h"
 
 class Player : public Transformable
 {
 public:
 	Player(Transform& transform);
 	~Player();
+
+	SoundMasterSFML SnowCrunch;
+	SoundMasterSFML AmbientMusic;
+	SoundMasterSFML AmbientWind;
+	SoundMasterSFML Swing;
 
 	bool click;
 
@@ -25,18 +31,24 @@ public:
 	float foodTick;
 	float damage;
 	float fade;
+	float winFade;
 	float textFade;
+	float flareTimer;
+
+	std::string equipedItem;
 
 	bool startGame;
 	bool textOnScreen;
-
+	bool win;
+	
+	int currentlyEquipedItem;
 	int initializer;
 	int textInitializer;
 	int inventory[5];
 	int maxAmountOfItems;
 	int inventoryCount;
 
-	std::string imageNames[5] = {"InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "MainMenuConcept"};
+	std::string imageNames[5] = { "InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "MainMenuConcept" };
 	std::string imagesCurrentlyInInventory[5] = { "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage" };
 
 	unsigned int equipedFBO;
@@ -65,7 +77,15 @@ public:
 	void processEvents(GLFWwindow *window, float deltaTime);
 
 	//glm::mat4 getViewMatrix()const;
-	void interactionResponse(const ObjectType::ID id, bool & isAlive);
+	int interactionResponse(const ObjectType::ID id, bool & isAlive);
+	int collisionResponse(const ObjectType::ID);
+	void heatResponse();
+	void takeDamange(float damage, float deltaTime);
+	int getEquipedItem();
+	bool addClick;
+
+	float pitch;
+	float yaw;
 
 private:
 
@@ -76,12 +96,13 @@ private:
 	bool rightCollision = false;
 	bool backCollision = false;
 	bool topCollision = false;
+	bool inInventory[5];
+	bool isPressed;
 
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
-	float pitch;
-	float yaw;
+
 	bool firstMouse;
 	float lastX, lastY;
 	double xpos, ypos;
@@ -102,6 +123,9 @@ private:
 	bool inAir = false;
 	float timeInAir = 0.3;
 	bool gravity = false;
+
+	//------=====Walking=====----
+	bool isWalking = false;
 
 	//Terrain
 	float currentY;

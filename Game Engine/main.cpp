@@ -7,9 +7,12 @@ Gamestate::ID Gamestate::StateOfGame::state;
 
 int main()
 {
-	Game game;
-	game.run();
-	
+	Game* game = new Game();
+
+	game->run();
+
+	delete game;
+
 	_CrtDumpMemoryLeaks();
 
 	return 0;

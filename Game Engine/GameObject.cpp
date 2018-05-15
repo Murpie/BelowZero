@@ -8,22 +8,47 @@ GameObject::GameObject()
     isRenderable = false;
     hasLight = false;
 	isInteractable = false;
+	isBurning = false;
+	gameEnd = false;
+	timeAlive = 0.0f;
+	timeToBurn = 10.f;
 	modelMatrix = glm::mat4();
 	objectID = ObjectType::ID::Stone_1;
+	fireComponent = nullptr;
 }
 
 GameObject::~GameObject()
 {
 	deleteAllComponents();
+	
 	delete transform;
 
 	for (bBox* bbox_ptr : bbox)
 		delete bbox_ptr;
 	bbox.clear();
+
+	if (fireComponent != nullptr)
+	{
+		delete fireComponent;
+	}
 }
 
 void GameObject::update(float deltaTime, float seconds)
 {
+	if (isBurning == true)
+	{
+		timeAlive += deltaTime;
+		if (timeAlive >= timeToBurn)
+		{
+			isBurning = false;
+			if (fireComponent != nullptr)
+			{
+				delete fireComponent;
+				fireComponent = nullptr;
+			}
+		}
+	}
+
 	for (Component* components_ptr : components)
 	{
 		Component& component = *components_ptr;
@@ -108,6 +133,21 @@ void GameObject::addComponent(Component* otherComponent)
  //   updateHasLight();
 }
 
+void GameObject::updateMeshFilter(int id)
+{
+	for (Component* component_ptr : components)
+	{
+		if (component_ptr->id == ComponentType::ID::MESHFILTER)
+		{
+			MeshFilter* meshFilter = static_cast<MeshFilter*>(component_ptr);
+			if (meshFilter->typeID == id)
+			{
+				meshFilterComponent = meshFilter;
+			}
+		}
+	}
+}
+
 /*
 void GameObject::addComponent(Component* otherComponent)
 {
@@ -151,6 +191,35 @@ void GameObject::setIsRenderable(bool isRenderable)
 	this->isRenderable = isRenderable;
 }
 
+void GameObject::setIsBurning(float timeToBurn)
+{
+	this->timeToBurn = timeToBurn;
+	timeAlive = 0.0f;
+
+	if (fireComponent == nullptr)
+	{
+		fireComponent = new Light(*transform);
+		fireComponent->lightType = 1;
+		fireComponent->color = glm::vec4(0.9, 0.2, 0, .5);
+		fireComponent->Linear = 25;
+		fireComponent->Quadratic = 0.15;
+		fireComponent->offset = 9;
+		fireComponent->intensity = 0.9;
+	}
+
+	isBurning = true;
+}
+
+void GameObject::setGameEnd()
+{
+	gameEnd = true;
+}
+
+const bool GameObject::getIsBurning()
+{
+	return this->isBurning;
+}
+
 Player * GameObject::getPlayer()
 {
 	for (Component* component_ptr : components)
@@ -187,7 +256,6 @@ glm::mat4 GameObject::getModelMatrix()
 glm::mat4 GameObject::getViewMatrix()
 {
 	return glm::lookAt(transform->position, transform->position + transform->forward, transform->up);
-
 }
 
 Terrain * GameObject::getTerrain()

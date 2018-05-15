@@ -6,13 +6,15 @@ MeshFilter::MeshFilter():Component()
 
 }
 
-MeshFilter::MeshFilter(GLuint otherVertexBuffer, GLuint otherVertexAttribute, int otherVertexCount, int meshType )
+MeshFilter::MeshFilter(GLuint otherVertexBuffer, GLuint otherVertexAttribute, int otherVertexCount, int meshType, int typeID )
 {
 	assetName = "MeshFilter";
 	gVertexBuffer = otherVertexBuffer;
 	gVertexAttribute=otherVertexAttribute;
 	vertexCount = otherVertexCount;
 	this->meshType = meshType;
+	this->typeID = typeID;
+	Component::id = ComponentType::ID::MESHFILTER;
 }
 
 MeshFilter::~MeshFilter()

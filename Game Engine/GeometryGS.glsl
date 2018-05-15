@@ -8,7 +8,6 @@ vec2 uv_coord;
 mat4 world_matrix;
 mat4 view_matrix;
 mat4 projection_matrix;
-int followCamera;
 } gs_in[];
 
 out GS_OUT{
@@ -16,6 +15,7 @@ out GS_OUT{
 vec4 FragPos;
 vec2 TexCoords;
 } gs_out;
+
 
 void main() {
 
@@ -31,10 +31,11 @@ void main() {
 	gs_out.vertex_normal = gs_in[0].world_matrix * vec4(gs_in[0].vertex_normal, 0);
 
 	float d = dot(normal, camRay.xyz);
-	if (d > 0.0 || gs_in[0].followCamera == 1)
+	if (d > 0.0)
 	{
 		for (int i = 0; i < gl_in.length(); i++)
 		{
+
 			gl_Position = gs_in[i].projection_matrix * gs_in[i].view_matrix * gs_in[i].world_matrix * gl_in[i].gl_Position;
 
 			gs_out.FragPos = gs_in[i].world_matrix * gl_in[i].gl_Position;
