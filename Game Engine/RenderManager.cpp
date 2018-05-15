@@ -626,8 +626,7 @@ void RenderManager::Render() {
 		{
 			//... Position
 			tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
-			//float oneMinusDot = 1 - glm::dot(gameObjectsToRender[i]->transform->rotation, glm::vec3(0, 0, 0));
-			//float F = glm::pow(oneMinusDot, 5.0);
+			//... Rotation
 			tempMatrix = glm::rotate(tempMatrix, glm::radians(gameObjectsToRender[i]->transform->rotation.y), gameObjectsToRender[i]->transform->up);
 		}
 

@@ -47,4 +47,9 @@ private:
 	bool addObject;
 	MaterialLib* material;
 	MeshLib* meshes;
+
+	//test functions
+	void setBurningByDistance(const float distance, GameObject & other);
+	void meltIceWall(GameObject & other);
+	//
 };
