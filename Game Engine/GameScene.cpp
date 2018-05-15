@@ -218,18 +218,26 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 					for (int i = 0; i < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); i++)
 					{
 						bBox* box = new bBox();
+
 						//add center
 						box->center.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[0];
 						box->center.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[1];
 						box->center.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[2];
+
 						//add max vector
 						box->vMax.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[0];
 						box->vMax.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[1];
 						box->vMax.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[2];
+
+						/*glm::mat4 tempMatrix = glm::mat4(1);
+						tempMatrix = glm::translate(tempMatrix, box->center);
+						tempMatrix = glm::rotate(tempMatrix, glm::radians(level->levelObjects[i]->rotationY), glm::vec3(0, 1, 0));*/
+
 						//add min vector
 						box->vMin.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[0];
 						box->vMin.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[1];
 						box->vMin.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[2];
+
 						//push into gameobject
 						gameObject_ptr->bbox.push_back(box);
 					}

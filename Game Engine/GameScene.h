@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
-
+#include "glm/glm/gtc/matrix_transform.hpp"
+#include "glm/glm/gtc/type_ptr.hpp"
+#include "glm/glm/glm.hpp"
 #include "EnumID.h"
 #include "GameObject.h"
 #include "MeshLib.h"
