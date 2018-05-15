@@ -529,7 +529,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	//Transformable::transform.up = up;
 
-	printf("%f, %f, %f\n", Transformable::transform.right.x, Transformable::transform.right.y, Transformable::transform.right.z);
+	//printf("%f, %f, %f\n", Transformable::transform.right.x, Transformable::transform.right.y, Transformable::transform.right.z);
 	//printf("%f,\n", glm::radians(pitch));
 
 	if (firstMouse) {
