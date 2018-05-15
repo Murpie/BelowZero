@@ -376,6 +376,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 			}
 			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) && gameObject_ptr->getPlayer()->click == true)
 				gameObject_ptr->getPlayer()->click = false;
+			break;
 		}
 	}
 }
