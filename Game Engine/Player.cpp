@@ -8,6 +8,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	addClick = false;
 
 	this->currentlyEquipedItem = -1;
+	this->equipedID = -1;
 
 	this->hp = 80;
 	this->cold = 100;
@@ -68,7 +69,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	AmbientWind.playSound();
 	AmbientWind.loop(true);
 
-	AmbientMusic.addSound("AmbientMusic1.wav");
+	//AmbientMusic.addSound("AmbientMusic1.wav");
 	AmbientMusic.setVolume(50.0f);
 	AmbientMusic.playSound();
 	AmbientMusic.loop(true);
@@ -450,6 +451,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		equip("AxeIcon");
 		this->currentlyEquipedItem = 0;
+		this->equipedID = 33;
 		addImageToInventory("InventoryAxeIcon", 0);
 		inInventory[0] = true;
 		isPressed = true;
@@ -458,6 +460,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		equip("LighterIcon");
 		this->currentlyEquipedItem = 1;
+		this->equipedID = 44;
 		addImageToInventory("InventoryLighterIcon", 1);
 		inInventory[1] = true;
 		isPressed = true;
@@ -482,6 +485,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		equip("BucketIcon");
 		this->currentlyEquipedItem = 4;
+		this->equipedID = 34;
 		addImageToInventory("InventoryBucketIcon", 4);
 		inInventory[4] = true;
 		isPressed = true;
@@ -504,20 +508,30 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	glm::mat4 matrix = glm::mat4(1);
 
-	glm::vec4 forward = glm::vec4(Transformable::transform.forward, 0);
-	glm::vec4 right = glm::vec4(Transformable::transform.right, 0);
-	glm::vec4 up = glm::vec4(Transformable::transform.up, 0);
+	glm::vec4 forward = normalize(glm::vec4(Transformable::transform.forward, 0));
+	glm::vec4 right = normalize(glm::vec4(Transformable::transform.right, 0));
+	glm::vec4 up = normalize(glm::vec4(Transformable::transform.up, 0));
 
 	matrix = glm::rotate(matrix, pitch, Transformable::transform.right);
-	matrix *= glm::rotate(matrix, -yaw, Transformable::transform.up);
+	matrix = glm::rotate(matrix, -yaw, Transformable::transform.up);
 
 	forward = matrix * forward;
-	up = matrix * up;
 	right = matrix * right;
 
+//	up = glm::vec4(glm::cross(glm::vec3(right), glm::vec3(forward)), 0);
+	//if ((glm::dot(Transformable::transform.forward, Transformable::transform.up) < 0.9f && pitch > 0.0f) || (glm::dot(Transformable::transform.forward, Transformable::transform.up) > -0.9f && pitch < 0.0f))
 	Transformable::transform.forward = forward;
+	//else
+	//	pitch = 0;
+//	Transformable::transform.up = up;
 	Transformable::transform.right = right;
 
+
+
+	//Transformable::transform.up = up;
+
+	//printf("%f, %f, %f\n", Transformable::transform.right.x, Transformable::transform.right.y, Transformable::transform.right.z);
+	//printf("%f,\n", glm::radians(pitch));
 
 	if (firstMouse) {
 		lastX = (float)xpos;
@@ -729,6 +743,11 @@ int Player::getEquipedItem()
 	}
 
 	return -1;
+}
+
+const int Player::getEquipedID()
+{
+	return this->equipedID;
 }
 
 void Player::findY()

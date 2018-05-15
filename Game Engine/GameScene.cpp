@@ -61,21 +61,8 @@ void GameScene::update(float deltaTime, float seconds)
 		{
 			delete gameObjects[i];
 			gameObjects.erase(gameObjects.begin() + i);
-			//gameObjects[i] = gameObjects.erase(gameObjects[i]);
 		}
-
-		setBurningByDistance(5.f, *gameObjects[i]);
 	}
-
-	//for (auto it = gameObjects.begin(); it != gameObjects.end();)
-	//{
-	//	if ((*it)->isActive == false)
-	//	{
-	//		delete *it;
-	//		it = gameObjects.erase(it);
-	//	}
-	//}
-
 }
 
 void GameScene::processEvents(GLFWwindow * window, float deltaTime)
@@ -85,6 +72,7 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 		gameObjects[i]->processEvents(window, deltaTime);
 		interactionTest(*gameObjects[i], window);
 		addNewObjectTest(window);
+		addEquipment();
 	}
 }
 
@@ -96,18 +84,17 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 	if (typeOfScene == Scene::ID::LEVEL_1)
 	{
 		// Camera - (modify position with level file?)
-		addPlayer(*meshLibrary);
+		addPlayer(*meshLibrary, *matertialLibrary);
 		// Lights - (add lights with level file?)
 		addLight(glm::vec3(7, 9, -4), 0);
 		// Terrain
-		std::string heightMap = "test1234.jpg";
+		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("Lvl0.leap");
+		LeapLevel* level = new LeapLevel("IceIceBby.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
 
-		addEquipment(*meshLibrary, *matertialLibrary);
 		makeObjectsInteractable();
 	}
 	else if (typeOfScene == Scene::ID::MENU)
@@ -119,7 +106,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 
-		LeapLevel* level = new LeapLevel("Lvl2.leap");
+		LeapLevel* level = new LeapLevel("Lvl4.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
 	}
@@ -144,7 +131,7 @@ void GameScene::addLight(glm::vec3 transform, int lightType)
 	lightsInScene++;
 }
 
-void GameScene::addPlayer(MeshLib & meshLibrary)
+void GameScene::addPlayer(MeshLib & meshLibrary, MaterialLib& materialLibrary)
 {
 	//Create player object
 	GameObject* playerObject = new GameObject();
@@ -155,37 +142,31 @@ void GameScene::addPlayer(MeshLib & meshLibrary)
 	Player* player = new Player(*playerObject->transform);
 	playerObject->addComponent(player);
 
-	//Add to scene
-	gameObjects.push_back(playerObject);
-	camerasInScene++;
-}
-
-void GameScene::addEquipment(MeshLib & meshLibrary, MaterialLib& materialLibrary)
-{
 	//Add Equipment Meshes
-	int equipmenID[] = { 33, 34 };
+	int equipmenID[] = { 33, 34, 44 };
 
 	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++)
 	{
-		GameObject* gameObject_ptr = new GameObject();
 		MeshFilter* meshFilter = new MeshFilter(
 			meshLibrary.getMesh(equipmenID[i])->gVertexBuffer,
 			meshLibrary.getMesh(equipmenID[i])->gVertexAttribute,
 			meshLibrary.getMesh(equipmenID[i])->leapMesh->getVertexCount(),
 			meshLibrary.getMesh(equipmenID[i])->meshType,
 			equipmenID[i]);
-		gameObject_ptr->name = "Equipment";
-		gameObject_ptr->addComponent(meshFilter);
-		gameObject_ptr->addComponent(materialLibrary.getMaterial(0));
-		if ( i == 1 )
-			gameObject_ptr->setIsRenderable(false);
-		gameObject_ptr->objectID = (ObjectType::ID)equipmenID[i];
-		glm::vec3 position = glm::vec3(gameObjects[0]->transform->position);
-		gameObject_ptr->transform->position = position;
-		glm::vec3 rotation = glm::vec3(gameObjects[0]->transform->rotation);
-		gameObject_ptr->transform->rotation = rotation;
-		gameObjects.push_back(gameObject_ptr);
+		playerObject->addComponent(meshFilter);
+		playerObject->addComponent(materialLibrary.getMaterial(0));
 	}
+
+	//Add to scene
+	gameObjects.push_back(playerObject);
+	camerasInScene++;
+}
+
+void GameScene::addEquipment()
+{
+	if( gameObjects[0]->getPlayer() != nullptr )
+		if (gameObjects[0]->getPlayer()->getEquipedID() != -1)
+			gameObjects[0]->updateMeshFilter(gameObjects[0]->getPlayer()->getEquipedID());
 }
 
 void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibrary, LeapLevel* level)
@@ -235,21 +216,21 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 						(int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 3)
 						gameObject_ptr->isInteractable = true;
 					//Add BBox from leapmesh to player object
-					for (int i = 0; i < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); i++)
+					for (int j = 0; j < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); j++)
 					{
 						bBox* box = new bBox();
 						//add center
-						box->center.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[0];
-						box->center.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[1];
-						box->center.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[2];
+						box->center.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->center[0];
+						box->center.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->center[1];
+						box->center.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->center[2];
 						//add max vector
-						box->vMax.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[0];
-						box->vMax.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[1];
-						box->vMax.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[2];
+						box->vMax.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->maxVector[0];
+						box->vMax.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->maxVector[1];
+						box->vMax.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->maxVector[2];
 						//add min vector
-						box->vMin.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[0];
-						box->vMin.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[1];
-						box->vMin.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[2];
+						box->vMin.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->minVector[0];
+						box->vMin.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->minVector[1];
+						box->vMin.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->minVector[2];
 						//push into gameobject
 						gameObject_ptr->bbox.push_back(box);
 					}
@@ -296,21 +277,21 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 			if ((int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 1)
 				meshObject->isInteractable = true;
 			//Add BBox from leapmesh to gameObject
-			for (int i = 0; i < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); i++)
+			for (int j = 0; j < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); j++)
 			{
 				bBox* box = new bBox();
 				//add center
-				box->center.x = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[i]->center[0];
-				box->center.y = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[i]->center[1];
-				box->center.z = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[i]->center[2];
+				box->center.x = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->center[0];
+				box->center.y = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->center[1];
+				box->center.z = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->center[2];
 				//add max vector
-				box->vMax.x = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[i]->maxVector[0];
-				box->vMax.y = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[i]->maxVector[1];
-				box->vMax.z = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[i]->maxVector[2];
+				box->vMax.x = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->maxVector[0];
+				box->vMax.y = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->maxVector[1];
+				box->vMax.z = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->maxVector[2];
 				//add min vector
-				box->vMin.x = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[i]->minVector[0];
-				box->vMin.y = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[i]->minVector[1];
-				box->vMin.z = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[i]->minVector[2];
+				box->vMin.x = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->minVector[0];
+				box->vMin.y = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->minVector[1];
+				box->vMin.z = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->minVector[2];
 				//push into gameobject
 				meshObject->bbox.push_back(box);
 			}
@@ -376,6 +357,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::Campfire)
 							{
 								other.setIsBurning(60.0f);
+								meltIceWall(other);
 							}
 							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::FlareGun)
 							{
@@ -410,12 +392,16 @@ void GameScene::collisionTest(GameObject & other)
 							Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
 							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
 							
-							if(other.getIsBurning())
+							if (other.getIsBurning())
+							{
 									gameObject_ptr->setIsBurning(5.f);
+							}
 							int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
 
 							if (gameObject_ptr->getIsBurning() && !other.getIsBurning())
+							{
 								other.setIsBurning(10.f);
+							}
 						}
 					}
 				}
@@ -438,7 +424,6 @@ void GameScene::makeObjectsInteractable()
 		}
 	}
 }
-
 
 void GameScene::addGameObject(const glm::vec3 position, const int key)
 {
@@ -495,6 +480,12 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	meshObject->setIsRenderable(true);
 	//Add to scene
 	gameObjects.push_back(meshObject);
+	//...
+	//Check if we created a new campfire and makes stuff happen if true
+	if (gameObjects[gameObjects.size() - 1]->objectID == ObjectType::ID::Campfire)
+	{
+		setBurningByDistance(5.f, *gameObjects[gameObjects.size() - 1]);
+	}
 
 }
 
@@ -539,16 +530,17 @@ void GameScene::meltIceWall(GameObject & other)
 {
 	for (GameObject* gameObject_ptr : gameObjects)
 	{
-		/*
 		if (gameObject_ptr->objectID == ObjectType::ID::IceWall && other.objectID == ObjectType::ID::Campfire)
 		{
-			if (glm::distance(gameObject_ptr->transform->position, other.transform->position) < 10)
+			// Check distance between campfire and icewall
+			// todo start timer in game object or similar.
+			// todo move icewall -y until it's under map and then delete it
+			if (glm::distance(gameObject_ptr->transform->position, other.transform->position) < 40)
 			{
-				gameObject_ptr->isActive = false;
-				break;
+				gameObject_ptr->moveBelowTerrain = true;
+				//break;
 			}
 		}
-		*/
 	}
 }
 
