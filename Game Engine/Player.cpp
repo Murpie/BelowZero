@@ -460,6 +460,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		equip("LighterIcon");
 		this->currentlyEquipedItem = 1;
+		this->equipedID = 43;
 		addImageToInventory("InventoryLighterIcon", 1);
 		inInventory[1] = true;
 		isPressed = true;
