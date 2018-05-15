@@ -308,7 +308,7 @@ void Player::swappingItem(float deltaTime)
 			if (pickUp >= 0)
 				swapItem = false;
 			else
-				pickUp += deltaTime * 2;
+				pickUp += deltaTime * 3;
 		}
 		else
 		{
@@ -318,7 +318,7 @@ void Player::swappingItem(float deltaTime)
 				this->equipedID = equipItem;
 			}
 			else
-				pickUp -= deltaTime * 2;
+				pickUp -= deltaTime * 4;
 		}
 	}
 }
@@ -477,14 +477,14 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 0)
 	{
-		equip("AxeIcon");
-		this->currentlyEquipedItem = 0;
-		this->equipItem = 33;
-		addImageToInventory("InventoryAxeIcon", 0);
-		inInventory[0] = true;
-		isPressed = true;
-		swapItem = true;
-		pullDown = true;
+		if (inInventory[0] == true)
+		{
+			this->currentlyEquipedItem = 0;
+			this->equipItem = 33;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 1)
 	{
@@ -501,28 +501,37 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		if (inInventory[2] == true)
 		{
-			equip("WoodIcon");
+			this->currentlyEquipedItem = 2;
+			this->equipItem = 45;
 			isPressed = true;
+			swapItem = true;
+			pullDown = true;
 		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 3)
 	{
-		equip("FoodIcon");
-		this->currentlyEquipedItem = 3;
-		addImageToInventory("InventoryFoodIcon", 3);
-		inInventory[3] = true;
-		isPressed = true;
+		if (inInventory[3] == true)
+		{
+			equip("FoodIcon");
+			this->currentlyEquipedItem = 3;
+			this->equipItem = 44;
+			addImageToInventory("InventoryFoodIcon", 3);
+			inInventory[3] = true;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 4)
 	{
-		equip("BucketIcon");
-		this->currentlyEquipedItem = 4;
-		this->equipItem = 34;
-		addImageToInventory("InventoryBucketIcon", 4);
-		inInventory[4] = true;
-		isPressed = true;
-		swapItem = true;
-		pullDown = true;
+		if (inInventory[4] == true)
+		{
+			this->currentlyEquipedItem = 4;
+			this->equipItem = 34;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+		}
 	}
 	else if (  glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE
 			&& glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_4) == GLFW_RELEASE
@@ -699,24 +708,27 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 {
 	// Check ObjectType ID
 	// Set isAlive to false if you want to delete the interacted item from the world.
-	if (id == ObjectType::ID::Bucket_Empty)
+	if (id == ObjectType::ID::Axe)
 	{
-		equip("BucketIcon");
-		addImageToInventory("InventoryBucketIcon", 4);
-		isAlive = false;
+		if (inInventory[0] == false)
+		{
+			equip("Axe");
+			this->currentlyEquipedItem = 0;
+			this->equipItem = 33;
+			addImageToInventory("InventoryAxeIcon", 0);
+			inInventory[0] = true;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+			isAlive = false;
+		}
+		else
+			addTextToScreen("Text-ItemAlreadyEquipped");
 	}
-	else if (id == ObjectType::ID::Jacket)
-	{
-		isAlive = false;
-	}
-	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
-	{
-		return 3;
-	}
-	else if ((  id == ObjectType::ID::BrokenTree   || id == ObjectType::ID::BrokenTree_Snow    || id == ObjectType::ID::DeadTree
+	else if ((id == ObjectType::ID::BrokenTree || id == ObjectType::ID::BrokenTree_Snow || id == ObjectType::ID::DeadTree
 		|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
-		|| id == ObjectType::ID::Pine_Tree    || id == ObjectType::ID::Pine_Tree_Snow     || id == ObjectType::ID::Tree 
-		|| id == ObjectType::ID::TreeWithSnow || id == ObjectType::ID::Tree_Small         || id == ObjectType::ID::Tree_Small_Snow)
+		|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree
+		|| id == ObjectType::ID::TreeWithSnow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
 		&& currentlyEquipedItem == 0)
 	{
 		if (inInventory[2] == false)
@@ -726,10 +738,57 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 			this->currentlyEquipedItem = 2;
 			addImageToInventory("InventoryWoodIcon", 2);
 			inInventory[2] = true;
+			this->currentlyEquipedItem = 2;
+			this->equipItem = 45;
+			swapItem = true;
+			pullDown = true;
 		}
 		else
 			addTextToScreen("Text-ItemAlreadyEquipped");
 	}
+	else if (id == ObjectType::ID::Can)
+	{
+		if (inInventory[3] == false)
+		{
+			equip("FoodIcon");
+			this->currentlyEquipedItem = 3;
+			this->equipItem = 46;
+			addImageToInventory("InventoryFoodIcon", 3);
+			inInventory[3] = true;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+			isAlive = false;
+		}
+		else
+			addTextToScreen("Text-ItemAlreadyEquipped");
+	}
+	else if (id == ObjectType::ID::Bucket_Empty)
+	{
+		if (inInventory[4] == false)
+		{
+			equip("BucketIcon");
+			this->currentlyEquipedItem = 4;
+			this->equipItem = 34;
+			addImageToInventory("InventoryBucketIcon", 4);
+			inInventory[4] = true;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+			isAlive = false;
+		}
+		else
+			addTextToScreen("Text-ItemAlreadyEquipped");
+	}
+	else if (id == ObjectType::ID::Jacket)
+	{
+		isAlive = false;
+	}
+	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
+	{
+		return 3;
+	}
+
 	if (id == ObjectType::ID::FlareGun)
 	{
 		this->win = true;

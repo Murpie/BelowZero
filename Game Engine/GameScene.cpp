@@ -143,7 +143,7 @@ void GameScene::addPlayer(MeshLib & meshLibrary, MaterialLib& materialLibrary)
 	playerObject->addComponent(player);
 
 	//Add Equipment Meshes
-	int equipmenID[] = { 33, 34, 44 };
+	int equipmenID[] = { 33, 34, 44, 45, 46 };
 
 	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++)
 	{
