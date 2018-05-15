@@ -44,7 +44,7 @@ void calculateLightSpacePositions(vec3 FragPos)
 	for (int i = 0; i < 3; i++)
 		lightSpacePosition[i] = lightSpaceMatrix[i] * vec4(FragPos, 1.0f);
 }
-
+float z;
 float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos)
 {
 	float shadow = 0.0f;
@@ -54,7 +54,7 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos)
 	vec2 UVCoords;
 	UVCoords.x = 0.5 * projectionCoordinates.x + 0.5;
 	UVCoords.y = 0.5 * projectionCoordinates.y + 0.5;
-	float z = 0.5 * projectionCoordinates.z + 0.5;
+	z = 0.5 * projectionCoordinates.z + 0.5;
 	
 	if (cascadeIndex == 0)
 		depth = texture(shadowMap0, UVCoords.xy).x;
@@ -134,7 +134,7 @@ void main()
 	FragColor = lighting * (1.0f - shadowFactor);
 	FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5, visibility);
 
-	//FragColor = lightSpacePosition[2].xyz;
+	//FragColor = lightSpacePosition[1].xyz;
 
 	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
 }

@@ -487,6 +487,8 @@ void RenderManager::Render() {
 	glViewport(0, 0, display_w, display_h);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
+	glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
 
 	calculateOrthoProjectionMatrices(shadowMapShaderProgram);
 
@@ -1209,10 +1211,10 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 	view_matrix = gameScene->gameObjects[0]->getViewMatrix();
 	inverseViewMatrix = glm::inverse(view_matrix);
 	lightView = glm::lookAt(glm::vec3(0.0, 8.0, 0.0), glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
-	float fieldOfView = 45.0f;
+	float fieldOfView = 60.0f;
 
 
-	float aspectRatio = display_h / display_w;
+	float aspectRatio = (float)display_h / (float)display_w;
 	float tanHalfHeightFOV = tanf(glm::radians(fieldOfView / 2.0f));
 	float tanHalfWidthFOV = tanf(glm::radians((fieldOfView * aspectRatio) / 2.0f));
 
@@ -1267,8 +1269,7 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 		
 		vView = glm::vec4(0.0f, 0.0f, cascadePlaneEnds[i + 1], 1.0f);
 		vClip = view_matrix * vView;
-		cascadesInClipSpace[i] = vClip.z;
-
+		cascadesInClipSpace[i] = vClip.x;
 	}
 }
 
