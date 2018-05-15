@@ -55,6 +55,7 @@ void GameScene::update(float deltaTime, float seconds)
 			}
 		}
 		gameObjects[i]->update(deltaTime, seconds);
+
 		collisionTest(*gameObjects[i]);
 
 		if (gameObjects[i]->isActive == false)
@@ -65,15 +66,8 @@ void GameScene::update(float deltaTime, float seconds)
 	}
 }
 
-void DoWork()
-{
-
-}
-
 void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 {
-	//std::thread test(addEquipment);
-
 	for (int i = 0; i < gameObjects.size(); i++)
 	{
 		gameObjects[i]->processEvents(window, deltaTime);
