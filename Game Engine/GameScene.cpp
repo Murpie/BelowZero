@@ -51,6 +51,7 @@ void GameScene::update(float deltaTime, float seconds)
 				if (gameObjects[j]->getTerrain() != nullptr)
 				{
 					gameObjects[i]->getPlayer()->setCurrentHeight(gameObjects[j]->getTerrain()->calculateY(u, v));
+					break;
 				}
 			}
 		}
@@ -540,7 +541,6 @@ void GameScene::meltIceWall(GameObject & other)
 			if (glm::distance(gameObject_ptr->transform->position, other.transform->position) < 40)
 			{
 				gameObject_ptr->moveBelowTerrain = true;
-				//break;
 			}
 		}
 	}
