@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <thread>
 
 #include "EnumID.h"
 #include "GameObject.h"
@@ -30,8 +31,8 @@ private:
 	int lightsInScene; 
 
 	void addLight(glm::vec3 transform, int lightType);
-	void addPlayer(MeshLib& meshLibrary);
-	void addEquipment(MeshLib & meshLibrary, MaterialLib& materialLibrary);
+	void addPlayer(MeshLib& meshLibrary, MaterialLib& materialLibrary);
+	void addEquipment();
 	void addLevelObjects(MeshLib& meshLibrary, MaterialLib& matertialLibrary, LeapLevel* level);
 	void addTerrain(const std::string & heightMap, GLuint shader);
 	void addMainMenu();
@@ -47,4 +48,9 @@ private:
 	bool addObject;
 	MaterialLib* material;
 	MeshLib* meshes;
+
+	//test functions
+	void setBurningByDistance(const float distance, GameObject & other);
+	void meltIceWall(GameObject & other);
+	//
 };

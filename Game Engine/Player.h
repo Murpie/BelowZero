@@ -68,6 +68,7 @@ public:
 	void addImageToInventory(std::string item, int inventorySlot);
 	bool checkInventory(std::string item);
 	void addTextToScreen(std::string item);
+	void swappingItem(float deltaTime);
 
 	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
 	void setCurrentHeight(float height);
@@ -82,10 +83,12 @@ public:
 	void heatResponse();
 	void takeDamange(float damage, float deltaTime);
 	int getEquipedItem();
+	const int getEquipedID();
 	bool addClick;
 
-	float pitch;
-	float yaw;
+	float oldPitch;
+	float oldYaw;
+	float pickUp;
 
 private:
 
@@ -103,6 +106,11 @@ private:
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
 
+	int equipedID;
+	bool swapItem;
+	bool pullDown;
+	int equipItem;
+
 	bool firstMouse;
 	float lastX, lastY;
 	double xpos, ypos;
@@ -110,6 +118,8 @@ private:
 	float xoffset;
 	float yoffset;
 	float sensitivity;
+	float pitch;
+	float yaw;
 
 	float time = 0.0;
 	float textTimer = 0.0;

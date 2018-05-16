@@ -32,6 +32,7 @@ public:
     bool hasLight;
 	bool isInteractable;
 	bool gameEnd;
+	bool moveBelowTerrain;
 	float timeAlive;
 	ObjectType::ID objectID;
 	std::string name;
@@ -86,4 +87,7 @@ private:
 	float timeToBurn;
 
 	glm::mat4 modelMatrix;
+
+	void moveDown(float deltaTime);
+	float timeLimit;
 };
