@@ -34,10 +34,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
 	//createMainMenuBuffer();
-
 	shatteredIce.CreateTextureData("glassNormalTangent.jpg");
-
-
 }
 
 RenderManager::~RenderManager()
@@ -49,7 +46,7 @@ void RenderManager::FindObjectsToRender() {
 		glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
 		float distance = length(vectorToObject);
 
-		if (gameScene->gameObjects[i]->getIsRenderable() == true && distance < 83) {
+		if (gameScene->gameObjects[i]->getIsRenderable() == true && distance < 100) {
 			gameObjectsToRender.push_back(gameScene->gameObjects[i]);
 		}
 
@@ -599,8 +596,6 @@ void RenderManager::Render() {
 
 	glUseProgram(geometryShaderProgram);
 
-
-
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	//glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
@@ -617,10 +612,11 @@ void RenderManager::Render() {
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
 		{
 			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
-			oldYaw = oldYaw - gameObjectsToRender[i]->getPlayer()->yaw;
-			oldPitch = oldPitch + (gameObjectsToRender[i]->getPlayer()->pitch);
-			tempMatrix = glm::rotate(tempMatrix, oldYaw, glm::vec3(0,1,0));
-			tempMatrix = glm::rotate(tempMatrix, oldPitch, glm::vec3(0, 0, 1));
+			glm::vec3 forward = glm::vec3(gameObjectsToRender[i]->transform->forward);
+			glm::vec3 right = glm::vec3(gameObjectsToRender[i]->transform->right);
+			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
+			tempMatrix = glm::rotate(tempMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
+			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldPitch + gameObjectsToRender[i]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
 		}
 		else
 		{
@@ -634,7 +630,6 @@ void RenderManager::Render() {
 		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
-	//printf("%f\n", gameObjectsToRender[0]->transform->position.y + gameObjectsToRender[0]->transform->forward.y);
 
 	//... VFX--------------------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
