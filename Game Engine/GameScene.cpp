@@ -365,7 +365,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 						{
 							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::Campfire)
 							{
-								other.setIsBurning(60.0f);
+								other.setIsBurning(5.0f);
 								meltIceWall(other);
 							}
 							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::FlareGun)
@@ -404,7 +404,7 @@ void GameScene::collisionTest(GameObject & other)
 							
 							if (other.getIsBurning())
 							{
-									gameObject_ptr->setIsBurning(5.f);
+									gameObject_ptr->setIsBurning(60.0f);
 							}
 							int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
 
