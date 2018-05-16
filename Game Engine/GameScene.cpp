@@ -145,7 +145,7 @@ void GameScene::addPlayer(MeshLib & meshLibrary, MaterialLib& materialLibrary)
 	playerObject->addComponent(player);
 
 	//Add Equipment Meshes
-	int equipmenID[] = { 33, 34, 44 };
+	int equipmenID[] = { 33, 34, 44, 45, 46 };
 
 	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++)
 	{
@@ -158,7 +158,6 @@ void GameScene::addPlayer(MeshLib & meshLibrary, MaterialLib& materialLibrary)
 		playerObject->addComponent(meshFilter);
 		playerObject->addComponent(materialLibrary.getMaterial(0));
 	}
-
 	//Add to scene
 	gameObjects.push_back(playerObject);
 	camerasInScene++;
@@ -222,17 +221,24 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 					{
 						bBox* box = new bBox();
 						//add center
-						box->center.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->center[0];
-						box->center.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->center[1];
-						box->center.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->center[2];
+						box->center.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[0];
+						box->center.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[1];
+						box->center.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->center[2];
+
 						//add max vector
-						box->vMax.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->maxVector[0];
-						box->vMax.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->maxVector[1];
-						box->vMax.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->maxVector[2];
+						box->vMax.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[0];
+						box->vMax.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[1];
+						box->vMax.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->maxVector[2];
+
+						/*glm::mat4 tempMatrix = glm::mat4(1);
+						tempMatrix = glm::translate(tempMatrix, box->center);
+						tempMatrix = glm::rotate(tempMatrix, glm::radians(level->levelObjects[i]->rotationY), glm::vec3(0, 1, 0));*/
+
 						//add min vector
-						box->vMin.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->minVector[0];
-						box->vMin.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->minVector[1];
-						box->vMin.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[j]->minVector[2];
+						box->vMin.x = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[0];
+						box->vMin.y = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[1];
+						box->vMin.z = meshLibrary.getMesh(0)->leapMesh->boundingBoxes[i]->minVector[2];
+
 						//push into gameobject
 						gameObject_ptr->bbox.push_back(box);
 					}
@@ -343,8 +349,9 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 			if (gameObject_ptr->getPlayer()->click == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
 			{
 				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-				if (distance < 15 && other.isInteractable == true)
+				if (distance < 10 && other.isInteractable == true)
 				{
+					
 					gameObject_ptr->getPlayer()->click = true;
 					RayData ray = Ray::getWorldRay(
 						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,

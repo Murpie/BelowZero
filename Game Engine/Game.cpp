@@ -368,6 +368,8 @@ void Game::addMeshName()
 		"FlareGun.leap",				//42
 		"IceWall.leap",					//43
 		"EquipedLighter.leap",			//44
+		"EquipedWood.leap",				//45
+		"EquipedCan.leap"				//46
 	};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)

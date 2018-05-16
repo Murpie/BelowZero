@@ -95,6 +95,8 @@ namespace ObjectType
 		Tree_Small_Snow,
 		FlareGun,
 		IceWall,
-		EquipedLighter
+		EquipedLighter,
+		EquipedWood,
+		EquipedCan
 	};
 }

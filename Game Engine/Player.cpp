@@ -9,6 +9,9 @@ Player::Player(Transform& transform) : Transformable(transform)
 
 	this->currentlyEquipedItem = -1;
 	this->equipedID = -1;
+	this->pickUp = -1;
+	this->swapItem = false;
+	this->pullDown = false;
 
 	this->hp = 80;
 	this->cold = 100;
@@ -38,10 +41,12 @@ Player::Player(Transform& transform) : Transformable(transform)
 	/**/
 	assetName = "CharacterMovement";
 	cameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-	cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
 	cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	pitch = 0;
 	yaw = 0;
+	oldPitch = 0;
+	oldYaw = 0;
 	firstMouse = true;
 	lastX = 400;
 	lastY = 300;
@@ -296,6 +301,30 @@ void Player::addTextToScreen(std::string item)
 
 }
 
+void Player::swappingItem(float deltaTime)
+{
+	if (swapItem)
+	{
+		if (!pullDown)
+		{
+			if (pickUp >= 0)
+				swapItem = false;
+			else
+				pickUp += deltaTime * 3;
+		}
+		else
+		{
+			if (pickUp <= -1)
+			{
+				pullDown = false;
+				this->equipedID = equipItem;
+			}
+			else
+				pickUp -= deltaTime * 4;
+		}
+	}
+}
+
 void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
 {
 	this->currentY = currentHeight;
@@ -328,6 +357,7 @@ void Player::update(float deltaTime, float seconds)
 	//update velocity
 	//Transformable::transform.velocity = Transformable::transform.forward * deltaTime;
 	//...
+	swappingItem(deltaTime);
 
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
@@ -447,48 +477,63 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			addImageToInventory("EmptyImage", i);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !isPressed)
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 0)
 	{
-		equip("AxeIcon");
-		this->currentlyEquipedItem = 0;
-		this->equipedID = 33;
-		addImageToInventory("InventoryAxeIcon", 0);
-		inInventory[0] = true;
-		isPressed = true;
+		if (inInventory[0] == true)
+		{
+			this->currentlyEquipedItem = 0;
+			this->equipItem = 33;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+		}
 	}
-	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !isPressed)
+	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 1)
 	{
 		equip("LighterIcon");
 		this->currentlyEquipedItem = 1;
-		this->equipedID = 44;
+		this->equipItem = 44;
 		addImageToInventory("InventoryLighterIcon", 1);
 		inInventory[1] = true;
 		isPressed = true;
+		swapItem = true;
+		pullDown = true;
 	}
-	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !isPressed)
+	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 2)
 	{
 		if (inInventory[2] == true)
 		{
-			equip("WoodIcon");
+			this->currentlyEquipedItem = 2;
+			this->equipItem = 45;
 			isPressed = true;
+			swapItem = true;
+			pullDown = true;
 		}
 	}
-	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && !isPressed)
+	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 3)
 	{
-		equip("FoodIcon");
-		this->currentlyEquipedItem = 3;
-		addImageToInventory("InventoryFoodIcon", 3);
-		inInventory[3] = true;
-		isPressed = true;
+		if (inInventory[3] == true)
+		{
+			equip("FoodIcon");
+			this->currentlyEquipedItem = 3;
+			this->equipItem = 46;
+			addImageToInventory("InventoryFoodIcon", 3);
+			inInventory[3] = true;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+		}
 	}
-	else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && !isPressed)
+	else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 4)
 	{
-		equip("BucketIcon");
-		this->currentlyEquipedItem = 4;
-		this->equipedID = 34;
-		addImageToInventory("InventoryBucketIcon", 4);
-		inInventory[4] = true;
-		isPressed = true;
+		if (inInventory[4] == true)
+		{
+			this->currentlyEquipedItem = 4;
+			this->equipItem = 34;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+		}
 	}
 	else if (  glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE
 			&& glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_4) == GLFW_RELEASE
@@ -508,30 +553,28 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	glm::mat4 matrix = glm::mat4(1);
 
-	glm::vec4 forward = normalize(glm::vec4(Transformable::transform.forward, 0));
-	glm::vec4 right = normalize(glm::vec4(Transformable::transform.right, 0));
-	glm::vec4 up = normalize(glm::vec4(Transformable::transform.up, 0));
 
-	matrix = glm::rotate(matrix, pitch, Transformable::transform.right);
-	matrix = glm::rotate(matrix, -yaw, Transformable::transform.up);
+	oldYaw = oldYaw - yaw;
+	oldPitch = oldPitch + pitch;
 
-	forward = matrix * forward;
-	right = matrix * right;
-
-//	up = glm::vec4(glm::cross(glm::vec3(right), glm::vec3(forward)), 0);
-	//if ((glm::dot(Transformable::transform.forward, Transformable::transform.up) < 0.9f && pitch > 0.0f) || (glm::dot(Transformable::transform.forward, Transformable::transform.up) > -0.9f && pitch < 0.0f))
-	Transformable::transform.forward = forward;
-	//else
-	//	pitch = 0;
-//	Transformable::transform.up = up;
+	matrix = glm::rotate(matrix, -oldYaw, Transformable::transform.up);
+	glm::vec4 right = glm::vec4(matrix[0][0], matrix[1][0], matrix[2][0], 0);
 	Transformable::transform.right = right;
 
-
-
-	//Transformable::transform.up = up;
-
-	//printf("%f, %f, %f\n", Transformable::transform.right.x, Transformable::transform.right.y, Transformable::transform.right.z);
-	//printf("%f,\n", glm::radians(pitch));
+	if (oldPitch < 1.48f && oldPitch > -1.48f)
+	{
+		matrix = glm::rotate(matrix, oldPitch, Transformable::transform.right);
+		glm::vec4 forward = glm::vec4(matrix[0][2], matrix[1][2], matrix[2][2], 0);
+		Transformable::transform.forward = forward;
+	}
+	else if (oldPitch > 1.48f)
+	{
+		oldPitch = 1.48f;
+	}
+	else if (oldPitch < -1.48f)
+	{
+		oldPitch = -1.48f;
+	}
 
 	if (firstMouse) {
 		lastX = (float)xpos;
@@ -593,8 +636,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			isWalking = true;
 
 		float tempY = Transformable::transform.position.y;
-		direction -= Transformable::transform.right;
-		Transformable::transform.position -= Transformable::transform.right * cameraSpeed * deltaTime;
+		direction += Transformable::transform.right;
+		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;
@@ -606,8 +649,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			isWalking = true;
 
 		float tempY = Transformable::transform.position.y;
-		direction += Transformable::transform.right;
-		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
+		direction -= Transformable::transform.right;
+		Transformable::transform.position -= Transformable::transform.right * cameraSpeed * deltaTime;
 		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;
@@ -665,24 +708,26 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 {
 	// Check ObjectType ID
 	// Set isAlive to false if you want to delete the interacted item from the world.
-	if (id == ObjectType::ID::Bucket_Empty)
+	if (id == ObjectType::ID::Axe)
 	{
-		equip("BucketIcon");
-		addImageToInventory("InventoryBucketIcon", 4);
-		isAlive = false;
+		if (inInventory[0] == false)
+		{
+			equip("Axe");
+			this->currentlyEquipedItem = 0;
+			this->equipItem = 33;
+			addImageToInventory("InventoryAxeIcon", 0);
+			inInventory[0] = true;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+			isAlive = false;
+		}
+		else
+			addTextToScreen("Text-ItemAlreadyEquipped");
 	}
-	else if (id == ObjectType::ID::Jacket)
-	{
-		isAlive = false;
-	}
-	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
-	{
-		return 3;
-	}
-	else if ((  id == ObjectType::ID::BrokenTree   || id == ObjectType::ID::BrokenTree_Snow    || id == ObjectType::ID::DeadTree
+	else if ((id == ObjectType::ID::BrokenTree || id == ObjectType::ID::BrokenTree_Snow || id == ObjectType::ID::DeadTree
 		|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
-		|| id == ObjectType::ID::Pine_Tree    || id == ObjectType::ID::Pine_Tree_Snow     || id == ObjectType::ID::Tree 
-		|| id == ObjectType::ID::TreeWithSnow || id == ObjectType::ID::Tree_Small         || id == ObjectType::ID::Tree_Small_Snow)
+		|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
 		&& currentlyEquipedItem == 0)
 	{
 		if (inInventory[2] == false)
@@ -692,10 +737,57 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 			this->currentlyEquipedItem = 2;
 			addImageToInventory("InventoryWoodIcon", 2);
 			inInventory[2] = true;
+			this->currentlyEquipedItem = 2;
+			this->equipItem = 45;
+			swapItem = true;
+			pullDown = true;
 		}
 		else
 			addTextToScreen("Text-ItemAlreadyEquipped");
 	}
+	else if (id == ObjectType::ID::Can)
+	{
+		if (inInventory[3] == false)
+		{
+			equip("FoodIcon");
+			this->currentlyEquipedItem = 3;
+			this->equipItem = 46;
+			addImageToInventory("InventoryFoodIcon", 3);
+			inInventory[3] = true;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+			isAlive = false;
+		}
+		else
+			addTextToScreen("Text-ItemAlreadyEquipped");
+	}
+	else if (id == ObjectType::ID::Bucket_Empty)
+	{
+		if (inInventory[4] == false)
+		{
+			equip("BucketIcon");
+			this->currentlyEquipedItem = 4;
+			this->equipItem = 34;
+			addImageToInventory("InventoryBucketIcon", 4);
+			inInventory[4] = true;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+			isAlive = false;
+		}
+		else
+			addTextToScreen("Text-ItemAlreadyEquipped");
+	}
+	else if (id == ObjectType::ID::Jacket)
+	{
+		isAlive = false;
+	}
+	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
+	{
+		return 3;
+	}
+
 	if (id == ObjectType::ID::FlareGun)
 	{
 		this->win = true;
