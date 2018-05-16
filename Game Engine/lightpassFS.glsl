@@ -3,7 +3,6 @@ layout(location = 0) out vec3 FragColor;
 
 in vec2 TexCoords;
 uniform vec3 view_position;
-uniform vec3 player_position;
 
 struct Light {
 	vec3 Position;

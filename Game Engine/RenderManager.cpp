@@ -1170,7 +1170,7 @@ void RenderManager::Render() {
 
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
-	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "player_position"), 1, glm::value_ptr(positionForShadowToLookAt));
+	
 
 
 	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ScreenX"), SCREEN_WIDTH);
