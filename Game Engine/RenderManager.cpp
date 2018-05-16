@@ -35,7 +35,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
 	//createMainMenuBuffer();
 
-	shatteredIce.CreateTextureData("glassNormalTangent.jpg");
+	shatteredIce.CreateTextureData("iceNormal2.jpg");
 
 
 }
@@ -494,18 +494,19 @@ void RenderManager::Render() {
 	FindObjectsToRender();
 	dayNightCycle();
 
-	for (int i = 0; i < gameScene->gameObjects.size(); i++)
-	{
-		if (gameScene->gameObjects[i]->getPlayer() != nullptr)
-		{
-			glm::vec2 temp = gameScene->gameObjects[i]->getPlayer()->setXZ();
-			for (int j = 0; j < gameScene->gameObjects.size(); j++)
-				if (gameScene->gameObjects[j]->getTerrain() != nullptr)
-				{
-					gameScene->gameObjects[i]->getPlayer()->setCurrentHeight(gameScene->gameObjects[j]->getTerrain()->calculateY(temp.x, temp.y));
-				}
-		}
-	}
+	//for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	//{
+	//	if (gameScene->gameObjects[i]->getPlayer() != nullptr)
+	//	{
+	//		glm::vec2 temp = gameScene->gameObjects[i]->getPlayer()->setXZ();
+	//		for (int j = 0; j < gameScene->gameObjects.size(); j++)
+	//			if (gameScene->gameObjects[j]->getTerrain() != nullptr)
+	//			{
+	//				gameScene->gameObjects[i]->getPlayer()->setIsWalkable(gameScene->gameObjects[j]->getTerrain()->calculateNormal(temp.x, temp.y));
+	//				gameScene->gameObjects[i]->getPlayer()->setCurrentHeight(gameScene->gameObjects[j]->getTerrain()->calculateY(temp.x, temp.y));
+	//			}
+	//	}
+	//}
 
 	//... Set view and projection matrix
 	for (int i = 0; i < gameScene->gameObjects.size(); i++)
@@ -655,6 +656,17 @@ void RenderManager::Render() {
 	{
 		if (gameObject_ptr->getIsBurning())
 		{
+
+			gameObject_ptr->burning.setPosition(gameScene->gameObjects[0]->getPlayer()->transform.position - gameObject_ptr->transform->position);
+			//gameObject_ptr->burning.setPosition(glm::vec3(0.0, 1.0, 1.0));
+			if (!gameObject_ptr->burning.isPlaying())
+			{
+				gameObject_ptr->burning.setAttenuation(10.0f);
+				gameObject_ptr->burning.setRelativeToListener(true);
+				gameObject_ptr->burning.loop(true);
+				gameObject_ptr->burning.playSound();
+
+			}
 			//Particle system location, can be changed dynamically if e.g. a torch is wanted
 
 			//defaultX = 536.0f;

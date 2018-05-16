@@ -224,8 +224,8 @@ void Game::levelState()
 	}
 	else if (stateOfGame.state == Gamestate::ID::RUN_LEVEL)
 	{
-		gameScene.update(deltaTime, seconds);
 		processInput(window, deltaTime, gameScene);
+		gameScene.update(deltaTime, seconds);
 		renderManager[1].setDeltaTime(deltaTime);
 		renderManager[1].setSeconds(seconds);
 		renderManager[1].Render();

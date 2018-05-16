@@ -15,6 +15,7 @@ GameObject::GameObject()
 	modelMatrix = glm::mat4();
 	objectID = ObjectType::ID::Stone_1;
 	fireComponent = nullptr;
+	burning.addSound("fireplace.wav");
 }
 
 GameObject::~GameObject()
@@ -40,6 +41,7 @@ void GameObject::update(float deltaTime, float seconds)
 		timeAlive += deltaTime;
 		if (timeAlive >= timeToBurn)
 		{
+			burning.stopSound();
 			isBurning = false;
 			if (fireComponent != nullptr)
 			{
@@ -191,8 +193,9 @@ void GameObject::setIsRenderable(bool isRenderable)
 	this->isRenderable = isRenderable;
 }
 
-void GameObject::setIsBurning(float timeToBurn)
+void GameObject::setIsBurning(float timeToBurn, glm::vec3 playerPos)
 {
+
 	this->timeToBurn = timeToBurn;
 	timeAlive = 0.0f;
 
