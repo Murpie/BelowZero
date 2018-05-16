@@ -61,10 +61,7 @@ public:
 	void Update();
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
-	void setupMatrices(unsigned int shaderToUse);
 	void setupMeshY();
-	void calculateOrthoProjectionMatrices(unsigned int shaderToUse);
-	void setOrthoProjectionMatrix(int index);
 	void renderFireParticles();
 	void renderSnowParticles();
 	void dayNightCycle();
@@ -85,8 +82,10 @@ public:
 	int FindUnusedParticle(Particle* container, int lastUsedParticle);
 	void ParticleLinearSort(Particle* arr, int size);
 
+	//Shadows
 	void bindForWriting(int cascadeIndex);
-	void bindForReading();
+	void calculateOrthoProjectionMatrices(unsigned int shaderToUse);
+	void setOrthoProjectionMatrix(int index);
 
 private:
 

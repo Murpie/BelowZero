@@ -32,7 +32,6 @@ public:
 	float damage;
 	float fade;
 	float winFade;
-	float textFade;
 	float flareTimer;
 
 	std::string equipedItem;

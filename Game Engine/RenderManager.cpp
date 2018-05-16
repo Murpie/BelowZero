@@ -530,7 +530,9 @@ void RenderManager::Render() {
 				if (gameScene->gameObjects[j]->getTerrain() != nullptr)
 				{
 					gameScene->gameObjects[i]->getPlayer()->setCurrentHeight(gameScene->gameObjects[j]->getTerrain()->calculateY(temp.x, temp.y));
+					break;
 				}
+			break;
 		}
 	}
 
@@ -625,6 +627,8 @@ void RenderManager::Render() {
 			gameScene->gameObjects[i]->getTerrain()->bindVertexArray();
 			
 			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
+			
+			break;
 		}
 	}
 	
@@ -1170,9 +1174,6 @@ void RenderManager::Render() {
 
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
-	
-
-
 	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ScreenX"), SCREEN_WIDTH);
 	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ScreenY"), SCREEN_HEIGHT);
 
@@ -1343,7 +1344,6 @@ void RenderManager::Render() {
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0]->getPlayer()->fade);
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "winFade"), gameScene->gameObjects[0]->getPlayer()->winFade);
 			glUniform1f(glGetUniformLocation(UIShaderProgram, "flareTimer"), gameScene->gameObjects[0]->getPlayer()->flareTimer);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0]->getPlayer()->textFade);
 
 			//glBindTexture(GL_TEXTURE_2D, finalPPFBO);
 			renderQuad();

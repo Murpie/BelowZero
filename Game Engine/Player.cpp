@@ -28,7 +28,6 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->fade = 1;
 	this->winFade = 0;
 	this->flareTimer = 0;
-	this->textFade = 1;
 	this->startGame = true;
 	this->isPressed = false;
 	this->win = false;
@@ -287,10 +286,7 @@ void Player::addTextToScreen(std::string item)
 	if (item == "EmptyImageTexture")
 		this->textOnScreen = false;
 	else
-	{
 		this->textOnScreen = true;
-		this->textFade = 1.0;
-	}
 
 	this->textTimer = 0.0;
 
@@ -400,9 +396,6 @@ void Player::update(float deltaTime, float seconds)
 		this->winFade += deltaTime / 10.0f;
 	}
 
-	// Text Fade
-	if (this->textOnScreen == true)
-		this->textFade -= 0.05;
 	//else if (this->textOnScreen == false)
 	//this->textFade = 1.0;
 

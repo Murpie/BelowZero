@@ -20,7 +20,6 @@ uniform float food;
 uniform float fade;
 uniform float winFade;
 uniform float flareTimer;
-uniform float textFade;
 
 void main()
 {
