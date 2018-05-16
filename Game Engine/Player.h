@@ -48,7 +48,7 @@ public:
 	int maxAmountOfItems;
 	int inventoryCount;
 
-	std::string imageNames[5] = { "InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "MainMenuConcept" };
+	std::string imageNames[5] = { "InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "InventoryBucketIconTexture" };
 	std::string imagesCurrentlyInInventory[5] = { "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage" };
 
 	unsigned int equipedFBO;
