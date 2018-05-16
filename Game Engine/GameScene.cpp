@@ -445,15 +445,34 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	for (GameObject* gameObject_ptr : gameObjects)
 	{
 		if (gameObject_ptr->getTerrain() != nullptr)
+		{
 			terrain = gameObject_ptr->getTerrain();
+			break;
+		}
 	}
 
-	gameObjects[0]->getPlayer()->dropItem();
+	glm::vec3 offsetVector;
+	float distance = 10.f;
+
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->getPlayer() != nullptr)
+		{
+			if (key == (int)ObjectType::ID::Campfire)
+				gameObject_ptr->getPlayer()->dropItem();
+
+			offsetVector = gameObject_ptr->transform->forward;
+			break;
+		}
+
+	}
 
 	//Create new mesh object
 	GameObject* meshObject = new GameObject();
 	//Set mesh object position in world
 	meshObject->transform->position = position;
+	// Add offset values to position
+	meshObject->transform->position += offsetVector * distance;
 	//Calculate new world Y-position from height map and update value
 	float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z);
 	meshObject->transform->position.y = newPositionY;
