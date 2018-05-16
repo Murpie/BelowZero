@@ -58,7 +58,7 @@ public:
 
     const bool getIsRenderable();
 	void setIsRenderable(bool isRenderable);
-	void setIsBurning(float timeToBurn, glm::vec3 playerPos);
+	void setIsBurning(float timeToBurn);
 	void setGameEnd();
 
 	const bool getIsBurning();

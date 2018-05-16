@@ -197,7 +197,7 @@ void GameObject::setIsRenderable(bool isRenderable)
 	this->isRenderable = isRenderable;
 }
 
-void GameObject::setIsBurning(float timeToBurn, glm::vec3 playerPos)
+void GameObject::setIsBurning(float timeToBurn)
 {
 
 	this->timeToBurn = timeToBurn;

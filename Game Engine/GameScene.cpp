@@ -337,7 +337,7 @@ void GameScene::checkInteractionResponse(GameObject & other, int objectID)
 {
 	if (objectID == (int)ObjectType::ID::Campfire)
 	{
-		other.setIsBurning(60.0f, gameObjects[0]->getPlayer()->transform.position);
+		other.setIsBurning(60.0f);
 	}
 }
 
