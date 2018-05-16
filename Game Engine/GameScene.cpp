@@ -443,6 +443,9 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 		if (gameObject_ptr->getTerrain() != nullptr)
 			terrain = gameObject_ptr->getTerrain();
 	}
+
+	gameObjects[0]->getPlayer()->dropItem();
+
 	//Create new mesh object
 	GameObject* meshObject = new GameObject();
 	//Set mesh object position in world
@@ -496,7 +499,6 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	{
 		setBurningByDistance(5.f, *gameObjects[gameObjects.size() - 1]);
 	}
-
 }
 
 void GameScene::addNewObjectTest(GLFWwindow * window)
