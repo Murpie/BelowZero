@@ -91,12 +91,13 @@ public:
 	float pickUp;
 
 private:
+	float previousY;
+	bool isColliding;
 
-
-	bool frontCollision = false;
-	bool bottomCollision = false;
-	bool leftCollision = false;
-	bool rightCollision = false;
+	bool movingForward = false;
+	bool movingBackwards = false;
+	bool movingLeft = false;
+	bool movingRight = false;
 	bool backCollision = false;
 	bool topCollision = false;
 	bool inInventory[5];
