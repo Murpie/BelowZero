@@ -766,17 +766,6 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 	{
 		if (inInventory[4] == false)
 		{
-			equip("BucketIcon");
-			this->currentlyEquipedItem = 4;
-			this->equipItem = 34;
-			addImageToInventory("InventoryBucketIcon", 4);
-			inInventory[4] = true;
-			isPressed = true;
-			swapItem = true;
-			pullDown = true;
-			isAlive = false;
-		}
-		else
 			if (counter >= 4)
 			{
 				isAlive = false;
