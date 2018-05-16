@@ -348,8 +348,9 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 			if (gameObject_ptr->getPlayer()->click == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
 			{
 				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-				if (distance < 15 && other.isInteractable == true)
+				if (distance < 10 && other.isInteractable == true)
 				{
+					
 					gameObject_ptr->getPlayer()->click = true;
 					RayData ray = Ray::getWorldRay(
 						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,

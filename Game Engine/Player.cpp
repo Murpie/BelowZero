@@ -516,7 +516,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		{
 			equip("FoodIcon");
 			this->currentlyEquipedItem = 3;
-			this->equipItem = 44;
+			this->equipItem = 46;
 			addImageToInventory("InventoryFoodIcon", 3);
 			inInventory[3] = true;
 			isPressed = true;
@@ -575,8 +575,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		oldPitch = -1.48f;
 	}
-
-	printf("%f\n", oldPitch);
 
 	if (firstMouse) {
 		lastX = (float)xpos;
