@@ -325,6 +325,11 @@ void Player::swappingItem(float deltaTime)
 	}
 }
 
+void Player::dropItem()
+{
+	pickUp = -1;
+}
+
 void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
 {
 	this->currentY = currentHeight;

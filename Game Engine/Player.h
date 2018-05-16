@@ -69,6 +69,7 @@ public:
 	bool checkInventory(std::string item);
 	void addTextToScreen(std::string item);
 	void swappingItem(float deltaTime);
+	void dropItem();
 
 	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
 	void setCurrentHeight(float height);
