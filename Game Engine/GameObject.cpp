@@ -17,6 +17,7 @@ GameObject::GameObject()
 	modelMatrix = glm::mat4();
 	objectID = ObjectType::ID::Stone_1;
 	fireComponent = nullptr;
+	playerHitCounter = 0;
 }
 
 GameObject::~GameObject()

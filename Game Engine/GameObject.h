@@ -34,6 +34,7 @@ public:
 	bool gameEnd;
 	bool moveBelowTerrain;
 	float timeAlive;
+	int playerHitCounter; //used to count how many hits the object has taken from player
 	ObjectType::ID objectID;
 	std::string name;
 	Transform *transform;

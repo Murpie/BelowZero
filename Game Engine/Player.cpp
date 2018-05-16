@@ -661,7 +661,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	}
 }
 
-int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
+int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & counter)
 {
 	// Check ObjectType ID
 	// Set isAlive to false if you want to delete the interacted item from the world.
@@ -679,19 +679,32 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	{
 		return 3;
 	}
-	else if ((  id == ObjectType::ID::BrokenTree   || id == ObjectType::ID::BrokenTree_Snow    || id == ObjectType::ID::DeadTree
-		|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
-		|| id == ObjectType::ID::Pine_Tree    || id == ObjectType::ID::Pine_Tree_Snow     || id == ObjectType::ID::Tree 
-		|| id == ObjectType::ID::TreeWithSnow || id == ObjectType::ID::Tree_Small         || id == ObjectType::ID::Tree_Small_Snow)
+	else if ((  id == ObjectType::ID::BrokenTree   
+		|| id == ObjectType::ID::BrokenTree_Snow    
+		|| id == ObjectType::ID::DeadTree
+		|| id == ObjectType::ID::DeadTreeSnow 
+		|| id == ObjectType::ID::DeadTreeSnow_Small 
+		|| id == ObjectType::ID::DeadTree_Small
+		|| id == ObjectType::ID::Pine_Tree    
+		|| id == ObjectType::ID::Pine_Tree_Snow     
+		|| id == ObjectType::ID::Tree 
+		|| id == ObjectType::ID::TreeWithSnow 
+		|| id == ObjectType::ID::Tree_Small         
+		|| id == ObjectType::ID::Tree_Small_Snow)
 		&& currentlyEquipedItem == 0)
 	{
 		if (inInventory[2] == false)
 		{
-			isAlive = false;
-			equip("WoodIcon");
-			this->currentlyEquipedItem = 2;
-			addImageToInventory("InventoryWoodIcon", 2);
-			inInventory[2] = true;
+			if (counter >= 4)
+			{
+				isAlive = false;
+				equip("WoodIcon");
+				this->currentlyEquipedItem = 2;
+				addImageToInventory("InventoryWoodIcon", 2);
+				inInventory[2] = true;
+			}
+			else
+				counter++;
 		}
 		else
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -702,6 +715,10 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		return 42;
 	}
 	else if(id == ObjectType::ID::Axe)
+	{
+		isAlive = false;
+	}
+	else if (id == ObjectType::ID::Axe)
 	{
 		isAlive = false;
 	}
