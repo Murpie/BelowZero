@@ -727,8 +727,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	}
 	else if ((id == ObjectType::ID::BrokenTree || id == ObjectType::ID::BrokenTree_Snow || id == ObjectType::ID::DeadTree
 		|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
-		|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree
-		|| id == ObjectType::ID::TreeWithSnow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
+		|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
 		&& currentlyEquipedItem == 0)
 	{
 		if (inInventory[2] == false)
