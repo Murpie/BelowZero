@@ -352,14 +352,6 @@ void Player::setCurrentHeight(float height)
 	currentY = height + 7;
 }
 
-void Player::setIsWalkable(bool walkable)
-{
-	if (walkable)
-		isColliding = false;
-	else
-		isColliding = true;
-}
-
 glm::vec2 Player::setXZ()
 {
 	float u = Transformable::transform.position.x;
@@ -374,48 +366,6 @@ void Player::update(float deltaTime, float seconds)
 	//update velocity
 	//Transformable::transform.velocity = Transformable::transform.forward * deltaTime;
 	//...
-	if (isColliding && lastPos.y < currentY)
-	{
-		Transformable::transform.position = lastPos;
-		currentY = lastPos.y;
-	}
-	if (time <= timeInAir && inAir == true)
-	{
-		glm::vec3 jumpdir = Transformable::transform.up;
-
-		Transformable::transform.position += jumpSpeed * jumpdir * deltaTime;
-		Transformable::transform.velocity = Transformable::transform.up * deltaTime * cameraSpeed;
-	}
-	else
-		inAir = false;
-
-
-	if (inAir == false && Transformable::transform.position.y <= currentY)
-	{
-		gravity = false;
-		jumpReady = true;
-	}
-	else
-		gravity = true;
-
-
-	if (gravity == true && inAir == false)
-		Transformable::transform.position -= fallSpeed * Transformable::transform.up  * deltaTime;
-
-
-	if (Transformable::transform.position.y <= currentY - 0.0001)
-		Transformable::transform.position.y = currentY;
-
-	if (isWalking == true)
-	{
-		if (!SnowCrunch.isPlaying())
-			SnowCrunch.playSound();
-	}
-	else
-	{
-		SnowCrunch.stopSound();
-	}
-//=======================-------------Leons Test Sak------------==================
 
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
@@ -511,12 +461,6 @@ void Player::update(float deltaTime, float seconds)
 void Player::processEvents(GLFWwindow * window, float deltaTime)
 {
 	isWalking = false;
-	movingForward = false;
-	movingBackwards = false;
-	movingLeft = false;
-	movingRight = false;
-
-	lastPosTemp = Transformable::transform.position;
 
 	//Equipment and Stats
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)

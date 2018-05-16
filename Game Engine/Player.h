@@ -16,7 +16,6 @@ public:
 	SoundMasterSFML AmbientMusic;
 	SoundMasterSFML AmbientWind;
 	SoundMasterSFML Swing;
-	SoundMasterSFML fireSound;
 
 	bool click;
 
@@ -73,7 +72,6 @@ public:
 
 	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
 	void setCurrentHeight(float height);
-	void setIsWalkable(bool walkable);
 	glm::vec2 setXZ();
 	//Physics
 	void update(float deltaTime, float seconds);
@@ -93,14 +91,14 @@ public:
 	float pickUp;
 
 private:
-	bool isColliding = false;
 
-	bool movingForward = false;
-	bool movingBackwards = false;
-	bool movingLeft = false;
-	bool movingRight = false;
-	bool isMovingThisFrame = false;
 
+	bool frontCollision = false;
+	bool bottomCollision = false;
+	bool leftCollision = false;
+	bool rightCollision = false;
+	bool backCollision = false;
+	bool topCollision = false;
 	bool inInventory[5];
 	bool isPressed;
 
@@ -129,9 +127,9 @@ private:
 	float time = 0.0;
 	float textTimer = 0.0;
 
-	float jumpSpeed = 13.64;
+	float jumpSpeed = 7.64;
 	float cameraSpeed = 7.06;
-	float fallSpeed = 18.82;
+	float fallSpeed = 9.82;
 	//--------=====Jumping=====-----------
 
 	bool jumpReady = true;
@@ -144,7 +142,6 @@ private:
 
 	//Terrain
 	float currentY;
-	float previousY;
 	float frontVertexHeight;
 	float backVertexHeight;
 	float leftVertexHeight;

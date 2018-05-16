@@ -50,9 +50,7 @@ void GameScene::update(float deltaTime, float seconds)
 				float v = UVS.y;
 				if (gameObjects[j]->getTerrain() != nullptr)
 				{
-					gameObjects[i]->getPlayer()->setIsWalkable(gameObjects[j]->getTerrain()->calculateNormal(u, v));
 					gameObjects[i]->getPlayer()->setCurrentHeight(gameObjects[j]->getTerrain()->calculateY(u, v));
-					break;
 				}
 			}
 		}
@@ -64,6 +62,7 @@ void GameScene::update(float deltaTime, float seconds)
 		{
 			delete gameObjects[i];
 			gameObjects.erase(gameObjects.begin() + i);
+			//gameObjects[i] = gameObjects.erase(gameObjects[i]);
 		}
 	}
 }
@@ -367,7 +366,6 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::Campfire)
 							{
 								other.setIsBurning(60.0f);
-								meltIceWall(other);
 							}
 							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::FlareGun)
 							{
@@ -403,16 +401,12 @@ void GameScene::collisionTest(GameObject & other)
 							Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
 							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
 							
-							if (other.getIsBurning())
-							{
+							if(other.getIsBurning())
 									gameObject_ptr->setIsBurning(5.f);
-							}
 							int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
 
 							if (gameObject_ptr->getIsBurning() && !other.getIsBurning())
-							{
 								other.setIsBurning(10.f);
-							}
 						}
 					}
 				}

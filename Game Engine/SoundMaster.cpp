@@ -58,22 +58,6 @@ void SoundMasterSFML::setPitch(float pitch)
 
 }
 
-void SoundMasterSFML::setPosition(glm::vec3 pos)
-{
-	Sound.setPosition(pos.x, pos.y, pos.z);
-}
-
-void SoundMasterSFML::setRelativeToListener(bool relative)
-{
-	Sound.setRelativeToListener(relative);
-}
-
-void SoundMasterSFML::setAttenuation(float atten)
-{
-	Sound.setAttenuation(atten);
-	
-}
-
 void SoundMasterSFML::loop(bool looping)
 {
 	Sound.setLoop(looping);
