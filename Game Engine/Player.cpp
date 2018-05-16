@@ -696,10 +696,14 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		else
 			addTextToScreen("Text-ItemAlreadyEquipped");
 	}
-	if (id == ObjectType::ID::FlareGun)
+	else if (id == ObjectType::ID::FlareGun)
 	{
 		this->win = true;
 		return 42;
+	}
+	else if(id == ObjectType::ID::Axe)
+	{
+		isAlive = false;
 	}
 	/*
 	if(id == fallenTree && axeIsEquiped)

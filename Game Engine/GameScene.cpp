@@ -93,7 +93,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("IceIceBby.leap");
+		LeapLevel* level = new LeapLevel("IceIceBaby2.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
 
@@ -332,6 +332,10 @@ void GameScene::checkInteractionResponse(GameObject & other, int objectID)
 	{
 		other.setIsBurning(60.0f);
 	}
+	if (objectID == (int)ObjectType::ID::Axe)
+	{
+		std::cout << "GameScene::Axe_intersection" << std::endl;
+	}
 }
 
 void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
@@ -356,6 +360,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 					{
 						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
 						{
+
 							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::Campfire)
 							{
 								other.setIsBurning(60.0f);
