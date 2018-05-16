@@ -737,15 +737,21 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 	{
 		if (inInventory[2] == false)
 		{
-			isAlive = false;
-			equip("WoodIcon");
-			this->currentlyEquipedItem = 2;
-			addImageToInventory("InventoryWoodIcon", 2);
-			inInventory[2] = true;
-			this->currentlyEquipedItem = 2;
-			this->equipItem = 45;
-			swapItem = true;
-			pullDown = true;
+
+			if (counter >= 4)
+			{
+				isAlive = false;
+				equip("WoodIcon");
+				this->currentlyEquipedItem = 2;
+				addImageToInventory("InventoryWoodIcon", 2);
+				inInventory[2] = true;
+				this->currentlyEquipedItem = 2;
+				this->equipItem = 45;
+				swapItem = true;
+				pullDown = true;
+			}
+			else
+				counter++;
 		}
 		else
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -771,16 +777,15 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 	{
 		if (inInventory[4] == false)
 		{
-			if (counter >= 4)
-			{
-				isAlive = false;
-				equip("WoodIcon");
-				this->currentlyEquipedItem = 2;
-				addImageToInventory("InventoryWoodIcon", 2);
-				inInventory[2] = true;
-			}
-			else
-				counter++;
+			isAlive = false;
+			equip("BucketIconTexture");
+			this->currentlyEquipedItem = 4;
+			addImageToInventory("InventoryBucketIconTexture", 4);
+			inInventory[4] = true;
+			this->currentlyEquipedItem = 4;
+			this->equipItem = 34;
+			swapItem = true;
+			pullDown = true;
 		}
 		else
 			addTextToScreen("Text-ItemAlreadyEquipped");
