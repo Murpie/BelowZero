@@ -451,8 +451,10 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 		}
 	}
 
+	// Direction vector of the camera
 	glm::vec3 offsetVector;
-	float distance = 10.f;
+	// Distance to place object infront of the position vector
+	float distance = 7.5f;
 
 	for (GameObject* gameObject_ptr : gameObjects)
 	{
