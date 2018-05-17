@@ -58,6 +58,15 @@ void AI::move(float deltaTime)
 {
 	//Transformable::transform.position;
 	Transformable::transform.position += direction * transform.forward * (float)SPEED * deltaTime;
+	//X: = originX + cos(angle)*radius;
+	//Y: = originY + sin(angle)*radius;
+	// (originX, originY) is the center of your circle. radius is its radius. That's it.
+	float radius = 20.f;
+	float x = startPosition.x + glm::cos(30) * radius;
+	float y = startPosition.y + glm::sin(30) * radius;
+
+	//Transformable::transform.position.x = x * (float)SPEED; //* deltaTime;
+	//Transformable::transform.position.y += y * (float)SPEED * deltaTime;
 }
 
 void AI::moveHome()
