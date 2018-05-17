@@ -13,6 +13,9 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->swapItem = false;
 	this->pullDown = false;
 	this->jacket = false;
+	this->bucketContent = 0;
+	this->swing = false;
+	this->axeSwing = 0;
 
 	this->hp = 80;
 	this->cold = 100;
@@ -331,6 +334,26 @@ void Player::dropItem()
 	pickUp = -1;
 }
 
+void Player::useItem(GLFWwindow * window)
+{
+	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 0 && pickUp >= 0 && !swing)
+	{
+		swing = true;
+		axeSwing = 0;
+	}
+
+	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 4 && pickUp >= 0)
+	{
+		if (bucketContent == 0)
+		{
+			bucketContent = 1;
+			equipItemMesh();
+			swapItem = true;
+			pullDown = true;
+		}
+	}
+}
+
 void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
 {
 	this->currentY = currentHeight;
@@ -364,6 +387,9 @@ void Player::update(float deltaTime, float seconds)
 	//Transformable::transform.velocity = Transformable::transform.forward * deltaTime;
 	//...
 	swappingItem(deltaTime);
+
+	if (swing)
+		swingAxe(deltaTime);
 
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
@@ -459,6 +485,8 @@ void Player::update(float deltaTime, float seconds)
 void Player::processEvents(GLFWwindow * window, float deltaTime)
 {
 	isWalking = false;
+
+	useItem(window);
 
 	//Equipment and Stats
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
@@ -738,10 +766,8 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 	{
 		if (inInventory[2] == false)
 		{
-
 			if (counter >= 4)
 			{
-				isAlive = false;
 				equip("WoodIcon");
 				this->currentlyEquipedItem = 2;
 				addImageToInventory("InventoryWoodIcon", 2);
@@ -750,6 +776,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 				this->equipItem = 45;
 				swapItem = true;
 				pullDown = true;
+				isAlive = false;
 			}
 			else
 				counter++;
@@ -778,15 +805,15 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 	{
 		if (inInventory[4] == false)
 		{
-			isAlive = false;
-			equip("BucketIconTexture");
-			this->currentlyEquipedItem = 4;
-			addImageToInventory("InventoryBucketIconTexture", 4);
-			inInventory[4] = true;
+			equip("BucketIcon");
 			this->currentlyEquipedItem = 4;
 			this->equipItem = 34;
+			addImageToInventory("InventoryBucketIcon", 4);
+			inInventory[4] = true;
+			isPressed = true;
 			swapItem = true;
 			pullDown = true;
+			isAlive = false;
 		}
 		else
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -906,10 +933,23 @@ void Player::equipItemMesh()
 		case 4:
 		{
 			if (jacket)
-				this->equipItem = 47;
+			{
+				if (bucketContent = 0)
+					this->equipItem = 47;
+				else if (bucketContent = 1)
+					this->equipItem = 48;
+				else
+					this->equipItem = 49;
+			}
 			else
-				this->equipItem = 34;
-			break;
+			{
+				if (bucketContent = 0)
+					this->equipItem = 34;
+				else if (bucketContent = 1)
+					this->equipItem = 35;
+				else
+					this->equipItem = 36;
+			}
 		}
 	}
 		
@@ -925,4 +965,34 @@ void Player::findY()
 	float xpos = cameraPos.x;
 	float xCoord = ((int)cameraPos.x % (int)distanceToNextVertex) / distanceToNextVertex;
 	float zCoord = ((int)cameraPos.z % (int)distanceToNextVertex) / distanceToNextVertex;
+}
+
+void Player::swingAxe(float deltaTime)
+{
+	if (currentlyEquipedItem != 0)
+	{
+		swing = false;
+		return;
+	}
+	else if (pickUp < 0.4 && axeSwing == 0)
+	{
+		pickUp += deltaTime * 2;
+		if (pickUp >= 0.4)
+			axeSwing = 1;
+	}
+	else if (pickUp > -0.3 && axeSwing == 1)
+	{
+		pickUp -= deltaTime * 7;
+		if (pickUp <= -0.3)
+			axeSwing = 3;
+	}
+	else if (pickUp < 0 && axeSwing == 3)
+	{
+		pickUp += deltaTime;
+		if (pickUp >= 0)
+		{
+			pickUp = 0;
+			swing = false;
+		}
+	}
 }

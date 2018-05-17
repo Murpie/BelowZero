@@ -70,6 +70,7 @@ public:
 	void addTextToScreen(std::string item);
 	void swappingItem(float deltaTime);
 	void dropItem();
+	void useItem(GLFWwindow * window);
 
 	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
 	void setCurrentHeight(float height);
@@ -112,6 +113,9 @@ private:
 	bool pullDown;
 	int equipItem;
 	bool jacket;
+	int bucketContent;
+	bool swing;
+	int axeSwing;
 
 	bool firstMouse;
 	float lastX, lastY;
@@ -151,4 +155,5 @@ private:
 
 	void equipItemMesh();
 	void findY();
+	void swingAxe(float deltaTime);
 };
