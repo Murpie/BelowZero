@@ -75,10 +75,13 @@ Player::Player(Transform& transform) : Transformable(transform)
 	AmbientWind.loop(true);
 
 	//AmbientMusic.addSound("AmbientMusic1.wav");
-	AmbientMusic.setVolume(50.0f);
-	AmbientMusic.playSound();
-	AmbientMusic.loop(true);
+	//AmbientMusic.setVolume(50.0f);
+	//AmbientMusic.playSound();
+	//AmbientMusic.loop(true);
 
+	Swing.addSound("woosh.wav");
+
+	HitWAxe.addSound("AxeHit.ogg");
 }
 
 Player::~Player()
@@ -640,9 +643,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	}
 
 	if (firstMouse) {
-		lastX = (float)xpos;
-		lastY = (float)ypos;
-		firstMouse = false;
+lastX = (float)xpos;
+lastY = (float)ypos;
+firstMouse = false;
 	}
 
 	xoffset = (float)xpos - lastX;
@@ -734,13 +737,22 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (movingForward || movingBackwards || movingLeft || movingRight)
 		lastPos = lastPosTemp;
 }
-
+void  Player::swingTest()
+{
+	if (currentlyEquipedItem == 0 && !Swing.isPlaying())
+	{
+		Swing.playSound();
+	}
+}
 int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 {
 	// Check ObjectType ID
 	// Set isAlive to false if you want to delete the interacted item from the world.
+
+
 	if (id == ObjectType::ID::Axe)
 	{
+
 		if (inInventory[0] == false)
 		{
 			equip("Axe");
@@ -761,6 +773,8 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
 		&& currentlyEquipedItem == 0)
 	{
+		if(!HitWAxe.isPlaying())
+			HitWAxe.playSound();
 		if (inInventory[2] == false)
 		{
 			isAlive = false;

@@ -350,6 +350,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 		{
 			if (gameObject_ptr->getPlayer()->click == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
 			{
+				gameObject_ptr->getPlayer()->swingTest();
 				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
 				if (distance < 10 && other.isInteractable == true)
 				{

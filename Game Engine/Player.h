@@ -16,6 +16,7 @@ public:
 	SoundMasterSFML AmbientMusic;
 	SoundMasterSFML AmbientWind;
 	SoundMasterSFML Swing;
+	SoundMasterSFML HitWAxe;
 
 	bool click;
 
@@ -79,6 +80,7 @@ public:
 	void processEvents(GLFWwindow *window, float deltaTime);
 
 	//glm::mat4 getViewMatrix()const;
+	void swingTest();
 	int interactionResponse(const ObjectType::ID id, bool & isAlive);
 	int collisionResponse(const ObjectType::ID);
 	void heatResponse();
