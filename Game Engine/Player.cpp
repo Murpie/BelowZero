@@ -541,6 +541,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		if (inInventory[0] == true)
 		{
+			equip("AxeIcon");
 			this->currentlyEquipedItem = 0;
 			this->equipItem = 33;
 			isPressed = true;
@@ -563,6 +564,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		if (inInventory[2] == true)
 		{
+			equip("WoodIcon");
 			this->currentlyEquipedItem = 2;
 			this->equipItem = 45;
 			isPressed = true;
@@ -588,6 +590,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		if (inInventory[4] == true)
 		{
+			equip("BucketIcon");
 			this->currentlyEquipedItem = 4;
 			this->equipItem = 34;
 			isPressed = true;
