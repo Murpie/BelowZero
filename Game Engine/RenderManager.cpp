@@ -36,9 +36,9 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//createMainMenuBuffer();
 
 	cascadePlaneEnds[0] = 0.1f;
-	cascadePlaneEnds[1] = 50.0f;
-	cascadePlaneEnds[2] = 100.0f;
-	cascadePlaneEnds[3] = 150.0f;
+	cascadePlaneEnds[1] = 333.0f;
+	cascadePlaneEnds[2] = 666.0f;
+	cascadePlaneEnds[3] = 1000.0f;
 
 	shatteredIce.CreateTextureData("glassNormalTangent.jpg");
 
@@ -89,30 +89,12 @@ void RenderManager::createBuffers()
 	//screen size
 	glfwGetFramebufferSize(window, &display_w, &display_h);
 
-	//----------========== ShadowMap FBO DIRECTIONAL LIGHTS ==========----------
-	/*glGenFramebuffers(1, &shadowFBO);
-	glGenTextures(1, &shadowMap);
-	glBindTexture(GL_TEXTURE_2D, shadowMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SUPER_SHADOW, SUPER_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
-
 	// ----------========== CASCADED SHADOW MAPS ==========----------
 	glGenFramebuffers(1, &shadowFBO);
 	glGenTextures(3, shadowMaps);
 	for (int i = 0; i < 3; i++) {
 		glBindTexture(GL_TEXTURE_2D, shadowMaps[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, display_w, display_h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, MEDIUM_SHADOW, MEDIUM_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
@@ -545,7 +527,7 @@ void RenderManager::Render() {
 			break;
 		}
 	}
-	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 150.0f);
+	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 1000.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
 	//world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -569,15 +551,12 @@ void RenderManager::Render() {
 	
 	// CASCADED SHADOWMAP PASS-----------------------------------------------------------------
 
+	glUseProgram(shadowMapShaderProgram);
+	glViewport(0, 0, MEDIUM_SHADOW, MEDIUM_SHADOW);
+	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-
-	glUseProgram(shadowMapShaderProgram); //? what is gameObject[2] supposed to be?
-	glViewport(0, 0, display_w, display_h);
-	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "view_matrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
-	glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "lightView"), 1, GL_FALSE, glm::value_ptr(lightView));
 
 	calculateOrthoProjectionMatrices(shadowMapShaderProgram);
 
@@ -587,6 +566,7 @@ void RenderManager::Render() {
 		glClear(GL_DEPTH_BUFFER_BIT);
 
 		setOrthoProjectionMatrix(i);
+		glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "lightProjection"), 1, GL_FALSE, glm::value_ptr(lightProjection));
 
 		for (unsigned int j = 0; j < gameObjectsToRender.size(); j++)
 		{
@@ -600,6 +580,19 @@ void RenderManager::Render() {
 			gameObjectsToRender[j]->meshFilterComponent->bindVertexArray();
 			glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[j]->meshFilterComponent->vertexCount);
 		}
+
+		for (int i = 0; i < gameScene->gameObjects.size(); i++)
+		{
+			if (gameScene->gameObjects[i]->getTerrain() != nullptr)
+			{
+
+				gameScene->gameObjects[i]->getTerrain()->bindVertexArray();
+				glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+
+				glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
+				break;
+			}
+		}
 	}
 
 	glCullFace(GL_BACK);
@@ -609,6 +602,7 @@ void RenderManager::Render() {
 	//... Terrain PASS-----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glViewport(0, 0, display_w, display_h);
 	glUseProgram(terrainShaderProgram);
 
 	glUniformMatrix4fv(glGetUniformLocation(terrainShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
@@ -1235,13 +1229,13 @@ void RenderManager::Render() {
 	for (int i = 0; i < CASCADESPLITS; i++)
 	{
 		std::string cT = "cascadeEndClipSpace[" + std::to_string(i) + "]";
-		glUniform1i(glGetUniformLocation(lightpassShaderProgram, cT.c_str()), vClip.z);
+		glUniform1f(glGetUniformLocation(lightpassShaderProgram, cT.c_str()), cascadesInClipSpace[i]);
 	}
 	for (int i = 0; i < CASCADESPLITS; i++)
 	{
 		std::string lT = "lightSpaceMatrix[" + std::to_string(i) + "]";
 		glUniformMatrix4fv(glGetUniformLocation(lightpassShaderProgram, lT.c_str()), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrices[i]));
-	}
+	}	
 
 	glUniform1f(glGetUniformLocation(lightpassShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
 
@@ -1581,15 +1575,16 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 		}
 	}*/
 
-	//glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-
 	// ----------========== CASCADED SHADOWS ==========----------
-	view_matrix = gameScene->gameObjects[0]->getViewMatrix();
-	inverseViewMatrix = glm::inverse(view_matrix);
-	lightView = glm::lookAt(glm::vec3(0.0, 8.0, 0.0), glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	glm::mat4 newView = glm::lookAt(gameScene->gameObjects[0]->transform->position, gameScene->gameObjects[0]->transform->forward, gameScene->gameObjects[0]->transform->up);
+	inverseViewMatrix = glm::inverse(newView);
+	
+	lightView = glm::lookAt(
+		glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y + 10.0, gameScene->gameObjects[0]->transform->position.z), // Position, 4 units above PlayerPos
+		glm::vec3(gameScene->gameObjects[0]->transform->position.x + 1, gameScene->gameObjects[0]->transform->position.y, gameScene->gameObjects[0]->transform->position.z), // Direction, 1 units infront of PlayerPos
+		glm::vec3(0.0, 1.0, 0.0)); // Up
+	
 	float fieldOfView = 60.0f;
-
-
 	float aspectRatio = (float)display_h / (float)display_w;
 	float tanHalfHeightFOV = tanf(glm::radians(fieldOfView / 2.0f));
 	float tanHalfWidthFOV = tanf(glm::radians((fieldOfView * aspectRatio) / 2.0f));
@@ -1603,11 +1598,13 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 
 		glm::vec4 frustrumCorners[8]
 		{
+			// Near Plane
 			glm::vec4(xn, yn, cascadePlaneEnds[i], 1.0f),
 			glm::vec4(-xn, yn, cascadePlaneEnds[i], 1.0f),
 			glm::vec4(xn, -yn, cascadePlaneEnds[i], 1.0f),
 			glm::vec4(-xn, -yn, cascadePlaneEnds[i], 1.0f),
 
+			// Far Plane
 			glm::vec4(xf, yf, cascadePlaneEnds[i + 1], 1.0f),
 			glm::vec4(-xf, yf, cascadePlaneEnds[i + 1], 1.0f),
 			glm::vec4(xf, -yf, cascadePlaneEnds[i + 1], 1.0f),
@@ -1641,17 +1638,19 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 		shadowOrthoProjInfo[i][2] = maxY;
 		shadowOrthoProjInfo[i][3] = minY;
 		shadowOrthoProjInfo[i][4] = maxZ;
-		shadowOrthoProjInfo[i][5] = minZ;
+		shadowOrthoProjInfo[i][5] = -minZ;
 		
 		vView = glm::vec4(0.0f, 0.0f, cascadePlaneEnds[i + 1], 1.0f);
-		vClip = view_matrix * vView;
-		cascadesInClipSpace[i] = vClip.x;
+		vClip = projection_matrix * vView;
+		cascadesInClipSpace[i] = -vClip.z;
 	}
 }
 
 void RenderManager::setOrthoProjectionMatrix(int index)
 {
 	lightProjection = glm::ortho(shadowOrthoProjInfo[index][1], shadowOrthoProjInfo[index][0], -shadowOrthoProjInfo[index][3], shadowOrthoProjInfo[index][2], shadowOrthoProjInfo[index][5], shadowOrthoProjInfo[index][4]);
+	//lightProjection = glm::ortho(shadowOrthoProjInfo[index][0], shadowOrthoProjInfo[index][1], -shadowOrthoProjInfo[index][2], shadowOrthoProjInfo[index][3], shadowOrthoProjInfo[index][4], shadowOrthoProjInfo[index][5]);
+
 	lightSpaceMatrices[index] = lightProjection * lightView;
 }
 

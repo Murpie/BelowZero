@@ -24,8 +24,8 @@ uniform sampler2D gNormal;
 uniform sampler2D shadowMap0;
 uniform sampler2D shadowMap1;
 uniform sampler2D shadowMap2;
-uniform float cascadeEndClipSpace[];
-uniform mat4 lightSpaceMatrix[];
+uniform float cascadeEndClipSpace[3];
+uniform mat4 lightSpaceMatrix[3];
 
 uniform int ScreenX;
 uniform int ScreenY;
@@ -90,6 +90,7 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos)
 {
 	float shadow = 0.0f;
 	float depth = 0.0f;
+	float bias = 0.0005f;
 	vec3 projectionCoordinates = lightSpacePos.xyz / lightSpacePos.w;
 
 	vec2 UVCoords;
@@ -105,8 +106,9 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos)
 		depth = texture(shadowMap2, UVCoords.xy).x;
 
 	if (depth < z + 0.0001)
-		shadow = 0.4f;
-	else
+		shadow = 0.35f;
+	
+	if (depth > 1.0f)
 		shadow = 0.0f;
 
 	return shadow;
@@ -198,11 +200,9 @@ void main()
 		}
 	}
 
-
-
-
-
 	FragColor = lighting * (1.0f - shadowFactor);
-	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, FragColor / 1.5, visibility);
+	//FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, FragColor / 1.5, visibility);
+
 	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
 }
+
