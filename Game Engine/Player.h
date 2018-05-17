@@ -111,6 +111,7 @@ private:
 	bool swapItem;
 	bool pullDown;
 	int equipItem;
+	bool jacket;
 
 	bool firstMouse;
 	float lastX, lastY;
@@ -148,5 +149,6 @@ private:
 
 	int vertexLength;
 
+	void equipItemMesh();
 	void findY();
 };

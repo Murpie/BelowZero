@@ -145,7 +145,7 @@ void GameScene::addPlayer(MeshLib & meshLibrary, MaterialLib& materialLibrary)
 	playerObject->addComponent(player);
 
 	//Add Equipment Meshes
-	int equipmenID[] = { 33, 34, 44, 45, 46 };
+	int equipmenID[] = { 33, 34, 44, 45, 46, 35, 36, 47, 48, 49, 50, 51, 52, 53 };
 
 	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++)
 	{
@@ -408,13 +408,13 @@ void GameScene::collisionTest(GameObject & other)
 							
 							if (other.getIsBurning())
 							{
-									gameObject_ptr->setIsBurning(5.f);
+									gameObject_ptr->setIsBurning(10);
 							}
 							int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
 
 							if (gameObject_ptr->getIsBurning() && !other.getIsBurning())
 							{
-								other.setIsBurning(10.f);
+								other.setIsBurning(60);
 							}
 						}
 					}
