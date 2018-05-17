@@ -24,6 +24,7 @@ uniform sampler2D gNormal;
 uniform sampler2D shadowMap0;
 uniform sampler2D shadowMap1;
 uniform sampler2D shadowMap2;
+uniform vec3 shadowMapLightPosition;
 uniform float cascadeEndClipSpace[3];
 uniform mat4 lightSpaceMatrix[3];
 
@@ -85,30 +86,34 @@ void calculateLightSpacePositions(vec3 FragPos)
 	for (int i = 0; i < 3; i++)
 		lightSpacePosition[i] = lightSpaceMatrix[i] * vec4(FragPos, 1.0f);
 }
-float z;
-float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos)
+
+float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 normals)
 {
 	float shadow = 0.0f;
 	float depth = 0.0f;
-	float bias = 0.0005f;
+	float z;
+	vec3 lightDirForShadow;
+	float bias = max(0.05 * (1.0 - dot(normals, shadowMapLightPosition)), 0.005);
 	vec3 projectionCoordinates = lightSpacePos.xyz / lightSpacePos.w;
+
+
 
 	vec2 UVCoords;
 	UVCoords.x = 0.5 * projectionCoordinates.x + 0.5;
 	UVCoords.y = 0.5 * projectionCoordinates.y + 0.5;
 	z = 0.5 * projectionCoordinates.z + 0.5;
 	
-	if (cascadeIndex == 0)
+	if (cascadeIndex == 0)							// Check Which ShadowMap To Use
 		depth = texture(shadowMap0, UVCoords.xy).x;
 	if (cascadeIndex == 1)
 		depth = texture(shadowMap1, UVCoords.xy).x;
 	if (cascadeIndex == 2)
 		depth = texture(shadowMap2, UVCoords.xy).x;
 
-	if (depth < z + 0.0001)
+	if (depth < z + 0.0001) // Determine If There Shall Be Shadow
 		shadow = 0.35f;
 	
-	if (depth > 1.0f)
+	if (depth > 1.0f) // If Shadow Is Outside of range 0-1
 		shadow = 0.0f;
 
 	return shadow;
@@ -188,14 +193,13 @@ void main()
 	
 	// =========================== TESTING SHADOWS ==================================
 	float shadowFactor = 0.0;
-
 	calculateLightSpacePositions(FragPos);
 
 	for (int i = 0; i < 3; i++)
 	{
-		if (FragPos.z <= cascadeEndClipSpace[i])
+		if (FragPos.z <= cascadeEndClipSpace[i]) // Check Which Cascade To Sample from
 		{
-			shadowFactor = cascadedShadowMapCalculation(i, lightSpacePosition[i]);
+			shadowFactor = cascadedShadowMapCalculation(i, lightSpacePosition[i], Normal);
 			break;
 		}
 	}

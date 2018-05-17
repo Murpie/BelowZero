@@ -36,9 +36,9 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//createMainMenuBuffer();
 
 	cascadePlaneEnds[0] = 0.1f;
-	cascadePlaneEnds[1] = 333.0f;
-	cascadePlaneEnds[2] = 666.0f;
-	cascadePlaneEnds[3] = 1000.0f;
+	cascadePlaneEnds[1] = 150.0f;
+	cascadePlaneEnds[2] = 300.0f;
+	cascadePlaneEnds[3] = 450.0f;
 
 	shatteredIce.CreateTextureData("glassNormalTangent.jpg");
 
@@ -527,7 +527,7 @@ void RenderManager::Render() {
 			break;
 		}
 	}
-	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 1000.0f);
+	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 450.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
 	//world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -1226,6 +1226,8 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, shadowMaps[2]);
 	
+	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "shadowMapLightPosition"), 1, glm::value_ptr(shadowMapLightPosition));
+
 	for (int i = 0; i < CASCADESPLITS; i++)
 	{
 		std::string cT = "cascadeEndClipSpace[" + std::to_string(i) + "]";
@@ -1579,8 +1581,10 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 	glm::mat4 newView = glm::lookAt(gameScene->gameObjects[0]->transform->position, gameScene->gameObjects[0]->transform->forward, gameScene->gameObjects[0]->transform->up);
 	inverseViewMatrix = glm::inverse(newView);
 	
+	shadowMapLightPosition = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y + 8.0, gameScene->gameObjects[0]->transform->position.z);
+	
 	lightView = glm::lookAt(
-		glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y + 10.0, gameScene->gameObjects[0]->transform->position.z), // Position, 4 units above PlayerPos
+		glm::vec3(shadowMapLightPosition), // Position, 8 units above PlayerPos
 		glm::vec3(gameScene->gameObjects[0]->transform->position.x + 1, gameScene->gameObjects[0]->transform->position.y, gameScene->gameObjects[0]->transform->position.z), // Direction, 1 units infront of PlayerPos
 		glm::vec3(0.0, 1.0, 0.0)); // Up
 	

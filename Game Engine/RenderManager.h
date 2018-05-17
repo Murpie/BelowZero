@@ -225,6 +225,7 @@ private:
 	//Shadow
 	glm::vec4 vView;
 	glm::vec4 vClip;
+	glm::vec3 shadowMapLightPosition;
 
 	glm::mat4 lightProjection;
 	glm::mat4 lightView;
