@@ -5,22 +5,33 @@
 AI::AI(Transform& transform) : Transformable(transform)
 {
 	Component::id = ComponentType::ID::AI;
+
 	this->startPosition = transform.position;
 	this->collision = false;
-	this->direction = 1.f;
+	this->time = 0.f;
+
+	lastTarget = glm::vec3(0, 0, 0);
+	target = glm::vec3(0, 0, 0);
+	direction = glm::vec3(0, 0, 0);
 }
 
 
 AI::~AI()
 {
+
 }
 
 void AI::update(float deltaTime, float seconds)
 {
+	time += deltaTime;
 
-	if (collision)
+	if (time > 10.f || collision)
 	{
-		rotate(deltaTime);
+		setNewTarget();
+	}
+	if (time > 3.f && time < 5.f)
+	{
+
 	}
 	else
 		move(deltaTime);
@@ -42,31 +53,18 @@ glm::vec2 AI::getXY()
 
 void AI::setCurrentHeight(float height)
 {
-	if (height + 1.001 < Transformable::transform.position.y + 1.002);
-	this->Transformable::transform.position.y = height + 1.0;
+	if (height + 0.001 < Transformable::transform.position.y + 0.002);
+	this->Transformable::transform.position.y = height + 0.0;
 }
 
 void AI::swapDirection()
 {
-	if (direction == 1)
-		direction = -1;
-	else
-		direction = 1;
+
 }
 
 void AI::move(float deltaTime)
 {
-	//Transformable::transform.position;
-	Transformable::transform.position += direction * transform.forward * (float)SPEED * deltaTime;
-	//X: = originX + cos(angle)*radius;
-	//Y: = originY + sin(angle)*radius;
-	// (originX, originY) is the center of your circle. radius is its radius. That's it.
-	float radius = 20.f;
-	float x = startPosition.x + glm::cos(30) * radius;
-	float y = startPosition.y + glm::sin(30) * radius;
-
-	//Transformable::transform.position.x = x * (float)SPEED; //* deltaTime;
-	//Transformable::transform.position.y += y * (float)SPEED * deltaTime;
+	Transformable::transform.position +=  direction * (float)SPEED * deltaTime;
 }
 
 void AI::moveHome()
@@ -78,6 +76,29 @@ void AI::rotate(float deltaTime)
 {
 	transform.rotation.y += 10.f * deltaTime;
 	Transformable::transform.forward = transform.rotation;
+}
+
+void AI::awake()
+{
+
+}
+
+void AI::wander()
+{
+}
+
+void AI::setNewTarget()
+{
+	glm::vec3 currentPosition = Transformable::transform.position;
+	lastTarget = target;
+	float x = rand() % 20 - 10;
+	float z = rand() % 20 - 10;
+	// Update target
+	target = glm::vec3(startPosition.x + x, startPosition.y, startPosition.z + z);
+	// Update direction
+	direction = glm::normalize(glm::vec3(target.x - currentPosition.x, target.y - currentPosition.y, target.z - currentPosition.z));
+	// Reset timer
+	time = 0.f;
 }
 
 /*

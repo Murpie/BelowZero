@@ -120,6 +120,8 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 
 void GameScene::addAI(MeshLib & meshLibrary, MaterialLib & materialLibrary)
 {
+	int key = 1;
+
 	//Create AI object
 	GameObject* AiObject = new GameObject();
 	AiObject->name = "AI ";
@@ -127,10 +129,10 @@ void GameScene::addAI(MeshLib & meshLibrary, MaterialLib & materialLibrary)
 	AiObject->transform->position.z -= 30;
 	//
 	MeshFilter* meshFilter = new MeshFilter(
-		meshLibrary.getMesh(1)->gVertexBuffer,
-		meshLibrary.getMesh(1)->gVertexAttribute,
-		meshLibrary.getMesh(1)->leapMesh->getVertexCount(),
-		meshLibrary.getMesh(1)->meshType, 1);
+		meshLibrary.getMesh(key)->gVertexBuffer,
+		meshLibrary.getMesh(key)->gVertexAttribute,
+		meshLibrary.getMesh(key)->leapMesh->getVertexCount(),
+		meshLibrary.getMesh(key)->meshType, 1);
 	AiObject->addComponent(meshFilter);
 	AiObject->addComponent(materialLibrary.getMaterial(0));
 	//Add AI component
@@ -143,17 +145,17 @@ void GameScene::addAI(MeshLib & meshLibrary, MaterialLib & materialLibrary)
 	{
 		bBox* box = new bBox();
 		//add center
-		box->center.x = meshLibrary.getMesh(1)->leapMesh->boundingBoxes[j]->center[0];
-		box->center.y = meshLibrary.getMesh(1)->leapMesh->boundingBoxes[j]->center[1];
-		box->center.z = meshLibrary.getMesh(1)->leapMesh->boundingBoxes[j]->center[2];
+		box->center.x = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->center[0];
+		box->center.y = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->center[1];
+		box->center.z = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->center[2];
 		//add max vector
-		box->vMax.x = meshLibrary.getMesh(1)->leapMesh->boundingBoxes[j]->maxVector[0];
-		box->vMax.y = meshLibrary.getMesh(1)->leapMesh->boundingBoxes[j]->maxVector[1];
-		box->vMax.z = meshLibrary.getMesh(1)->leapMesh->boundingBoxes[j]->maxVector[2];
+		box->vMax.x = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->maxVector[0];
+		box->vMax.y = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->maxVector[1];
+		box->vMax.z = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->maxVector[2];
 		//add min vector
-		box->vMin.x = meshLibrary.getMesh(1)->leapMesh->boundingBoxes[j]->minVector[0];
-		box->vMin.y = meshLibrary.getMesh(1)->leapMesh->boundingBoxes[j]->minVector[1];
-		box->vMin.z = meshLibrary.getMesh(1)->leapMesh->boundingBoxes[j]->minVector[2];
+		box->vMin.x = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->minVector[0];
+		box->vMin.y = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->minVector[1];
+		box->vMin.z = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->minVector[2];
 		//push into gameobject
 		AiObject->bbox.push_back(box);
 	}
@@ -468,28 +470,6 @@ void GameScene::collisionTest(GameObject & other)
 			if (distance < 15 && other.getIsBurning())
 			{
 				gameObject_ptr->getPlayer()->heatResponse();
-			}
-		}
-		if (gameObject_ptr->getAI() != nullptr && other.getPlayer() == nullptr)
-		{
-			float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-			if (distance < 25)
-			{
-				for (int i = 0; i < gameObject_ptr->bbox.size(); i++)
-				{
-					for (int j = 0; j < other.bbox.size(); j++)
-					{
-						if (Intersection::collisionTest(*gameObject_ptr->bbox[i], gameObject_ptr->transform->position, *other.bbox[j], other.transform->position))
-						{
-							gameObject_ptr->getAI()->collision = true;
-							//std::cout << gameObject_ptr->transform->velocity.x << std::endl;
-							//Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
-							break;
-						}
-						else 
-							gameObject_ptr->getAI()->collision = false;
-					}
-				}
 			}
 		}
 	}

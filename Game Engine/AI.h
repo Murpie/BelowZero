@@ -2,7 +2,7 @@
 #include "Transformable.h"
 
 #define MAX_DISTANCE 50
-#define SPEED 1.0f
+#define SPEED 2.0f
 class AI :
 	public Transformable
 {
@@ -20,11 +20,20 @@ public:
 
 private:
 	glm::vec3 startPosition;
-	float direction;
+	glm::vec3 lastTarget;
+	glm::vec3 target;
+	glm::vec3 direction;
+
+	float time;
+
 	void swapDirection();
 
 	void move(float deltaTime);
 	void moveHome();
 	void rotate(float deltaTime);
+
+	void awake();
+	void wander();
+	void setNewTarget();
 };
 
