@@ -47,7 +47,7 @@ public:
 	int maxAmountOfItems;
 	int inventoryCount;
 
-	std::string imageNames[5] = { "InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "MainMenuConcept" };
+	std::string imageNames[5] = { "InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "InventoryBucketIconTexture" };
 	std::string imagesCurrentlyInInventory[5] = { "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage" };
 
 	unsigned int equipedFBO;
@@ -67,6 +67,8 @@ public:
 	void addImageToInventory(std::string item, int inventorySlot);
 	bool checkInventory(std::string item);
 	void addTextToScreen(std::string item);
+	void swappingItem(float deltaTime);
+	void dropItem();
 
 	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
 	void setCurrentHeight(float height);
@@ -76,7 +78,7 @@ public:
 	void processEvents(GLFWwindow *window, float deltaTime);
 
 	//glm::mat4 getViewMatrix()const;
-	int interactionResponse(const ObjectType::ID id, bool & isAlive);
+	int interactionResponse(const ObjectType::ID id, bool & isAlive, int & counter);
 	int collisionResponse(const ObjectType::ID);
 	void heatResponse();
 	void takeDamange(float damage, float deltaTime);
@@ -84,8 +86,9 @@ public:
 	const int getEquipedID();
 	bool addClick;
 
-	float pitch;
-	float yaw;
+	float oldPitch;
+	float oldYaw;
+	float pickUp;
 
 	int test;
 
@@ -106,6 +109,9 @@ private:
 	glm::vec3 cameraUp;
 
 	int equipedID;
+	bool swapItem;
+	bool pullDown;
+	int equipItem;
 
 	bool firstMouse;
 	float lastX, lastY;
@@ -114,6 +120,8 @@ private:
 	float xoffset;
 	float yoffset;
 	float sensitivity;
+	float pitch;
+	float yaw;
 
 	float time = 0.0;
 	float textTimer = 0.0;
