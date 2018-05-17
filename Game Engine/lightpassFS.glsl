@@ -87,16 +87,14 @@ void calculateLightSpacePositions(vec3 FragPos)
 		lightSpacePosition[i] = lightSpaceMatrix[i] * vec4(FragPos, 1.0f);
 }
 
-float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 normals)
+float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 normals, vec3 FragPos)
 {
 	float shadow = 0.0f;
 	float depth = 0.0f;
 	float z;
-	vec3 lightDirForShadow;
-	float bias = max(0.05 * (1.0 - dot(normals, shadowMapLightPosition)), 0.005);
+	vec3 lightDirForShadow = normalize(shadowMapLightPosition - FragPos);
+	float bias = max(0.05 * (1.0 - dot(normals, lightDirForShadow)), 0.005);
 	vec3 projectionCoordinates = lightSpacePos.xyz / lightSpacePos.w;
-
-
 
 	vec2 UVCoords;
 	UVCoords.x = 0.5 * projectionCoordinates.x + 0.5;
@@ -110,7 +108,7 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 no
 	if (cascadeIndex == 2)
 		depth = texture(shadowMap2, UVCoords.xy).x;
 
-	if (depth < z + 0.0001) // Determine If There Shall Be Shadow
+	if (z - bias > depth) // Determine If There Shall Be Shadow
 		shadow = 0.35f;
 	
 	if (depth > 1.0f) // If Shadow Is Outside of range 0-1
@@ -199,7 +197,7 @@ void main()
 	{
 		if (FragPos.z <= cascadeEndClipSpace[i]) // Check Which Cascade To Sample from
 		{
-			shadowFactor = cascadedShadowMapCalculation(i, lightSpacePosition[i], Normal);
+			shadowFactor = cascadedShadowMapCalculation(i, lightSpacePosition[i], Normal, FragPos);
 			break;
 		}
 	}
