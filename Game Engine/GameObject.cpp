@@ -250,6 +250,19 @@ MainMenuScene * GameObject::getMenuScene()
 	return nullptr;
 }
 
+AI * GameObject::getAI()
+{
+	for (Component* component_ptr : components)
+	{
+		if (component_ptr->id == ComponentType::ID::AI)
+		{
+			AI* ai = static_cast<AI*>(component_ptr);
+			return ai;
+		}
+	}
+	return nullptr;
+}
+
 void GameObject::moveDown(float deltaTime)
 {
 	timeLimit += deltaTime;

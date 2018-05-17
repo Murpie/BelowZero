@@ -497,10 +497,24 @@ void RenderManager::Render() {
 		{
 			glm::vec2 temp = gameScene->gameObjects[i]->getPlayer()->setXZ();
 			for (int j = 0; j < gameScene->gameObjects.size(); j++)
+			{
 				if (gameScene->gameObjects[j]->getTerrain() != nullptr)
 				{
 					gameScene->gameObjects[i]->getPlayer()->setCurrentHeight(gameScene->gameObjects[j]->getTerrain()->calculateY(temp.x, temp.y));
+					break;
 				}
+			}
+		}
+		if (gameScene->gameObjects[i]->getAI() != nullptr)
+		{
+			glm::vec2 temp = gameScene->gameObjects[i]->getAI()->getXY();
+			for (int j = 0; j < gameScene->gameObjects.size(); j++)
+				if (gameScene->gameObjects[j]->getTerrain() != nullptr)
+				{
+					gameScene->gameObjects[i]->getAI()->setCurrentHeight(gameScene->gameObjects[j]->getTerrain()->calculateY(temp.x, temp.y));
+					break;
+				}
+			break;
 		}
 	}
 

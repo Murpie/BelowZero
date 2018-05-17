@@ -43,7 +43,8 @@ namespace ComponentType
 		LIGHT,
 		MATERIAL,
 		MAINMENU,
-		MESHFILTER
+		MESHFILTER,
+		AI
 	};
 }
 

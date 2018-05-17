@@ -11,6 +11,7 @@
 #include "glm/glm/glm.hpp"
 #include "Player.h"
 #include "Terrain.h"
+#include "AI.h"
 #include "MainMenuScene.h"
 
 #include "Ray.h"
@@ -70,6 +71,7 @@ public:
 	glm::mat4 getViewMatrix();
 	Terrain* getTerrain();
 	MainMenuScene* getMenuScene();
+	AI* getAI();
 
 	template <class T>
 	T* getComponent() {
