@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "Terrain.h"
 #include "MainMenuScene.h"
+#include "SoundMaster.h"
 
 #include "Ray.h"
 #include "Intersection.h"
@@ -24,6 +25,8 @@ class GameObject
 public:
 	GameObject();
 	~GameObject();
+
+	SoundMasterSFML burning;
 
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
@@ -59,6 +62,7 @@ public:
 	void setIsBurning(float timeToBurn);
 	void setGameEnd();
 
+	bool hasSoundAttatched = false;
 	const bool getIsBurning();
 	const bool getGameEnd();
 	

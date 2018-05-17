@@ -72,6 +72,7 @@ public:
 
 	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
 	void setCurrentHeight(float height);
+	void setIsWalkable(bool walkable);
 	glm::vec2 setXZ();
 	//Physics
 	void update(float deltaTime, float seconds);
@@ -91,20 +92,22 @@ public:
 	float pickUp;
 
 private:
+	bool isColliding = false;
 
+	bool movingForward = false;
+	bool movingBackwards = false;
+	bool movingLeft = false;
+	bool movingRight = false;
 
-	bool frontCollision = false;
-	bool bottomCollision = false;
-	bool leftCollision = false;
-	bool rightCollision = false;
-	bool backCollision = false;
-	bool topCollision = false;
 	bool inInventory[5];
 	bool isPressed;
 
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
+
+	glm::vec3 lastPos;
+	glm::vec3 lastPosTemp;
 
 	int equipedID;
 	bool swapItem;
@@ -138,6 +141,7 @@ private:
 	bool isWalking = false;
 
 	//Terrain
+	float previousY;
 	float currentY;
 	float frontVertexHeight;
 	float backVertexHeight;

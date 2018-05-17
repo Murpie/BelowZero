@@ -50,6 +50,7 @@ void GameScene::update(float deltaTime, float seconds)
 				float v = UVS.y;
 				if (gameObjects[j]->getTerrain() != nullptr)
 				{
+					gameObjects[i]->getPlayer()->setIsWalkable(gameObjects[j]->getTerrain()->calculateNormal(u, v));
 					gameObjects[i]->getPlayer()->setCurrentHeight(gameObjects[j]->getTerrain()->calculateY(u, v));
 					break;
 				}
@@ -256,7 +257,8 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 			meshObject->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
 			meshObject->transform->rotation = glm::vec3(level->levelObjects[i]->rotationX, level->levelObjects[i]->rotationY, level->levelObjects[i]->rotationZ);
 			//Calculate new world Y-position from height map and update value
-			
+		
+
 			if (level->levelObjects[i]->id == ObjectType::ID::Cliffside_1
 				|| level->levelObjects[i]->id == ObjectType::ID::Cliffside_2
 				|| level->levelObjects[i]->id == ObjectType::ID::Cliffside_3

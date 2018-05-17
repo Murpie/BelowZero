@@ -339,8 +339,18 @@ void Player::recieveTerrainInformation(float currentHeight, float frontV, float 
 
 void Player::setCurrentHeight(float height)
 {
-	if (height + 7.001 < currentY + 7.002);
-		this->currentY = height + 7.0;
+	if (isColliding)
+		previousY = currentY;
+
+	currentY = height + 7;
+}
+
+void Player::setIsWalkable(bool walkable)
+{
+	if (walkable)
+		isColliding = false;
+	else
+		isColliding = true;
 }
 
 glm::vec2 Player::setXZ()
@@ -357,6 +367,49 @@ void Player::update(float deltaTime, float seconds)
 	//update velocity
 	//Transformable::transform.velocity = Transformable::transform.forward * deltaTime;
 	//...
+	if (isColliding && lastPos.y < currentY)
+	{
+		Transformable::transform.position = lastPos;
+		currentY = lastPos.y;
+	}
+	if (time <= timeInAir && inAir == true)
+	{
+		glm::vec3 jumpdir = Transformable::transform.up;
+
+		Transformable::transform.position += jumpSpeed * jumpdir * deltaTime;
+		Transformable::transform.velocity = Transformable::transform.up * deltaTime * cameraSpeed;
+	}
+	else
+		inAir = false;
+
+
+	if (inAir == false && Transformable::transform.position.y <= currentY)
+	{
+		gravity = false;
+		jumpReady = true;
+	}
+	else
+		gravity = true;
+
+
+	if (gravity == true && inAir == false)
+		Transformable::transform.position -= fallSpeed * Transformable::transform.up  * deltaTime;
+
+
+	if (Transformable::transform.position.y <= currentY - 0.0001)
+		Transformable::transform.position.y = currentY;
+
+	if (isWalking == true)
+	{
+		if (!SnowCrunch.isPlaying())
+			SnowCrunch.playSound();
+	}
+	else
+	{
+		SnowCrunch.stopSound();
+	}
+	//=======================-------------Leons Test Sak------------==================
+
 	swappingItem(deltaTime);
 
 	float tempSeconds = seconds / 1000;
@@ -452,7 +505,14 @@ void Player::update(float deltaTime, float seconds)
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
 {
+
 	isWalking = false;
+	movingForward = false;
+	movingBackwards = false;
+	movingLeft = false;
+	movingRight = false;
+
+	lastPosTemp = Transformable::transform.position;
 
 	//Equipment and Stats
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
@@ -601,63 +661,65 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		SnowCrunch.setPitch(1.0);
 
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && frontCollision == false)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		if (jumpReady == true)
 			isWalking = true;
 
-		float tempY = Transformable::transform.position.y;
+		movingForward = true;
+
+
 		direction += Transformable::transform.forward;
 		if (shift == true)
 			Transformable::transform.position += cameraSpeed * (Transformable::transform.forward * 1.8f) * deltaTime;
 		else
 			Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
-		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.forward * deltaTime * cameraSpeed;
+
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && backCollision == false)
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		if (jumpReady == true)
 			isWalking = true;
 
-		float tempY = Transformable::transform.position.y;
+		movingBackwards = true;
+
 		direction -= Transformable::transform.forward;
 		Transformable::transform.position -= cameraSpeed * Transformable::transform.forward * deltaTime;
-		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.forward * deltaTime * cameraSpeed;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && leftCollision == false)
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		if (jumpReady == true)
 			isWalking = true;
 
-		float tempY = Transformable::transform.position.y;
+		movingLeft = true;
+
 		direction += Transformable::transform.right;
 		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
-		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		if (jumpReady == true)
 			isWalking = true;
 
-		float tempY = Transformable::transform.position.y;
-		direction -= Transformable::transform.right;
+		movingRight = true;
+
+		direction += Transformable::transform.right;
 		Transformable::transform.position -= Transformable::transform.right * cameraSpeed * deltaTime;
-		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;
 	}
 
 	//... Jump mechanic
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true)
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true && !isColliding)
 	{
 
 		inAir = true;
@@ -665,43 +727,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		jumpReady = false;
 	}
 
-	if (time <= timeInAir && inAir == true)
-	{
-		glm::vec3 jumpdir = Transformable::transform.up;
 
-		Transformable::transform.position += jumpSpeed * jumpdir * deltaTime;
-		Transformable::transform.velocity = Transformable::transform.up * deltaTime * cameraSpeed;
-	}
-	else
-		inAir = false;
-
-
-	if (inAir == false && Transformable::transform.position.y <= currentY)
-	{
-		gravity = false;
-		jumpReady = true;
-	}
-	else
-		gravity = true;
-
-
-	if (gravity == true && inAir == false)
-		Transformable::transform.position -= fallSpeed * Transformable::transform.up  * deltaTime;
-
-	//if (Transformable::transform.position.y <= currentY -0.1f)
-	//	Transformable::transform.position.y = currentY;
-	if (Transformable::transform.position.y <= currentY - 0.0001)
-		Transformable::transform.position.y = currentY;
-
-	if (isWalking == true)
-	{
-		if (!SnowCrunch.isPlaying())
-			SnowCrunch.playSound();
-	}
-	else
-	{
-		SnowCrunch.stopSound();
-	}
+	if (movingForward || movingBackwards || movingLeft || movingRight)
+		lastPos = lastPosTemp;
 }
 
 int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
