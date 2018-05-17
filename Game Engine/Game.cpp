@@ -357,9 +357,9 @@ void Game::addMeshName()
 		"Cabin.leap",					//31
 		"DeadTree.leap",				//32
 		"EquipedAxe.leap",				//33
-		"EquipedEmptyBucket.leap",		//34
-		"EquipedEmptyBucketSnow.leap",	//35
-		"EquipedEmptyBucketWater.leap",	//36
+		"EquipedBucketEmpty.leap",		//34
+		"EquipedBucketSnow.leap",		//35
+		"EquipedBucketWater.leap",		//36
 		"Tree_Small.leap",				//37
 		"DeadTree_Small.leap",			//38
 		"DeadTreeSnow.leap",			//39

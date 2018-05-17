@@ -1646,7 +1646,7 @@ void RenderManager::renderFlareParticles()
 
 void RenderManager::dayNightCycle()
 {
-	if (time > 300 && dayOrNight)
+	if (time > 120 && dayOrNight)
 	{
 		daylight -= deltaTime * 0.02;
 		if (daylight < 0.1)
