@@ -35,6 +35,7 @@ void AI::update(float deltaTime, float seconds)
 	}
 	else
 		move(deltaTime);
+
 }
 
 void AI::processEvents(GLFWwindow * window, float deltaTime)
@@ -46,7 +47,6 @@ glm::vec2 AI::getXY()
 {
 	float u = Transformable::transform.position.x;
 	float v = Transformable::transform.position.z;
-
 
 	return glm::vec2(u, v);
 }
@@ -67,32 +67,12 @@ void AI::move(float deltaTime)
 	Transformable::transform.position +=  direction * (float)SPEED * deltaTime;
 }
 
-void AI::moveHome()
-{
-
-}
-
-void AI::rotate(float deltaTime)
-{
-	transform.rotation.y += 10.f * deltaTime;
-	Transformable::transform.forward = transform.rotation;
-}
-
-void AI::awake()
-{
-
-}
-
-void AI::wander()
-{
-}
-
 void AI::setNewTarget()
 {
 	glm::vec3 currentPosition = Transformable::transform.position;
 	lastTarget = target;
-	float x = rand() % 20 - 10;
-	float z = rand() % 20 - 10;
+	float x = rand() % SPAWN_OFFSET - SPAWN_OFFSET * 0.5;
+	float z = rand() % SPAWN_OFFSET - SPAWN_OFFSET * 0.5;
 	// Update target
 	target = glm::vec3(startPosition.x + x, startPosition.y, startPosition.z + z);
 	// Update direction
@@ -100,29 +80,3 @@ void AI::setNewTarget()
 	// Reset timer
 	time = 0.f;
 }
-
-/*
-
-xoffset *= sensitivity;
-yoffset *= sensitivity;
-
-yaw = xoffset;
-pitch = yoffset;
-
-glm::mat4 matrix = glm::mat4(1);
-
-
-oldYaw = oldYaw - yaw;
-oldPitch = oldPitch + pitch;
-
-matrix = glm::rotate(matrix, -oldYaw, Transformable::transform.up);
-glm::vec4 right = glm::vec4(matrix[0][0], matrix[1][0], matrix[2][0], 0);
-Transformable::transform.right = right;
-
-if (oldPitch < 1.48f && oldPitch > -1.48f)
-{
-matrix = glm::rotate(matrix, oldPitch, Transformable::transform.right);
-glm::vec4 forward = glm::vec4(matrix[0][2], matrix[1][2], matrix[2][2], 0);
-Transformable::transform.forward = forward;
-}
-*/

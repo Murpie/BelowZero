@@ -2,7 +2,9 @@
 #include "Transformable.h"
 
 #define MAX_DISTANCE 50
+#define SPAWN_OFFSET 20
 #define SPEED 2.0f
+
 class AI :
 	public Transformable
 {
@@ -18,6 +20,8 @@ public:
 
 	bool collision;
 
+	//todo add function to rotate object towards the direction
+
 private:
 	glm::vec3 startPosition;
 	glm::vec3 lastTarget;
@@ -29,11 +33,6 @@ private:
 	void swapDirection();
 
 	void move(float deltaTime);
-	void moveHome();
-	void rotate(float deltaTime);
-
-	void awake();
-	void wander();
 	void setNewTarget();
 };
 

@@ -64,6 +64,11 @@ void GameScene::update(float deltaTime, float seconds)
 			delete gameObjects[i];
 			gameObjects.erase(gameObjects.begin() + i);
 		}
+
+		if (gameObjects[i]->getAI() != nullptr)
+		{
+			aiCollisionTest(*gameObjects[i]);
+		}
 	}
 }
 
@@ -126,7 +131,8 @@ void GameScene::addAI(MeshLib & meshLibrary, MaterialLib & materialLibrary)
 	GameObject* AiObject = new GameObject();
 	AiObject->name = "AI ";
 	AiObject->transform->position = gameObjects[0]->transform->position;
-	AiObject->transform->position.z -= 30;
+	AiObject->transform->position.x += 10;
+	AiObject->transform->position.z -= 25;
 	//
 	MeshFilter* meshFilter = new MeshFilter(
 		meshLibrary.getMesh(key)->gVertexBuffer,
@@ -178,7 +184,6 @@ void GameScene::addLight(glm::vec3 transform, int lightType)
 	gameObjects.push_back(lightObject);
 	lightsInScene++;
 }
-
 
 void GameScene::addPlayer(MeshLib & meshLibrary, MaterialLib& materialLibrary)
 {
@@ -475,25 +480,27 @@ void GameScene::collisionTest(GameObject & other)
 	}
 }
 
-void GameScene::aiCollisionTest(GameObject & other, GameObject & player)
+void GameScene::aiCollisionTest(GameObject & other)
 {
 	for (GameObject* gameObject_ptr : gameObjects)
 	{
-		if (gameObject_ptr->getAI() != nullptr)
+		float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
+		if (distance < 25 && gameObject_ptr->getAI() == nullptr)
 		{
-			float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-			if (distance < 25)
+			for (int i = 0; i < other.bbox.size(); i++)
 			{
-				for (int i = 0; i < gameObject_ptr->bbox.size(); i++)
+				for (int j = 0; j < gameObject_ptr->bbox.size(); j++)
 				{
-					for (int j = 0; j < other.bbox.size(); j++)
+					if (Intersection::collisionTest(*other.bbox[i], other.transform->position, *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))
 					{
-						if (Intersection::collisionTest(*gameObject_ptr->bbox[i], gameObject_ptr->transform->position, *other.bbox[j], other.transform->position))
-						{
-							//std::cout << gameObject_ptr->transform->velocity.x << std::endl;
-							Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
-							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
-						}
+						other.getAI()->collision = true;
+						Intersection::collisionResponse(*other.bbox[i], *other.transform, *gameObject_ptr->bbox[j], gameObject_ptr->transform->position);
+						std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
+						break;
+					}
+					else
+					{
+						other.getAI()->collision = false;
 					}
 				}
 			}

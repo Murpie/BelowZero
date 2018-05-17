@@ -41,7 +41,7 @@ private:
 
 	void interactionTest(GameObject & other, GLFWwindow * window); // Intersection test on mouse click
 	void collisionTest(GameObject & other); // Collision test when two AABB overlap
-	void aiCollisionTest(GameObject & other, GameObject & player);
+	void aiCollisionTest(GameObject & other);
 
 	void makeObjectsInteractable();
 
