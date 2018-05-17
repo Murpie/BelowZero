@@ -615,6 +615,7 @@ void GameScene::addNewObjectTest(GLFWwindow * window)
 			}
 			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) && gameObject_ptr->getPlayer()->addClick == true)
 				gameObject_ptr->getPlayer()->addClick = false;
+			break;
 		}
 	}
 
