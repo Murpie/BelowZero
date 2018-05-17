@@ -12,6 +12,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->pickUp = -1;
 	this->swapItem = false;
 	this->pullDown = false;
+	this->jacket = false;
 
 	this->hp = 80;
 	this->cold = 100;
@@ -487,7 +488,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		if (inInventory[0] == true)
 		{
 			this->currentlyEquipedItem = 0;
-			this->equipItem = 33;
+			equipItemMesh();
 			isPressed = true;
 			swapItem = true;
 			pullDown = true;
@@ -497,7 +498,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		equip("LighterIcon");
 		this->currentlyEquipedItem = 1;
-		this->equipItem = 44;
+		equipItemMesh();
 		addImageToInventory("InventoryLighterIcon", 1);
 		inInventory[1] = true;
 		isPressed = true;
@@ -509,7 +510,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		if (inInventory[2] == true)
 		{
 			this->currentlyEquipedItem = 2;
-			this->equipItem = 45;
+			equipItemMesh();
 			isPressed = true;
 			swapItem = true;
 			pullDown = true;
@@ -521,7 +522,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		{
 			equip("FoodIcon");
 			this->currentlyEquipedItem = 3;
-			this->equipItem = 46;
+			equipItemMesh();
 			addImageToInventory("InventoryFoodIcon", 3);
 			inInventory[3] = true;
 			isPressed = true;
@@ -534,7 +535,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		if (inInventory[4] == true)
 		{
 			this->currentlyEquipedItem = 4;
-			this->equipItem = 34;
+			equipItemMesh();
 			isPressed = true;
 			swapItem = true;
 			pullDown = true;
@@ -786,7 +787,12 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	}
 	else if (id == ObjectType::ID::Jacket)
 	{
+		jacket = true;
+		equipItemMesh();
+		swapItem = true;
+		pullDown = true;
 		isAlive = false;
+		this->coldTick = 0.3;
 	}
 	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
 	{
@@ -845,6 +851,55 @@ int Player::getEquipedItem()
 const int Player::getEquipedID()
 {
 	return this->equipedID;
+}
+
+void Player::equipItemMesh()
+{
+	switch (currentlyEquipedItem)
+	{
+		case 0:
+		{
+			if (jacket)
+				this->equipItem = 50;
+			else
+				this->equipItem = 33;
+			break;
+		}
+		case 1:
+		{
+			if (jacket)
+				this->equipItem = 52;
+			else
+				this->equipItem = 44;
+			break;
+		}
+		case 2:
+		{
+			if (jacket)
+				this->equipItem = 53;
+			else
+				this->equipItem = 45;
+			break;
+		}
+		case 3:
+		{
+			if (jacket)
+				this->equipItem = 51;
+			else
+				this->equipItem = 46;
+			break;
+		}
+		case 4:
+		{
+			if (jacket)
+				this->equipItem = 47;
+			else
+				this->equipItem = 34;
+			break;
+		}
+	}
+		
+
 }
 
 void Player::findY()
