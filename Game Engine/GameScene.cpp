@@ -65,6 +65,11 @@ void GameScene::update(float deltaTime, float seconds)
 			delete gameObjects[i];
 			gameObjects.erase(gameObjects.begin() + i);
 		}
+
+		if (gameObjects[i]->getAI() != nullptr)
+		{
+			aiCollisionTest(*gameObjects[i]);
+		}
 	}
 }
 
@@ -94,10 +99,10 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("IceIceBby.leap");
+		LeapLevel* level = new LeapLevel("ItemSpawn.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
-
+		addAI(*meshLibrary, *matertialLibrary);
 		makeObjectsInteractable();
 	}
 	else if (typeOfScene == Scene::ID::MENU)
@@ -117,6 +122,53 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 	{
 		std::cout << "GAMESCENE::initScene() - Scene::ID : not valid" << std::endl;
 	}
+}
+
+void GameScene::addAI(MeshLib & meshLibrary, MaterialLib & materialLibrary)
+{
+	int key = 1;
+
+	//Create AI object
+	GameObject* AiObject = new GameObject();
+	AiObject->name = "AI ";
+	AiObject->transform->position = gameObjects[0]->transform->position;
+	AiObject->transform->position.x += 10;
+	AiObject->transform->position.z -= 25;
+	//
+	MeshFilter* meshFilter = new MeshFilter(
+		meshLibrary.getMesh(key)->gVertexBuffer,
+		meshLibrary.getMesh(key)->gVertexAttribute,
+		meshLibrary.getMesh(key)->leapMesh->getVertexCount(),
+		meshLibrary.getMesh(key)->meshType, 1);
+	AiObject->addComponent(meshFilter);
+	AiObject->addComponent(materialLibrary.getMaterial(0));
+	//Add AI component
+	AI* ai = new AI(*AiObject->transform);
+	AiObject->addComponent(ai);
+	//...
+	AiObject->setIsRenderable(true);
+	//...
+	for (int j = 0; j < meshLibrary.getMesh(1)->leapMesh->boundingBoxes.size(); j++)
+	{
+		bBox* box = new bBox();
+		//add center
+		box->center.x = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->center[0];
+		box->center.y = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->center[1];
+		box->center.z = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->center[2];
+		//add max vector
+		box->vMax.x = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->maxVector[0];
+		box->vMax.y = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->maxVector[1];
+		box->vMax.z = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->maxVector[2];
+		//add min vector
+		box->vMin.x = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->minVector[0];
+		box->vMin.y = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->minVector[1];
+		box->vMin.z = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->minVector[2];
+		//push into gameobject
+		AiObject->bbox.push_back(box);
+	}
+
+	//Add to scene
+	gameObjects.push_back(AiObject);
 }
 
 void GameScene::addLight(glm::vec3 transform, int lightType)
@@ -146,7 +198,7 @@ void GameScene::addPlayer(MeshLib & meshLibrary, MaterialLib& materialLibrary)
 	playerObject->addComponent(player);
 
 	//Add Equipment Meshes
-	int equipmenID[] = { 33, 34, 44, 45, 46 };
+	int equipmenID[] = { 33, 34, 44, 45, 46, 35, 36, 47, 48, 49, 50, 51, 52, 53 };
 
 	for (int i = 0; i < sizeof(equipmenID) / sizeof(equipmenID[0]); i++)
 	{
@@ -340,6 +392,9 @@ void GameScene::checkInteractionResponse(GameObject & other, int objectID)
 	{
 		other.setIsBurning(60.0f);
 	}
+	if (objectID == (int)ObjectType::ID::Axe)
+	{
+	}
 }
 
 void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
@@ -348,19 +403,17 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 	{
 		if (gameObject_ptr->getPlayer() != nullptr)
 		{
-			if (gameObject_ptr->getPlayer()->click == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
+			if (gameObject_ptr->getPlayer()->click == false && (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS))
 			{
-				gameObject_ptr->getPlayer()->swingTest();
-				gameObject_ptr->getPlayer()->eatFood();
-				
+
 				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
 				if (distance < 10 && other.isInteractable == true)
 				{
-					
+
 					gameObject_ptr->getPlayer()->click = true;
 					RayData ray = Ray::getWorldRay(
 						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,
-						gameObject_ptr->getViewMatrix(), 
+						gameObject_ptr->getViewMatrix(),
 						SCREEN_WIDTH, SCREEN_HEIGHT,
 						gameObject_ptr->transform->position);
 
@@ -368,14 +421,37 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 					{
 						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
 						{
-							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::Campfire)
-							{
-								other.setIsBurning(60.0f);
-								meltIceWall(other);
-							}
 							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::FlareGun)
 							{
 								other.setGameEnd();
+							}
+						}
+					}
+				}
+			}
+
+			if (gameObject_ptr->getPlayer()->click == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
+			{
+
+				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
+				if (distance < 10 && other.isInteractable == true)
+				{
+
+					gameObject_ptr->getPlayer()->click = true;
+					RayData ray = Ray::getWorldRay(
+						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,
+						gameObject_ptr->getViewMatrix(),
+						SCREEN_WIDTH, SCREEN_HEIGHT,
+						gameObject_ptr->transform->position);
+
+					for (int i = 0; i < other.bbox.size(); i++)
+					{
+						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
+						{
+							if (gameObject_ptr->getPlayer()->actionResponse(other.objectID, other.isActive, other.playerHitCounter) == ObjectType::ID::Campfire)
+							{
+								other.setIsBurning(60.0f);
+								meltIceWall(other);
 							}
 						}
 					}
@@ -409,13 +485,13 @@ void GameScene::collisionTest(GameObject & other)
 							
 							if (other.getIsBurning())
 							{
-									gameObject_ptr->setIsBurning(5.f);
+									gameObject_ptr->setIsBurning(10);
 							}
 							int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
 
 							if (gameObject_ptr->getIsBurning() && !other.getIsBurning())
 							{
-								other.setIsBurning(10.f);
+								other.setIsBurning(60);
 							}
 						}
 					}
@@ -424,6 +500,34 @@ void GameScene::collisionTest(GameObject & other)
 			if (distance < 15 && other.getIsBurning())
 			{
 				gameObject_ptr->getPlayer()->heatResponse();
+			}
+		}
+	}
+}
+
+void GameScene::aiCollisionTest(GameObject & other)
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
+		if (distance < 25 && gameObject_ptr->getAI() == nullptr)
+		{
+			for (int i = 0; i < other.bbox.size(); i++)
+			{
+				for (int j = 0; j < gameObject_ptr->bbox.size(); j++)
+				{
+					if (Intersection::collisionTest(*other.bbox[i], other.transform->position + (other.getAI()->direction * 3.f), *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))
+					{
+						other.getAI()->collision = true;
+						if (Intersection::collisionTest(*other.bbox[i], other.transform->position, *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))
+							Intersection::collisionResponse(*other.bbox[i], *other.transform, *gameObject_ptr->bbox[j], gameObject_ptr->transform->position);
+						break;
+					}
+					else
+					{
+						other.getAI()->collision = false;
+					}
+				}
 			}
 		}
 	}
@@ -446,12 +550,36 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	for (GameObject* gameObject_ptr : gameObjects)
 	{
 		if (gameObject_ptr->getTerrain() != nullptr)
+		{
 			terrain = gameObject_ptr->getTerrain();
+			break;
+		}
 	}
+
+	// Direction vector of the camera
+	glm::vec3 offsetVector;
+	// Distance to place object infront of the position vector
+	float distance = 7.5f;
+
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->getPlayer() != nullptr)
+		{
+			if (key == (int)ObjectType::ID::Campfire)
+				gameObject_ptr->getPlayer()->dropItem();
+
+			offsetVector = gameObject_ptr->transform->forward;
+			break;
+		}
+
+	}
+
 	//Create new mesh object
 	GameObject* meshObject = new GameObject();
 	//Set mesh object position in world
 	meshObject->transform->position = position;
+	// Add offset values to position
+	meshObject->transform->position += offsetVector * distance;
 	//Calculate new world Y-position from height map and update value
 	float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z);
 	meshObject->transform->position.y = newPositionY;
@@ -501,7 +629,6 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	{
 		setBurningByDistance(5.f, *gameObjects[gameObjects.size() - 1]);
 	}
-
 }
 
 void GameScene::addNewObjectTest(GLFWwindow * window)
@@ -520,6 +647,7 @@ void GameScene::addNewObjectTest(GLFWwindow * window)
 			}
 			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) && gameObject_ptr->getPlayer()->addClick == true)
 				gameObject_ptr->getPlayer()->addClick = false;
+			break;
 		}
 	}
 

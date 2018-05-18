@@ -30,6 +30,7 @@ private:
 	int camerasInScene; //player 
 	int lightsInScene; 
 
+	void addAI(MeshLib& meshLibrary, MaterialLib& materialLibrary);
 	void addLight(glm::vec3 transform, int lightType);
 	void addPlayer(MeshLib& meshLibrary, MaterialLib& materialLibrary);
 	void addEquipment();
@@ -40,12 +41,14 @@ private:
 
 	void interactionTest(GameObject & other, GLFWwindow * window); // Intersection test on mouse click
 	void collisionTest(GameObject & other); // Collision test when two AABB overlap
+	void aiCollisionTest(GameObject & other);
 
 	void makeObjectsInteractable();
 
 	void addGameObject(const glm::vec3 position, const int key);
 	void addNewObjectTest(GLFWwindow * window);
 	bool addObject;
+
 	MaterialLib* material;
 	MeshLib* meshes;
 

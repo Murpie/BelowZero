@@ -17,6 +17,7 @@ GameObject::GameObject()
 	modelMatrix = glm::mat4();
 	objectID = ObjectType::ID::Stone_1;
 	fireComponent = nullptr;
+	playerHitCounter = 0;
 }
 
 GameObject::~GameObject()
@@ -244,6 +245,19 @@ MainMenuScene * GameObject::getMenuScene()
 		{
 			MainMenuScene* mainMenu = static_cast<MainMenuScene*>(component_ptr);
 			return mainMenu;
+		}
+	}
+	return nullptr;
+}
+
+AI * GameObject::getAI()
+{
+	for (Component* component_ptr : components)
+	{
+		if (component_ptr->id == ComponentType::ID::AI)
+		{
+			AI* ai = static_cast<AI*>(component_ptr);
+			return ai;
 		}
 	}
 	return nullptr;

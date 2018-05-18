@@ -12,6 +12,10 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->pickUp = -1;
 	this->swapItem = false;
 	this->pullDown = false;
+	this->jacket = false;
+	this->bucketContent = 0;
+	this->swing = false;
+	this->axeSwing = 0;
 
 	this->hp = 80;
 	this->cold = 100;
@@ -28,7 +32,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->textInitializer = 0;
 	this->inventoryCount = 0;
 	this->maxAmountOfItems = 5;
-	this->fade = 1;
+	this->fade = 0.9f;
 	this->winFade = 0;
 	this->flareTimer = 0;
 	this->textFade = 1;
@@ -197,7 +201,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 {
 	if (checkInventory(item) && item != "EmptyImage")
 	{
-		if (this->textTimer >= 1.0f || this->textOnScreen == false)
+		if (this->textTimer >= 1.0f || this->textOnScreen == false && currentlyEquipedItem != 1)
 		{
 			std::cout << "Item already exists in players inventory" << std::endl;
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -328,6 +332,47 @@ void Player::swappingItem(float deltaTime)
 	}
 }
 
+void Player::dropItem()
+{
+	pickUp = -1;
+	inInventory[this->currentlyEquipedItem] = false;
+}
+
+void Player::useItem(GLFWwindow * window)
+{
+	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 0 && pickUp >= 0 && !swing)
+	{
+		swing = true;
+		axeSwing = 0;
+		if (!Swing.isPlaying())
+		{
+			Swing.playSound();
+		}
+	}
+
+	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 3 && pickUp >= 0 && inInventory[3] == true && foodTimer > 1.0f)
+	{
+		food += 50;
+		if (food >= 100)
+			food = 100;
+		addImageToInventory("EmptyImage", 3);
+		dropItem();
+	}
+
+
+
+	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 4 && pickUp >= 0)
+	{
+		if (bucketContent == 0)
+		{
+			bucketContent = 1;
+			equipItemMesh();
+			swapItem = true;
+			pullDown = true;
+		}
+	}
+}
+
 void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
 {
 	this->currentY = currentHeight;
@@ -415,6 +460,19 @@ void Player::update(float deltaTime, float seconds)
 
 	swappingItem(deltaTime);
 
+	if (swing)
+		swingAxe(deltaTime);
+
+	if (win)
+	{
+		if (flareTimer >= 10.0f)
+			stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
+	}
+	else if (fade >= 1.0f)
+	{
+		stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
+	}
+
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
 
@@ -483,10 +541,13 @@ void Player::update(float deltaTime, float seconds)
 		
 	//Winning
 
-	if (this->win == true && this->flareTimer <= 10.0f)
+	if (this->win == true)
 	{
 		this->flareTimer += deltaTime;
-		this->winFade += deltaTime / 10.0f;
+		if (flareTimer <= 10.0f)
+		{
+			this->winFade += deltaTime / 10.0f;
+		}
 	}
 
 	// Text Fade
@@ -520,6 +581,8 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	lastPosTemp = Transformable::transform.position;
 
+	useItem(window);
+
 	//Equipment and Stats
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 		setCold(10);
@@ -536,6 +599,12 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		hp -= 10;
 
+	//Fast win
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+	{
+		this->win = true;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 	{
 		equip("EmptyImage");
@@ -549,7 +618,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		{
 			equip("AxeIcon");
 			this->currentlyEquipedItem = 0;
-			this->equipItem = 33;
+			equipItemMesh();
 			isPressed = true;
 			swapItem = true;
 			pullDown = true;
@@ -559,7 +628,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		equip("LighterIcon");
 		this->currentlyEquipedItem = 1;
-		this->equipItem = 44;
+		equipItemMesh();
 		addImageToInventory("InventoryLighterIcon", 1);
 		inInventory[1] = true;
 		isPressed = true;
@@ -572,7 +641,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		{
 			equip("WoodIcon");
 			this->currentlyEquipedItem = 2;
-			this->equipItem = 45;
+			equipItemMesh();
 			isPressed = true;
 			swapItem = true;
 			pullDown = true;
@@ -584,7 +653,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		{
 			equip("FoodIcon");
 			this->currentlyEquipedItem = 3;
-			this->equipItem = 46;
+			equipItemMesh();
 			addImageToInventory("InventoryFoodIcon", 3);
 			inInventory[3] = true;
 			isPressed = true;
@@ -598,7 +667,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		{
 			equip("BucketIcon");
 			this->currentlyEquipedItem = 4;
-			this->equipItem = 34;
+			equipItemMesh();
 			isPressed = true;
 			swapItem = true;
 			pullDown = true;
@@ -742,23 +811,10 @@ firstMouse = false;
 }
 void  Player::swingTest()
 {
-	if (currentlyEquipedItem == 0 && !Swing.isPlaying())
-	{
-		Swing.playSound();
-	}
 }
 
 void Player::eatFood()
 {
-	if (currentlyEquipedItem == 3 && inInventory[3] == true && foodTimer > 1.0f)
-	{
-		food += 50;
-		if (food >= 100)
-			food = 100;
-		inInventory[3] = false;
-		addImageToInventory("EmptyImage", 3);
-		
-	}
 }
 
 int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
@@ -780,28 +836,6 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 			swapItem = true;
 			pullDown = true;
 			isAlive = false;
-		}
-		else
-			addTextToScreen("Text-ItemAlreadyEquipped");
-	}
-	else if ((id == ObjectType::ID::BrokenTree || id == ObjectType::ID::BrokenTree_Snow || id == ObjectType::ID::DeadTree
-		|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
-		|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
-		&& currentlyEquipedItem == 0)
-	{
-		if(!HitWAxe.isPlaying())
-			HitWAxe.playSound();
-		if (inInventory[2] == false)
-		{
-			isAlive = false;
-			equip("WoodIcon");
-			this->currentlyEquipedItem = 2;
-			addImageToInventory("InventoryWoodIcon", 2);
-			inInventory[2] = true;
-			this->currentlyEquipedItem = 2;
-			this->equipItem = 45;
-			swapItem = true;
-			pullDown = true;
 		}
 		else
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -843,17 +877,21 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	}
 	else if (id == ObjectType::ID::Jacket)
 	{
+		jacket = true;
+		equipItemMesh();
+		swapItem = true;
+		pullDown = true;
 		isAlive = false;
+		this->coldTick = 0.3;
 	}
-	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
-	{
-		return 3;
-	}
-
 	if (id == ObjectType::ID::FlareGun)
 	{
 		this->win = true;
 		return 42;
+	}
+	else if(id == ObjectType::ID::Axe)
+	{
+		isAlive = false;
 	}
 	/*
 	if(id == fallenTree && axeIsEquiped)
@@ -862,6 +900,43 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		isAlive = false;
 	}
 	*/
+
+	return -1;
+}
+
+int Player::actionResponse(const ObjectType::ID id, bool & isAlive, int & counter)
+{
+	if ((id == ObjectType::ID::BrokenTree || id == ObjectType::ID::BrokenTree_Snow || id == ObjectType::ID::DeadTree
+	|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
+	|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
+	&& currentlyEquipedItem == 0)
+	{
+		if (!HitWAxe.isPlaying())
+			HitWAxe.playSound();
+		if (inInventory[2] == false)
+		{
+			if (counter >= 4)
+			{
+				equip("WoodIcon");
+				this->currentlyEquipedItem = 2;
+				addImageToInventory("InventoryWoodIcon", 2);
+				inInventory[2] = true;
+				this->currentlyEquipedItem = 2;
+				this->equipItem = 45;
+				swapItem = true;
+				pullDown = true;
+				isAlive = false;
+			}
+			else
+				counter++;
+		}
+		else
+			addTextToScreen("Text-ItemAlreadyEquipped");
+	}
+	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
+	{
+		return 3;
+	}
 
 	return -1;
 }
@@ -905,6 +980,68 @@ const int Player::getEquipedID()
 	return this->equipedID;
 }
 
+void Player::equipItemMesh()
+{
+	switch (currentlyEquipedItem)
+	{
+		case 0:
+		{
+			if (jacket)
+				this->equipItem = 50;
+			else
+				this->equipItem = 33;
+			break;
+		}
+		case 1:
+		{
+			if (jacket)
+				this->equipItem = 52;
+			else
+				this->equipItem = 44;
+			break;
+		}
+		case 2:
+		{
+			if (jacket)
+				this->equipItem = 53;
+			else
+				this->equipItem = 45;
+			break;
+		}
+		case 3:
+		{
+			if (jacket)
+				this->equipItem = 51;
+			else
+				this->equipItem = 46;
+			break;
+		}
+		case 4:
+		{
+			if (jacket)
+			{
+				if (bucketContent = 0)
+					this->equipItem = 47;
+				else if (bucketContent = 1)
+					this->equipItem = 48;
+				else
+					this->equipItem = 49;
+			}
+			else
+			{
+				if (bucketContent = 0)
+					this->equipItem = 34;
+				else if (bucketContent = 1)
+					this->equipItem = 35;
+				else
+					this->equipItem = 36;
+			}
+		}
+	}
+		
+
+}
+
 void Player::findY()
 {
 	//float frontTemp = glm::mix(currentY, frontVertexHeight);
@@ -914,4 +1051,34 @@ void Player::findY()
 	float xpos = cameraPos.x;
 	float xCoord = ((int)cameraPos.x % (int)distanceToNextVertex) / distanceToNextVertex;
 	float zCoord = ((int)cameraPos.z % (int)distanceToNextVertex) / distanceToNextVertex;
+}
+
+void Player::swingAxe(float deltaTime)
+{
+	if (currentlyEquipedItem != 0)
+	{
+		swing = false;
+		return;
+	}
+	else if (pickUp < 0.4 && axeSwing == 0)
+	{
+		pickUp += deltaTime * 2;
+		if (pickUp >= 0.4)
+			axeSwing = 1;
+	}
+	else if (pickUp > -0.3 && axeSwing == 1)
+	{
+		pickUp -= deltaTime * 7;
+		if (pickUp <= -0.3)
+			axeSwing = 3;
+	}
+	else if (pickUp < 0 && axeSwing == 3)
+	{
+		pickUp += deltaTime;
+		if (pickUp >= 0)
+		{
+			pickUp = 0;
+			swing = false;
+		}
+	}
 }

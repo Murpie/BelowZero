@@ -18,6 +18,8 @@ public:
 	SoundMasterSFML Swing;
 	SoundMasterSFML HitWAxe;
 
+	Gamestate::StateOfGame stateOfGame;
+
 	bool click;
 
 	float hp;
@@ -49,7 +51,7 @@ public:
 	int maxAmountOfItems;
 	int inventoryCount;
 
-	std::string imageNames[5] = { "InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "MainMenuConcept" };
+	std::string imageNames[5] = { "InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "InventoryBucketIconTexture" };
 	std::string imagesCurrentlyInInventory[5] = { "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage" };
 
 	unsigned int equipedFBO;
@@ -70,6 +72,8 @@ public:
 	bool checkInventory(std::string item);
 	void addTextToScreen(std::string item);
 	void swappingItem(float deltaTime);
+	void dropItem();
+	void useItem(GLFWwindow * window);
 
 	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
 	void setCurrentHeight(float height);
@@ -83,6 +87,7 @@ public:
 	void swingTest();
 	void eatFood();
 	int interactionResponse(const ObjectType::ID id, bool & isAlive);
+	int actionResponse(const ObjectType::ID id, bool & isAlive, int & counter);
 	int collisionResponse(const ObjectType::ID);
 	void heatResponse();
 	void takeDamange(float damage, float deltaTime);
@@ -118,6 +123,10 @@ private:
 	bool swapItem;
 	bool pullDown;
 	int equipItem;
+	bool jacket;
+	int bucketContent;
+	bool swing;
+	int axeSwing;
 
 	bool firstMouse;
 	float lastX, lastY;
@@ -156,5 +165,7 @@ private:
 
 	int vertexLength;
 
+	void equipItemMesh();
 	void findY();
+	void swingAxe(float deltaTime);
 };

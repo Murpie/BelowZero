@@ -11,6 +11,7 @@
 #include "glm/glm/glm.hpp"
 #include "Player.h"
 #include "Terrain.h"
+#include "AI.h"
 #include "MainMenuScene.h"
 #include "SoundMaster.h"
 
@@ -37,6 +38,9 @@ public:
 	bool gameEnd;
 	bool moveBelowTerrain;
 	float timeAlive;
+	
+	int playerHitCounter; //used to count how many hits the object has taken from player
+	
 	ObjectType::ID objectID;
 	std::string name;
 	Transform *transform;
@@ -71,6 +75,7 @@ public:
 	glm::mat4 getViewMatrix();
 	Terrain* getTerrain();
 	MainMenuScene* getMenuScene();
+	AI* getAI();
 
 	template <class T>
 	T* getComponent() {

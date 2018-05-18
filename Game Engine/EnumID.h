@@ -43,7 +43,8 @@ namespace ComponentType
 		LIGHT,
 		MATERIAL,
 		MAINMENU,
-		MESHFILTER
+		MESHFILTER,
+		AI
 	};
 }
 
@@ -97,6 +98,13 @@ namespace ObjectType
 		IceWall,
 		EquipedLighter,
 		EquipedWood,
-		EquipedCan
+		EquipedCan,
+		EquipedBucketEmptyWarm,
+		EquipedBucketSnowWarm,
+		EquipedBucketWaterWarm,
+		EquipedAxeWard,
+		EquipedCanWard,
+		EquipedLighterWarm,
+		EquipedWoodWarm
 	};
 }
