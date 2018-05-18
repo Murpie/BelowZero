@@ -81,6 +81,7 @@ public:
 
 	//glm::mat4 getViewMatrix()const;
 	void swingTest();
+	void eatFood();
 	int interactionResponse(const ObjectType::ID id, bool & isAlive);
 	int collisionResponse(const ObjectType::ID);
 	void heatResponse();
@@ -95,6 +96,9 @@ public:
 
 private:
 	bool isColliding = false;
+
+	bool pickUpFood = false;
+	float foodTimer = 0.0;
 
 	bool movingForward = false;
 	bool movingBackwards = false;

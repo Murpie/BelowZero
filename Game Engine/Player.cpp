@@ -418,6 +418,9 @@ void Player::update(float deltaTime, float seconds)
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
 
+	if(pickUpFood)
+		this->foodTimer += tempSeconds;
+
 	this->textTimer += tempSeconds;
 	if (this->textTimer >= 1.0f && this->textOnScreen == true)
 	{
@@ -744,6 +747,19 @@ void  Player::swingTest()
 		Swing.playSound();
 	}
 }
+
+void Player::eatFood()
+{
+	if (currentlyEquipedItem == 3 && inInventory[3] == true && foodTimer > 1.0f)
+	{
+		food += 50;
+		inInventory[3] = false;
+		addImageToInventory("EmptyImage", 3);
+		this->pickUpFood = false;
+		
+	}
+}
+
 int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 {
 	// Check ObjectType ID
@@ -752,7 +768,6 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 
 	if (id == ObjectType::ID::Axe)
 	{
-
 		if (inInventory[0] == false)
 		{
 			equip("Axe");
@@ -794,6 +809,8 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	{
 		if (inInventory[3] == false)
 		{
+			this->pickUpFood = true;
+			this->foodTimer = 0.0f;
 			equip("FoodIcon");
 			this->currentlyEquipedItem = 3;
 			this->equipItem = 46;
@@ -845,6 +862,8 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		isAlive = false;
 	}
 	*/
+	eatFood();
+
 	return -1;
 }
 
