@@ -30,7 +30,7 @@ private:
 	int camerasInScene; //player 
 	int lightsInScene; 
 
-	void addAI(MeshLib& meshLibrary, MaterialLib& materialLibrary);
+	void addAI(MeshLib& meshLibrary, MaterialLib& materialLibrary, LeapLevel level);
 	void addLight(glm::vec3 transform, int lightType);
 	void addPlayer(MeshLib& meshLibrary, MaterialLib& materialLibrary);
 	void addEquipment();

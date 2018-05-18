@@ -77,6 +77,7 @@ void AI::setNewTarget()
 	target = glm::vec3(startPosition.x + x, startPosition.y, startPosition.z + z);
 	// Update direction
 	direction = glm::normalize(glm::vec3(target.x - currentPosition.x, target.y - currentPosition.y, target.z - currentPosition.z));
+	Transformable::transform.rotation = glm::vec3(target.x - currentPosition.x, target.y - currentPosition.y, target.z - currentPosition.z);
 	// Reset timer
 	time = 0.f;
 }

@@ -99,10 +99,11 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("ItemSpawn.leap");
+		LeapLevel* level = new LeapLevel("ItemsAndBunny.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
+		//addAI(*meshLibrary, *matertialLibrary, *level);
 		delete level;
-		addAI(*meshLibrary, *matertialLibrary);
+
 		makeObjectsInteractable();
 	}
 	else if (typeOfScene == Scene::ID::MENU)
@@ -124,7 +125,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 	}
 }
 
-void GameScene::addAI(MeshLib & meshLibrary, MaterialLib & materialLibrary)
+void GameScene::addAI(MeshLib & meshLibrary, MaterialLib & materialLibrary, LeapLevel level)
 {
 	int key = 54;
 
@@ -299,6 +300,57 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 					break;
 				}
 			}
+		}
+		else if (level->levelObjects[i]->id == ObjectType::ID::Rabbit)
+		{
+			//Create new mesh object
+			GameObject* aiObject = new GameObject();
+			aiObject->name = "AI " + std::to_string(i);
+			//Set mesh object position in world
+			aiObject->transform->position = glm::vec3(level->levelObjects[i]->x, level->levelObjects[i]->y, level->levelObjects[i]->z);
+			aiObject->transform->rotation = glm::vec3(level->levelObjects[i]->rotationX, level->levelObjects[i]->rotationY, level->levelObjects[i]->rotationZ);
+			//Calculate new world Y-position from height map and update value
+			float newPositionY = terrain->calculateY(aiObject->transform->position.x, aiObject->transform->position.z);
+			aiObject->transform->position.y = newPositionY;
+			//Add new mesh component with data from mesh library
+			MeshFilter* meshFilter = new MeshFilter(
+				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer,
+				meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexAttribute,
+				meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->getVertexCount(),
+				meshLibrary.getMesh(level->levelObjects[i]->id)->meshType,
+				level->levelObjects[i]->id);
+			aiObject->addComponent(meshFilter);
+			//Add material to gameObject from materialLibrary
+			aiObject->addComponent(materialLibrary.getMaterial(0));
+			//Add AI component to gameObject
+			AI* ai = new AI(*aiObject->transform);
+			aiObject->addComponent(ai);
+			//Set customAttribute ID from Enum.H
+			aiObject->objectID = (ObjectType::ID)level->levelObjects[i]->id;
+			//Set customAttribute interactable
+			if ((int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 1)
+				aiObject->isInteractable = true;
+			//Add BBox from leapmesh to gameObject
+			for (int j = 0; j < meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes.size(); j++)
+			{
+				bBox* box = new bBox();
+				//add center
+				box->center.x = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->center[0];
+				box->center.y = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->center[1];
+				box->center.z = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->center[2];
+				//add max vector
+				box->vMax.x = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->maxVector[0];
+				box->vMax.y = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->maxVector[1];
+				box->vMax.z = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->maxVector[2];
+				//add min vector
+				box->vMin.x = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->minVector[0];
+				box->vMin.y = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->minVector[1];
+				box->vMin.z = meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->boundingBoxes[j]->minVector[2];
+				//push into gameobject
+				aiObject->bbox.push_back(box);
+			}
+			//Add to scene
+			gameObjects.push_back(aiObject);
 		}
 		else 
 		{
@@ -520,6 +572,10 @@ void GameScene::makeObjectsInteractable()
 		if (gameObject_ptr->objectID == ObjectType::ID::Campfire)
 		{
 			gameObject_ptr->isInteractable = 1;
+		}
+		if (gameObject_ptr->objectID == ObjectType::ID::Rabbit)
+		{
+			gameObject_ptr->setIsRenderable(true);
 		}
 	}
 }

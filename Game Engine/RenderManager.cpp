@@ -627,9 +627,10 @@ void RenderManager::Render() {
 			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
 			glm::vec3 forward = glm::vec3(gameObjectsToRender[i]->transform->forward);
 			glm::vec3 right = glm::vec3(gameObjectsToRender[i]->transform->right);
-			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
+
+			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
 			tempMatrix = glm::rotate(tempMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
-			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldPitch + gameObjectsToRender[i]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
+			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldPitch + gameObjectsToRender[0]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
 		}
 		else
 		{
