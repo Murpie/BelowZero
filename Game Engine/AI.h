@@ -19,14 +19,13 @@ public:
 	void setCurrentHeight(float height);
 
 	bool collision;
-
+	glm::vec3 direction;
 	//todo add function to rotate object towards the direction
 
 private:
 	glm::vec3 startPosition;
 	glm::vec3 lastTarget;
 	glm::vec3 target;
-	glm::vec3 direction;
 
 	float time;
 
