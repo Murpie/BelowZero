@@ -13,7 +13,7 @@ AI::AI(Transform& transform) : Transformable(transform)
 	lastTarget = glm::vec3(0, 0, 0);
 	target = glm::vec3(0, 0, 0);
 	direction = glm::vec3(0, 0, 0);
-	forward = Transformable::transform.forward;
+	forward = Transformable::transform.right;
 }
 
 
@@ -86,20 +86,18 @@ void AI::setNewTarget()
 	float directionMag = glm::length(direction);
 	float forwardMag = glm::length(forward);
 
-	float angle = dot / (directionMag);
+	float angle = dot / (directionMag * forwardMag);
 	angle = glm::degrees(glm::acos(angle));
 
 	std::cout << "Rabbit Angle: " << angle << std::endl;
 	std::cout << "Rabbit Direction: " << direction.x << ", " << direction.y << ", " << direction.z << std::endl;
 
-	//forward = direction;
-	if		(direction.x < 0.01f && direction.z < 0.01f)
-		Transformable::transform.rotation.y = (angle + 90.f) * -1;
-	else if (direction.x > 0.01f && direction.z < 0.01f)
-		Transformable::transform.rotation.y = (angle + 270.f) * 1;
-	else if (direction.x < 0.01f && direction.z > 0.01f)
-		Transformable::transform.rotation.y = (angle + 135.f) * 1;
-	else if (direction.x > 0.01f && direction.z > 0.01f)
-		Transformable::transform.rotation.y = (angle + 0.f) * -1;
-
+	if (direction.x > 0.f && direction.z > 0.f)
+		Transformable::transform.rotation.y = angle * -1; // tweak
+	else if (direction.x < 0.f && direction.z > 0.f) 
+		Transformable::transform.rotation.y = angle	; // tweak
+	else if (direction.x > 0.f && direction.z > 0.f)
+		Transformable::transform.rotation.y = angle * -1;
+	else
+		Transformable::transform.rotation.y = angle;
 }
