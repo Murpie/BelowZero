@@ -2,31 +2,37 @@
 
 SoundMasterSFML::SoundMasterSFML()
 {
-
+	this->Sound = new sf::Sound;
+	this->Buffer = new sf::SoundBuffer;
 }
 
 SoundMasterSFML::SoundMasterSFML(const std::string & filePath)
 {
+
 	addSound(filePath);
 }
 
 SoundMasterSFML::~SoundMasterSFML()
 {
-	//delete &this->Buffer;
-	//delete &this->Sound;
+	this->Sound->stop();
+	this->Sound->resetBuffer();
+	
+	delete this->Buffer;
+	delete this->Sound;
 }
 
 void SoundMasterSFML::addSound(const std::string & filePath)
 {
-	if (!this->Buffer.loadFromFile(filePath))
+
+	if (!this->Buffer->loadFromFile(filePath))
 		std::cout << "Cant Load File" << std::endl;
 
-	Sound.setBuffer(Buffer);
+	this->Sound->setBuffer(*this->Buffer);
 }
 
 bool SoundMasterSFML::isPlaying()
 {
-	if (Sound.getStatus() == 2)
+	if (this->Sound->getStatus() == 2)
 		return true;
 
 	return false;
@@ -34,52 +40,52 @@ bool SoundMasterSFML::isPlaying()
 
 void SoundMasterSFML::playSound()
 {
-	Sound.play();
+	this->Sound->play();
 }
 
 void SoundMasterSFML::pauseSound()
 {
-	Sound.pause();
+	this->Sound->pause();
 }
 
 void SoundMasterSFML::stopSound()
 {
-	Sound.stop();
+	this->Sound->stop();
 }
 
 void SoundMasterSFML::setVolume(float volume)
 {
-	Sound.setVolume(volume);
+	this->Sound->setVolume(volume);
 }
 
 void SoundMasterSFML::setPitch(float pitch)
 {
-	Sound.setPitch(pitch);
+	this->Sound->setPitch(pitch);
 
 }
 
 void SoundMasterSFML::setPosition(glm::vec3 pos)
 {
-	Sound.setPosition(pos.x, pos.y, pos.z);
+	this->Sound->setPosition(pos.x, pos.y, pos.z);
 }
 
 void SoundMasterSFML::setRelativeToListener(bool relative)
 {
-	Sound.setRelativeToListener(relative);
+	this->Sound->setRelativeToListener(relative);
 }
 
 void SoundMasterSFML::setAttenuation(float atten)
 {
-	Sound.setAttenuation(atten);
+	this->Sound->setAttenuation(atten);
 
 }
 
 void SoundMasterSFML::setMinDistance(float distance)
 {
-	Sound.setMinDistance(distance);
+	this->Sound->setMinDistance(distance);
 }
 
 void SoundMasterSFML::loop(bool looping)
 {
-	Sound.setLoop(looping);
+	this->Sound->setLoop(looping);
 }

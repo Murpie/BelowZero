@@ -380,6 +380,7 @@ void RenderManager::deleteData()
 	{
 		delete flareParticleColorData;
 	}
+	
 }
 
 void RenderManager::createMainMenuBuffer()
