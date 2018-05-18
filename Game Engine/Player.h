@@ -17,6 +17,8 @@ public:
 	SoundMasterSFML AmbientWind;
 	SoundMasterSFML Swing;
 
+	Gamestate::StateOfGame stateOfGame;
+
 	bool click;
 
 	float hp;
