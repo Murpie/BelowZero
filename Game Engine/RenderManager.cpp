@@ -34,7 +34,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
 	//createMainMenuBuffer();
-	shatteredIce.CreateTextureData("glassNormalTangent.jpg");
+	shatteredIce.CreateTextureData("iceNormal2.jpg");
 }
 
 RenderManager::~RenderManager()
@@ -530,7 +530,6 @@ void RenderManager::Render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//... Clear PPFBO
-	//... Clear finalFBO
 	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -644,13 +643,26 @@ void RenderManager::Render() {
 	glUseProgram(vfxFireShaderProgram);
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
+		if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire || gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player)
+		{
+			gameObject_ptr->hasSoundAttatched = true;
+			gameObject_ptr->burning.addSound("fireplace.wav");
+		}
 		if (gameObject_ptr->getIsBurning())
 		{
-			//Particle system location, can be changed dynamically if e.g. a torch is wanted
 
-			//defaultX = 536.0f;
-			//defaultY = -6.5f;
-			//defaultZ = 601.0f;
+			gameObject_ptr->burning.setPosition(gameScene->gameObjects[0]->getPlayer()->transform.position - gameObject_ptr->transform->position);
+			//gameObject_ptr->burning.setPosition(glm::vec3(0.0, 1.0, 1.0));
+			if (!gameObject_ptr->burning.isPlaying())
+			{
+				gameObject_ptr->burning.setMinDistance(2.0f);
+				gameObject_ptr->burning.setAttenuation(7.0f);
+				gameObject_ptr->burning.setVolume(1000.0f);
+				gameObject_ptr->burning.setRelativeToListener(true);
+				gameObject_ptr->burning.loop(true);
+				gameObject_ptr->burning.playSound();
+
+			}
 			offset = 40.0f;
 
 			float flickerSpeed = (rand() % 1000) / 100000.0f;
@@ -1134,8 +1146,6 @@ void RenderManager::Render() {
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
 
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ScreenX"), SCREEN_WIDTH);
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ScreenY"), SCREEN_HEIGHT);
 
 	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)

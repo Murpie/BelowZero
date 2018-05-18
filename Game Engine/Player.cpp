@@ -79,10 +79,13 @@ Player::Player(Transform& transform) : Transformable(transform)
 	AmbientWind.loop(true);
 
 	//AmbientMusic.addSound("AmbientMusic1.wav");
-	AmbientMusic.setVolume(50.0f);
-	AmbientMusic.playSound();
-	AmbientMusic.loop(true);
+	//AmbientMusic.setVolume(50.0f);
+	//AmbientMusic.playSound();
+	//AmbientMusic.loop(true);
 
+	Swing.addSound("woosh.wav");
+
+	HitWAxe.addSound("AxeHit.ogg");
 }
 
 Player::~Player()
@@ -368,8 +371,18 @@ void Player::recieveTerrainInformation(float currentHeight, float frontV, float 
 
 void Player::setCurrentHeight(float height)
 {
-	if (height + 7.001 < currentY + 7.002);
-		this->currentY = height + 7.0;
+	if (isColliding)
+		previousY = currentY;
+
+	currentY = height + 7;
+}
+
+void Player::setIsWalkable(bool walkable)
+{
+	if (walkable)
+		isColliding = false;
+	else
+		isColliding = true;
 }
 
 glm::vec2 Player::setXZ()
@@ -386,6 +399,49 @@ void Player::update(float deltaTime, float seconds)
 	//update velocity
 	//Transformable::transform.velocity = Transformable::transform.forward * deltaTime;
 	//...
+	if (isColliding && lastPos.y < currentY)
+	{
+		Transformable::transform.position = lastPos;
+		currentY = lastPos.y;
+	}
+	if (time <= timeInAir && inAir == true)
+	{
+		glm::vec3 jumpdir = Transformable::transform.up;
+
+		Transformable::transform.position += jumpSpeed * jumpdir * deltaTime;
+		Transformable::transform.velocity = Transformable::transform.up * deltaTime * cameraSpeed;
+	}
+	else
+		inAir = false;
+
+
+	if (inAir == false && Transformable::transform.position.y <= currentY)
+	{
+		gravity = false;
+		jumpReady = true;
+	}
+	else
+		gravity = true;
+
+
+	if (gravity == true && inAir == false)
+		Transformable::transform.position -= fallSpeed * Transformable::transform.up  * deltaTime;
+
+
+	if (Transformable::transform.position.y <= currentY - 0.0001)
+		Transformable::transform.position.y = currentY;
+
+	if (isWalking == true)
+	{
+		if (!SnowCrunch.isPlaying())
+			SnowCrunch.playSound();
+	}
+	else
+	{
+		SnowCrunch.stopSound();
+	}
+	//=======================-------------Leons Test Sak------------==================
+
 	swappingItem(deltaTime);
 
 	if (swing)
@@ -403,6 +459,9 @@ void Player::update(float deltaTime, float seconds)
 
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
+
+
+	this->foodTimer += tempSeconds;
 
 	this->textTimer += tempSeconds;
 	if (this->textTimer >= 1.0f && this->textOnScreen == true)
@@ -497,7 +556,14 @@ void Player::update(float deltaTime, float seconds)
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
 {
+
 	isWalking = false;
+	movingForward = false;
+	movingBackwards = false;
+	movingLeft = false;
+	movingRight = false;
+
+	lastPosTemp = Transformable::transform.position;
 
 	useItem(window);
 
@@ -534,6 +600,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		if (inInventory[0] == true)
 		{
+			equip("AxeIcon");
 			this->currentlyEquipedItem = 0;
 			equipItemMesh();
 			isPressed = true;
@@ -556,6 +623,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		if (inInventory[2] == true)
 		{
+			equip("WoodIcon");
 			this->currentlyEquipedItem = 2;
 			equipItemMesh();
 			isPressed = true;
@@ -581,6 +649,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		if (inInventory[4] == true)
 		{
+			equip("BucketIcon");
 			this->currentlyEquipedItem = 4;
 			equipItemMesh();
 			isPressed = true;
@@ -630,9 +699,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	}
 
 	if (firstMouse) {
-		lastX = (float)xpos;
-		lastY = (float)ypos;
-		firstMouse = false;
+lastX = (float)xpos;
+lastY = (float)ypos;
+firstMouse = false;
 	}
 
 	xoffset = (float)xpos - lastX;
@@ -654,63 +723,65 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		SnowCrunch.setPitch(1.0);
 
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && frontCollision == false)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		if (jumpReady == true)
 			isWalking = true;
 
-		float tempY = Transformable::transform.position.y;
+		movingForward = true;
+
+
 		direction += Transformable::transform.forward;
 		if (shift == true)
 			Transformable::transform.position += cameraSpeed * (Transformable::transform.forward * 1.8f) * deltaTime;
 		else
 			Transformable::transform.position += cameraSpeed * Transformable::transform.forward * deltaTime;
-		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.forward * deltaTime * cameraSpeed;
+
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && backCollision == false)
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		if (jumpReady == true)
 			isWalking = true;
 
-		float tempY = Transformable::transform.position.y;
+		movingBackwards = true;
+
 		direction -= Transformable::transform.forward;
 		Transformable::transform.position -= cameraSpeed * Transformable::transform.forward * deltaTime;
-		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.forward * deltaTime * cameraSpeed;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && leftCollision == false)
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		if (jumpReady == true)
 			isWalking = true;
 
-		float tempY = Transformable::transform.position.y;
+		movingLeft = true;
+
 		direction += Transformable::transform.right;
 		Transformable::transform.position += Transformable::transform.right * cameraSpeed * deltaTime;
-		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && rightCollision == false)
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		if (jumpReady == true)
 			isWalking = true;
 
-		float tempY = Transformable::transform.position.y;
-		direction -= Transformable::transform.right;
+		movingRight = true;
+
+		direction += Transformable::transform.right;
 		Transformable::transform.position -= Transformable::transform.right * cameraSpeed * deltaTime;
-		Transformable::transform.position.y = tempY;
 		//velocity
 		Transformable::transform.velocity = Transformable::transform.right * deltaTime * cameraSpeed;
 	}
 
 	//... Jump mechanic
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true)
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && inAir == false && jumpReady == true && !isColliding)
 	{
 
 		inAir = true;
@@ -718,42 +789,28 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		jumpReady = false;
 	}
 
-	if (time <= timeInAir && inAir == true)
-	{
-		glm::vec3 jumpdir = Transformable::transform.up;
 
-		Transformable::transform.position += jumpSpeed * jumpdir * deltaTime;
-		Transformable::transform.velocity = Transformable::transform.up * deltaTime * cameraSpeed;
+	if (movingForward || movingBackwards || movingLeft || movingRight)
+		lastPos = lastPosTemp;
+}
+void  Player::swingTest()
+{
+	if (currentlyEquipedItem == 0 && !Swing.isPlaying())
+	{
+		Swing.playSound();
 	}
-	else
-		inAir = false;
+}
 
-
-	if (inAir == false && Transformable::transform.position.y <= currentY)
+void Player::eatFood()
+{
+	if (currentlyEquipedItem == 3 && inInventory[3] == true && foodTimer > 1.0f)
 	{
-		gravity = false;
-		jumpReady = true;
-	}
-	else
-		gravity = true;
-
-
-	if (gravity == true && inAir == false)
-		Transformable::transform.position -= fallSpeed * Transformable::transform.up  * deltaTime;
-
-	//if (Transformable::transform.position.y <= currentY -0.1f)
-	//	Transformable::transform.position.y = currentY;
-	if (Transformable::transform.position.y <= currentY - 0.0001)
-		Transformable::transform.position.y = currentY;
-
-	if (isWalking == true)
-	{
-		if (!SnowCrunch.isPlaying())
-			SnowCrunch.playSound();
-	}
-	else
-	{
-		SnowCrunch.stopSound();
+		food += 50;
+		if (food >= 100)
+			food = 100;
+		inInventory[3] = false;
+		addImageToInventory("EmptyImage", 3);
+		
 	}
 }
 
@@ -761,6 +818,8 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 {
 	// Check ObjectType ID
 	// Set isAlive to false if you want to delete the interacted item from the world.
+
+
 	if (id == ObjectType::ID::Axe)
 	{
 		if (inInventory[0] == false)
@@ -783,6 +842,8 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 		|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
 		&& currentlyEquipedItem == 0)
 	{
+		if(!HitWAxe.isPlaying())
+			HitWAxe.playSound();
 		if (inInventory[2] == false)
 		{
 			if (counter >= 4)
@@ -807,6 +868,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 	{
 		if (inInventory[3] == false)
 		{
+			this->foodTimer = 0.0f;
 			equip("FoodIcon");
 			this->currentlyEquipedItem = 3;
 			this->equipItem = 46;
@@ -871,6 +933,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 		isAlive = false;
 	}
 	*/
+
 	return -1;
 }
 
