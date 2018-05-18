@@ -126,7 +126,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 
 void GameScene::addAI(MeshLib & meshLibrary, MaterialLib & materialLibrary)
 {
-	int key = 1;
+	int key = 54;
 
 	//Create AI object
 	GameObject* AiObject = new GameObject();
