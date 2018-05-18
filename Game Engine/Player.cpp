@@ -25,7 +25,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->textInitializer = 0;
 	this->inventoryCount = 0;
 	this->maxAmountOfItems = 5;
-	this->fade = 1;
+	this->fade = 0.9f;
 	this->winFade = 0;
 	this->flareTimer = 0;
 	this->textFade = 1;
@@ -329,6 +329,16 @@ void Player::update(float deltaTime, float seconds)
 	//Transformable::transform.velocity = Transformable::transform.forward * deltaTime;
 	//...
 
+	if (win)
+	{
+		if (flareTimer >= 10.0f)
+			stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
+	}
+	else if (fade >= 1.0f)
+	{
+		stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
+	}
+
 	float tempSeconds = seconds / 1000;
 	time += tempSeconds;
 
@@ -394,10 +404,13 @@ void Player::update(float deltaTime, float seconds)
 		
 	//Winning
 
-	if (this->win == true && this->flareTimer <= 10.0f)
+	if (this->win == true)
 	{
 		this->flareTimer += deltaTime;
-		this->winFade += deltaTime / 10.0f;
+		if (flareTimer <= 10.0f)
+		{
+			this->winFade += deltaTime / 10.0f;
+		}
 	}
 
 	// Text Fade
@@ -439,6 +452,12 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		setFood(-10);
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		hp -= 10;
+
+	//Fast win
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+	{
+		this->win = true;
+	}
 
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 	{

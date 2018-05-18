@@ -112,6 +112,6 @@ void main()
 
 	if (flareTimer > 0)
 	{
-		color.xyz = color.xyz + vec3(winFade, 0.0, 0.0);
+		color.xyz = color.xyz + winFade;
 	}
 }
