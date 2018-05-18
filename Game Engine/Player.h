@@ -97,7 +97,6 @@ public:
 private:
 	bool isColliding = false;
 
-	bool pickUpFood = false;
 	float foodTimer = 0.0;
 
 	bool movingForward = false;
