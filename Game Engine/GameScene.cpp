@@ -98,7 +98,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("Yeti.leap");
+		LeapLevel* level = new LeapLevel("ItemSpawn.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
 		addAI(*meshLibrary, *matertialLibrary);
