@@ -1,8 +1,12 @@
 #pragma once
 #include "Transformable.h"
+#include <iostream>
+#include "glm/glm/gtc/matrix_transform.hpp"
+#include "glm/glm/gtc/type_ptr.hpp"
+#include "glm/glm/glm.hpp"
 
 #define MAX_DISTANCE 50
-#define SPAWN_OFFSET 20
+#define SPAWN_OFFSET 10
 #define SPEED 3.0f
 
 class AI :
@@ -26,6 +30,7 @@ private:
 	glm::vec3 startPosition;
 	glm::vec3 lastTarget;
 	glm::vec3 target;
+	glm::vec3 forward;
 
 	float time;
 

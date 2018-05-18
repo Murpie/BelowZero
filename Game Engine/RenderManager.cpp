@@ -509,12 +509,13 @@ void RenderManager::Render() {
 		{
 			glm::vec2 temp = gameScene->gameObjects[i]->getAI()->getXY();
 			for (int j = 0; j < gameScene->gameObjects.size(); j++)
+			{
 				if (gameScene->gameObjects[j]->getTerrain() != nullptr)
 				{
 					gameScene->gameObjects[i]->getAI()->setCurrentHeight(gameScene->gameObjects[j]->getTerrain()->calculateY(temp.x, temp.y));
 					break;
 				}
-			break;
+			}
 		}
 	}
 
