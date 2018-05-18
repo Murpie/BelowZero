@@ -64,6 +64,11 @@ void GameScene::update(float deltaTime, float seconds)
 			delete gameObjects[i];
 			gameObjects.erase(gameObjects.begin() + i);
 		}
+
+		if (gameObjects[i]->getAI() != nullptr)
+		{
+			aiCollisionTest(*gameObjects[i]);
+		}
 	}
 }
 
@@ -96,7 +101,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		LeapLevel* level = new LeapLevel("Yeti.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
-
+		addAI(*meshLibrary, *matertialLibrary);
 		makeObjectsInteractable();
 	}
 	else if (typeOfScene == Scene::ID::MENU)
@@ -116,6 +121,53 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 	{
 		std::cout << "GAMESCENE::initScene() - Scene::ID : not valid" << std::endl;
 	}
+}
+
+void GameScene::addAI(MeshLib & meshLibrary, MaterialLib & materialLibrary)
+{
+	int key = 1;
+
+	//Create AI object
+	GameObject* AiObject = new GameObject();
+	AiObject->name = "AI ";
+	AiObject->transform->position = gameObjects[0]->transform->position;
+	AiObject->transform->position.x += 10;
+	AiObject->transform->position.z -= 25;
+	//
+	MeshFilter* meshFilter = new MeshFilter(
+		meshLibrary.getMesh(key)->gVertexBuffer,
+		meshLibrary.getMesh(key)->gVertexAttribute,
+		meshLibrary.getMesh(key)->leapMesh->getVertexCount(),
+		meshLibrary.getMesh(key)->meshType, 1);
+	AiObject->addComponent(meshFilter);
+	AiObject->addComponent(materialLibrary.getMaterial(0));
+	//Add AI component
+	AI* ai = new AI(*AiObject->transform);
+	AiObject->addComponent(ai);
+	//...
+	AiObject->setIsRenderable(true);
+	//...
+	for (int j = 0; j < meshLibrary.getMesh(1)->leapMesh->boundingBoxes.size(); j++)
+	{
+		bBox* box = new bBox();
+		//add center
+		box->center.x = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->center[0];
+		box->center.y = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->center[1];
+		box->center.z = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->center[2];
+		//add max vector
+		box->vMax.x = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->maxVector[0];
+		box->vMax.y = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->maxVector[1];
+		box->vMax.z = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->maxVector[2];
+		//add min vector
+		box->vMin.x = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->minVector[0];
+		box->vMin.y = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->minVector[1];
+		box->vMin.z = meshLibrary.getMesh(key)->leapMesh->boundingBoxes[j]->minVector[2];
+		//push into gameobject
+		AiObject->bbox.push_back(box);
+	}
+
+	//Add to scene
+	gameObjects.push_back(AiObject);
 }
 
 void GameScene::addLight(glm::vec3 transform, int lightType)
@@ -428,6 +480,34 @@ void GameScene::collisionTest(GameObject & other)
 	}
 }
 
+void GameScene::aiCollisionTest(GameObject & other)
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
+		if (distance < 25 && gameObject_ptr->getAI() == nullptr)
+		{
+			for (int i = 0; i < other.bbox.size(); i++)
+			{
+				for (int j = 0; j < gameObject_ptr->bbox.size(); j++)
+				{
+					if (Intersection::collisionTest(*other.bbox[i], other.transform->position + (other.getAI()->direction * 3.f), *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))
+					{
+						other.getAI()->collision = true;
+						if (Intersection::collisionTest(*other.bbox[i], other.transform->position, *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))
+							Intersection::collisionResponse(*other.bbox[i], *other.transform, *gameObject_ptr->bbox[j], gameObject_ptr->transform->position);
+						break;
+					}
+					else
+					{
+						other.getAI()->collision = false;
+					}
+				}
+			}
+		}
+	}
+}
+
 void GameScene::makeObjectsInteractable()
 {
 	for (GameObject* gameObject_ptr : gameObjects)
@@ -542,6 +622,7 @@ void GameScene::addNewObjectTest(GLFWwindow * window)
 			}
 			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) && gameObject_ptr->getPlayer()->addClick == true)
 				gameObject_ptr->getPlayer()->addClick = false;
+			break;
 		}
 	}
 
