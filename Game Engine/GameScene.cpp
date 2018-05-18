@@ -58,7 +58,7 @@ void GameScene::update(float deltaTime, float seconds)
 		}
 		gameObjects[i]->update(deltaTime, seconds);
 
-		collisionTest(*gameObjects[i]);
+		collisionTest(*gameObjects[i], deltaTime);
 
 		if (gameObjects[i]->isActive == false)
 		{
@@ -464,7 +464,7 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 	}
 }
 
-void GameScene::collisionTest(GameObject & other)
+void GameScene::collisionTest(GameObject & other, float deltaTime)
 {
 	for (GameObject* gameObject_ptr : gameObjects)
 	{
@@ -499,7 +499,7 @@ void GameScene::collisionTest(GameObject & other)
 			}
 			if (distance < 15 && other.getIsBurning())
 			{
-				gameObject_ptr->getPlayer()->heatResponse();
+				gameObject_ptr->getPlayer()->heatResponse(deltaTime);
 			}
 		}
 	}
@@ -637,7 +637,7 @@ void GameScene::addNewObjectTest(GLFWwindow * window)
 	{
 		if (gameObject_ptr->getPlayer() != nullptr)
 		{
-			if (gameObject_ptr->getPlayer()->addClick == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS))
+			if (gameObject_ptr->getPlayer()->addClick == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) && gameObject_ptr->getPlayer()->currentlyEquipedItem == 2)
 			{
 				gameObject_ptr->getPlayer()->addClick = true;
 				if (gameObject_ptr->getPlayer()->getEquipedItem() == 2)

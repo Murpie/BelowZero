@@ -16,7 +16,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->bucketContent = 0;
 	this->swing = false;
 	this->axeSwing = 0;
-
+	this->pickUpSnow = false;
 	this->hp = 80;
 	this->cold = 100;
 	this->coldMeter = 0;
@@ -367,6 +367,7 @@ void Player::useItem(GLFWwindow * window)
 		{
 			bucketContent = 1;
 			equipItemMesh();
+			pickUpSnow = true;
 			swapItem = true;
 			pullDown = true;
 		}
@@ -951,11 +952,23 @@ int Player::collisionResponse(const ObjectType::ID)
 	return -1;
 }
 
-void Player::heatResponse()
+void Player::heatResponse(float deltaTime)
 {
-	cold += .1f; 
+	cold += .1f;
 	if (this->cold > 100)
 		this->cold = 100;
+	if (currentlyEquipedItem == 4 && bucketContent == 1)
+	{
+		meltTimer += deltaTime;
+		if (meltTimer > 5.0)
+		{
+			bucketContent = 2;
+			equipItemMesh();
+			swapItem = true;
+			pullDown = true;
+			meltTimer = 0.0;
+		}
+	}
 }
 
 void Player::takeDamange(float damage, float deltaTime)
@@ -1020,19 +1033,25 @@ void Player::equipItemMesh()
 		{
 			if (jacket)
 			{
-				if (bucketContent = 0)
+				if (bucketContent == 0)
 					this->equipItem = 47;
-				else if (bucketContent = 1)
+				else if (bucketContent == 1)
+				{
 					this->equipItem = 48;
+					pickUpSnow = false;
+				}
 				else
 					this->equipItem = 49;
 			}
 			else
 			{
-				if (bucketContent = 0)
+				if (bucketContent == 0)
 					this->equipItem = 34;
-				else if (bucketContent = 1)
+				else if (bucketContent == 1)
+				{
 					this->equipItem = 35;
+					pickUpSnow = false;
+				}
 				else
 					this->equipItem = 36;
 			}

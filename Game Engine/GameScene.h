@@ -40,7 +40,7 @@ private:
 	void checkInteractionResponse(GameObject & other, int objectID);
 
 	void interactionTest(GameObject & other, GLFWwindow * window); // Intersection test on mouse click
-	void collisionTest(GameObject & other); // Collision test when two AABB overlap
+	void collisionTest(GameObject & other, float deltaTime); // Collision test when two AABB overlap
 	void aiCollisionTest(GameObject & other);
 
 	void makeObjectsInteractable();
