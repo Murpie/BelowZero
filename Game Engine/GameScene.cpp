@@ -575,7 +575,7 @@ void GameScene::makeObjectsInteractable()
 		}
 		if (gameObject_ptr->objectID == ObjectType::ID::Rabbit)
 		{
-			gameObject_ptr->setIsRenderable(true);
+			gameObject_ptr->isInteractable = 1;
 		}
 	}
 }
