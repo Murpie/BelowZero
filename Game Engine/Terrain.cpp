@@ -26,8 +26,15 @@ Terrain::~Terrain()
 			delete[] Heights[i];	
 		}
 	}
+	for (int i = 0; i < this->Length; i++)
+	{
+		if (Positions[i] != nullptr)
+		{
+			delete[] Positions[i];
+		}
+	}
 		
-
+	delete[] Positions;
 	delete[] Heights;
 }
 
@@ -47,11 +54,12 @@ void Terrain::setupVertexData()
 	int heightTemp = (int)(HeightMap.height / Height);
 	int lengthTemp = (int)(HeightMap.width / Length);
 
-
+	Positions = new glm::vec3*[Height];
 	Heights = new float*[Height];
 
 	for (int i = 0; i < this->Height; i++)
 	{
+		Positions[i] = new glm::vec3[Length];
 		Heights[i] = new float[Length];
 		for (int j = 0; j < this->Length; j++)
 		{
@@ -61,7 +69,7 @@ void Terrain::setupVertexData()
 
 
 
-			temp.x = (float)j * offset; 
+			temp.x = (float)j * offset;
 
 			float tempY = ((float)(int)pixels[0] / 255);
 			tempY = glm::mix(MIN_HEIGHT, MAX_HEIGHT, tempY);
@@ -77,9 +85,9 @@ void Terrain::setupVertexData()
 			this->terrainVertices.push_back(temp);
 
 			Heights[i][j] = tempY;
+			Positions[i][j] = glm::vec3(temp.x, temp.y, temp.z);
 		}
 	}
-
 
 	//for (int i = 0; i < this->HeightMap.height; i++)
 	//{
@@ -331,6 +339,45 @@ float Terrain::calculateY(float x, float z)
 	answer;
 	return answer;
 
+}
+
+bool Terrain::calculateNormal(float x, float z)
+{
+
+
+	int gridX = (int)glm::floor(x / offset);
+	int gridZ = (int)glm::floor(z / offset);
+
+	if (gridX >= terrainVertices.size() - 1 || gridZ >= terrainVertices.size() - 1 || gridX < 0 || gridZ < 0)
+		return -10;
+
+	float xCoord = std::fmod(x, (float)offset) / (float)offset;
+	float zCoord = std::fmod(z, (float)offset) / (float)offset;
+	float answer;
+	float normalAngle;
+
+	if (xCoord <= (1 - zCoord))
+	{
+
+		glm::vec3 a = Positions[gridZ + 1][gridX] - Positions[gridZ][gridX];
+		glm::vec3 b = Positions[gridZ][gridX + 1] - Positions[gridZ][gridX];
+		glm::vec3 c = glm::normalize(glm::cross(a, b));
+		normalAngle = glm::dot(c, glm::vec3(0.0, 1.0, 0.0));
+		if (normalAngle < 0.65)
+			return false;
+	}
+	else
+	{
+
+		glm::vec3 a = Positions[gridZ + 1][gridX + 1] - Positions[gridZ + 1][gridX];
+		glm::vec3 b = Positions[gridZ][gridX + 1] - Positions[gridZ + 1][gridX];
+		glm::vec3 c = glm::normalize(glm::cross(a, b));
+		normalAngle = glm::dot(c, glm::vec3(0.0, 1.0, 0.0));
+		if (normalAngle < 0.65)
+			return false;
+	}
+
+	return true;
 }
 
 

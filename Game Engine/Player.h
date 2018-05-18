@@ -16,6 +16,7 @@ public:
 	SoundMasterSFML AmbientMusic;
 	SoundMasterSFML AmbientWind;
 	SoundMasterSFML Swing;
+	SoundMasterSFML HitWAxe;
 
 	Gamestate::StateOfGame stateOfGame;
 
@@ -76,12 +77,15 @@ public:
 
 	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
 	void setCurrentHeight(float height);
+	void setIsWalkable(bool walkable);
 	glm::vec2 setXZ();
 	//Physics
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
 
 	//glm::mat4 getViewMatrix()const;
+	void swingTest();
+	void eatFood();
 	int interactionResponse(const ObjectType::ID id, bool & isAlive, int & counter);
 	int collisionResponse(const ObjectType::ID);
 	void heatResponse();
@@ -95,20 +99,24 @@ public:
 	float pickUp;
 
 private:
+	bool isColliding = false;
 
+	float foodTimer = 0.0;
 
-	bool frontCollision = false;
-	bool bottomCollision = false;
-	bool leftCollision = false;
-	bool rightCollision = false;
-	bool backCollision = false;
-	bool topCollision = false;
+	bool movingForward = false;
+	bool movingBackwards = false;
+	bool movingLeft = false;
+	bool movingRight = false;
+
 	bool inInventory[5];
 	bool isPressed;
 
 	glm::vec3 cameraPos;
 	glm::vec3 cameraFront;
 	glm::vec3 cameraUp;
+
+	glm::vec3 lastPos;
+	glm::vec3 lastPosTemp;
 
 	int equipedID;
 	bool swapItem;
@@ -146,6 +154,7 @@ private:
 	bool isWalking = false;
 
 	//Terrain
+	float previousY;
 	float currentY;
 	float frontVertexHeight;
 	float backVertexHeight;

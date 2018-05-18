@@ -2,6 +2,7 @@
 layout(location = 0) out vec3 FragColor;
 
 in vec2 TexCoords;
+in vec3 cornerPos;
 uniform vec3 view_position;
 
 
@@ -9,6 +10,8 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D iceNormal;
 uniform sampler2D SceneTexture;
+
+uniform mat4 vMatrix;
 
 uniform float hp;
 uniform float cold;
@@ -71,21 +74,20 @@ void main()
 	vec3 bumpTex = 2.0 * texture(iceNormal, texCoords).rgb - 1.0;
 	vec2 newUV = vec2(texCoords.x + bumpTex.x, texCoords.y + bumpTex.y);
 
-	vec3 posDir = normalize(view_position - FragPos);
-	bump = normalize(-viewDir * ice);
+	vec3 posDir = view_position - FragPos;
+	posDir = vec4(vMatrix * vec4(posDir, 1.0)).xyz;
 
+	bump = vec4(vMatrix * vec4(-bump, 1.0)).xyz;;
+	vec3 itsADir = cornerPos - FragPos;
 
-	vec3 Refract = normalize(refract(-viewDir, -bumpTex, 1.75));
-	vec3 Reflect = normalize(reflect(-viewDir, -bumpTex));
+	vec3 Refract = normalize(refract(itsADir, -ice, 1.35));
+	vec3 Reflect = normalize(reflect(itsADir, -bumpTex));
 	vec3 testAlbedo1 = texture(SceneTexture, Refract.xy).rgb;
 	vec3 testAlbedo2 = texture(SceneTexture, Reflect.xy).rgb;
 
 	vec3 testAlbedo = (testAlbedo2 * testAlbedo1);
-	vec3 Mix = mix(testAlbedo, Albedo, 0.8);
-	Mix *= vec3(0.33, 0.9, 1.0);
-
-	vec3 itsagoodashow = texture(SceneTexture, newUV).rgb;
-
+	vec3 Mix = mix(testAlbedo, Albedo, 0.7);
+	//Mix *= vec3(0.33, 0.9, 1.0);
 
 	float coldVariable = 1.0;
 	if (Cold <= 50)
@@ -99,9 +101,18 @@ void main()
 		hungerVariable = Hunger / 100;
 	}
 
-	
+	vec3 coldTexture = Albedo;
 
-	vec3 coldTexture = mix(Mix, Albedo, coldVariable);
+	if (gl_FragCoord.x > ScreenX * 0.8)
+		coldTexture = mix(Mix2, Albedo, coldVariable);
+	else if (gl_FragCoord.y > ScreenY * 0.7)
+		coldTexture = mix(Mix2, Albedo, coldVariable);
+	else if (gl_FragCoord.x < ScreenX * 0.2)
+		coldTexture = mix(Mix2, Albedo, coldVariable);
+	else if (gl_FragCoord.y < ScreenY * 0.3)
+		coldTexture = mix(Mix2, Albedo, coldVariable);
+
+	coldTexture = mix(Mix, Albedo, coldVariable);
 
 	float grayScale = dot(coldTexture, vec3(0.299, 0.587, 0.114));
 	vec3 grayScaleTexture = vec3(grayScale);
