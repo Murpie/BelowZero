@@ -86,7 +86,8 @@ public:
 	//glm::mat4 getViewMatrix()const;
 	void swingTest();
 	void eatFood();
-	int interactionResponse(const ObjectType::ID id, bool & isAlive, int & counter);
+	int interactionResponse(const ObjectType::ID id, bool & isAlive);
+	int actionResponse(const ObjectType::ID id, bool & isAlive, int & counter);
 	int collisionResponse(const ObjectType::ID);
 	void heatResponse();
 	void takeDamange(float damage, float deltaTime);

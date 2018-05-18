@@ -403,19 +403,17 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 	{
 		if (gameObject_ptr->getPlayer() != nullptr)
 		{
-			if (gameObject_ptr->getPlayer()->click == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
+			if (gameObject_ptr->getPlayer()->click == false && (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS))
 			{
-				gameObject_ptr->getPlayer()->swingTest();
-				gameObject_ptr->getPlayer()->eatFood();
-				
+
 				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
 				if (distance < 10 && other.isInteractable == true)
 				{
-					
+
 					gameObject_ptr->getPlayer()->click = true;
 					RayData ray = Ray::getWorldRay(
 						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,
-						gameObject_ptr->getViewMatrix(), 
+						gameObject_ptr->getViewMatrix(),
 						SCREEN_WIDTH, SCREEN_HEIGHT,
 						gameObject_ptr->transform->position);
 
@@ -423,15 +421,37 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 					{
 						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
 						{
+							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::FlareGun)
+							{
+								other.setGameEnd();
+							}
+						}
+					}
+				}
+			}
 
-							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive, other.playerHitCounter) == ObjectType::ID::Campfire)
+			if (gameObject_ptr->getPlayer()->click == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
+			{
+
+				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
+				if (distance < 10 && other.isInteractable == true)
+				{
+
+					gameObject_ptr->getPlayer()->click = true;
+					RayData ray = Ray::getWorldRay(
+						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,
+						gameObject_ptr->getViewMatrix(),
+						SCREEN_WIDTH, SCREEN_HEIGHT,
+						gameObject_ptr->transform->position);
+
+					for (int i = 0; i < other.bbox.size(); i++)
+					{
+						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
+						{
+							if (gameObject_ptr->getPlayer()->actionResponse(other.objectID, other.isActive, other.playerHitCounter) == ObjectType::ID::Campfire)
 							{
 								other.setIsBurning(60.0f);
 								meltIceWall(other);
-							}
-							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive, other.playerHitCounter) == ObjectType::ID::FlareGun)
-							{
-								other.setGameEnd();
 							}
 						}
 					}
