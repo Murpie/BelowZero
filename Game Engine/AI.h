@@ -2,7 +2,7 @@
 #include "Transformable.h"
 
 #define MAX_DISTANCE 50
-#define SPAWN_OFFSET 50
+#define SPAWN_OFFSET 20
 #define SPEED 5.0f
 
 class AI :
