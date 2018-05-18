@@ -8,14 +8,15 @@ SoundMasterSFML::SoundMasterSFML()
 
 SoundMasterSFML::SoundMasterSFML(const std::string & filePath)
 {
-
+	this->Sound = new sf::Sound;
+	this->Buffer = new sf::SoundBuffer;
 	addSound(filePath);
 }
 
 SoundMasterSFML::~SoundMasterSFML()
 {
 	this->Sound->stop();
-	this->Sound->resetBuffer();
+
 	
 	delete this->Buffer;
 	delete this->Sound;

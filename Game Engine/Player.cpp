@@ -78,13 +78,17 @@ Player::Player(Transform& transform) : Transformable(transform)
 	AmbientWind.playSound();
 	AmbientWind.loop(true);
 
+	HeavySnow.addSound("HeavyWind.ogg");
+	HeavySnow.loop(true);
+	HeavySnow.setVolume(0.0f);
+
 	//AmbientMusic.addSound("AmbientMusic1.wav");
 	//AmbientMusic.setVolume(50.0f);
 	//AmbientMusic.playSound();
 	//AmbientMusic.loop(true);
 
 	Swing.addSound("woosh.wav");
-
+	pickUpSnow.addSound("PickUpSnow.ogg");
 	HitWAxe.addSound("AxeHit.ogg");
 }
 
@@ -359,8 +363,6 @@ void Player::useItem(GLFWwindow * window)
 		dropItem();
 	}
 
-
-
 	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 4 && pickUp >= 0)
 	{
 		if (bucketContent == 0)
@@ -369,6 +371,8 @@ void Player::useItem(GLFWwindow * window)
 			equipItemMesh();
 			swapItem = true;
 			pullDown = true;
+			if (!pickUpSnow.isPlaying())
+				pickUpSnow.playSound();
 		}
 	}
 }
@@ -457,6 +461,33 @@ void Player::update(float deltaTime, float seconds)
 		SnowCrunch.stopSound();
 	}
 	//=======================-------------Leons Test Sak------------==================
+
+	if (Transformable::transform.position.y > 40.0f + 7.0f)
+	{
+		if(!HeavySnow.isPlaying())
+			HeavySnow.playSound();
+		
+		float mixVar = 89.0f - 47.0f;
+		float volumeVar = Transformable::transform.position.y - 47.0f;
+		float volume = glm::mix(0, 100, volumeVar / mixVar);
+		volume *= 0.7;
+		HeavySnow.setVolume(volume);
+
+		if (!jacket)
+		{
+			float coldStrength = glm::mix(0, 8, volumeVar / mixVar);
+			this->cold = this->cold - (this->coldTick * 8 * deltaTime);
+
+			//this->damage = this->coldMeter + this->waterMeter + this->foodMeter;
+			this->hp = this->hp - (this->coldTick * 8 * deltaTime);
+
+		}
+	}
+	else if (HeavySnow.isPlaying())
+	{
+		HeavySnow.stopSound();
+	}
+		
 
 	swappingItem(deltaTime);
 

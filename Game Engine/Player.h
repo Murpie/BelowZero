@@ -15,7 +15,9 @@ public:
 	SoundMasterSFML SnowCrunch;
 	SoundMasterSFML AmbientMusic;
 	SoundMasterSFML AmbientWind;
+	SoundMasterSFML HeavySnow;
 	SoundMasterSFML Swing;
+	SoundMasterSFML pickUpSnow;
 	SoundMasterSFML HitWAxe;
 
 	Gamestate::StateOfGame stateOfGame;
