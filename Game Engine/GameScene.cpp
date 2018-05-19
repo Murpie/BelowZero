@@ -1,5 +1,7 @@
 #include "GameScene.h"
 
+
+
 GameScene::GameScene(Scene::ID typeOfScene) :
 	camerasInScene(0), lightsInScene(0),
 	addObject(false)
@@ -40,6 +42,9 @@ void GameScene::update(float deltaTime, float seconds)
 
 		if (gameObjects[i]->getPlayer() != nullptr)
 		{
+			// Update player zone;
+			setZone(*gameObjects[i]);
+
 			if (gameObjects[i]->getIsBurning())
 				gameObjects[i]->getPlayer()->takeDamange(5.f, deltaTime);
 
@@ -296,6 +301,8 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 						//push into gameobject
 						gameObject_ptr->bbox.push_back(box);
 					}
+					// set zone
+					setZone(*gameObject_ptr);
 					//break loop
 					break;
 				}
@@ -349,6 +356,8 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 				//push into gameobject
 				aiObject->bbox.push_back(box);
 			}
+			// set zone
+			setZone(*aiObject);
 			//Add to scene
 			gameObjects.push_back(aiObject);
 		}
@@ -409,6 +418,8 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 				//push into gameobject
 				meshObject->bbox.push_back(box);
 			}
+			// set zone
+			setZone(*meshObject);
 			//Add to scene
 			gameObjects.push_back(meshObject);
 		}
@@ -457,25 +468,41 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 		{
 			if (gameObject_ptr->getPlayer()->click == false && (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS))
 			{
-
-				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-				if (distance < 10 && other.isInteractable == true)
+				if (zoneTest(gameObject_ptr, &other))
 				{
+					float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
 
-					gameObject_ptr->getPlayer()->click = true;
-					RayData ray = Ray::getWorldRay(
-						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,
-						gameObject_ptr->getViewMatrix(),
-						SCREEN_WIDTH, SCREEN_HEIGHT,
-						gameObject_ptr->transform->position);
-
-					for (int i = 0; i < other.bbox.size(); i++)
+					/*
+					// Create promise
+					std::promise<float> prms;
+					// Extract future
+					std::future<float> ftr = prms.get_future();
+					// Thread function
+					std::thread th(&getDistance, std::move(prms), other.transform->position, gameObject_ptr->transform->position);
+					// Get value
+					float distance = ftr.get();
+					// Join Thread
+					th.join();
+					//...
+					*/
+					if (distance < 10 && other.isInteractable == true)
 					{
-						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
+
+						gameObject_ptr->getPlayer()->click = true;
+						RayData ray = Ray::getWorldRay(
+							SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,
+							gameObject_ptr->getViewMatrix(),
+							SCREEN_WIDTH, SCREEN_HEIGHT,
+							gameObject_ptr->transform->position);
+
+						for (int i = 0; i < other.bbox.size(); i++)
 						{
-							if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::FlareGun)
+							if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
 							{
-								other.setGameEnd();
+								if (gameObject_ptr->getPlayer()->interactionResponse(other.objectID, other.isActive) == ObjectType::ID::FlareGun)
+								{
+									other.setGameEnd();
+								}
 							}
 						}
 					}
@@ -484,26 +511,28 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 
 			if (gameObject_ptr->getPlayer()->click == false && (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS))
 			{
-
-				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-				if (distance < 10 && other.isInteractable == true)
+				if (zoneTest(gameObject_ptr, &other))
 				{
-
-					gameObject_ptr->getPlayer()->click = true;
-					RayData ray = Ray::getWorldRay(
-						SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,
-						gameObject_ptr->getViewMatrix(),
-						SCREEN_WIDTH, SCREEN_HEIGHT,
-						gameObject_ptr->transform->position);
-
-					for (int i = 0; i < other.bbox.size(); i++)
+					float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
+					if (distance < 10 && other.isInteractable == true)
 					{
-						if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
+
+						gameObject_ptr->getPlayer()->click = true;
+						RayData ray = Ray::getWorldRay(
+							SCREEN_WIDTH*0.5f, SCREEN_HEIGHT*0.5f,
+							gameObject_ptr->getViewMatrix(),
+							SCREEN_WIDTH, SCREEN_HEIGHT,
+							gameObject_ptr->transform->position);
+
+						for (int i = 0; i < other.bbox.size(); i++)
 						{
-							if (gameObject_ptr->getPlayer()->actionResponse(other.objectID, other.isActive, other.playerHitCounter) == ObjectType::ID::Campfire)
+							if (Intersection::rayBoxTest(ray, *other.bbox[i], other.getModelMatrix()))
 							{
-								other.setIsBurning(60.0f);
-								meltIceWall(other);
+								if (gameObject_ptr->getPlayer()->actionResponse(other.objectID, other.isActive, other.playerHitCounter) == ObjectType::ID::Campfire)
+								{
+									other.setIsBurning(60.0f);
+									meltIceWall(other);
+								}
 							}
 						}
 					}
@@ -522,36 +551,39 @@ void GameScene::collisionTest(GameObject & other, float deltaTime)
 	{
 		if (gameObject_ptr->getPlayer() != nullptr && other.objectID != ObjectType::ID::Player)
 		{
-			float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-			if (distance < 25)
+			if (zoneTest(gameObject_ptr, &other))
 			{
-				for (int i = 0; i < gameObject_ptr->bbox.size(); i++)
+				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
+				if (distance < 25)
 				{
-					for (int j = 0; j < other.bbox.size(); j++)
+					for (int i = 0; i < gameObject_ptr->bbox.size(); i++)
 					{
-						if (Intersection::collisionTest(*gameObject_ptr->bbox[i], gameObject_ptr->transform->position, *other.bbox[j], other.transform->position))
+						for (int j = 0; j < other.bbox.size(); j++)
 						{
-							//std::cout << gameObject_ptr->transform->velocity.x << std::endl;
-							Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
-							std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
+							if (Intersection::collisionTest(*gameObject_ptr->bbox[i], gameObject_ptr->transform->position, *other.bbox[j], other.transform->position))
+							{
+								//std::cout << gameObject_ptr->transform->velocity.x << std::endl;
+								Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
+								//std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
 							
-							if (other.getIsBurning())
-							{
-									gameObject_ptr->setIsBurning(10);
-							}
-							int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
+								if (other.getIsBurning())
+								{
+										gameObject_ptr->setIsBurning(10);
+								}
+								int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
 
-							if (gameObject_ptr->getIsBurning() && !other.getIsBurning())
-							{
-								other.setIsBurning(60);
+								if (gameObject_ptr->getIsBurning() && !other.getIsBurning())
+								{
+									other.setIsBurning(60);
+								}
 							}
 						}
 					}
 				}
-			}
-			if (distance < 15 && other.getIsBurning())
-			{
-				gameObject_ptr->getPlayer()->heatResponse(deltaTime);
+				if (distance < 15 && other.getIsBurning())
+				{
+					gameObject_ptr->getPlayer()->heatResponse(deltaTime);
+				}
 			}
 		}
 	}
@@ -561,23 +593,26 @@ void GameScene::aiCollisionTest(GameObject & other)
 {
 	for (GameObject* gameObject_ptr : gameObjects)
 	{
-		float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-		if (distance < 25 && gameObject_ptr->getAI() == nullptr)
+		if (zoneTest(gameObject_ptr, &other))
 		{
-			for (int i = 0; i < other.bbox.size(); i++)
+			float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
+			if (distance < 25 && gameObject_ptr->getAI() == nullptr)
 			{
-				for (int j = 0; j < gameObject_ptr->bbox.size(); j++)
+				for (int i = 0; i < other.bbox.size(); i++)
 				{
-					if (Intersection::collisionTest(*other.bbox[i], other.transform->position + (other.getAI()->direction * 4.f), *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))
+					for (int j = 0; j < gameObject_ptr->bbox.size(); j++)
 					{
-						other.getAI()->collision = true;
-						if (Intersection::collisionTest(*other.bbox[i], other.transform->position, *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))
-							Intersection::collisionResponse(*other.bbox[i], *other.transform, *gameObject_ptr->bbox[j], gameObject_ptr->transform->position);
-						break;
-					}
-					else
-					{
-						other.getAI()->collision = false;
+						if (Intersection::collisionTest(*other.bbox[i], other.transform->position + (other.getAI()->direction * 4.f), *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))
+						{
+							other.getAI()->collision = true;
+							if (Intersection::collisionTest(*other.bbox[i], other.transform->position, *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))
+								Intersection::collisionResponse(*other.bbox[i], *other.transform, *gameObject_ptr->bbox[j], gameObject_ptr->transform->position);
+							break;
+						}
+						else
+						{
+							other.getAI()->collision = false;
+						}
 					}
 				}
 			}
@@ -679,6 +714,8 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 		meshObject->bbox.push_back(box);
 	}
 	meshObject->setIsRenderable(true);
+	//Set zone
+	setZone(*meshObject);
 	//Add to scene
 	gameObjects.push_back(meshObject);
 	//...
@@ -742,6 +779,38 @@ void GameScene::meltIceWall(GameObject & other)
 			}
 		}
 	}
+}
+
+void GameScene::setZone(GameObject & other)
+{
+	glm::ivec2 previousZone = other.zone.zoneXY;
+
+	float X = other.transform->position.x;
+	float Z = other.transform->position.z;
+
+	other.zone.zoneXY.x = (int)(X / 128.0f) + 0.5f;
+	other.zone.zoneXY.y = (int)(Z / 128.0f) + 0.5f;
+
+	if (previousZone != other.zone.zoneXY)
+		std::cout << other.name << " " << "new zone: " << other.zone.zoneXY.x << " " << other.zone.zoneXY.y << std::endl;
+}
+
+bool GameScene::zoneTest(GameObject* target1, GameObject* target2)
+{
+	if (target1->zone.zoneXY == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(0, 1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(0, -1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(1, 0)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(-1, 0)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(1, -1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(1, 1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(-1, -1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(-1, 1)) == target2->zone.zoneXY
+		)
+	{
+		return true;
+	}
+	return false;
 }
 
 

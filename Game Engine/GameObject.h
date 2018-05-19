@@ -19,6 +19,11 @@
 #include "Intersection.h"
 #include <list>
 
+struct Zone
+{
+	glm::ivec2 zoneXY = glm::ivec2(-1, -1);
+};
+
 class Component;
 
 class GameObject 
@@ -28,6 +33,7 @@ public:
 	~GameObject();
 
 	SoundMasterSFML burning;
+	Zone zone;
 
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);

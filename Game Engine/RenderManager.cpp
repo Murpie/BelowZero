@@ -41,22 +41,43 @@ RenderManager::~RenderManager()
 {
 }
 
+bool zoneTest(GameObject* player, GameObject* object)
+{
+	if (player->zone.zoneXY == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(0, 1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(0, -1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(1, 0)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(-1, 0)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(-1, 1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(1, -1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(1, 1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(-1, -1)) == object->zone.zoneXY
+		)
+	{
+		return true;
+	}
+	return false;
+}
+
 void RenderManager::FindObjectsToRender() {
 	for (unsigned int i = 0; i < gameScene->gameObjects.size(); i++) {
-		glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
-		float distance = length(vectorToObject);
-
-		if (gameScene->gameObjects[i]->getIsRenderable() == true && distance < 100) {
-			gameObjectsToRender.push_back(gameScene->gameObjects[i]);
-		}
-
-		if (gameScene->gameObjects[i]->hasLight == true) {
-			gameScene->gameObjects[i]->lightComponent->color = glm::vec4(0.85, 0.85, 1.0, 1)*daylight;
-			lightsToRender.push_back(gameScene->gameObjects[i]->lightComponent);
-		}
-		if (gameScene->gameObjects[i]->fireComponent != nullptr)
+		if (zoneTest(gameScene->gameObjects[0], gameScene->gameObjects[i]))
 		{
-			lightsToRender.push_back(gameScene->gameObjects[i]->fireComponent);
+			glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
+			float distance = length(vectorToObject);
+
+			if (gameScene->gameObjects[i]->getIsRenderable() == true && distance < 100) {
+				gameObjectsToRender.push_back(gameScene->gameObjects[i]);
+			}
+
+			if (gameScene->gameObjects[i]->hasLight == true) {
+				gameScene->gameObjects[i]->lightComponent->color = glm::vec4(0.85, 0.85, 1.0, 1)*daylight;
+				lightsToRender.push_back(gameScene->gameObjects[i]->lightComponent);
+			}
+			if (gameScene->gameObjects[i]->fireComponent != nullptr)
+			{
+				lightsToRender.push_back(gameScene->gameObjects[i]->fireComponent);
+			}
 		}
 	}
 }
