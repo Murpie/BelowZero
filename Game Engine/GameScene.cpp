@@ -712,6 +712,8 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 		meshObject->bbox.push_back(box);
 	}
 	meshObject->setIsRenderable(true);
+	//Set zone
+	setZone(*meshObject);
 	//Add to scene
 	gameObjects.push_back(meshObject);
 	//...
@@ -797,7 +799,12 @@ bool GameScene::zoneTest(GameObject* target1, GameObject* target2)
 		(target1->zone.zoneXY + glm::ivec2(0, 1)) == target2->zone.zoneXY ||
 		(target1->zone.zoneXY + glm::ivec2(0, -1)) == target2->zone.zoneXY ||
 		(target1->zone.zoneXY + glm::ivec2(1, 0)) == target2->zone.zoneXY ||
-		(target1->zone.zoneXY + glm::ivec2(-1, 0)) == target2->zone.zoneXY)
+		(target1->zone.zoneXY + glm::ivec2(-1, 0)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(1, -1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(1, 1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(-1, -1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(-1, 1)) == target2->zone.zoneXY
+		)
 	{
 		return true;
 	}
