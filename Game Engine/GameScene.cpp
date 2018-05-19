@@ -797,7 +797,12 @@ bool GameScene::zoneTest(GameObject* target1, GameObject* target2)
 		(target1->zone.zoneXY + glm::ivec2(0, 1)) == target2->zone.zoneXY ||
 		(target1->zone.zoneXY + glm::ivec2(0, -1)) == target2->zone.zoneXY ||
 		(target1->zone.zoneXY + glm::ivec2(1, 0)) == target2->zone.zoneXY ||
-		(target1->zone.zoneXY + glm::ivec2(-1, 0)) == target2->zone.zoneXY)
+		(target1->zone.zoneXY + glm::ivec2(-1, 0)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(1, -1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(1, 1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(-1, -1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2(-1, 1)) == target2->zone.zoneXY
+		)
 	{
 		return true;
 	}

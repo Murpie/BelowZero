@@ -47,7 +47,12 @@ bool zoneTest(GameObject* player, GameObject* object)
 		(player->zone.zoneXY + glm::ivec2(0, 1)) == object->zone.zoneXY ||
 		(player->zone.zoneXY + glm::ivec2(0, -1)) == object->zone.zoneXY ||
 		(player->zone.zoneXY + glm::ivec2(1, 0)) == object->zone.zoneXY ||
-		(player->zone.zoneXY + glm::ivec2(-1, 0)) == object->zone.zoneXY)
+		(player->zone.zoneXY + glm::ivec2(-1, 0)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(-1, 1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(1, -1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(1, 1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(-1, -1)) == object->zone.zoneXY
+		)
 	{
 		return true;
 	}
