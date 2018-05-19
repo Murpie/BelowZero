@@ -29,13 +29,10 @@ void GameScene::update(float deltaTime, float seconds)
 	{
 		for (unsigned int i = 0; i < gameObjects.size(); i++)
 		{
-
 			if (gameObjects[i]->getPlayer() != nullptr)
 			{
 				addGameObject(gameObjects[i]->transform->position, 3);
 				addObject = false;
-				// update inZone
-				setZone(*gameObjects[i], true);
 				break;
 			}
 		}
@@ -94,7 +91,8 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		interactionTest(*inZone[i], window);
 	}
-	for (int i = 0; i < gameObjects.size(); i++)
+	//...
+	for (int i = 0; i < 5; i++)
 	{
 		gameObjects[i]->processEvents(window, deltaTime);
 	}
@@ -716,8 +714,8 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 		meshObject->bbox.push_back(box);
 	}
 	meshObject->setIsRenderable(true);
-	//Set zone
-	setZone(*meshObject, true);
+	// Set Zone
+	setZone(*meshObject, false);
 	//Add to scene
 	gameObjects.push_back(meshObject);
 	//...
@@ -725,6 +723,8 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	if (gameObjects[gameObjects.size() - 1]->objectID == ObjectType::ID::Campfire)
 	{
 		setBurningByDistance(5.f, *gameObjects[gameObjects.size() - 1]);
+		//push to inZone
+		inZone.push_back(gameObjects[gameObjects.size() - 1]);
 	}
 }
 
