@@ -340,6 +340,7 @@ void Player::dropItem()
 
 void Player::useItem(GLFWwindow * window)
 {
+	// Use Axe
 	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && (this->currentlyEquipedItem == 0) && (pickUp >= 0) && !swing && !isPressed)
 	{
 		swing = true;
@@ -350,18 +351,18 @@ void Player::useItem(GLFWwindow * window)
 			Swing.playSound();
 		}
 	}
-	else if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 3 && pickUp >= 0 && inInventory[3] == true && foodTimer > 1.0f)
+	// Use Can
+	else if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 3 && pickUp >= 0 && inInventory[3] == true && foodTimer > 1.0f && !isPressed)
 	{
 		food += 50;
 		if (food >= 100)
 			food = 100;
 		addImageToInventory("EmptyImage", 3);
 		dropItem();
+		equip("EmptyImage");
 	}
-
-
-
-	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 4 && pickUp >= 0)
+	// Use Bucket
+	else if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 4 && pickUp >= 0 && !isPressed)
 	{
 		if (bucketContent == 0)
 		{
@@ -370,6 +371,16 @@ void Player::useItem(GLFWwindow * window)
 			pickUpSnow = true;
 			swapItem = true;
 			pullDown = true;
+		}
+		if (bucketContent == 2)
+		{
+			bucketContent = 0;
+			water += 50;
+			equipItemMesh();
+			swapItem = true;
+			pullDown = true;
+			if (water >= 100)
+				water = 100;
 		}
 	}
 }
@@ -406,7 +417,6 @@ glm::vec2 Player::setXZ()
 {
 	float u = Transformable::transform.position.x;
 	float v = Transformable::transform.position.z;
-
 
 	return glm::vec2(u, v);
 }
@@ -655,7 +665,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			equip("FoodIcon");
 			this->currentlyEquipedItem = 3;
 			equipItemMesh();
-			addImageToInventory("InventoryFoodIcon", 3);
 			inInventory[3] = true;
 			isPressed = true;
 			swapItem = true;
