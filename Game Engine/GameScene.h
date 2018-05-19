@@ -20,6 +20,7 @@ public:
 	~GameScene();
 
 	std::vector<GameObject*> gameObjects;
+	std::vector<GameObject*> inZone; // active Objects from player
 
 	void clearGameObjects();
 	void update(float deltaTime, float seconds); // Updates all the objects in the scene
@@ -56,7 +57,7 @@ private:
 	//test functions
 	void setBurningByDistance(const float distance, GameObject & other);
 	void meltIceWall(GameObject & other);
-	void setZone(GameObject & other);
+	void setZone(GameObject & other, const bool forceUpdate);
 	bool zoneTest(GameObject* target1, GameObject* target2);
 	//
 };

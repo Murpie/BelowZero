@@ -11,6 +11,7 @@ GameScene::GameScene(Scene::ID typeOfScene) :
 
 GameScene::~GameScene()
 {
+	inZone.clear();
 	clearGameObjects();
 }
 
@@ -32,6 +33,8 @@ void GameScene::update(float deltaTime, float seconds)
 			{
 				addGameObject(gameObjects[i]->transform->position, 3);
 				addObject = false;
+				// update inZone
+				setZone(*gameObjects[i], true);
 				break;
 			}
 		}
@@ -43,7 +46,7 @@ void GameScene::update(float deltaTime, float seconds)
 		if (gameObjects[i]->getPlayer() != nullptr)
 		{
 			// Update player zone;
-			setZone(*gameObjects[i]);
+			setZone(*gameObjects[i], false);
 
 			if (gameObjects[i]->getIsBurning())
 				gameObjects[i]->getPlayer()->takeDamange(5.f, deltaTime);
@@ -61,14 +64,14 @@ void GameScene::update(float deltaTime, float seconds)
 				}
 			}
 		}
-		gameObjects[i]->update(deltaTime, seconds);
-
-		collisionTest(*gameObjects[i], deltaTime);
+		//gameObjects[i]->update(deltaTime, seconds);
+		//collisionTest(*gameObjects[i], deltaTime);
 
 		if (gameObjects[i]->isActive == false)
 		{
 			delete gameObjects[i];
 			gameObjects.erase(gameObjects.begin() + i);
+			setZone(*gameObjects[0], true);
 		}
 
 		if (gameObjects[i]->getAI() != nullptr)
@@ -76,14 +79,23 @@ void GameScene::update(float deltaTime, float seconds)
 			aiCollisionTest(*gameObjects[i]);
 		}
 	}
+	// Update inZone
+	for (unsigned int i = 0; i < inZone.size(); i++)
+	{
+		inZone[i]->update(deltaTime, seconds);
+		collisionTest(*inZone[i], deltaTime);
+	}
 }
 
 void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 {
+	for (int i = 0; i < inZone.size(); i++)
+	{
+		interactionTest(*inZone[i], window);
+	}
 	for (int i = 0; i < gameObjects.size(); i++)
 	{
 		gameObjects[i]->processEvents(window, deltaTime);
-		interactionTest(*gameObjects[i], window);
 	}
 	addEquipment();
 	addNewObjectTest(window);
@@ -302,7 +314,7 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 						gameObject_ptr->bbox.push_back(box);
 					}
 					// set zone
-					setZone(*gameObject_ptr);
+					setZone(*gameObject_ptr, true);
 					//break loop
 					break;
 				}
@@ -357,7 +369,7 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 				aiObject->bbox.push_back(box);
 			}
 			// set zone
-			setZone(*aiObject);
+			setZone(*aiObject, true);
 			//Add to scene
 			gameObjects.push_back(aiObject);
 		}
@@ -419,7 +431,7 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 				meshObject->bbox.push_back(box);
 			}
 			// set zone
-			setZone(*meshObject);
+			setZone(*meshObject, true);
 			//Add to scene
 			gameObjects.push_back(meshObject);
 		}
@@ -462,7 +474,7 @@ void GameScene::checkInteractionResponse(GameObject & other, int objectID)
 
 void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 {
-	for (GameObject* gameObject_ptr : gameObjects)
+	for (GameObject* gameObject_ptr : inZone)
 	{
 		if (gameObject_ptr->getPlayer() != nullptr)
 		{
@@ -472,19 +484,6 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 				{
 					float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
 
-					/*
-					// Create promise
-					std::promise<float> prms;
-					// Extract future
-					std::future<float> ftr = prms.get_future();
-					// Thread function
-					std::thread th(&getDistance, std::move(prms), other.transform->position, gameObject_ptr->transform->position);
-					// Get value
-					float distance = ftr.get();
-					// Join Thread
-					th.join();
-					//...
-					*/
 					if (distance < 10 && other.isInteractable == true)
 					{
 
@@ -547,12 +546,12 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 
 void GameScene::collisionTest(GameObject & other, float deltaTime)
 {
-	for (GameObject* gameObject_ptr : gameObjects)
+	for (GameObject* gameObject_ptr : inZone)
 	{
 		if (gameObject_ptr->getPlayer() != nullptr && other.objectID != ObjectType::ID::Player)
 		{
-			if (zoneTest(gameObject_ptr, &other))
-			{
+			//if (zoneTest(gameObject_ptr, &other))
+			//{
 				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
 				if (distance < 25)
 				{
@@ -584,7 +583,7 @@ void GameScene::collisionTest(GameObject & other, float deltaTime)
 				{
 					gameObject_ptr->getPlayer()->heatResponse(deltaTime);
 				}
-			}
+			//}
 		}
 	}
 }
@@ -713,7 +712,7 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	}
 	meshObject->setIsRenderable(true);
 	//Set zone
-	setZone(*meshObject);
+	setZone(*meshObject, true);
 	//Add to scene
 	gameObjects.push_back(meshObject);
 	//...
@@ -779,7 +778,7 @@ void GameScene::meltIceWall(GameObject & other)
 	}
 }
 
-void GameScene::setZone(GameObject & other)
+void GameScene::setZone(GameObject & other, const bool forceUpdate)
 {
 	glm::ivec2 previousZone = other.zone.zoneXY;
 
@@ -789,8 +788,31 @@ void GameScene::setZone(GameObject & other)
 	other.zone.zoneXY.x = (int)(X / 128.0f) + 0.5f;
 	other.zone.zoneXY.y = (int)(Z / 128.0f) + 0.5f;
 
-	if (previousZone != other.zone.zoneXY)
+	if (previousZone != other.zone.zoneXY && other.getPlayer() != nullptr)
+	{
+		inZone.clear();
 		std::cout << other.name << " " << "new zone: " << other.zone.zoneXY.x << " " << other.zone.zoneXY.y << std::endl;
+		for (GameObject* gameObject_ptr : gameObjects)
+		{
+			if (zoneTest(&other, gameObject_ptr))
+			{
+				inZone.push_back(gameObject_ptr);
+			}
+
+		}
+	}
+	else if (forceUpdate)
+	{
+		//force inZone update
+		inZone.clear();
+		for (GameObject* gameObject_ptr : gameObjects)
+		{
+			if (zoneTest(gameObjects[0], gameObject_ptr))
+			{
+				inZone.push_back(gameObject_ptr);
+			}
+		}
+	}
 }
 
 bool GameScene::zoneTest(GameObject* target1, GameObject* target2)
