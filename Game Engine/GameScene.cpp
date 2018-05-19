@@ -548,7 +548,7 @@ void GameScene::aiCollisionTest(GameObject & other)
 			{
 				for (int j = 0; j < gameObject_ptr->bbox.size(); j++)
 				{
-					if (Intersection::collisionTest(*other.bbox[i], other.transform->position + (other.getAI()->direction * 3.f), *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))
+					if (Intersection::collisionTest(*other.bbox[i], other.transform->position + (other.getAI()->direction * 4.f), *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))
 					{
 						other.getAI()->collision = true;
 						if (Intersection::collisionTest(*other.bbox[i], other.transform->position, *gameObject_ptr->bbox[j], gameObject_ptr->transform->position))

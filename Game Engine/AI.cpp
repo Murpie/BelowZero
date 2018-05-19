@@ -9,6 +9,12 @@ AI::AI(Transform& transform) : Transformable(transform)
 	this->startPosition = transform.position;
 	this->collision = false;
 	this->time = 0.f;
+	this->bounce = 0.f;
+	this->bounceTimer = 0.f;
+	this->bounceCounter = 0;
+
+	this->wait = false;
+	this->jumping = false;
 
 	lastTarget = glm::vec3(0, 0, 0);
 	target = glm::vec3(0, 0, 0);
@@ -25,15 +31,16 @@ AI::~AI()
 void AI::update(float deltaTime, float seconds)
 {
 	time += deltaTime;
+	setBounce(deltaTime);
 
-	if (time > 8.f || collision)
+	if (time > 10.f || collision == true)
 	{
 		setNewTarget();
 	}
-	//if (time > 3.f && time < 5.f)
-	//{
+	if (time > 4.5f && time < 6.f)
+	{
 
-	//}
+	}
 	else
 		move(deltaTime);
 
@@ -55,12 +62,65 @@ glm::vec2 AI::getXY()
 void AI::setCurrentHeight(float height)
 {
 	if (height + 0.001 < Transformable::transform.position.y + 0.002);
-	this->Transformable::transform.position.y = height + 0.0;
+		this->Transformable::transform.position.y = height + 0.0;
+
+	this->Transformable::transform.position.y += bounce;
 }
 
-void AI::swapDirection()
+void AI::setRotation()
 {
+	// Calculate angle
+	float dot = glm::dot(forward, direction);
+	float directionMag = glm::length(direction);
+	float forwardMag = glm::length(forward);
+	float angle = dot / (directionMag * forwardMag);
+	angle = glm::degrees(glm::acos(angle));
+	// Set new rotation.y angle
+	if (direction.x > 0.f && direction.z > 0.f)
+		Transformable::transform.rotation.y = angle * -1;
+	else if (direction.x < 0.f && direction.z > 0.f)
+		Transformable::transform.rotation.y = angle;
+	else if (direction.x > 0.f && direction.z > 0.f)
+		Transformable::transform.rotation.y = angle * -1;
+	else
+		Transformable::transform.rotation.y = angle;
 
+	//std::cout << "Rabbit Angle: " << angle << std::endl;
+	//std::cout << "Rabbit Direction: " << direction.x << ", " << direction.y << ", " << direction.z << std::endl;
+}
+
+void AI::setBounce(float deltaTime)
+{
+	if (wait == true)
+	{
+		bounce = 0.f;
+		bounceTimer += deltaTime;
+		if (bounceTimer >= 3.0f)
+		{
+			bounceCounter = rand() % 3;
+			bounceTimer = 0.f;
+			wait = false;
+		}
+	}
+	else if (jumping == false && wait == false)
+	{
+		bounce += JUMP_SPEED * deltaTime;
+		if (bounce > JUMP_HEIGHT)
+		{
+			jumping = true;
+		}
+	}
+	else if (jumping == true && wait == false)
+	{
+		bounce -= JUMP_SPEED * deltaTime;
+		if (bounce < 0.001f)
+		{
+			jumping = false;
+			bounceCounter++;
+			if (bounceCounter >= 4)
+				wait = true;
+		}
+	}
 }
 
 void AI::move(float deltaTime)
@@ -81,23 +141,6 @@ void AI::setNewTarget()
 	direction = glm::normalize(target - currentPosition);
 	// Reset timer
 	time = 0.f;
-	// Calculate angle
-	float dot = glm::dot(forward, direction);
-	float directionMag = glm::length(direction);
-	float forwardMag = glm::length(forward);
-
-	float angle = dot / (directionMag * forwardMag);
-	angle = glm::degrees(glm::acos(angle));
-
-	std::cout << "Rabbit Angle: " << angle << std::endl;
-	std::cout << "Rabbit Direction: " << direction.x << ", " << direction.y << ", " << direction.z << std::endl;
-
-	if (direction.x > 0.f && direction.z > 0.f)
-		Transformable::transform.rotation.y = angle * -1; // tweak
-	else if (direction.x < 0.f && direction.z > 0.f) 
-		Transformable::transform.rotation.y = angle	; // tweak
-	else if (direction.x > 0.f && direction.z > 0.f)
-		Transformable::transform.rotation.y = angle * -1;
-	else
-		Transformable::transform.rotation.y = angle;
+	// Set rotation y
+	setRotation();
 }

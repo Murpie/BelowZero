@@ -6,8 +6,10 @@
 #include "glm/glm/glm.hpp"
 
 #define MAX_DISTANCE 50
-#define SPAWN_OFFSET 10
+#define SPAWN_OFFSET 20
 #define SPEED 3.0f
+#define JUMP_HEIGHT 0.75f
+#define JUMP_SPEED 2.0f
 
 class AI :
 	public Transformable
@@ -33,9 +35,14 @@ private:
 	glm::vec3 forward;
 
 	float time;
+	float bounce;
+	float bounceTimer;
+	int bounceCounter;
+	bool wait;
+	bool jumping;
 
-	void swapDirection();
-
+	void setRotation();
+	void setBounce(float deltaTime);
 	void move(float deltaTime);
 	void setNewTarget();
 };
