@@ -16,7 +16,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->bucketContent = 0;
 	this->swing = false;
 	this->axeSwing = 0;
-
+	this->pickUpSnow = false;
 	this->hp = 80;
 	this->cold = 100;
 	this->coldMeter = 0;
@@ -201,7 +201,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 {
 	if (checkInventory(item) && item != "EmptyImage")
 	{
-		if (this->textTimer >= 1.0f || this->textOnScreen == false)
+		if (this->textTimer >= 1.0f || this->textOnScreen == false && currentlyEquipedItem != 1)
 		{
 			std::cout << "Item already exists in players inventory" << std::endl;
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -335,6 +335,7 @@ void Player::swappingItem(float deltaTime)
 void Player::dropItem()
 {
 	pickUp = -1;
+	inInventory[this->currentlyEquipedItem] = false;
 }
 
 void Player::useItem(GLFWwindow * window)
@@ -343,7 +344,22 @@ void Player::useItem(GLFWwindow * window)
 	{
 		swing = true;
 		axeSwing = 0;
+		if (!Swing.isPlaying())
+		{
+			Swing.playSound();
+		}
 	}
+
+	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 3 && pickUp >= 0 && inInventory[3] == true && foodTimer > 1.0f)
+	{
+		food += 50;
+		if (food >= 100)
+			food = 100;
+		addImageToInventory("EmptyImage", 3);
+		dropItem();
+	}
+
+
 
 	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 4 && pickUp >= 0)
 	{
@@ -351,6 +367,7 @@ void Player::useItem(GLFWwindow * window)
 		{
 			bucketContent = 1;
 			equipItemMesh();
+			pickUpSnow = true;
 			swapItem = true;
 			pullDown = true;
 		}
@@ -795,26 +812,13 @@ firstMouse = false;
 }
 void  Player::swingTest()
 {
-	if (currentlyEquipedItem == 0 && !Swing.isPlaying())
-	{
-		Swing.playSound();
-	}
 }
 
 void Player::eatFood()
 {
-	if (currentlyEquipedItem == 3 && inInventory[3] == true && foodTimer > 1.0f)
-	{
-		food += 50;
-		if (food >= 100)
-			food = 100;
-		inInventory[3] = false;
-		addImageToInventory("EmptyImage", 3);
-		
-	}
 }
 
-int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & counter)
+int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 {
 	// Check ObjectType ID
 	// Set isAlive to false if you want to delete the interacted item from the world.
@@ -833,33 +837,6 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 			swapItem = true;
 			pullDown = true;
 			isAlive = false;
-		}
-		else
-			addTextToScreen("Text-ItemAlreadyEquipped");
-	}
-	else if ((id == ObjectType::ID::BrokenTree || id == ObjectType::ID::BrokenTree_Snow || id == ObjectType::ID::DeadTree
-		|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
-		|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
-		&& currentlyEquipedItem == 0)
-	{
-		if(!HitWAxe.isPlaying())
-			HitWAxe.playSound();
-		if (inInventory[2] == false)
-		{
-			if (counter >= 4)
-			{
-				equip("WoodIcon");
-				this->currentlyEquipedItem = 2;
-				addImageToInventory("InventoryWoodIcon", 2);
-				inInventory[2] = true;
-				this->currentlyEquipedItem = 2;
-				this->equipItem = 45;
-				swapItem = true;
-				pullDown = true;
-				isAlive = false;
-			}
-			else
-				counter++;
 		}
 		else
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -908,21 +885,12 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 		isAlive = false;
 		this->coldTick = 0.3;
 	}
-	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
-	{
-		return 3;
-	}
-
 	if (id == ObjectType::ID::FlareGun)
 	{
 		this->win = true;
 		return 42;
 	}
 	else if(id == ObjectType::ID::Axe)
-	{
-		isAlive = false;
-	}
-	else if (id == ObjectType::ID::Axe)
 	{
 		isAlive = false;
 	}
@@ -937,6 +905,43 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive, int & c
 	return -1;
 }
 
+int Player::actionResponse(const ObjectType::ID id, bool & isAlive, int & counter)
+{
+	if ((id == ObjectType::ID::BrokenTree || id == ObjectType::ID::BrokenTree_Snow || id == ObjectType::ID::DeadTree
+	|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
+	|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
+	&& currentlyEquipedItem == 0)
+	{
+		if (!HitWAxe.isPlaying())
+			HitWAxe.playSound();
+		if (inInventory[2] == false)
+		{
+			if (counter >= 4)
+			{
+				equip("WoodIcon");
+				this->currentlyEquipedItem = 2;
+				addImageToInventory("InventoryWoodIcon", 2);
+				inInventory[2] = true;
+				this->currentlyEquipedItem = 2;
+				this->equipItem = 45;
+				swapItem = true;
+				pullDown = true;
+				isAlive = false;
+			}
+			else
+				counter++;
+		}
+		else
+			addTextToScreen("Text-ItemAlreadyEquipped");
+	}
+	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
+	{
+		return 3;
+	}
+
+	return -1;
+}
+
 int Player::collisionResponse(const ObjectType::ID)
 {
 	if (id == ObjectType::ID::Campfire)
@@ -947,11 +952,23 @@ int Player::collisionResponse(const ObjectType::ID)
 	return -1;
 }
 
-void Player::heatResponse()
+void Player::heatResponse(float deltaTime)
 {
-	cold += .1f; 
+	cold += .1f;
 	if (this->cold > 100)
 		this->cold = 100;
+	if (currentlyEquipedItem == 4 && bucketContent == 1)
+	{
+		meltTimer += deltaTime;
+		if (meltTimer > 5.0)
+		{
+			bucketContent = 2;
+			equipItemMesh();
+			swapItem = true;
+			pullDown = true;
+			meltTimer = 0.0;
+		}
+	}
 }
 
 void Player::takeDamange(float damage, float deltaTime)
@@ -1016,19 +1033,25 @@ void Player::equipItemMesh()
 		{
 			if (jacket)
 			{
-				if (bucketContent = 0)
+				if (bucketContent == 0)
 					this->equipItem = 47;
-				else if (bucketContent = 1)
+				else if (bucketContent == 1)
+				{
 					this->equipItem = 48;
+					pickUpSnow = false;
+				}
 				else
 					this->equipItem = 49;
 			}
 			else
 			{
-				if (bucketContent = 0)
+				if (bucketContent == 0)
 					this->equipItem = 34;
-				else if (bucketContent = 1)
+				else if (bucketContent == 1)
+				{
 					this->equipItem = 35;
+					pickUpSnow = false;
+				}
 				else
 					this->equipItem = 36;
 			}

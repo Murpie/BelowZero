@@ -86,9 +86,10 @@ public:
 	//glm::mat4 getViewMatrix()const;
 	void swingTest();
 	void eatFood();
-	int interactionResponse(const ObjectType::ID id, bool & isAlive, int & counter);
+	int interactionResponse(const ObjectType::ID id, bool & isAlive);
+	int actionResponse(const ObjectType::ID id, bool & isAlive, int & counter);
 	int collisionResponse(const ObjectType::ID);
-	void heatResponse();
+	void heatResponse(float deltaTime);
 	void takeDamange(float damage, float deltaTime);
 	int getEquipedItem();
 	const int getEquipedID();
@@ -126,6 +127,7 @@ private:
 	int bucketContent;
 	bool swing;
 	int axeSwing;
+	bool pickUpSnow;
 
 	bool firstMouse;
 	float lastX, lastY;
@@ -139,6 +141,7 @@ private:
 
 	float time = 0.0;
 	float textTimer = 0.0;
+	float meltTimer = 0.0;
 
 	float jumpSpeed = 7.64;
 	float cameraSpeed = 7.06;
