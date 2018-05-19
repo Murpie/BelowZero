@@ -7,6 +7,7 @@ GameScene::GameScene(Scene::ID typeOfScene) :
 	addObject(false)
 {
 	this->typeOfScene = typeOfScene;
+	this->directionalLight = nullptr;
 }
 
 GameScene::~GameScene()
@@ -199,6 +200,8 @@ void GameScene::addLight(glm::vec3 transform, int lightType)
 	Light* light = new Light(*lightObject->transform);
 	light->lightType = lightType;
 	lightObject->addComponent(light);
+	// Set directionalLightPointer
+	directionalLight = lightObject;
 	//Add to scene
 	gameObjects.push_back(lightObject);
 	lightsInScene++;
@@ -793,6 +796,9 @@ void GameScene::setZone(GameObject & other, const bool forceUpdate)
 	if (previousZone != other.zone.zoneXY && other.getPlayer() != nullptr)
 	{
 		inZone.clear();
+		// Update directional light to follow player into new zone;
+		directionalLight->zone.zoneXY = other.zone.zoneXY;
+		//..
 		std::cout << other.name << " " << "new zone: " << other.zone.zoneXY.x << " " << other.zone.zoneXY.y << std::endl;
 		for (GameObject* gameObject_ptr : gameObjects)
 		{

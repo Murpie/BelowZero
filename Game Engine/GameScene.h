@@ -21,6 +21,7 @@ public:
 
 	std::vector<GameObject*> gameObjects;
 	std::vector<GameObject*> inZone; // active Objects from player
+	GameObject* directionalLight;
 
 	void clearGameObjects();
 	void update(float deltaTime, float seconds); // Updates all the objects in the scene
