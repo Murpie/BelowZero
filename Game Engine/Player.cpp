@@ -340,17 +340,17 @@ void Player::dropItem()
 
 void Player::useItem(GLFWwindow * window)
 {
-	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 0 && pickUp >= 0 && !swing)
+	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && (this->currentlyEquipedItem == 0) && (pickUp >= 0) && !swing && !isPressed)
 	{
 		swing = true;
 		axeSwing = 0;
+		isPressed = true;
 		if (!Swing.isPlaying())
 		{
 			Swing.playSound();
 		}
 	}
-
-	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 3 && pickUp >= 0 && inInventory[3] == true && foodTimer > 1.0f)
+	else if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 3 && pickUp >= 0 && inInventory[3] == true && foodTimer > 1.0f)
 	{
 		food += 50;
 		if (food >= 100)
@@ -676,7 +676,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	}
 	else if (  glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE
 			&& glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_4) == GLFW_RELEASE
-			&& glfwGetKey(window, GLFW_KEY_5) == GLFW_RELEASE)
+			&& glfwGetKey(window, GLFW_KEY_5) == GLFW_RELEASE && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
 	{
 		isPressed = false;
 	}
