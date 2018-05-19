@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <thread>
+#include <future>
 
 #include "EnumID.h"
 #include "GameObject.h"
@@ -55,5 +56,7 @@ private:
 	//test functions
 	void setBurningByDistance(const float distance, GameObject & other);
 	void meltIceWall(GameObject & other);
+	void setZone(GameObject & other);
+	bool zoneTest(GameObject* target1, GameObject* target2);
 	//
 };
