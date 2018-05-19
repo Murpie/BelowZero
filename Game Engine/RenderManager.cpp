@@ -642,8 +642,7 @@ void RenderManager::Render() {
 	{
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-		//... Rotation, not sure if this works (probably not)
-		// need to calculate radians from rotation vector from maya
+		//... Rotation equipment with player
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
 		{
 			tempMatrix = gameObjectsToRender[i]->getModelMatrix();

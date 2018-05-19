@@ -656,12 +656,14 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 		if (gameObject_ptr->getPlayer() != nullptr)
 		{
 			if (key == (int)ObjectType::ID::Campfire)
+			{
 				gameObject_ptr->getPlayer()->dropItem();
+				gameObject_ptr->getPlayer()->equip("EmptyImage");
+			}
 
 			offsetVector = gameObject_ptr->transform->forward;
 			break;
 		}
-
 	}
 
 	//Create new mesh object
