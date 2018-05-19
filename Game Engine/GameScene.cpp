@@ -712,6 +712,8 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 		meshObject->bbox.push_back(box);
 	}
 	meshObject->setIsRenderable(true);
+	//Set zone
+	setZone(*meshObject);
 	//Add to scene
 	gameObjects.push_back(meshObject);
 	//...
