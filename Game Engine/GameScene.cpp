@@ -25,6 +25,7 @@ void GameScene::clearGameObjects()
 
 void GameScene::update(float deltaTime, float seconds)
 {
+	// Add new Object to scene
 	if (addObject)
 	{
 		for (unsigned int i = 0; i < gameObjects.size(); i++)
@@ -37,7 +38,7 @@ void GameScene::update(float deltaTime, float seconds)
 			}
 		}
 	}
-
+	// Update player position, AI collision and Active gameObjects
 	for (unsigned int i = 0; i < gameObjects.size(); i++)
 	{
 
@@ -64,7 +65,6 @@ void GameScene::update(float deltaTime, float seconds)
 		}
 		//gameObjects[i]->update(deltaTime, seconds);
 		//collisionTest(*gameObjects[i], deltaTime);
-
 		if (gameObjects[i]->isActive == false)
 		{
 			delete gameObjects[i];
@@ -77,7 +77,7 @@ void GameScene::update(float deltaTime, float seconds)
 			aiCollisionTest(*gameObjects[i]);
 		}
 	}
-	// Update inZone
+	// Update inZone GameObjects
 	for (unsigned int i = 0; i < inZone.size(); i++)
 	{
 		inZone[i]->update(deltaTime, seconds);
@@ -91,10 +91,14 @@ void GameScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		interactionTest(*inZone[i], window);
 	}
-	//...
-	for (int i = 0; i < 5; i++)
+	// Process Events in player or menuScene object
+	for (int i = 0; gameObjects.size(); i++)
 	{
-		gameObjects[i]->processEvents(window, deltaTime);
+		if (gameObjects[i]->getPlayer() != nullptr || gameObjects[i]->getMenuScene() != nullptr)
+		{
+			gameObjects[i]->processEvents(window, deltaTime);
+			break;
+		}
 	}
 	addEquipment();
 	addNewObjectTest(window);
@@ -826,14 +830,14 @@ void GameScene::setZone(GameObject & other, const bool forceUpdate)
 bool GameScene::zoneTest(GameObject* target1, GameObject* target2)
 {
 	if (target1->zone.zoneXY == target2->zone.zoneXY ||
-		(target1->zone.zoneXY + glm::ivec2(0, 1)) == target2->zone.zoneXY ||
-		(target1->zone.zoneXY + glm::ivec2(0, -1)) == target2->zone.zoneXY ||
-		(target1->zone.zoneXY + glm::ivec2(1, 0)) == target2->zone.zoneXY ||
-		(target1->zone.zoneXY + glm::ivec2(-1, 0)) == target2->zone.zoneXY ||
-		(target1->zone.zoneXY + glm::ivec2(1, -1)) == target2->zone.zoneXY ||
-		(target1->zone.zoneXY + glm::ivec2(1, 1)) == target2->zone.zoneXY ||
-		(target1->zone.zoneXY + glm::ivec2(-1, -1)) == target2->zone.zoneXY ||
-		(target1->zone.zoneXY + glm::ivec2(-1, 1)) == target2->zone.zoneXY
+		(target1->zone.zoneXY + glm::ivec2	(0, 1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2	(0, -1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2	(1, 0)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2	(-1, 0)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2	(1, -1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2	(1, 1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2	(-1, -1)) == target2->zone.zoneXY ||
+		(target1->zone.zoneXY + glm::ivec2	(-1, 1)) == target2->zone.zoneXY
 		)
 	{
 		return true;
