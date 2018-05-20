@@ -268,7 +268,7 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 				if (gameObject_ptr->getPlayer() != nullptr)
 				{
 					//Add new mesh component to player with data from mesh library
-					MeshFilter* meshFilter = new MeshFilter(1
+					MeshFilter* meshFilter = new MeshFilter(
 						meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexBuffer,
 						meshLibrary.getMesh(level->levelObjects[i]->id)->gVertexAttribute,
 						meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->getVertexCount(),
