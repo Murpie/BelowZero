@@ -32,6 +32,7 @@ public:
     bool hasLight;
 	bool isInteractable;
 	bool gameEnd;
+	bool lighterEquipped;
 	bool moveBelowTerrain;
 	float timeAlive;
 	
@@ -61,9 +62,11 @@ public:
 	void setIsRenderable(bool isRenderable);
 	void setIsBurning(float timeToBurn);
 	void setGameEnd();
+	void setLighterEquipped();
 
 	const bool getIsBurning();
-	const bool getGameEnd();
+	const bool getLighterEquipped();
+	int getEquippedItem();
 	
 	Player* getPlayer();
 	glm::mat4 getModelMatrix();

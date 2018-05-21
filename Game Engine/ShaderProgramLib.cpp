@@ -79,3 +79,9 @@ void ShaderProgramLib::addVFXFlareShaders()
 	VFXFlareShaders* newShaderProgram = new VFXFlareShaders();
 	shaders.push_back(newShaderProgram);
 }
+
+void ShaderProgramLib::addVFXLighterShaders()
+{
+	VFXLighterShaders* newShaderProgram = new VFXLighterShaders();
+	shaders.push_back(newShaderProgram);
+}

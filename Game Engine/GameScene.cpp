@@ -43,6 +43,8 @@ void GameScene::update(float deltaTime, float seconds)
 			if (gameObjects[i]->getIsBurning())
 				gameObjects[i]->getPlayer()->takeDamange(5.f, deltaTime);
 
+			lighterCheck();
+
 			for (int j = 0; j < gameObjects.size(); j++)
 			{
 				glm::vec2 UVS = gameObjects[i]->getPlayer()->setXZ();
@@ -424,6 +426,26 @@ void GameScene::collisionTest(GameObject & other)
 			{
 				gameObject_ptr->getPlayer()->heatResponse();
 			}
+			break;
+		}
+	}
+}
+
+void GameScene::lighterCheck()
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->getPlayer() != nullptr)
+		{
+			if (gameObject_ptr->getEquippedItem() == 1)
+			{
+				gameObject_ptr->lighterEquipped = true;
+			}
+			else
+			{
+				gameObject_ptr->lighterEquipped = false;
+			}
+			break;
 		}
 	}
 }
@@ -542,6 +564,8 @@ void GameScene::addNewObjectTest(GLFWwindow * window)
 			}
 			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) && gameObject_ptr->getPlayer()->addClick == true)
 				gameObject_ptr->getPlayer()->addClick = false;
+
+			break;
 		}
 	}
 

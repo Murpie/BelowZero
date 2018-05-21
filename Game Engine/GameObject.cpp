@@ -10,6 +10,7 @@ GameObject::GameObject()
 	isInteractable = false;
 	isBurning = false;
 	gameEnd = false;
+	lighterEquipped = false;
 	this->moveBelowTerrain = false;
 	timeLimit = 0.f;
 	timeAlive = 0.0f;
@@ -220,9 +221,26 @@ void GameObject::setGameEnd()
 	gameEnd = true;
 }
 
+void GameObject::setLighterEquipped()
+{
+	this->lighterEquipped = true;
+}
+
 const bool GameObject::getIsBurning()
 {
 	return this->isBurning;
+}
+
+const bool GameObject::getLighterEquipped()
+{
+	return this->lighterEquipped;
+}
+
+int GameObject::getEquippedItem()
+{
+	Player* tempPlayer = getPlayer();
+	
+	return tempPlayer->currentlyEquipedItem;
 }
 
 Player * GameObject::getPlayer()
