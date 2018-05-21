@@ -82,11 +82,6 @@ Player::Player(Transform& transform) : Transformable(transform)
 	HeavySnow.loop(true);
 	HeavySnow.setVolume(0.0f);
 
-	//AmbientMusic.addSound("AmbientMusic1.wav");
-	//AmbientMusic.setVolume(50.0f);
-	//AmbientMusic.playSound();
-	//AmbientMusic.loop(true);
-
 	Swing.addSound("woosh.wav");
 	pickUpSnowSound.addSound("PickUpSnow.ogg");
 	HitWAxe.addSound("AxeHit.ogg");
@@ -521,17 +516,18 @@ void Player::update(float deltaTime, float seconds)
 
 	if (win)
 	{
-		if (flareTimer >= 5.0f && !HelicopterSound.isPlaying())
+		if (flareTimer >= 3.0f && !HelicopterSound.isPlaying())
 		{
 
 			HelicopterSound.playSound();
 		}
 
-		if (flareTimer >= 5.0f && flareTimer <= 10.0)
+		if (flareTimer >= 3.0f && flareTimer <= 10.0)
 		{
 
-			float tempTimer = flareTimer - 5.0f;
-			float volume = glm::mix(0, 100, tempTimer / 5);
+			float tempTimer = flareTimer - 3.0f;
+			float volume = glm::mix(0, 100, tempTimer / 3);
+			HelicopterSound.setVolume(volume);
 		}
 
 		if (flareTimer >= 10.0f)
@@ -1106,19 +1102,25 @@ void Player::equipItemMesh()
 	{
 		if (jacket)
 		{
-			if (bucketContent = 0)
+			if (bucketContent == 0)
 				this->equipItem = 47;
-			else if (bucketContent = 1)
+			else if (bucketContent == 1)
+			{
 				this->equipItem = 48;
+				pickUpSnow = false;
+			}
 			else
 				this->equipItem = 49;
 		}
 		else
 		{
-			if (bucketContent = 0)
+			if (bucketContent == 0)
 				this->equipItem = 34;
-			else if (bucketContent = 1)
+			else if (bucketContent == 1)
+			{
 				this->equipItem = 35;
+				pickUpSnow = false;
+			}
 			else
 				this->equipItem = 36;
 		}

@@ -13,7 +13,6 @@ public:
 	~Player();
 
 	SoundMasterSFML SnowCrunch;
-	SoundMasterSFML AmbientMusic;
 	SoundMasterSFML AmbientWind;
 	SoundMasterSFML HeavySnow;
 	SoundMasterSFML Swing;
