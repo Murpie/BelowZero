@@ -86,6 +86,7 @@ public:
 	void bindForWriting(int cascadeIndex);
 	void calculateOrthoProjectionMatrices(unsigned int shaderToUse);
 	void setOrthoProjectionMatrix(int index);
+	void renderDepthQuadsForVisualization();
 
 private:
 
@@ -225,16 +226,21 @@ private:
 	//Shadow
 	glm::vec4 vView;
 	glm::vec4 vClip;
+	glm::vec4 frustrumCorners[8];
 	glm::vec3 shadowMapLightPosition;
 
 	glm::mat4 lightProjection;
 	glm::mat4 lightView;
 	glm::mat4 lightSpaceMatrices[3];
 	glm::mat4 inverseViewMatrix;
+	
 
 	float cascadePlaneEnds[4];
 	float cascadesInClipSpace[3];
 	float shadowOrthoProjInfo[3][6];
 	unsigned int shadowMaps[3];
+
+	unsigned int depthMapVertexArrayObject[3];
+	unsigned int depthMapBufferObject[3];
 
 };

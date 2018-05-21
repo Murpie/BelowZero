@@ -36,9 +36,9 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//createMainMenuBuffer();
 
 	cascadePlaneEnds[0] = 0.1f;
-	cascadePlaneEnds[1] = 150.0f;
-	cascadePlaneEnds[2] = 300.0f;
-	cascadePlaneEnds[3] = 450.0f;
+	cascadePlaneEnds[1] = 200.0f;
+	cascadePlaneEnds[2] = 400.0f;
+	cascadePlaneEnds[3] = 600.0f;
 
 	shatteredIce.CreateTextureData("glassNormalTangent.jpg");
 }
@@ -525,7 +525,7 @@ void RenderManager::Render() {
 			break;
 		}
 	}
-	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 450.0f);
+	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 600.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
 	//world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -662,6 +662,7 @@ void RenderManager::Render() {
 		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
+
 
 	//... VFX--------------------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
@@ -1296,50 +1297,83 @@ void RenderManager::Render() {
 
 	//... UI -----------------------------------------------------------------------------------------------------------------------------------
 
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glUseProgram(UIShaderProgram);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(UIShaderProgram);
 
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "theTexture"), 0);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, UITexture);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "equipedTexture"), 1);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->equipedTexture);
+	int depthMapTransformation = 0;
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
 
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture1"), 2);
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[0]);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture2"), 3);
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[1]);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture3"), 4);
-			glActiveTexture(GL_TEXTURE4);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[2]);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture4"), 5);
-			glActiveTexture(GL_TEXTURE5);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[3]);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
-			glActiveTexture(GL_TEXTURE6);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[4]);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "textTexture"), 7);
-			glActiveTexture(GL_TEXTURE7);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->textTexture);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "theTexture"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, UITexture);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "equipedTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->equipedTexture);
 
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 8);
-			glActiveTexture(GL_TEXTURE8);
-			glBindTexture(GL_TEXTURE_2D, finalPPFBO);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture1"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[0]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture2"), 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[1]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture3"), 4);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[2]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture4"), 5);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[3]);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[4]);
 
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0]->getPlayer()->food);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0]->getPlayer()->fade);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "winFade"), gameScene->gameObjects[0]->getPlayer()->winFade);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "flareTimer"), gameScene->gameObjects[0]->getPlayer()->flareTimer);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "textTexture"), 7);
+	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->textTexture);
 
-			//glBindTexture(GL_TEXTURE_2D, finalPPFBO);
-			renderQuad();
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 8);
+	glActiveTexture(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_2D, finalPPFBO);
+
+	renderDepthQuadsForVisualization();
+	depthMapTransformation = 1;
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "shadowMap1"), 9);
+	glActiveTexture(GL_TEXTURE9);
+	glBindTexture(GL_TEXTURE_2D, shadowMaps[0]);
+	glBindVertexArray(depthMapVertexArrayObject[0]);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	depthMapTransformation = 2;
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "shadowMap2"), 10);
+	glActiveTexture(GL_TEXTURE10);
+	glBindTexture(GL_TEXTURE_2D, shadowMaps[1]);
+	glBindVertexArray(depthMapVertexArrayObject[1]);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	depthMapTransformation = 3;
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "shadowMap3"), 11);
+	glActiveTexture(GL_TEXTURE11);
+	glBindTexture(GL_TEXTURE_2D, shadowMaps[2]);
+	glBindVertexArray(depthMapVertexArrayObject[2]);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	depthMapTransformation = 0;
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
+
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0]->getPlayer()->food);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0]->getPlayer()->fade);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "winFade"), gameScene->gameObjects[0]->getPlayer()->winFade);
+	glUniform1f(glGetUniformLocation(UIShaderProgram, "flareTimer"), gameScene->gameObjects[0]->getPlayer()->flareTimer);
+
+	//glBindTexture(GL_TEXTURE_2D, finalPPFBO);
+	renderQuad();
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 
 
 	clearObjectsToRender();
@@ -1578,10 +1612,13 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 	inverseViewMatrix = glm::inverse(newView);
 	
 	shadowMapLightPosition = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y + 8.0, gameScene->gameObjects[0]->transform->position.z);
-	
+	//glm::vec3 shadowDirection = shadowMapLightPosition - gameScene->gameObjects[0]->transform->position;
+	//shadowDirection.x += 1.0;
+
+
 	lightView = glm::lookAt(
 		glm::vec3(shadowMapLightPosition), // Position, 8 units above PlayerPos
-		glm::vec3(gameScene->gameObjects[0]->transform->position.x + 1, gameScene->gameObjects[0]->transform->position.y, gameScene->gameObjects[0]->transform->position.z), // Direction, 1 units infront of PlayerPos
+		glm::vec3(gameScene->gameObjects[0]->transform->position.x + 1.0, gameScene->gameObjects[0]->transform->position.y, gameScene->gameObjects[0]->transform->position.z), // Direction, on PlayerPos
 		glm::vec3(0.0, 1.0, 0.0)); // Up
 	
 	float fieldOfView = 60.0f;
@@ -1648,10 +1685,76 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 
 void RenderManager::setOrthoProjectionMatrix(int index)
 {
+	glm::mat4 worldMatrix = glm::mat4(1);
 	lightProjection = glm::ortho(shadowOrthoProjInfo[index][1], shadowOrthoProjInfo[index][0], -shadowOrthoProjInfo[index][3], shadowOrthoProjInfo[index][2], shadowOrthoProjInfo[index][5], shadowOrthoProjInfo[index][4]);
-	//lightProjection = glm::ortho(shadowOrthoProjInfo[index][0], shadowOrthoProjInfo[index][1], -shadowOrthoProjInfo[index][2], shadowOrthoProjInfo[index][3], shadowOrthoProjInfo[index][4], shadowOrthoProjInfo[index][5]);
+	lightSpaceMatrices[index] = lightProjection * lightView * worldMatrix;
+}
 
-	lightSpaceMatrices[index] = lightProjection * lightView;
+void RenderManager::renderDepthQuadsForVisualization()
+{
+	float depthMapQuadVertices1[] =
+	{
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		-0.3f, -0.3f, 0.0f, 0.0f,
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+	
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+		0.3f,  0.3f,  1.0f, 1.0f
+	
+	};
+	float depthMapQuadVertices2[] =
+	{
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		-0.3f, -0.3f, 0.0f, 0.0f,
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+		0.3f,  0.3f,  1.0f, 1.0f
+
+	};
+	float depthMapQuadVertices3[] =
+	{
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		-0.3f, -0.3f, 0.0f, 0.0f,
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+		0.3f,  0.3f,  1.0f, 1.0f
+
+	};
+	glGenVertexArrays(1, &depthMapVertexArrayObject[0]);
+	glGenBuffers(1, &depthMapBufferObject[0]);
+	glBindVertexArray(depthMapVertexArrayObject[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, depthMapBufferObject[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(depthMapQuadVertices1), &depthMapQuadVertices1, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	glGenVertexArrays(1, &depthMapVertexArrayObject[1]);
+	glGenBuffers(1, &depthMapBufferObject[1]);
+	glBindVertexArray(depthMapVertexArrayObject[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, depthMapBufferObject[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(depthMapQuadVertices2), &depthMapQuadVertices2, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	glGenVertexArrays(1, &depthMapVertexArrayObject[3]);
+	glGenBuffers(1, &depthMapBufferObject[3]);
+	glBindVertexArray(depthMapVertexArrayObject[3]);
+	glBindBuffer(GL_ARRAY_BUFFER, depthMapBufferObject[3]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(depthMapQuadVertices3), &depthMapQuadVertices3, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
 }
 
 void RenderManager::renderFireParticles()
