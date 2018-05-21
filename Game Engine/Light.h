@@ -19,6 +19,7 @@ public:
 	float offset;
 	float intensity;
 	bool isLighter;
+	bool isFlare;
 
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);

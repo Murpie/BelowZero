@@ -19,6 +19,7 @@ GameObject::GameObject()
 	objectID = ObjectType::ID::Stone_1;
 	fireComponent = nullptr;
 	lighterComponent = nullptr;
+	flareComponent = nullptr;
 	playerHitCounter = 0;
 }
 
@@ -39,6 +40,10 @@ GameObject::~GameObject()
 	if (lighterComponent != nullptr)
 	{
 		delete lighterComponent;
+	}
+	if (flareComponent != nullptr)
+	{
+		delete flareComponent;
 	}
 }
 
@@ -224,6 +229,16 @@ void GameObject::setIsBurning(float timeToBurn)
 
 void GameObject::setGameEnd()
 {
+	if (flareComponent == nullptr)
+	{
+		flareComponent = new Light(*transform);
+		flareComponent->lightType = 1;
+		flareComponent->color = glm::vec4(0.9, 0, 0, 0.5);
+		flareComponent->Linear = 50;
+		flareComponent->Quadratic = 0.3;
+		flareComponent->offset = 9;
+		flareComponent->intensity = 2.0;
+	}
 	gameEnd = true;
 }
 
@@ -255,6 +270,18 @@ void GameObject::resetLighterEquipped()
 		{
 			delete lighterComponent;
 			lighterComponent = nullptr;
+		}
+	}
+}
+
+void GameObject::resetFlareLight()
+{
+	if (!gameEnd)
+	{
+		if (flareComponent != nullptr)
+		{
+			delete flareComponent;
+			flareComponent = nullptr;
 		}
 	}
 }

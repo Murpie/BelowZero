@@ -84,6 +84,10 @@ void RenderManager::FindObjectsToRender() {
 		{
 			lightsToRender.push_back(gameScene->gameObjects[i]->lighterComponent);
 		}
+		if (gameScene->gameObjects[i]->flareComponent != nullptr)
+		{
+			lightsToRender.push_back(gameScene->gameObjects[i]->flareComponent);
+		}
 	}
 }
 
@@ -1242,28 +1246,14 @@ void RenderManager::Render() {
 			defaultZ = gameObject_ptr->transform->position.z;
 			offset = 100.0f;
 
-			//Randomizer for the spawn location
-			//randomX = gameObject_ptr->transform->position.x + (rand() % 5000 - 2500.0f) / 1000.0f;
-			//randomZ = gameObject_ptr->transform->position.z + (rand() % 5000 - 2500.0f) / 1000.0f;
-
 			//Create the direction vector from a start and end point
 			//and check how far away the particles are.
-			//targetPoint = glm::vec3(defaultX, defaultY + offset, defaultZ);
 			targetPoint = gameObject_ptr->transform->position;
 			targetPoint.y += offset;
-			//startPoint = glm::vec3(randomX, defaultY, randomZ);
+
 			startPoint = glm::vec3(defaultX, defaultY, defaultZ);
-			//particlePivot = glm::vec3(defaultX, defaultY, defaultZ);
 			particlePivot = gameObject_ptr->transform->position;
 			directionVec = targetPoint - startPoint;
-
-			//Get a random target point direction
-			//randomDirectionX = directionVec.x + (rand() % 2000 - 1000) / 3000.0f;
-			//randomDirectionZ = directionVec.z + (rand() % 2000 - 1000) / 3000.0f;
-
-			//directionVec.x = randomDirectionX;
-			//directionVec.y = directionVec.y / 5.0f;
-			//directionVec.z = randomDirectionZ;
 
 			if (particleCount <= MAX_PARTICLES && flareAlive == false)
 			{
@@ -1313,6 +1303,7 @@ void RenderManager::Render() {
 
 					flareParticleContainer[i].pos += flareParticleContainer[i].speed / 20.0f;
 					flareParticleContainer[i].cameraDistance = glm::length(flareParticleContainer[i].pos - cameraPosition);
+					flarePosition = flareParticleContainer[i].pos;
 
 					//Set Positions
 					flareParticlePositionData[4 * particleCount + 0] = flareParticleContainer[i].pos.x;
@@ -1321,7 +1312,6 @@ void RenderManager::Render() {
 					flareParticlePositionData[4 * particleCount + 3] = flareParticleContainer[i].size;
 
 					//Set Colors
-
 					flareParticleColorData[4 * particleCount + 0] = flareParticleContainer[i].r * 255.0f;
 					flareParticleColorData[4 * particleCount + 1] = flareParticleContainer[i].g;
 					flareParticleColorData[4 * particleCount + 2] = flareParticleContainer[i].b;
@@ -1366,8 +1356,8 @@ void RenderManager::Render() {
 			//Draw Particles
 			renderFlareParticles();
 			glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
+			break;
 		}
-		
 	}
 
 	//... Copy Stencil Buffer from gbo to finalFBO
@@ -1394,6 +1384,11 @@ void RenderManager::Render() {
 		{
 			lightUniform = "lights[" + std::to_string(i) + "].Position";
 			glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(lightsToRender.at(i)->transform.getLighterPosition() + glm::vec3(0, 2, 0)));
+		}
+		else if (lightsToRender.at(i)->isFlare == true)
+		{
+			lightUniform = "lights[" + std::to_string(i) + "].Position";
+			glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(flarePosition));
 		}
 		else
 		{
