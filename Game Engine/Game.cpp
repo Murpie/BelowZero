@@ -224,8 +224,8 @@ void Game::levelState()
 	}
 	else if (stateOfGame.state == Gamestate::ID::RUN_LEVEL)
 	{
-		gameScene.update(deltaTime, seconds);
 		processInput(window, deltaTime, gameScene);
+		gameScene.update(deltaTime, seconds);
 		renderManager[1].setDeltaTime(deltaTime);
 		renderManager[1].setSeconds(seconds);
 		renderManager[1].Render();
@@ -324,7 +324,7 @@ void Game::addMeshName()
 	//Add file names to vector to load when reading mesh data. 
 	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
 	std::string meshLoader[] = { 
-		"Player_temp.leap", // Player_temp	//0
+		"Player_temp.leap",				//0
 		"Bucket_Empty.leap",			//1
 		"Stone_1.leap",					//2
 		"Campfire.leap",				//3
@@ -377,7 +377,8 @@ void Game::addMeshName()
 		"EquipedAxeWarm.leap",			//50
 		"EquipedCanWarm.leap",			//51
 		"EquipedLighterWarm.leap",		//52
-		"EquipedWoodWarm.leap"			//53
+		"EquipedWoodWarm.leap",			//53
+		"Rabbit.leap"					//54
 	};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)

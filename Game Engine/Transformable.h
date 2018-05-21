@@ -39,9 +39,9 @@ struct Transform
 		lighterPosition.y -= right.y * 0.36f;
 		lighterPosition.z -= right.z * 0.36f;
 
-		lighterPosition.x -= up.x * 0.33f;
-		lighterPosition.y -= up.y * 0.33f;
-		lighterPosition.z -= up.z * 0.33f;
+		lighterPosition.x -= up.x * 0.36f;
+		lighterPosition.y -= up.y * 0.36f;
+		lighterPosition.z -= up.z * 0.36f;
 
 		return lighterPosition;
 	}
