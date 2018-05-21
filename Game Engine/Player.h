@@ -135,6 +135,7 @@ private:
 	int axeSwing;
 	bool pickUpSnow;
 	bool warning;
+	float textureTimer;
 
 	bool firstMouse;
 	float lastX, lastY;
@@ -175,6 +176,7 @@ private:
 	int vertexLength;
 
 	void equipItemMesh();
+	void textWarnings();
 	void findY();
 	void swingAxe(float deltaTime);
 };
