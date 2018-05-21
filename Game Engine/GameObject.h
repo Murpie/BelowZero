@@ -79,6 +79,7 @@ public:
 	bool hasSoundAttatched = false;
 	const bool getIsBurning();
 	void resetLighterEquipped();
+	void resetFlareLight();
 	int getEquippedItem();
 	
 	Player* getPlayer();

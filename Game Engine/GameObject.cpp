@@ -274,6 +274,18 @@ void GameObject::resetLighterEquipped()
 	}
 }
 
+void GameObject::resetFlareLight()
+{
+	if (!gameEnd)
+	{
+		if (flareComponent != nullptr)
+		{
+			delete flareComponent;
+			flareComponent = nullptr;
+		}
+	}
+}
+
 int GameObject::getEquippedItem()
 {
 	Player* tempPlayer = getPlayer();
