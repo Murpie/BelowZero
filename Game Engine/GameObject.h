@@ -50,6 +50,7 @@ public:
 	Light *lightComponent;
 	Light *fireComponent;
 	Light* lighterComponent;
+	Light* flareComponent;
 
     void updateMaterialAndMeshFilterPointers();
     void updateHasLight();
