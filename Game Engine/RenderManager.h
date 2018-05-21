@@ -186,6 +186,7 @@ private:
 	glm::vec3 tempDistance;
 	glm::vec3 cameraRight_vector;
 	glm::vec3 cameraUp_vector;
+	glm::vec3 flarePosition;
 
 	GLfloat* fireParticlePositionData = 0;
 	GLfloat* snowParticlePositionData = 0;

@@ -18,14 +18,15 @@ GameScene::~GameScene()
 
 void GameScene::clearGameObjects()
 {
-	for (GameObject* gameObject_ptr : gameObjects)
+	for (GameObject* gameObject_ptr : gameObjects)												//!Fix this so it deletes everything
 		delete gameObject_ptr;
 	gameObjects.clear();
+
 }
 
 void GameScene::update(float deltaTime, float seconds)
 {
-	lighterCheck();
+	lightCheck();
 
 	if (addObject)
 	{
@@ -626,7 +627,7 @@ void GameScene::aiCollisionTest(GameObject & other)
 	}
 }
 
-void GameScene::lighterCheck()
+void GameScene::lightCheck()
 {
 	for (GameObject* gameObject_ptr : gameObjects)
 	{
@@ -642,6 +643,7 @@ void GameScene::lighterCheck()
 				gameObject_ptr->lighterEquipped = false;
 				gameObject_ptr->resetLighterEquipped();
 			}
+
 			break;
 		}
 	}

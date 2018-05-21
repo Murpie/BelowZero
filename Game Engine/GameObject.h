@@ -60,6 +60,7 @@ public:
 	Light *lightComponent;
 	Light *fireComponent;
 	Light* lighterComponent;
+	Light* flareComponent;
 
     void updateMaterialAndMeshFilterPointers();
     void updateHasLight();
@@ -78,6 +79,7 @@ public:
 	bool hasSoundAttatched = false;
 	const bool getIsBurning();
 	void resetLighterEquipped();
+	void resetFlareLight();
 	int getEquippedItem();
 	
 	Player* getPlayer();
