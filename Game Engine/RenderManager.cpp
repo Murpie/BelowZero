@@ -40,29 +40,51 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	cascadePlaneEnds[2] = 400.0f;
 	cascadePlaneEnds[3] = 600.0f;
 
-	shatteredIce.CreateTextureData("glassNormalTangent.jpg");
+	
+	shatteredIce.CreateTextureData("iceNormal2.jpg");
 }
 
 RenderManager::~RenderManager()
 {
 }
 
+bool zoneTest(GameObject* player, GameObject* object)
+{
+	if (player->zone.zoneXY == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(0, 1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(0, -1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(1, 0)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(-1, 0)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(-1, 1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(1, -1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(1, 1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(-1, -1)) == object->zone.zoneXY
+		)
+	{
+		return true;
+	}
+	return false;
+}
+
 void RenderManager::FindObjectsToRender() {
-	for (unsigned int i = 0; i < gameScene->gameObjects.size(); i++) {
-		glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
-		float distance = length(vectorToObject);
-
-		if (gameScene->gameObjects[i]->getIsRenderable() == true && distance < 100) {
-			gameObjectsToRender.push_back(gameScene->gameObjects[i]);
-		}
-
-		if (gameScene->gameObjects[i]->hasLight == true) {
-			gameScene->gameObjects[i]->lightComponent->color = glm::vec4(0.85, 0.85, 1.0, 1)*daylight;
-			lightsToRender.push_back(gameScene->gameObjects[i]->lightComponent);
-		}
-		if (gameScene->gameObjects[i]->fireComponent != nullptr)
+	for (unsigned int i = 0; i < gameScene->inZone.size(); i++) {
+		if (zoneTest(gameScene->gameObjects[0], gameScene->inZone[i]))
 		{
-			lightsToRender.push_back(gameScene->gameObjects[i]->fireComponent);
+			glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->inZone[i]->transform->position;
+			float distance = length(vectorToObject);
+
+			if (gameScene->inZone[i]->getIsRenderable() == true && distance < 100) {
+				gameObjectsToRender.push_back(gameScene->inZone[i]);
+			}
+
+			if (gameScene->inZone[i]->hasLight == true) {
+				gameScene->inZone[i]->lightComponent->color = glm::vec4(0.85, 0.85, 1.0, 1)*daylight;
+				lightsToRender.push_back(gameScene->inZone[i]->lightComponent);
+			}
+			if (gameScene->inZone[i]->fireComponent != nullptr)
+			{
+				lightsToRender.push_back(gameScene->inZone[i]->fireComponent);
+			}
 		}
 	}
 }
@@ -74,7 +96,7 @@ void RenderManager::clearObjectsToRender()
 		gameObjectsToRender.pop_back();
 	}
 	gameObjectsToRender.clear();
-	
+
 	while (!lightsToRender.empty())
 	{
 		lightsToRender.pop_back();
@@ -116,7 +138,7 @@ void RenderManager::createBuffers()
 	fireParticleColorData = new GLubyte[MAX_PARTICLES * 4];
 	snowParticleColorData = new GLubyte[MAX_PARTICLES * 4];
 	flareParticleColorData = new GLubyte[MAX_PARTICLES * 4];
-	
+
 	static const GLfloat g_vertex_buffer_data[] = {
 		-0.5f, -0.5f, 0.0f,
 		0.5f, -0.5f, 0.0f,
@@ -159,7 +181,7 @@ void RenderManager::createBuffers()
 		std::cout << "Failed to load Billboard Texture from path" << std::endl;
 	}
 	stbi_image_free(data);
-	
+
 	//Snow Texture
 	glGenVertexArrays(1, &snowVAO);
 	glBindVertexArray(snowVAO);
@@ -390,6 +412,7 @@ void RenderManager::deleteData()
 	{
 		delete flareParticleColorData;
 	}
+
 }
 
 void RenderManager::createMainMenuBuffer()
@@ -434,7 +457,7 @@ void RenderManager::createMainMenuBuffer()
 
 void RenderManager::createButtonQuads()
 {
-	float buttonQuadVertices1[] = 
+	float buttonQuadVertices1[] =
 	{
 		-0.3f,  0.1f, 0.0f, 1.0f, //same
 		-0.3f, -0.1f, 0.0f, 0.0f,
@@ -443,7 +466,7 @@ void RenderManager::createButtonQuads()
 		-0.3f,  0.1f, 0.0f, 1.0f, //same
 		0.3f, -0.1f,  1.0f, 0.0f, //same
 		0.3f,  0.1f,  1.0f, 1.0f
-	
+
 	};
 	float buttonQuadVertices2[] =
 	{
@@ -507,12 +530,25 @@ void RenderManager::Render() {
 		{
 			glm::vec2 temp = gameScene->gameObjects[i]->getPlayer()->setXZ();
 			for (int j = 0; j < gameScene->gameObjects.size(); j++)
+			{
 				if (gameScene->gameObjects[j]->getTerrain() != nullptr)
 				{
 					gameScene->gameObjects[i]->getPlayer()->setCurrentHeight(gameScene->gameObjects[j]->getTerrain()->calculateY(temp.x, temp.y));
 					break;
 				}
-			break;
+			}
+		}
+		if (gameScene->gameObjects[i]->getAI() != nullptr)
+		{
+			glm::vec2 temp = gameScene->gameObjects[i]->getAI()->getXY();
+			for (int j = 0; j < gameScene->gameObjects.size(); j++)
+			{
+				if (gameScene->gameObjects[j]->getTerrain() != nullptr)
+				{
+					gameScene->gameObjects[i]->getAI()->setCurrentHeight(gameScene->gameObjects[j]->getTerrain()->calculateY(temp.x, temp.y));
+					break;
+				}
+			}
 		}
 	}
 
@@ -542,7 +578,6 @@ void RenderManager::Render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//... Clear PPFBO
-	//... Clear finalFBO
 	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -617,13 +652,13 @@ void RenderManager::Render() {
 		if (gameScene->gameObjects[i]->getTerrain() != nullptr)
 		{
 			gameScene->gameObjects[i]->getTerrain()->bindVertexArray();
-			
+
 			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
 			
 			break;
 		}
 	}
-	
+
 	//... GEOMETRY PASS----------------------------------------------------------------------------------------------------------------------------------------
 
 	glUseProgram(geometryShaderProgram);
@@ -639,16 +674,16 @@ void RenderManager::Render() {
 	{
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-		//... Rotation, not sure if this works (probably not)
-		// need to calculate radians from rotation vector from maya
+		//... Rotation equipment with player
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
 		{
 			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
 			glm::vec3 forward = glm::vec3(gameObjectsToRender[i]->transform->forward);
 			glm::vec3 right = glm::vec3(gameObjectsToRender[i]->transform->right);
-			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
+
+			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
 			tempMatrix = glm::rotate(tempMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
-			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldPitch + gameObjectsToRender[i]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
+			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldPitch + gameObjectsToRender[0]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
 		}
 		else
 		{
@@ -677,13 +712,27 @@ void RenderManager::Render() {
 	glUseProgram(vfxFireShaderProgram);
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
+		if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire || gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player)
+		{
+			gameObject_ptr->hasSoundAttatched = true;
+			gameObject_ptr->burning.addSound("fireplace.wav");
+		}
 		if (gameObject_ptr->getIsBurning())
 		{
-			//Particle system location, can be changed dynamically if e.g. a torch is wanted
+			float mixVar = glm::length(gameScene->gameObjects[0]->getPlayer()->transform.position - gameObject_ptr->transform->position);
+			if (mixVar >= 50.0f)
+				mixVar = 50.0f;
 
-			//defaultX = 536.0f;
-			//defaultY = -6.5f;
-			//defaultZ = 601.0f;
+			float volume = glm::mix(100, 0, mixVar / 50);
+			volume *= 0.9;
+			gameObject_ptr->burning.setVolume(volume);
+
+			if (!gameObject_ptr->burning.isPlaying())
+			{
+				gameObject_ptr->burning.loop(true);
+				gameObject_ptr->burning.playSound();
+
+			}
 			offset = 40.0f;
 
 			float flickerSpeed = (rand() % 1000) / 100000.0f;
@@ -826,7 +875,7 @@ void RenderManager::Render() {
 							fireParticleColorData[4 * particleCount + 0] = fireParticleContainer[i].r * 255.0f;
 
 						}
-						
+
 						fireParticleColorData[4 * particleCount + 2] = fireParticleContainer[i].life * fireParticleContainer[i].b;
 						fireParticleColorData[4 * particleCount + 3] = (fireParticleContainer[i].a * fireParticleContainer[i].life) * 3.0f;
 					}
@@ -923,7 +972,7 @@ void RenderManager::Render() {
 				//Start direction
 				glm::vec3 mainDir = glm::vec3(10.0f, -4.5f, 5.0f);					//Change to (0.0f, -0.1f, 0.0f) for straight falling snow 
 
-				//Complete random in X- and Z-axis
+																					//Complete random in X- and Z-axis
 				glm::vec3 randomDir = glm::vec3(
 					(sin(rand() % 10 - 10.0f) / 5.0f),
 					0,
@@ -1010,7 +1059,7 @@ void RenderManager::Render() {
 	//Draw Particles
 	renderSnowParticles();
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
-	
+
 
 	//... FLARE
 	glUseProgram(vfxFlareShaderProgram);
@@ -1150,7 +1199,7 @@ void RenderManager::Render() {
 			renderFlareParticles();
 			glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
 		}
-		
+
 	}
 
 	//... Copy Stencil Buffer from gbo to finalFBO
@@ -1165,8 +1214,7 @@ void RenderManager::Render() {
 
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ScreenX"), SCREEN_WIDTH);
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "ScreenY"), SCREEN_HEIGHT);
+
 
 	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)
@@ -1275,7 +1323,7 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
-	
+
 	glUniform1f(glGetUniformLocation(refractionShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
 	glUniform1f(glGetUniformLocation(refractionShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
 	glUniform1f(glGetUniformLocation(refractionShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
@@ -1394,7 +1442,7 @@ void RenderManager::renderMainMenu()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, display_w, display_h);
 	glClearColor(0.749, 0.843, 0.823, 1.0f);
-	
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(mainMenuShaderProgram);
 
@@ -1408,7 +1456,7 @@ void RenderManager::renderMainMenu()
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	
+
 	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 2;
 	glBindVertexArray(buttonVertexArrayObject[1]);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
@@ -1419,7 +1467,7 @@ void RenderManager::renderMainMenu()
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	
+
 	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 3;
 	glBindVertexArray(buttonVertexArrayObject[2]);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
@@ -1443,7 +1491,7 @@ void RenderManager::renderMainMenu()
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	//gameScene->gameObjects[0].getMenuScene()->deleteObjects();
-	clearObjectsToRender(); 
+	clearObjectsToRender();
 	Update();
 	glDisable(GL_BLEND);
 }
@@ -1459,9 +1507,9 @@ void RenderManager::renderQuad()
 		QuadVertex vertices[] = {
 			// pos and normal and uv for each vertex
 			{ 1,  1, 1.0f, 1.0f },
-			{ 1, -1, 1.0f, 0.0f },
-			{ -1, -1, 0.0f, 0.0f },
-			{ -1,  1, 0.0f, 1.0f },
+		{ 1, -1, 1.0f, 0.0f },
+		{ -1, -1, 0.0f, 0.0f },
+		{ -1,  1, 0.0f, 1.0f },
 		};
 
 		unsigned int indices[] = {
@@ -1528,7 +1576,7 @@ void RenderManager::renderPPQuad()
 		//create vertices
 		QuadVertex vertices[] = {
 			// pos and normal and uv for each vertex
-		{ 1,  1, 1.0f, 1.0f },
+			{ 1,  1, 1.0f, 1.0f },
 		{ 1, -1, 1.0f, 0.0f },
 		{ -1, -1, 0.0f, 0.0f },
 		{ -1,  1, 0.0f, 1.0f },
@@ -1888,7 +1936,7 @@ void RenderManager::renderFlareParticles()
 
 void RenderManager::dayNightCycle()
 {
-	if (time > 300 && dayOrNight)
+	if (time > 120 && dayOrNight)
 	{
 		daylight -= deltaTime * 0.02;
 		if (daylight < 0.1)
@@ -1898,7 +1946,7 @@ void RenderManager::dayNightCycle()
 			time = 0;
 		}
 	}
-	else if(time > 120 && !dayOrNight)
+	else if (time > 120 && !dayOrNight)
 	{
 		daylight += deltaTime * 0.02;
 		if (daylight > 1)

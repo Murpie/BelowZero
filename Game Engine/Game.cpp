@@ -225,8 +225,8 @@ void Game::levelState()
 	}
 	else if (stateOfGame.state == Gamestate::ID::RUN_LEVEL)
 	{
-		gameScene.update(deltaTime, seconds);
 		processInput(window, deltaTime, gameScene);
+		gameScene.update(deltaTime, seconds);
 		renderManager[1].setDeltaTime(deltaTime);
 		renderManager[1].setSeconds(seconds);
 		renderManager[1].Render();
@@ -324,7 +324,7 @@ void Game::addMeshName()
 	//Add file names to vector to load when reading mesh data. 
 	//std::string meshLoader[] = { "Stone.leap", "Bucket.leap", "Stump.leap", "Tree.leap", "TreeWithSnow.leap", "Floor.leap" };
 	std::string meshLoader[] = { 
-		"Player_temp.leap", // Player_temp	//0
+		"Player_temp.leap",				//0
 		"Bucket_Empty.leap",			//1
 		"Stone_1.leap",					//2
 		"Campfire.leap",				//3
@@ -358,9 +358,9 @@ void Game::addMeshName()
 		"Cabin.leap",					//31
 		"DeadTree.leap",				//32
 		"EquipedAxe.leap",				//33
-		"EquipedEmptyBucket.leap",		//34
-		"EquipedEmptyBucketSnow.leap",	//35
-		"EquipedEmptyBucketWater.leap",	//36
+		"EquipedBucketEmpty.leap",		//34
+		"EquipedBucketSnow.leap",		//35
+		"EquipedBucketWater.leap",		//36
 		"Tree_Small.leap",				//37
 		"DeadTree_Small.leap",			//38
 		"DeadTreeSnow.leap",			//39
@@ -370,7 +370,15 @@ void Game::addMeshName()
 		"IceWall.leap",					//43
 		"EquipedLighter.leap",			//44
 		"EquipedWood.leap",				//45
-		"EquipedCan.leap"				//46
+		"EquipedCan.leap",				//46
+		"EquipedBucketEmptyWarm.leap",	//47
+		"EquipedBucketSnowWarm.leap",	//48
+		"EquipedBucketWaterWarm.leap",	//49
+		"EquipedAxeWarm.leap",			//50
+		"EquipedCanWarm.leap",			//51
+		"EquipedLighterWarm.leap",		//52
+		"EquipedWoodWarm.leap",			//53
+		"Rabbit.leap"					//54
 	};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)

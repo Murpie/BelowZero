@@ -208,7 +208,7 @@ void GameObject::setIsBurning(float timeToBurn)
 		fireComponent->color = glm::vec4(0.9, 0.2, 0, .5);
 		fireComponent->Linear = 25;
 		fireComponent->Quadratic = 0.15;
-		fireComponent->offset = 9;
+		fireComponent->offset = 6;
 		fireComponent->intensity = 0.9;
 	}
 
@@ -245,6 +245,19 @@ MainMenuScene * GameObject::getMenuScene()
 		{
 			MainMenuScene* mainMenu = static_cast<MainMenuScene*>(component_ptr);
 			return mainMenu;
+		}
+	}
+	return nullptr;
+}
+
+AI * GameObject::getAI()
+{
+	for (Component* component_ptr : components)
+	{
+		if (component_ptr->id == ComponentType::ID::AI)
+		{
+			AI* ai = static_cast<AI*>(component_ptr);
+			return ai;
 		}
 	}
 	return nullptr;

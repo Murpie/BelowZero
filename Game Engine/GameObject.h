@@ -11,11 +11,18 @@
 #include "glm/glm/glm.hpp"
 #include "Player.h"
 #include "Terrain.h"
+#include "AI.h"
 #include "MainMenuScene.h"
+#include "SoundMaster.h"
 
 #include "Ray.h"
 #include "Intersection.h"
 #include <list>
+
+struct Zone
+{
+	glm::ivec2 zoneXY = glm::ivec2(-1, -1);
+};
 
 class Component;
 
@@ -24,6 +31,9 @@ class GameObject
 public:
 	GameObject();
 	~GameObject();
+
+	SoundMasterSFML burning;
+	Zone zone;
 
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
@@ -62,6 +72,7 @@ public:
 	void setIsBurning(float timeToBurn);
 	void setGameEnd();
 
+	bool hasSoundAttatched = false;
 	const bool getIsBurning();
 	const bool getGameEnd();
 	
@@ -70,6 +81,7 @@ public:
 	glm::mat4 getViewMatrix();
 	Terrain* getTerrain();
 	MainMenuScene* getMenuScene();
+	AI* getAI();
 
 	template <class T>
 	T* getComponent() {
