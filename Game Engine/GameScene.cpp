@@ -18,7 +18,7 @@ GameScene::~GameScene()
 
 void GameScene::clearGameObjects()
 {
-	for (GameObject* gameObject_ptr : gameObjects)
+	for (GameObject* gameObject_ptr : gameObjects)												//!Fix this so it deletes everything
 		delete gameObject_ptr;
 	gameObjects.clear();
 
@@ -121,7 +121,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("Lvl2.leap");
+		LeapLevel* level = new LeapLevel("Lvl7.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		//addAI(*meshLibrary, *matertialLibrary, *level);
 		delete level;

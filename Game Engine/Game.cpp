@@ -192,7 +192,7 @@ void Game::menuState()
 	{
 		printCurrentState(stateOfGame.state);
 		initScene(menuScene);
-		renderManager[0].createMainMenuBuffer();
+		renderManager[0].createMainMenuBuffer();						//<<-- Creates memeory leaks atm
 		renderManager[0].createButtonQuads();
 		stateOfGame.state = Gamestate::ID::SHOW_MENU;
 		printCurrentState(stateOfGame.state);

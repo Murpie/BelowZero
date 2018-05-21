@@ -1318,7 +1318,7 @@ void RenderManager::Render() {
 					flareParticleColorData[4 * particleCount + 3] = flareParticleContainer[i].a;
 					if (flareParticleContainer[i].life <= 1.0f)
 					{
-						flareParticleColorData[4 * particleCount + 3] = (flareParticleContainer[i].a * flareParticleContainer[i].life) * 3.0f;
+						flareParticleColorData[4 * particleCount + 3] = flareParticleContainer[i].a * flareParticleContainer[i].life;
 					}
 				}
 				else
