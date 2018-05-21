@@ -1702,7 +1702,7 @@ void RenderManager::dayNightCycle()
 			time = 0;
 		}
 	}
-	else if(time > 120 && !dayOrNight)
+	else if(time > 60 && !dayOrNight)
 	{
 		daylight += deltaTime * 0.02;
 		if (daylight > 1)
