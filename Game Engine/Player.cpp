@@ -676,12 +676,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		hp -= 10;
 
-	//Fast win
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-	{
-		this->win = true;
-	}
-
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 	{
 		equip("EmptyImage");

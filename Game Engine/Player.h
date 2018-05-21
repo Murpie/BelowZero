@@ -47,6 +47,7 @@ public:
 
 	bool startGame;
 	bool textOnScreen;
+	bool inInventory[5];
 	bool win;
 
 	int currentlyEquipedItem;
@@ -115,7 +116,6 @@ private:
 	bool movingLeft = false;
 	bool movingRight = false;
 
-	bool inInventory[5];
 	bool isPressed;
 
 	glm::vec3 cameraPos;

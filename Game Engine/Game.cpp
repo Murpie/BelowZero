@@ -192,7 +192,7 @@ void Game::menuState()
 	{
 		printCurrentState(stateOfGame.state);
 		initScene(menuScene);
-		renderManager[0].createMainMenuBuffer();
+		renderManager[0].createMainMenuBuffer();						//<<-- Creates memeory leaks atm
 		renderManager[0].createButtonQuads();
 		stateOfGame.state = Gamestate::ID::SHOW_MENU;
 		printCurrentState(stateOfGame.state);
@@ -298,6 +298,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addVFXFireShaders();
 	shaderProgramLibrary.addVFXSnowShaders();
 	shaderProgramLibrary.addVFXFlareShaders();
+	shaderProgramLibrary.addVFXLighterShaders();
 	shaderProgramLibrary.addTerrainShaders();
 	shaderProgramLibrary.addMainMenuShaders();
 	shaderProgramLibrary.addRefractionShaders();
@@ -377,7 +378,10 @@ void Game::addMeshName()
 		"EquipedCanWarm.leap",			//51
 		"EquipedLighterWarm.leap",		//52
 		"EquipedWoodWarm.leap",			//53
-		"Rabbit.leap"					//54
+		"Rabbit.leap",					//54
+		"Cabin_rotate.leap",			//55
+		"BrokenTree_rotate.leap",		//56
+		"Balloon.leap"					//57
 	};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
