@@ -386,7 +386,7 @@ void Player::useItem(GLFWwindow * window)
 			if (!pickUpSnowSound.isPlaying())
 				pickUpSnowSound.playSound();
 		}
-		if (bucketContent == 2 && waterTimer > 1.0f)
+		if (bucketContent == 2)
 		{
 			bucketContent = 0;
 			water += 50;
@@ -399,16 +399,7 @@ void Player::useItem(GLFWwindow * window)
 			if (!Drink.isPlaying())
 				Drink.playSound();
 		}
-		if (bucketContent == 2)
-		{
-			bucketContent = 0;
-			water += 50;
-			equipItemMesh();
-			swapItem = true;
-			pullDown = true;
-			if (water >= 100)
-				water = 100;
-		}
+
 	}
 }
 
