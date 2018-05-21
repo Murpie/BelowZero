@@ -17,6 +17,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->swing = false;
 	this->axeSwing = 0;
 	this->pickUpSnow = false;
+	this->warning = false;
 	this->hp = 80;
 	this->cold = 100;
 	this->coldMeter = 0;
@@ -201,7 +202,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 {
 	if (checkInventory(item) && item != "EmptyImage")
 	{
-		if (this->textTimer >= 1.0f || this->textOnScreen == false && currentlyEquipedItem != 1)
+		if (this->textTimer >= 5.0f || this->textOnScreen == false && currentlyEquipedItem != 1)
 		{
 			std::cout << "Item already exists in players inventory" << std::endl;
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -426,6 +427,13 @@ void Player::update(float deltaTime, float seconds)
 	//update velocity
 	//Transformable::transform.velocity = Transformable::transform.forward * deltaTime;
 	//...
+
+	if (transform.position.y > 5 && !jacket && !warning)
+	{
+		addTextToScreen("ColdWarning");
+		warning = true;
+	}
+
 	if (isColliding && lastPos.y < currentY)
 	{
 		Transformable::transform.position = lastPos;
@@ -491,7 +499,7 @@ void Player::update(float deltaTime, float seconds)
 	this->foodTimer += tempSeconds;
 
 	this->textTimer += tempSeconds;
-	if (this->textTimer >= 1.0f && this->textOnScreen == true)
+	if (this->textTimer >= 5.0f && this->textOnScreen == true)
 	{
 		addTextToScreen("EmptyImageTexture");
 	}

@@ -128,6 +128,7 @@ private:
 	bool swing;
 	int axeSwing;
 	bool pickUpSnow;
+	bool warning;
 
 	bool firstMouse;
 	float lastX, lastY;
