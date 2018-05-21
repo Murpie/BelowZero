@@ -34,8 +34,8 @@ Terrain::~Terrain()
 		}
 	}
 		
-	delete[] Positions;
-	delete[] Heights;
+	delete Positions;
+	delete Heights;
 }
 
 void Terrain::setupVertexData()

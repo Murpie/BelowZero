@@ -13,10 +13,15 @@ public:
 	~Player();
 
 	SoundMasterSFML SnowCrunch;
-	SoundMasterSFML AmbientMusic;
 	SoundMasterSFML AmbientWind;
+	SoundMasterSFML HeavySnow;
 	SoundMasterSFML Swing;
+	SoundMasterSFML pickUpSnowSound;
 	SoundMasterSFML HitWAxe;
+	SoundMasterSFML Eat;
+	SoundMasterSFML Drink;
+	SoundMasterSFML FlareSound;
+	SoundMasterSFML HelicopterSound;
 
 	Gamestate::StateOfGame stateOfGame;
 
@@ -43,7 +48,7 @@ public:
 	bool startGame;
 	bool textOnScreen;
 	bool win;
-	
+
 	int currentlyEquipedItem;
 	int initializer;
 	int textInitializer;
@@ -103,6 +108,7 @@ private:
 	bool isColliding = false;
 
 	float foodTimer = 0.0;
+	float waterTimer = 0.0;
 
 	bool movingForward = false;
 	bool movingBackwards = false;

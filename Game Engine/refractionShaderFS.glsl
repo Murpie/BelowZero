@@ -92,13 +92,13 @@ void main()
 	float coldVariable = 1.0;
 	if (Cold <= 50)
 	{
-		coldVariable = Cold / 100;
+		coldVariable = (Cold -25) / 25;
 	}
 
 	float hungerVariable = 1.0;
 	if (Hunger <= 50)
 	{
-		hungerVariable = Hunger / 100;
+		hungerVariable = (Hunger - 25) / 25;
 	}
 
 	vec3 coldTexture = Albedo;

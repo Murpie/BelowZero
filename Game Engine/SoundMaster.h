@@ -9,9 +9,8 @@
 class SoundMasterSFML
 {
 private:
-	sf::SoundBuffer Buffer;
-	sf::Listener Listener;
-	sf::Sound Sound;
+	sf::SoundBuffer* Buffer;
+	sf::Sound* Sound;
 
 public:
 
