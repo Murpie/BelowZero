@@ -60,7 +60,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	xoffset = 0;
 	yoffset = 0;
 	sensitivity = 0.002f;
-	
+
 	for (int i = 0; i < sizeof(inInventory); i++)
 	{
 		inInventory[i] = false;
@@ -90,6 +90,10 @@ Player::Player(Transform& transform) : Transformable(transform)
 	Swing.addSound("woosh.wav");
 	pickUpSnow.addSound("PickUpSnow.ogg");
 	HitWAxe.addSound("AxeHit.ogg");
+	Eat.addSound("Eating.ogg");
+	Drink.addSound("DrinkWater.wav");
+	FlareSound.addSound("FlareSound.ogg");
+	HelicopterSound.addSound("HelicopterSound.wav");
 }
 
 Player::~Player()
@@ -356,6 +360,9 @@ void Player::useItem(GLFWwindow * window)
 
 	if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) && this->currentlyEquipedItem == 3 && pickUp >= 0 && inInventory[3] == true && foodTimer > 1.0f)
 	{
+		if (!Eat.isPlaying())
+			Eat.playSound();
+
 		food += 50;
 		if (food >= 100)
 			food = 100;
@@ -367,6 +374,7 @@ void Player::useItem(GLFWwindow * window)
 	{
 		if (bucketContent == 0)
 		{
+			waterTimer = 0.0f;
 			bucketContent = 1;
 			equipItemMesh();
 			swapItem = true;
@@ -374,7 +382,22 @@ void Player::useItem(GLFWwindow * window)
 			if (!pickUpSnow.isPlaying())
 				pickUpSnow.playSound();
 		}
+		if (bucketContent == 2 && waterTimer > 1.0f)
+		{
+			bucketContent = 0;
+			water += 50;
+			equipItemMesh();
+			swapItem = true;
+			pullDown = true;
+			if (water >= 100)
+				water = 100;
+
+			if (!Drink.isPlaying())
+				Drink.playSound();
+		}
 	}
+
+
 }
 
 void Player::recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof)
@@ -462,11 +485,11 @@ void Player::update(float deltaTime, float seconds)
 	}
 	//=======================-------------Leons Test Sak------------==================
 
-	if (Transformable::transform.position.y > 40.0f + 7.0f)
+	if (Transformable::transform.position.y > 47.0f)
 	{
-		if(!HeavySnow.isPlaying())
+		if (!HeavySnow.isPlaying())
 			HeavySnow.playSound();
-		
+
 		float mixVar = 89.0f - 47.0f;
 		float volumeVar = Transformable::transform.position.y - 47.0f;
 		float volume = glm::mix(0, 100, volumeVar / mixVar);
@@ -487,7 +510,7 @@ void Player::update(float deltaTime, float seconds)
 	{
 		HeavySnow.stopSound();
 	}
-		
+
 
 	swappingItem(deltaTime);
 
@@ -496,6 +519,19 @@ void Player::update(float deltaTime, float seconds)
 
 	if (win)
 	{
+		if (flareTimer >= 5.0f && !HelicopterSound.isPlaying())
+		{
+
+			HelicopterSound.playSound();
+		}
+
+		if (flareTimer >= 5.0f && flareTimer <= 10.0)
+		{
+
+			float tempTimer = flareTimer - 5.0f;
+			float volume = glm::mix(0, 100, tempTimer / 5);
+		}
+
 		if (flareTimer >= 10.0f)
 			stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
 	}
@@ -509,6 +545,7 @@ void Player::update(float deltaTime, float seconds)
 
 
 	this->foodTimer += tempSeconds;
+	this->waterTimer += tempSeconds;
 
 	this->textTimer += tempSeconds;
 	if (this->textTimer >= 1.0f && this->textOnScreen == true)
@@ -569,7 +606,7 @@ void Player::update(float deltaTime, float seconds)
 
 	if (this->hp <= 0 && this->fade < 1)
 		this->fade += deltaTime;
-		
+
 	//Winning
 
 	if (this->win == true)
@@ -704,9 +741,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 			pullDown = true;
 		}
 	}
-	else if (  glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE
-			&& glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_4) == GLFW_RELEASE
-			&& glfwGetKey(window, GLFW_KEY_5) == GLFW_RELEASE)
+	else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE
+		&& glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE && glfwGetKey(window, GLFW_KEY_4) == GLFW_RELEASE
+		&& glfwGetKey(window, GLFW_KEY_5) == GLFW_RELEASE)
 	{
 		isPressed = false;
 	}
@@ -746,9 +783,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	}
 
 	if (firstMouse) {
-lastX = (float)xpos;
-lastY = (float)ypos;
-firstMouse = false;
+		lastX = (float)xpos;
+		lastY = (float)ypos;
+		firstMouse = false;
 	}
 
 	xoffset = (float)xpos - lastX;
@@ -917,18 +954,23 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	}
 	if (id == ObjectType::ID::FlareGun)
 	{
+		if (!FlareSound.isPlaying())
+		{
+			FlareSound.playSound();
+		}
+
 		this->win = true;
 		return 42;
 	}
-	else if(id == ObjectType::ID::Axe)
+	else if (id == ObjectType::ID::Axe)
 	{
 		isAlive = false;
 	}
 	/*
 	if(id == fallenTree && axeIsEquiped)
 	{
-		logs++;
-		isAlive = false;
+	logs++;
+	isAlive = false;
 	}
 	*/
 
@@ -938,9 +980,9 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 int Player::actionResponse(const ObjectType::ID id, bool & isAlive, int & counter)
 {
 	if ((id == ObjectType::ID::BrokenTree || id == ObjectType::ID::BrokenTree_Snow || id == ObjectType::ID::DeadTree
-	|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
-	|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
-	&& currentlyEquipedItem == 0)
+		|| id == ObjectType::ID::DeadTreeSnow || id == ObjectType::ID::DeadTreeSnow_Small || id == ObjectType::ID::DeadTree_Small
+		|| id == ObjectType::ID::Pine_Tree || id == ObjectType::ID::Pine_Tree_Snow || id == ObjectType::ID::Tree_Small || id == ObjectType::ID::Tree_Small_Snow)
+		&& currentlyEquipedItem == 0)
 	{
 		if (!HitWAxe.isPlaying())
 			HitWAxe.playSound();
@@ -984,7 +1026,7 @@ int Player::collisionResponse(const ObjectType::ID)
 
 void Player::heatResponse()
 {
-	cold += .1f; 
+	cold += .1f;
 	if (this->cold > 100)
 		this->cold = 100;
 }
@@ -996,7 +1038,7 @@ void Player::takeDamange(float damage, float deltaTime)
 
 int Player::getEquipedItem()
 {
-	if (inInventory[2] == true) 
+	if (inInventory[2] == true)
 	{
 		addImageToInventory("EmptyImage", 2);
 		inInventory[2] = false;
@@ -1015,61 +1057,61 @@ void Player::equipItemMesh()
 {
 	switch (currentlyEquipedItem)
 	{
-		case 0:
+	case 0:
+	{
+		if (jacket)
+			this->equipItem = 50;
+		else
+			this->equipItem = 33;
+		break;
+	}
+	case 1:
+	{
+		if (jacket)
+			this->equipItem = 52;
+		else
+			this->equipItem = 44;
+		break;
+	}
+	case 2:
+	{
+		if (jacket)
+			this->equipItem = 53;
+		else
+			this->equipItem = 45;
+		break;
+	}
+	case 3:
+	{
+		if (jacket)
+			this->equipItem = 51;
+		else
+			this->equipItem = 46;
+		break;
+	}
+	case 4:
+	{
+		if (jacket)
 		{
-			if (jacket)
-				this->equipItem = 50;
+			if (bucketContent = 0)
+				this->equipItem = 47;
+			else if (bucketContent = 1)
+				this->equipItem = 48;
 			else
-				this->equipItem = 33;
-			break;
+				this->equipItem = 49;
 		}
-		case 1:
+		else
 		{
-			if (jacket)
-				this->equipItem = 52;
+			if (bucketContent = 0)
+				this->equipItem = 34;
+			else if (bucketContent = 1)
+				this->equipItem = 35;
 			else
-				this->equipItem = 44;
-			break;
-		}
-		case 2:
-		{
-			if (jacket)
-				this->equipItem = 53;
-			else
-				this->equipItem = 45;
-			break;
-		}
-		case 3:
-		{
-			if (jacket)
-				this->equipItem = 51;
-			else
-				this->equipItem = 46;
-			break;
-		}
-		case 4:
-		{
-			if (jacket)
-			{
-				if (bucketContent = 0)
-					this->equipItem = 47;
-				else if (bucketContent = 1)
-					this->equipItem = 48;
-				else
-					this->equipItem = 49;
-			}
-			else
-			{
-				if (bucketContent = 0)
-					this->equipItem = 34;
-				else if (bucketContent = 1)
-					this->equipItem = 35;
-				else
-					this->equipItem = 36;
-			}
+				this->equipItem = 36;
 		}
 	}
-		
+	}
+
 
 }
 
