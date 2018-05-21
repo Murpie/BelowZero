@@ -41,22 +41,43 @@ RenderManager::~RenderManager()
 {
 }
 
+bool zoneTest(GameObject* player, GameObject* object)
+{
+	if (player->zone.zoneXY == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(0, 1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(0, -1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(1, 0)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(-1, 0)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(-1, 1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(1, -1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(1, 1)) == object->zone.zoneXY ||
+		(player->zone.zoneXY + glm::ivec2(-1, -1)) == object->zone.zoneXY
+		)
+	{
+		return true;
+	}
+	return false;
+}
+
 void RenderManager::FindObjectsToRender() {
-	for (unsigned int i = 0; i < gameScene->gameObjects.size(); i++) {
-		glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[i]->transform->position;
-		float distance = length(vectorToObject);
-
-		if (gameScene->gameObjects[i]->getIsRenderable() == true && distance < 100) {
-			gameObjectsToRender.push_back(gameScene->gameObjects[i]);
-		}
-
-		if (gameScene->gameObjects[i]->hasLight == true) {
-			gameScene->gameObjects[i]->lightComponent->color = glm::vec4(0.85, 0.85, 1.0, 1)*daylight;
-			lightsToRender.push_back(gameScene->gameObjects[i]->lightComponent);
-		}
-		if (gameScene->gameObjects[i]->fireComponent != nullptr)
+	for (unsigned int i = 0; i < gameScene->inZone.size(); i++) {
+		if (zoneTest(gameScene->gameObjects[0], gameScene->inZone[i]))
 		{
-			lightsToRender.push_back(gameScene->gameObjects[i]->fireComponent);
+			glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->inZone[i]->transform->position;
+			float distance = length(vectorToObject);
+
+			if (gameScene->inZone[i]->getIsRenderable() == true && distance < 100) {
+				gameObjectsToRender.push_back(gameScene->inZone[i]);
+			}
+
+			if (gameScene->inZone[i]->hasLight == true) {
+				gameScene->inZone[i]->lightComponent->color = glm::vec4(0.85, 0.85, 1.0, 1)*daylight;
+				lightsToRender.push_back(gameScene->inZone[i]->lightComponent);
+			}
+			if (gameScene->inZone[i]->fireComponent != nullptr)
+			{
+				lightsToRender.push_back(gameScene->inZone[i]->fireComponent);
+			}
 		}
 	}
 }
@@ -510,12 +531,13 @@ void RenderManager::Render() {
 		{
 			glm::vec2 temp = gameScene->gameObjects[i]->getAI()->getXY();
 			for (int j = 0; j < gameScene->gameObjects.size(); j++)
+			{
 				if (gameScene->gameObjects[j]->getTerrain() != nullptr)
 				{
 					gameScene->gameObjects[i]->getAI()->setCurrentHeight(gameScene->gameObjects[j]->getTerrain()->calculateY(temp.x, temp.y));
 					break;
 				}
-			break;
+			}
 		}
 	}
 
@@ -621,16 +643,16 @@ void RenderManager::Render() {
 	{
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-		//... Rotation, not sure if this works (probably not)
-		// need to calculate radians from rotation vector from maya
+		//... Rotation equipment with player
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
 		{
 			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
 			glm::vec3 forward = glm::vec3(gameObjectsToRender[i]->transform->forward);
 			glm::vec3 right = glm::vec3(gameObjectsToRender[i]->transform->right);
-			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
+
+			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
 			tempMatrix = glm::rotate(tempMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
-			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldPitch + gameObjectsToRender[i]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
+			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldPitch + gameObjectsToRender[0]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
 		}
 		else
 		{
