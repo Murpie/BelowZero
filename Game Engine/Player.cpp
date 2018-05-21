@@ -88,6 +88,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	Eat.addSound("Eating.ogg");
 	Drink.addSound("DrinkWater.wav");
 	FlareSound.addSound("FlareSound.ogg");
+	FlareSound.setVolume(100.0f);
 	HelicopterSound.addSound("HelicopterSound.wav");
 }
 
