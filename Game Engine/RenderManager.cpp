@@ -59,6 +59,10 @@ void RenderManager::FindObjectsToRender() {
 		{
 			lightsToRender.push_back(gameScene->gameObjects[i]->fireComponent);
 		}
+		if (gameScene->gameObjects[i]->lighterComponent != nullptr)
+		{
+			lightsToRender.push_back(gameScene->gameObjects[i]->lighterComponent);
+		}
 	}
 }
 
@@ -661,8 +665,6 @@ void RenderManager::Render() {
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
 		{
 			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
-			glm::vec3 forward = glm::vec3(gameObjectsToRender[i]->transform->forward);
-			glm::vec3 right = glm::vec3(gameObjectsToRender[i]->transform->right);
 			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
 			tempMatrix = glm::rotate(tempMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
 			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldPitch + gameObjectsToRender[i]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
@@ -893,37 +895,22 @@ void RenderManager::Render() {
 		{
 			//Particle system location, can be changed dynamically if e.g. a torch is wanted
 
-			defaultX = gameObject_ptr->transform->position.x + 1.668f;
-			defaultY = gameObject_ptr->transform->position.y - 0.407f;
-			defaultZ = gameObject_ptr->transform->position.z + 0.364f;
-			//offset = 40.0f;
+			//Offset from local: X: 0.53 Y: 0.35 Z: -0.29
 
-			printf("Lighter: %.2f %.2f %.2f\n", defaultX, defaultY, defaultZ);
-			printf("Player: %.2f %.2f %.2f\n", gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y, gameScene->gameObjects[0]->transform->position.z);
-
-			//Randomizer for the spawn location
-			//randomX = gameObject_ptr->transform->position.x + 1.668f;
-			//randomZ = gameObject_ptr->transform->position.z + 0.364f;
+			startPoint = gameObject_ptr->transform->getLighterPosition();
 
 			//Create the direction vector from a start and end point
 			//and check how far away the particles are.
-			targetPoint = glm::vec3(defaultX, defaultY, defaultZ);
+			targetPoint = glm::vec3(startPoint.x, startPoint.y, startPoint.z);
 			targetPoint.y += 5.0f;
 
-			startPoint = glm::vec3(defaultX, defaultY, defaultZ);
 			particlePivot = gameObject_ptr->transform->position;
 			directionVec = targetPoint - startPoint;
 
-			//Get a random target point direction
-			/*randomDirectionX = directionVec.x + (rand() % 2000 - 1000) / 3000.0f;
-			randomDirectionZ = directionVec.z + (rand() % 2000 - 1000) / 3000.0f;
-
-			directionVec.x = randomDirectionX;
-			directionVec.y = directionVec.y / 5.0f;
-			directionVec.z = randomDirectionZ;*/
+			lighterPosition = startPoint;
 			
 			//Create a randomizer so it doesn't spawn all the particles on every frame, if needed
-			randomizer = 1;
+			randomizer = rand() % 5;
 
 			if (randomizer == 1)
 			{
@@ -943,7 +930,7 @@ void RenderManager::Render() {
 						glm::vec3 mainDir = glm::vec3(0.0f, 0.01f, 0.0f);
 
 						//Set the new direction for the particle
-						lighterParticleContainer[particleIndex].speed = mainDir + directionVec / 5.0f;
+						lighterParticleContainer[particleIndex].speed = mainDir + directionVec / 10.0f;
 
 						//Set colors
 						lighterParticleContainer[particleIndex].r = 1.0f;
@@ -951,7 +938,7 @@ void RenderManager::Render() {
 						lighterParticleContainer[particleIndex].b = 0;
 						lighterParticleContainer[particleIndex].a = (rand() % 256) / 3;
 
-						lighterParticleContainer[particleIndex].size = ((rand() % 1000) / 1500.0f) / 5.0f;
+						lighterParticleContainer[particleIndex].size = ((rand() % 1000) / 1500.0f) / 10.0f;
 					}
 				}
 			}
@@ -960,14 +947,26 @@ void RenderManager::Render() {
 			//Movement of the new particles
 			for (int i = 0; i < MAX_PARTICLES; i++)
 			{
-				lighterParticleContainer[i].life -= 0.016f / 1.8f;
+				lighterParticleContainer[i].life -= 0.016f;
 				if (lighterParticleContainer[i].life > 0.0f)
 				{
 					//Control the movement with the wind
 					
 					lighterParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//0.016 as a universal "fake" DT
 					
-					lighterParticleContainer[i].pos += lighterParticleContainer[i].speed / 30.0f;
+					if (lighterParticleContainer[i].life >= 0.6f)
+					{
+						lighterParticleContainer[i].pos += lighterParticleContainer[i].speed / 80.0f;
+					}
+					else if (lighterParticleContainer[i].life < 0.6f && lighterParticleContainer[i].life > 0.4f)
+					{
+						lighterParticleContainer[i].pos += lighterParticleContainer[i].speed / 100.0f;
+					}
+					else
+					{
+						lighterParticleContainer[i].pos += lighterParticleContainer[i].speed / 140.0f;
+					}
+
 					lighterParticleContainer[i].cameraDistance = glm::length(lighterParticleContainer[i].pos - cameraPosition);
 
 					//Set Positions
@@ -1035,7 +1034,7 @@ void RenderManager::Render() {
 			//Draw Particles
 			renderLighterParticles();
 			glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
-			//break;
+			break;
 		}
 	}
 
@@ -1343,9 +1342,18 @@ void RenderManager::Render() {
 	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)
 	{
+		std::string lightUniform;
 		//position
-		std::string lightUniform = "lights[" + std::to_string(i) + "].Position";
-		glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(glm::vec3(lightsToRender.at(i)->transform.position.x, lightsToRender.at(i)->transform.position.y + lightsToRender.at(i)->offset, lightsToRender.at(i)->transform.position.z)));
+		if (lightsToRender.at(i)->isLighter == true)
+		{
+			lightUniform = "lights[" + std::to_string(i) + "].Position";
+			glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(lightsToRender.at(i)->transform.getLighterPosition() + glm::vec3(0, 2, 0)));
+		}
+		else
+		{
+			lightUniform = "lights[" + std::to_string(i) + "].Position";
+			glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(glm::vec3(lightsToRender.at(i)->transform.position.x, lightsToRender.at(i)->transform.position.y + lightsToRender.at(i)->offset, lightsToRender.at(i)->transform.position.z)));
+		}
 
 		//Color
 		lightUniform = "lights[" + std::to_string(i) + "].Color";

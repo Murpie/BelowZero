@@ -21,6 +21,8 @@ void GameScene::clearGameObjects()
 
 void GameScene::update(float deltaTime, float seconds)
 {
+	lighterCheck();
+
 	if (addObject)
 	{
 		for (unsigned int i = 0; i < gameObjects.size(); i++)
@@ -42,8 +44,6 @@ void GameScene::update(float deltaTime, float seconds)
 		{
 			if (gameObjects[i]->getIsBurning())
 				gameObjects[i]->getPlayer()->takeDamange(5.f, deltaTime);
-
-			lighterCheck();
 
 			for (int j = 0; j < gameObjects.size(); j++)
 			{
@@ -440,10 +440,12 @@ void GameScene::lighterCheck()
 			if (gameObject_ptr->getEquippedItem() == 1)
 			{
 				gameObject_ptr->lighterEquipped = true;
+				gameObject_ptr->setLighterEquipped();
 			}
 			else
 			{
 				gameObject_ptr->lighterEquipped = false;
+				gameObject_ptr->resetLighterEquipped();
 			}
 			break;
 		}

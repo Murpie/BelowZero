@@ -49,6 +49,7 @@ public:
     MeshFilter *meshFilterComponent; 
 	Light *lightComponent;
 	Light *fireComponent;
+	Light* lighterComponent;
 
     void updateMaterialAndMeshFilterPointers();
     void updateHasLight();
@@ -65,7 +66,7 @@ public:
 	void setLighterEquipped();
 
 	const bool getIsBurning();
-	const bool getLighterEquipped();
+	void resetLighterEquipped();
 	int getEquippedItem();
 	
 	Player* getPlayer();

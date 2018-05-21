@@ -178,6 +178,7 @@ private:
 	bool flareAlive = false;
 	glm::mat4 viewProjectionMatrix;
 	glm::vec3 startPoint;
+	glm::vec3 lighterPosition;
 	glm::vec3 randomStartPoint;
 	glm::vec3 targetPoint;
 	glm::vec3 particlePivot;

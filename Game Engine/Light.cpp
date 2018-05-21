@@ -10,6 +10,7 @@ Light::Light(Transform& transform): Transformable(transform)
 	lightType = -1;
 	offset = 0;
 	intensity = 1;
+	isLighter = false;
 }
 
 Light::~Light()

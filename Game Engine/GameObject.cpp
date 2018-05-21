@@ -18,6 +18,7 @@ GameObject::GameObject()
 	modelMatrix = glm::mat4();
 	objectID = ObjectType::ID::Stone_1;
 	fireComponent = nullptr;
+	lighterComponent = nullptr;
 	playerHitCounter = 0;
 }
 
@@ -34,6 +35,10 @@ GameObject::~GameObject()
 	if (fireComponent != nullptr)
 	{
 		delete fireComponent;
+	}
+	if (lighterComponent != nullptr)
+	{
+		delete lighterComponent;
 	}
 }
 
@@ -52,6 +57,7 @@ void GameObject::update(float deltaTime, float seconds)
 			}
 		}
 	}
+
 	if (moveBelowTerrain)
 		moveDown(deltaTime);
 
@@ -223,7 +229,17 @@ void GameObject::setGameEnd()
 
 void GameObject::setLighterEquipped()
 {
-	this->lighterEquipped = true;
+	if (lighterComponent == nullptr)
+	{
+		lighterComponent = new Light(*transform);
+		lighterComponent->lightType = 1;
+		lighterComponent->color = glm::vec4(0.9, 0.2, 0, .5);
+		lighterComponent->Linear = 25;
+		lighterComponent->Quadratic = 0.15;
+		lighterComponent->offset = 9;
+		lighterComponent->intensity = 0.4;
+		lighterComponent->isLighter = true;
+	}
 }
 
 const bool GameObject::getIsBurning()
@@ -231,9 +247,16 @@ const bool GameObject::getIsBurning()
 	return this->isBurning;
 }
 
-const bool GameObject::getLighterEquipped()
+void GameObject::resetLighterEquipped()
 {
-	return this->lighterEquipped;
+	if (!lighterEquipped)
+	{
+		if (lighterComponent != nullptr)
+		{
+			delete lighterComponent;
+			lighterComponent = nullptr;
+		}
+	}
 }
 
 int GameObject::getEquippedItem()
