@@ -50,6 +50,10 @@ public:
 
 	void Render();
 	void renderMainMenu();
+	
+	void testRender();
+	void createTestBuffers(); 
+
 	void createBuffers();
 	void createMainMenuBuffer();
 	void createButtonQuads();
