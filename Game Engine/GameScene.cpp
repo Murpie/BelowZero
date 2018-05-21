@@ -25,7 +25,8 @@ void GameScene::clearGameObjects()
 
 void GameScene::update(float deltaTime, float seconds)
 {
-	// Add new Object to scene
+	lighterCheck();
+
 	if (addObject)
 	{
 		for (unsigned int i = 0; i < gameObjects.size(); i++)
@@ -620,6 +621,28 @@ void GameScene::aiCollisionTest(GameObject & other)
 					}
 				}
 			}
+			break;
+		}
+	}
+}
+
+void GameScene::lighterCheck()
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->getPlayer() != nullptr)
+		{
+			if (gameObject_ptr->getEquippedItem() == 1)
+			{
+				gameObject_ptr->lighterEquipped = true;
+				gameObject_ptr->setLighterEquipped();
+			}
+			else
+			{
+				gameObject_ptr->lighterEquipped = false;
+				gameObject_ptr->resetLighterEquipped();
+			}
+			break;
 		}
 	}
 }

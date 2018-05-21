@@ -42,6 +42,7 @@ public:
     bool hasLight;
 	bool isInteractable;
 	bool gameEnd;
+	bool lighterEquipped;
 	bool moveBelowTerrain;
 	float timeAlive;
 	
@@ -58,6 +59,7 @@ public:
     MeshFilter *meshFilterComponent; 
 	Light *lightComponent;
 	Light *fireComponent;
+	Light* lighterComponent;
 
     void updateMaterialAndMeshFilterPointers();
     void updateHasLight();
@@ -71,10 +73,12 @@ public:
 	void setIsRenderable(bool isRenderable);
 	void setIsBurning(float timeToBurn);
 	void setGameEnd();
+	void setLighterEquipped();
 
 	bool hasSoundAttatched = false;
 	const bool getIsBurning();
-	const bool getGameEnd();
+	void resetLighterEquipped();
+	int getEquippedItem();
 	
 	Player* getPlayer();
 	glm::mat4 getModelMatrix();
