@@ -34,8 +34,8 @@ Terrain::~Terrain()
 		}
 	}
 		
-	delete[] Positions;
-	delete[] Heights;
+	delete Positions;
+	delete Heights;
 }
 
 void Terrain::setupVertexData()
@@ -363,7 +363,7 @@ bool Terrain::calculateNormal(float x, float z)
 		glm::vec3 b = Positions[gridZ][gridX + 1] - Positions[gridZ][gridX];
 		glm::vec3 c = glm::normalize(glm::cross(a, b));
 		normalAngle = glm::dot(c, glm::vec3(0.0, 1.0, 0.0));
-		if (normalAngle < 0.65)
+		if (normalAngle < 0.50)
 			return false;
 	}
 	else
