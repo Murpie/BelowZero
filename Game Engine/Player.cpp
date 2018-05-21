@@ -88,7 +88,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	//AmbientMusic.loop(true);
 
 	Swing.addSound("woosh.wav");
-	pickUpSnow.addSound("PickUpSnow.ogg");
+	pickUpSnowSound.addSound("PickUpSnow.ogg");
 	HitWAxe.addSound("AxeHit.ogg");
 	Eat.addSound("Eating.ogg");
 	Drink.addSound("DrinkWater.wav");
@@ -383,8 +383,8 @@ void Player::useItem(GLFWwindow * window)
 			pickUpSnow = true;
 			swapItem = true;
 			pullDown = true;
-			if (!pickUpSnow.isPlaying())
-				pickUpSnow.playSound();
+			if (!pickUpSnowSound.isPlaying())
+				pickUpSnowSound.playSound();
 		}
 		if (bucketContent == 2 && waterTimer > 1.0f)
 		{

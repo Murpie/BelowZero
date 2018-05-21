@@ -17,7 +17,7 @@ public:
 	SoundMasterSFML AmbientWind;
 	SoundMasterSFML HeavySnow;
 	SoundMasterSFML Swing;
-	SoundMasterSFML pickUpSnow;
+	SoundMasterSFML pickUpSnowSound;
 	SoundMasterSFML HitWAxe;
 	SoundMasterSFML Eat;
 	SoundMasterSFML Drink;
