@@ -208,7 +208,7 @@ void GameObject::setIsBurning(float timeToBurn)
 		fireComponent->color = glm::vec4(0.9, 0.2, 0, .5);
 		fireComponent->Linear = 25;
 		fireComponent->Quadratic = 0.15;
-		fireComponent->offset = 9;
+		fireComponent->offset = 6;
 		fireComponent->intensity = 0.9;
 	}
 
