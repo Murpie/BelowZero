@@ -15,12 +15,14 @@ GameScene::~GameScene()
 {
 	inZone.clear();
 	clearGameObjects();
+	
 }
 
 void GameScene::clearGameObjects()
 {
 	for (GameObject* gameObject_ptr : gameObjects)												//!Fix this so it deletes everything
 		delete gameObject_ptr;
+
 	gameObjects.clear();
 
 }
@@ -123,22 +125,24 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
 
-		randomLevel = rand() % 4;
-		printf("\n\n\n%d\n\n\n", randomLevel);
 		LeapLevel * level;
+
+		//Randomizer
+		srand(time(NULL));
+		randomLevel = rand() % 4;
 
 		switch (randomLevel)
 		{
-		case 1:
+		case 0:
 			level = new LeapLevel("Lvl8.leap");
 			break;
-		case 2:
+		case 1:
 			level = new LeapLevel("Lvl9.leap");
 			break;
-		case 3:
+		case 2:
 			level = new LeapLevel("Lvl10.leap");
 			break;
-		case 4:
+		case 3:
 			level = new LeapLevel("Lvl11.leap");
 			break;
 		default:
@@ -159,9 +163,6 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
-
-		randomLevel = (rand() % 100);
-		printf("\n\n\nLevel: %d\n\n\n", randomLevel);
 
 		LeapLevel* level = new LeapLevel("Lvl4.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);

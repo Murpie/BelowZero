@@ -67,8 +67,6 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 	scene.processEvents(window, deltaTime);
 }
 
-
-
 Game::Game() :
 	shaderProgramLibrary(),
 	windowName("Game Engine"),
@@ -233,7 +231,7 @@ void Game::levelState()
 	{
 		printCurrentState(stateOfGame.state);
 		clearScene();
-		//stateOfGame = Gamestate::ID::LOAD_MENU;
+		clearScene();
 		stateOfGame.state = Gamestate::ID::LOAD_MENU;
 	}
 }

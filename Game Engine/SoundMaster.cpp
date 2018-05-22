@@ -17,8 +17,9 @@ SoundMasterSFML::~SoundMasterSFML()
 {
 	this->Sound->stop();
 
-	
+	if(Buffer != nullptr)
 	delete this->Buffer;
+	if(Sound != nullptr)
 	delete this->Sound;
 }
 
