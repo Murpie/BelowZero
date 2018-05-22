@@ -227,17 +227,23 @@ private:
 	glm::vec4 vView;
 	glm::vec4 vClip;
 	glm::vec4 frustrumCorners[8];
+	glm::vec4 worldSpaceFrustrumCorners[8];
 	glm::vec3 shadowMapLightPosition;
+	glm::vec3 shadowMapDirection;
 
+	
+	glm::mat4 tempView;
 	glm::mat4 lightProjection;
 	glm::mat4 lightView;
 	glm::mat4 lightSpaceMatrices[3];
 	glm::mat4 inverseViewMatrix;
-	
+	glm::mat4 shadowWorldMatrix;
+
 
 	float cascadePlaneEnds[4];
 	float cascadesInClipSpace[3];
 	float shadowOrthoProjInfo[3][6];
+	int depthMapTransformation;
 	unsigned int shadowMaps[3];
 
 	unsigned int depthMapVertexArrayObject[3];

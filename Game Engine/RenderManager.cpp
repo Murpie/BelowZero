@@ -1371,7 +1371,7 @@ void RenderManager::Render() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(UIShaderProgram);
 
-	int depthMapTransformation = 0;
+	depthMapTransformation = 0;
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
 
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "theTexture"), 0);
@@ -1405,7 +1405,6 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, finalPPFBO);
 
-	renderDepthQuadsForVisualization();
 	depthMapTransformation = 1;
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "shadowMap1"), 9);
@@ -1666,11 +1665,11 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 
 	glUseProgram(shaderToUse);
 
-	glm::mat4 newView = glm::lookAt(gameScene->gameObjects[0]->transform->position, gameScene->gameObjects[0]->transform->forward, gameScene->gameObjects[0]->transform->up);
-	inverseViewMatrix = glm::inverse(newView);
+	tempView = glm::lookAt(gameScene->gameObjects[0]->transform->position, gameScene->gameObjects[0]->transform->forward, gameScene->gameObjects[0]->transform->up);
+	inverseViewMatrix = glm::inverse(tempView);
 	
 	shadowMapLightPosition = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y + 20.0f, gameScene->gameObjects[0]->transform->position.z);
-	glm::vec3 shadowMapDirection = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y, gameScene->gameObjects[0]->transform->position.z);
+	shadowMapDirection = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y, gameScene->gameObjects[0]->transform->position.z);
 
 	lightView = glm::lookAt(
 		glm::vec3(shadowMapLightPosition), // Position, 8 units above PlayerPos
@@ -1691,6 +1690,8 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 		float yn = cascadePlaneEnds[i] * tanHalfWidthFOV;
 		float yf = cascadePlaneEnds[i + 1] * tanHalfWidthFOV;
 
+		
+
 		glm::vec4 frustrumCorners[8]
 		{
 			// Near Plane
@@ -1705,8 +1706,6 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 			glm::vec4(xf, -yf, cascadePlaneEnds[i + 1], 1.0f),
 			glm::vec4(-xf, -yf, cascadePlaneEnds[i + 1], 1.0f)
 		};
-
-		glm::vec4 worldSpaceFrustrumCorners[8];
 
 		float minX = std::numeric_limits<float>::max();
 		float maxX = std::numeric_limits<float>::min();
@@ -1743,11 +1742,11 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 
 void RenderManager::setOrthoProjectionMatrix(int index)
 {
-	glm::mat4 worldMatrix = glm::mat4(1);
+	shadowWorldMatrix = glm::mat4(1.0);
 	lightProjection = glm::ortho(shadowOrthoProjInfo[index][1], shadowOrthoProjInfo[index][0], shadowOrthoProjInfo[index][3], shadowOrthoProjInfo[index][2], shadowOrthoProjInfo[index][5], shadowOrthoProjInfo[index][4]);
 	//lightProjection = glm::ortho(shadowOrthoProjInfo[index][0], shadowOrthoProjInfo[index][1], shadowOrthoProjInfo[index][2], shadowOrthoProjInfo[index][3], shadowOrthoProjInfo[index][5], shadowOrthoProjInfo[index][4]);
 
-	lightSpaceMatrices[index] = lightProjection * lightView * worldMatrix;
+	lightSpaceMatrices[index] = lightProjection * lightView * shadowWorldMatrix;
 }
 
 void RenderManager::renderDepthQuadsForVisualization()

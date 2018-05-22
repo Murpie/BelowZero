@@ -126,7 +126,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 
 		makeObjectsInteractable();
 
-		//gameObjects[0]->transform->position = glm::vec3(0.0, 0.0, 0.0);
+		gameObjects[0]->transform->position = glm::vec3(0.0, 0.0, 0.0);
 	}
 	else if (typeOfScene == Scene::ID::MENU)
 	{

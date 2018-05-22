@@ -2,7 +2,6 @@
 layout(location = 0) out vec3 FragColor;
 
 in vec2 TexCoords;
-
 uniform vec3 view_position;
 
 struct Light {
@@ -25,31 +24,20 @@ uniform sampler2D gNormal;
 uniform sampler2D shadowMap0;
 uniform sampler2D shadowMap1;
 uniform sampler2D shadowMap2;
+
 uniform vec3 shadowMapLightPosition;
 uniform float cascadeEndClipSpace[3];
 uniform mat4 lightSpaceMatrix[3];
 uniform mat4 viewMatrix;
 uniform mat4 ProjectionMatrix;
-
-uniform int ScreenX;
-uniform int ScreenY;
 uniform float water;
 
 int selected = 0;
-vec4 lightSpacePosition[3];
 float clipSpacePosZ;
+vec4 lightSpacePosition;
 
 vec3 drColor = vec3(0.9f, 1.0f, 0.84f) * daylight;
 vec3 drPosition = vec3(lights[0].Position);
-
-vec3 gridSamplingDisk[20] = vec3[]
-(
-	vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
-	vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
-	vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
-	vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
-	vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
-	);
 
 vec3 getBlur()
 {
@@ -86,10 +74,9 @@ vec3 getBlur()
 }
 
 
-void calculateLightSpacePositions(vec3 FragPos)
+void calculateLightSpacePositions(vec4 FragPos, int index)
 {
-	for (int i = 0; i < 3; i++)
-		lightSpacePosition[i] = lightSpaceMatrix[i] * vec4(FragPos, 1.0f);
+	lightSpacePosition = lightSpaceMatrix[index] * FragPos;
 }
 
 float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 normals, vec3 FragPos)
@@ -201,33 +188,31 @@ void main()
 	
 	// =========================== TESTING SHADOWS ==================================
 	float shadowFactor = 0.0;
-	calculateLightSpacePositions(FragPos);
 
 	for (int i = 0; i < 3; i++)
 	{
-		if (clipSpacePosZ <= cascadeEndClipSpace[i])//if (FragPos.z <= cascadeEndClipSpace[i]) // Check Which Cascade To Sample from
+		if (clipSpacePosZ <= cascadeEndClipSpace[i])// Check Which Cascade To Sample from
 		{
-			shadowFactor = cascadedShadowMapCalculation(i, lightSpacePosition[i], Normal, FragPos);
+			calculateLightSpacePositions(FragPosition, i);
+			shadowFactor = cascadedShadowMapCalculation(i, lightSpacePosition, Normal, FragPos);
 			selected = i;
 			break;
 		}
 		else
-		{
 			selected = -1;
-		}
 	}
 
 	FragColor = lighting * (1.0f - shadowFactor);
 	//FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, FragColor / 1.5, visibility);
 
 	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
-	/*if (selected == 0)
+	if (selected == 0)
 		FragColor.xyz = FragColor.xyz + vec3(0.5, 0.0, 0.0);
 	if (selected == 1)
 		FragColor.xyz = FragColor.xyz + vec3(0.0, 0.5, 0.0);
 	if (selected == 2)
 		FragColor.xyz = FragColor.xyz + vec3(0.0, 0.0, 0.5);
 	if (selected == -1)
-		FragColor = FragColor;*/
+		FragColor = FragColor;
 }
 

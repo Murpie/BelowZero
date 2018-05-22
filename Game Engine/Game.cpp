@@ -220,6 +220,7 @@ void Game::levelState()
 		printCurrentState(stateOfGame.state);
 		initScene(gameScene);
 		renderManager[1].createBuffers();
+		renderManager[1].renderDepthQuadsForVisualization();
 		stateOfGame.state = Gamestate::ID::RUN_LEVEL;
 		printCurrentState(stateOfGame.state);
 	}
@@ -281,6 +282,8 @@ void Game::initScene(GameScene & scene)
 	}
 	//...
 	scene.initScene(&meshLibrary, &materialLibrary, shaderProgramLibrary, scene.typeOfScene);
+
+
 }
 
 void Game::clearScene(GameScene & scene)
