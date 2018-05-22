@@ -252,7 +252,7 @@ void GameObject::setLighterEquipped()
 		lighterComponent->Linear = 25;
 		lighterComponent->Quadratic = 0.15;
 		lighterComponent->offset = 9;
-		lighterComponent->intensity = 0.1;
+		lighterComponent->intensity = 0.5;
 		lighterComponent->isLighter = true;
 	}
 }

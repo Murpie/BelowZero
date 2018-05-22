@@ -32,6 +32,7 @@ public:
 private:
 	int camerasInScene; //player 
 	int lightsInScene; 
+	int randomLevel;
 
 	void addAI(MeshLib& meshLibrary, MaterialLib& materialLibrary, LeapLevel level);
 	void addLight(glm::vec3 transform, int lightType);
