@@ -204,6 +204,7 @@
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="VFXFireShaders.cpp" />
     <ClCompile Include="VFXFlareShaders.cpp" />
+    <ClCompile Include="VFXLighterShaders.cpp" />
     <ClCompile Include="VFXSnowShaders.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -253,6 +254,7 @@
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VFXFireShaders.h" />
     <ClInclude Include="VFXFlareShaders.h" />
+    <ClInclude Include="VFXLighterShaders.h" />
     <ClInclude Include="VFXSnowShaders.h" />
   </ItemGroup>
   <ItemGroup>
@@ -277,6 +279,8 @@
     <None Include="VFXFireVS.glsl" />
     <None Include="VFXFlareFS.glsl" />
     <None Include="VFXFlareVS.glsl" />
+    <None Include="VFXLighterFS.glsl" />
+    <None Include="VFXLighterVS.glsl" />
     <None Include="VFXSnowFS.glsl" />
     <None Include="VFXSnowVS.glsl" />
   </ItemGroup>

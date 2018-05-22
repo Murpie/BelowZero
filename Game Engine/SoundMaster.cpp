@@ -29,7 +29,7 @@ void SoundMasterSFML::addSound(const std::string & filePath)
 	if (!this->Buffer->loadFromFile(filePath))
 		std::cout << "Cant Load File" << std::endl;
 
-	this->Sound->setBuffer(*this->Buffer);
+	this->Sound->setBuffer(*Buffer);
 }
 
 bool SoundMasterSFML::isPlaying()

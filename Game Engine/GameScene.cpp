@@ -19,19 +19,18 @@ GameScene::~GameScene()
 
 void GameScene::clearGameObjects()
 {
-	for (GameObject* gameObject_ptr : gameObjects)
-	{
-		
-
+	for (GameObject* gameObject_ptr : gameObjects)												//!Fix this so it deletes everything
 		delete gameObject_ptr;
 		
 	}
 	gameObjects.clear();
+
 }
 
 void GameScene::update(float deltaTime, float seconds)
 {
-	// Add new Object to scene
+	lightCheck();
+
 	if (addObject)
 	{
 		for (unsigned int i = 0; i < gameObjects.size(); i++)
@@ -125,7 +124,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("lvl6.leap");
+		LeapLevel* level = new LeapLevel("Lvl8.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		//addAI(*meshLibrary, *matertialLibrary, *level);
 		delete level;
@@ -626,6 +625,29 @@ void GameScene::aiCollisionTest(GameObject & other)
 					}
 				}
 			}
+			break;
+		}
+	}
+}
+
+void GameScene::lightCheck()
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->getPlayer() != nullptr)
+		{
+			if (gameObject_ptr->getEquippedItem() == 1)
+			{
+				gameObject_ptr->lighterEquipped = true;
+				gameObject_ptr->setLighterEquipped();
+			}
+			else
+			{
+				gameObject_ptr->lighterEquipped = false;
+				gameObject_ptr->resetLighterEquipped();
+			}
+
+			break;
 		}
 	}
 }

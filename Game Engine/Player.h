@@ -51,6 +51,7 @@ public:
 
 	bool startGame;
 	bool textOnScreen;
+	bool inInventory[5];
 	bool win;
 
 	int currentlyEquipedItem;
@@ -121,7 +122,6 @@ private:
 	bool movingLeft = false;
 	bool movingRight = false;
 
-	bool inInventory[5];
 	bool isPressed;
 
 	glm::vec3 cameraPos;
@@ -140,6 +140,8 @@ private:
 	bool swing;
 	int axeSwing;
 	bool pickUpSnow;
+	bool warning;
+	float textureTimer;
 
 	bool firstMouse;
 	float lastX, lastY;
@@ -180,6 +182,7 @@ private:
 	int vertexLength;
 
 	void equipItemMesh();
+	void textWarnings();
 	void findY();
 	void swingAxe(float deltaTime);
 

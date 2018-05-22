@@ -30,6 +30,7 @@
 #define HIGH_SHADOW 4096
 
 #define MAX_PARTICLES 1000					//Maximum: 1000, Intel NUC can't handle more stack than this
+#define LIGHTER_PARTICLES 100
 
 struct QuadVertex
 {
@@ -52,6 +53,7 @@ public:
 
 	void Render();
 	void renderMainMenu();
+
 	void createBuffers();
 	void createMainMenuBuffer();
 	void createButtonQuads();
@@ -64,8 +66,9 @@ public:
 	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
 	void renderFireParticles();
 	void renderSnowParticles();
-	void dayNightCycle();
 	void renderFlareParticles();
+	void renderLighterParticles();
+	void dayNightCycle();
 
 	struct Particle {
 		glm::vec3 pos, speed;
@@ -78,6 +81,7 @@ public:
 	Particle fireParticleContainer[MAX_PARTICLES];
 	Particle snowParticleContainer[MAX_PARTICLES];
 	Particle flareParticleContainer[MAX_PARTICLES];
+	Particle lighterParticleContainer[MAX_PARTICLES];
 
 	int FindUnusedParticle(Particle* container, int lastUsedParticle);
 	void ParticleLinearSort(Particle* arr, int size);
@@ -137,27 +141,33 @@ private:
 	unsigned int fireTexture;
 	unsigned int snowTexture;
 	unsigned int flareTexture;
+	unsigned int lighterTexture;
 	unsigned int fireVAO;
 	unsigned int snowVAO;
 	unsigned int flareVAO;
+	unsigned int lighterVAO;
 	unsigned int fireVBO;
 	unsigned int snowVBO;
 	unsigned int flareVBO;
+	unsigned int lighterVBO;
 	unsigned int fireParticlePositionBuffer;
 	unsigned int snowParticlePositionBuffer;
 	unsigned int flareParticlePositionBuffer;
+	unsigned int lighterParticlePositionBuffer;
 	unsigned int fireParticleColorBuffer;
 	unsigned int snowParticleColorBuffer;
 	unsigned int flareParticleColorBuffer;
+	unsigned int lighterParticleColorBuffer;
 	unsigned int PPFBO;
 	unsigned int finalPPFBO;
 
 	//VFX
 	unsigned int lastUsedParticle = 0;
-	unsigned int particleCount;
+	unsigned int particleCount = 0;
 	unsigned int fireParticles = 1;
 	unsigned int snowParticles = 10;
 	unsigned int flareParticles = 1;
+	unsigned int lighterParticles = 1;
 	unsigned int randomizer = 0;
 	float randomX;
 	float randomY;
@@ -172,6 +182,7 @@ private:
 	bool flareAlive = false;
 	glm::mat4 viewProjectionMatrix;
 	glm::vec3 startPoint;
+	glm::vec3 lighterPosition;
 	glm::vec3 randomStartPoint;
 	glm::vec3 targetPoint;
 	glm::vec3 particlePivot;
@@ -179,13 +190,16 @@ private:
 	glm::vec3 tempDistance;
 	glm::vec3 cameraRight_vector;
 	glm::vec3 cameraUp_vector;
+	glm::vec3 flarePosition;
 
 	GLfloat* fireParticlePositionData = 0;
 	GLfloat* snowParticlePositionData = 0;
 	GLfloat* flareParticlePositionData = 0;
+	GLfloat* lighterParticlePositionData = 0;
 	GLubyte* fireParticleColorData = 0;
 	GLubyte* snowParticleColorData = 0;
 	GLubyte* flareParticleColorData = 0;
+	GLubyte* lighterParticleColorData = 0;
 
 	unsigned int equipedFBO;
 	unsigned int equipedTexture;
@@ -212,6 +226,7 @@ private:
 	GLuint vfxFireShaderProgram;
 	GLuint vfxSnowShaderProgram;
 	GLuint vfxFlareShaderProgram;
+	GLuint vfxLighterShaderProgram;
 	GLuint mainMenuShaderProgram;
 	GLuint refractionShaderProgram;
 

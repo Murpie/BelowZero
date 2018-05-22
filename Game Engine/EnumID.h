@@ -106,6 +106,10 @@ namespace ObjectType
 		EquipedCanWard				= 51,
 		EquipedLighterWarm			= 52,
 		EquipedWoodWarm				= 53,
-		Rabbit						= 54
+		Rabbit						= 54,
+		Cabin_rotate				= 55,
+		BrokenTree_rotate			= 56,
+		Balloon						= 57,
+		MatchBox					= 58
 	};
 }
