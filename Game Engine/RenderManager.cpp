@@ -1469,53 +1469,57 @@ void RenderManager::testRender()
 	glCullFace(GL_BACK);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glUseProgram(mainMenuShaderProgram);
+	
+	if (gameScene->typeOfScene == Scene::ID::MENU)
+	{
+		glUseProgram(mainMenuShaderProgram);
 
-	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 1;
-	glBindVertexArray(buttonVertexArrayObject[0]);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->startButtonTexture);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+		gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 1;
+		glBindVertexArray(buttonVertexArrayObject[0]);
+		glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->startButtonTexture);
+		glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 2;
-	glBindVertexArray(buttonVertexArrayObject[1]);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->settingsButtonTexture);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+		gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 2;
+		glBindVertexArray(buttonVertexArrayObject[1]);
+		glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->settingsButtonTexture);
+		glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 3;
-	glBindVertexArray(buttonVertexArrayObject[2]);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->exitButtonTexture);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+		gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 3;
+		glBindVertexArray(buttonVertexArrayObject[2]);
+		glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->exitButtonTexture);
+		glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 0;
-	glBindVertexArray(quadVertexArrayObject);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->backgroundTexture);
-	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
-	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-
+		gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 0;
+		glBindVertexArray(quadVertexArrayObject);
+		glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->backgroundTexture);
+		glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
+		glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
 	//DIRECTIONAL LIGHT SHADOWMAP PASS-----------------------------------------------------------------------------------------------------------------------
+	/*
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
@@ -1548,7 +1552,8 @@ void RenderManager::testRender()
 	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
-	
+	*/
+
 	//... Terrain PASS-----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -1582,7 +1587,16 @@ void RenderManager::testRender()
 	//glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
 
 	if (gameObjectsToRender.size() > 0)
-		gameObjectsToRender[0]->materialComponent->bindTextures();
+	{
+		for (GameObject* gameObject_ptr : gameObjectsToRender)
+		{
+			if (gameObject_ptr->materialComponent != nullptr)
+			{
+				gameObject_ptr->materialComponent->bindTextures();
+				break;
+			}
+		}
+	}
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
@@ -1610,17 +1624,6 @@ void RenderManager::testRender()
 		if (gameObject_ptr->getIsBurning())
 		{
 			gameObject_ptr->burning.setPosition(gameScene->gameObjects[0]->getPlayer()->transform.position - gameObject_ptr->transform->position);
-			//gameObject_ptr->burning.setPosition(glm::vec3(0.0, 1.0, 1.0));
-			if (!gameObject_ptr->burning.isPlaying())
-			{
-				gameObject_ptr->burning.setMinDistance(2.0f);
-				gameObject_ptr->burning.setAttenuation(7.0f);
-				gameObject_ptr->burning.setVolume(1000.0f);
-				gameObject_ptr->burning.setRelativeToListener(true);
-				gameObject_ptr->burning.loop(true);
-				gameObject_ptr->burning.playSound();
-
-			}
 			offset = 40.0f;
 
 			float flickerSpeed = (rand() % 1000) / 100000.0f;
@@ -2152,7 +2155,11 @@ void RenderManager::testRender()
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, shadowMap);
 
-	glUniform1f(glGetUniformLocation(lightpassShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
+	if(gameScene->typeOfScene != Scene::ID::MENU)
+		glUniform1f(glGetUniformLocation(lightpassShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
+	else
+		glUniform1f(glGetUniformLocation(lightpassShaderProgram, "water"), 0.0f);
+
 
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_EQUAL, 1, 0xFF);
@@ -2191,7 +2198,9 @@ void RenderManager::testRender()
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
-	
+	if (gameScene->typeOfScene != Scene::ID::MENU)
+	{
+
 	glUniform1f(glGetUniformLocation(refractionShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
 	glUniform1f(glGetUniformLocation(refractionShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
 	glUniform1f(glGetUniformLocation(refractionShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
@@ -2200,6 +2209,7 @@ void RenderManager::testRender()
 
 	glUniform1i(glGetUniformLocation(refractionShaderProgram, "ScreenX"), SCREEN_WIDTH);
 	glUniform1i(glGetUniformLocation(refractionShaderProgram, "ScreenY"), SCREEN_HEIGHT);
+	}
 
 	//glBindFramebuffer(GL_READ_FRAMEBUFFER, finalFBO);
 	//glBindFramebuffer(GL_TEXTURE_2D, PPFBO);
@@ -2212,53 +2222,54 @@ void RenderManager::testRender()
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	//... UI -----------------------------------------------------------------------------------------------------------------------------------
+	if (gameScene->typeOfScene != Scene::ID::MENU) 
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glUseProgram(UIShaderProgram);
 
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glUseProgram(UIShaderProgram);
+		glUniform1i(glGetUniformLocation(UIShaderProgram, "theTexture"), 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, UITexture);
+		glUniform1i(glGetUniformLocation(UIShaderProgram, "equipedTexture"), 1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->equipedTexture);
 
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "theTexture"), 0);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, UITexture);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "equipedTexture"), 1);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->equipedTexture);
+		glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture1"), 2);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[0]);
+		glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture2"), 3);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[1]);
+		glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture3"), 4);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[2]);
+		glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture4"), 5);
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[3]);
+		glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[4]);
+		glUniform1i(glGetUniformLocation(UIShaderProgram, "textTexture"), 7);
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->textTexture);
 
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture1"), 2);
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[0]);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture2"), 3);
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[1]);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture3"), 4);
-			glActiveTexture(GL_TEXTURE4);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[2]);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture4"), 5);
-			glActiveTexture(GL_TEXTURE5);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[3]);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
-			glActiveTexture(GL_TEXTURE6);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[4]);
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "textTexture"), 7);
-			glActiveTexture(GL_TEXTURE7);
-			glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->textTexture);
+		glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 8);
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_2D, finalPPFBO);
 
-			glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 8);
-			glActiveTexture(GL_TEXTURE8);
-			glBindTexture(GL_TEXTURE_2D, finalPPFBO);
+		glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
+		glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
+		glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
+		glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0]->getPlayer()->food);
+		glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0]->getPlayer()->fade);
+		glUniform1f(glGetUniformLocation(UIShaderProgram, "winFade"), gameScene->gameObjects[0]->getPlayer()->winFade);
+		glUniform1f(glGetUniformLocation(UIShaderProgram, "flareTimer"), gameScene->gameObjects[0]->getPlayer()->flareTimer);
+		glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0]->getPlayer()->textFade);
 
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "food"), gameScene->gameObjects[0]->getPlayer()->food);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0]->getPlayer()->fade);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "winFade"), gameScene->gameObjects[0]->getPlayer()->winFade);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "flareTimer"), gameScene->gameObjects[0]->getPlayer()->flareTimer);
-			glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0]->getPlayer()->textFade);
-
-			//glBindTexture(GL_TEXTURE_2D, finalPPFBO);
-			renderQuad();
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
+		//glBindTexture(GL_TEXTURE_2D, finalPPFBO);
+		renderQuad();
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	}
 
 	clearObjectsToRender();
 	Update();
@@ -2266,7 +2277,320 @@ void RenderManager::testRender()
 
 void RenderManager::createTestBuffers()
 {
+	if (gameScene->typeOfScene == Scene::ID::MENU)
+	{
+		glGenFramebuffers(1, &finalMainMenuFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, finalMainMenuFBO);
 
+		glGenTextures(1, &finalMainMenuFBOTexture);
+		glBindTexture(GL_TEXTURE_2D, finalMainMenuFBOTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalMainMenuFBOTexture, 0);
+
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, finalMainMenuFBOTexture);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			std::cout << "ERROR::FRAMEBUFFER:: Main Menu Framebuffer is not complete!" << std::endl;
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		float quadVertices[] =
+		{
+			-1.0f,  1.0f,  0.0f, 1.0f,
+			-1.0f, -1.0f,  0.0f, 0.0f,
+			1.0f, -1.0f,  1.0f, 0.0f,
+
+			-1.0f,  1.0f,  0.0f, 1.0f,
+			1.0f, -1.0f,  1.0f, 0.0f,
+			1.0f,  1.0f,  1.0f, 1.0f
+		};
+
+		glGenVertexArrays(1, &quadVertexArrayObject);
+		glGenBuffers(1, &quadVertexBufferObject);
+		glBindVertexArray(quadVertexArrayObject);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVertexBufferObject);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	}
+
+	//screen size
+	glfwGetFramebufferSize(window, &display_w, &display_h);
+
+	//----------========== ShadowMap FBO DIRECTIONAL LIGHTS ==========----------
+	glGenFramebuffers(1, &shadowFBO);
+	glGenTextures(1, &shadowMap);
+	glBindTexture(GL_TEXTURE_2D, shadowMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, HIGH_SHADOW, HIGH_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//VFX
+	fireParticlePositionData = new GLfloat[MAX_PARTICLES * 4];
+	snowParticlePositionData = new GLfloat[MAX_PARTICLES * 4];
+	flareParticlePositionData = new GLfloat[MAX_PARTICLES * 4];
+	fireParticleColorData = new GLubyte[MAX_PARTICLES * 4];
+	snowParticleColorData = new GLubyte[MAX_PARTICLES * 4];
+	flareParticleColorData = new GLubyte[MAX_PARTICLES * 4];
+
+	static const GLfloat g_vertex_buffer_data[] = {
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		-0.5f,  0.5f, 0.0f,
+		0.5f,  0.5f, 0.0f
+	};
+
+	//Fire Texture
+	glGenVertexArrays(1, &fireVAO);
+	glBindVertexArray(fireVAO);
+	glGenBuffers(1, &fireVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, fireVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &fireParticlePositionBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, fireParticlePositionBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+
+	glGenBuffers(1, &fireParticleColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, fireParticleColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+
+	width = 0;
+	height = 0;
+	nrOfChannels = 0;
+	data = stbi_load("ParticleQuad.png", &width, &height, &nrOfChannels, 0);
+	glGenTextures(1, &fireTexture);
+	glBindTexture(GL_TEXTURE_2D, fireTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load Billboard Texture from path" << std::endl;
+	}
+	stbi_image_free(data);
+
+	//Snow Texture
+	glGenVertexArrays(1, &snowVAO);
+	glBindVertexArray(snowVAO);
+	glGenBuffers(1, &snowVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, snowVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &snowParticlePositionBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, snowParticlePositionBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+
+	glGenBuffers(1, &snowParticleColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, snowParticleColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+
+	width = 0;
+	height = 0;
+	nrOfChannels = 0;
+	data = stbi_load("ParticleSnow.png", &width, &height, &nrOfChannels, 0);
+	glGenTextures(1, &snowTexture);
+	glBindTexture(GL_TEXTURE_2D, snowTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load Billboard Texture from path" << std::endl;
+	}
+	stbi_image_free(data);
+
+	//Flare Texture
+	//First reset the flareAlive bool
+	flareAlive = false;
+	glGenVertexArrays(1, &flareVAO);
+	glBindVertexArray(flareVAO);
+	glGenBuffers(1, &flareVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, flareVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &flareParticlePositionBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, flareParticlePositionBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+
+	glGenBuffers(1, &flareParticleColorBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, flareParticleColorBuffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+
+	width = 0;
+	height = 0;
+	nrOfChannels = 0;
+	data = stbi_load("Particle.png", &width, &height, &nrOfChannels, 0);
+	glGenTextures(1, &flareTexture);
+	glBindTexture(GL_TEXTURE_2D, flareTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load Billboard Texture from path" << std::endl;
+	}
+	stbi_image_free(data);
+
+	for (int i = 0; i < MAX_PARTICLES; i++)
+	{
+		fireParticleContainer[i].life = -1.0f;
+		snowParticleContainer[i].life = -1.0f;
+		flareParticleContainer[i].life = -1.0f;
+		fireParticleContainer[i].cameraDistance = -1.0f;
+		snowParticleContainer[i].cameraDistance = -1.0f;
+		flareParticleContainer[i].cameraDistance = -1.0f;
+	}
+
+	//... Create G-buffers
+	//framebufferobject
+	glGenFramebuffers(1, &gbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
+	//g-buffer position
+	glGenTextures(1, &gPosition);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//attach texture to current framebuffer
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
+
+	//g-buffer albedo
+	glGenTextures(1, &gAlbedo);
+	glBindTexture(GL_TEXTURE_2D, gAlbedo);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//attach texture to current framebuffer
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gAlbedo, 0);
+
+	//g-buffer normal
+	glGenTextures(1, &gNormal);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//attach texture to current framebuffer
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gNormal, 0);
+
+	glDrawBuffers(3, attachments);
+
+	//... Create and attach depth buffer
+	glGenRenderbuffers(1, &rboDepth);
+	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, display_w, display_h);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+	// finally check if framebuffer is complete
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer not complete!" << std::endl;
+
+	//... Create Colorbuffer
+	glGenFramebuffers(1, &finalFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
+	glGenTextures(1, &finalColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalColorBuffer, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "SSAO Framebuffer not complete!" << std::endl;
+
+	//... Create and attach depth and stencil buffer
+	glGenRenderbuffers(1, &finalDepthStensil);
+	glBindRenderbuffer(GL_RENDERBUFFER, finalDepthStensil);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, display_w, display_h);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, finalDepthStensil);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, finalDepthStensil);
+	// finally check if framebuffer is complete
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer not complete!" << std::endl;
+
+	//... Create PostProccessingbuffer
+	glGenFramebuffers(1, &PPFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
+	glGenTextures(1, &finalPPFBO);
+	glBindTexture(GL_TEXTURE_2D, finalPPFBO);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalPPFBO, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "SSAO Framebuffer not complete!" << std::endl;
+
+	//.. Create UI Frame Buffer with UI Texture
+	width = 0;
+	height = 0;
+	nrOfChannels = 0;
+	data = stbi_load("uiTexture3.png", &width, &height, &nrOfChannels, 0);
+
+	glGenFramebuffers(1, &UIFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, UIFBO);
+
+	glGenTextures(1, &UITexture);
+	glBindTexture(GL_TEXTURE_2D, UITexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load UI Texture from path" << std::endl;
+	}
+
+	stbi_image_free(data);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, UITexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "UI Framebuffer not complete!" << std::endl;
 }
 
 void RenderManager::renderQuad()
