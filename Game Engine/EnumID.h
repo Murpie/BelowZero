@@ -110,6 +110,7 @@ namespace ObjectType
 		Cabin_rotate				= 55,
 		BrokenTree_rotate			= 56,
 		Balloon						= 57,
-		MatchBox					= 58
+		MatchBox					= 58,
+		Wooden_Step					= 59
 	};
 }
