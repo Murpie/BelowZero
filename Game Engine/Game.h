@@ -44,8 +44,9 @@ private:
 	GLFWmonitor** primary;
 	const GLFWvidmode* mode;
 
-	GameScene gameScene;
-	GameScene menuScene;
+	//LevelScene
+	GameScene* gameScene;
+	RenderManager* renderer;
 
 	ShaderProgramLib shaderProgramLibrary;
 	MaterialLib materialLibrary;
@@ -53,7 +54,6 @@ private:
 	MeshLib meshLibrary;
 	
 	//
-	vector<RenderManager> renderManager; // use 1 render manager? delete and init new one
 	vector<string> meshName; // Filepaths for the importer?
 	vector<GLuint> meshType;
 
@@ -71,15 +71,14 @@ private:
 	char windowName[20];
 
 	void initWindow();
-	void initScene(GameScene &scene);
-	void clearScene(GameScene &scene);
+	void initScene(Scene::ID sceneID);
+	void clearScene();
 	void initShaderProgramLib();
 	void initInputOptions();
 
 	void useShaderProgram();
 
 	void addMeshName();
-	void addRenderManager(GameScene &scene);
 	void readMeshName(GameScene &scene);
 	
 	//...
