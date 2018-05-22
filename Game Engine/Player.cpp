@@ -977,6 +977,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	{
 		jacket = true;
 		equipItemMesh();
+		addTextToScreen("TipJacketTexture");
 		swapItem = true;
 		pullDown = true;
 		isAlive = false;
@@ -996,10 +997,6 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 
 		this->win = true;
 		return 42;
-	}
-	else if (id == ObjectType::ID::Axe)
-	{
-		isAlive = false;
 	}
 	/*
 	if(id == fallenTree && axeIsEquiped)
