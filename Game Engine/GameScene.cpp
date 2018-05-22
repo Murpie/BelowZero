@@ -21,8 +21,7 @@ void GameScene::clearGameObjects()
 {
 	for (GameObject* gameObject_ptr : gameObjects)												//!Fix this so it deletes everything
 		delete gameObject_ptr;
-		
-	}
+
 	gameObjects.clear();
 
 }

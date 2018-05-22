@@ -1112,13 +1112,13 @@ void Player::wolfHowl(float nightTimer)
 	float wolfTimer = nightTimer / 20;
 	if (nightTimer > 20)
 		wolfTimer = 1;
-	float vol = glm::mix(10, 70, wolfTimer);
+	float vol = glm::mix(10, 50, wolfTimer);
 	wolf1.setVolume(vol);
 	wolf2.setVolume(vol);
 	wolf3.setVolume(vol);
 
 	float lasthowl = howlNumber;
-	while(lasthowl != howlNumber)
+	while(lasthowl == howlNumber)
 		howlNumber = rand() & 3;
 
 

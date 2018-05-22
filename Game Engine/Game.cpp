@@ -232,17 +232,15 @@ void Game::levelState()
 	else if (stateOfGame.state == Gamestate::ID::CLEAR_LEVEL)
 	{
 		printCurrentState(stateOfGame.state);
-		clearScene(gameScene);
-		clearScene(menuScene);
+		clearScene();
+		clearScene();
 		stateOfGame.state = Gamestate::ID::LOAD_MENU;
 	}
 }
 
 void Game::exitState()
 {
-	clearScene(menuScene);
-	clearScene(gameScene);
-	renderManager.clear();
+	clearScene();
 	glfwSetWindowShouldClose(window, GL_TRUE);
 }
 

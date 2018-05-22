@@ -747,8 +747,7 @@ void RenderManager::Render() {
 			if (mixVar >= 50.0f)
 				mixVar = 50.0f;
 
-			float volume = glm::mix(100, 0, mixVar / 50);
-			volume *= 0.9;
+			float volume = glm::mix(60, 0, mixVar / 50);
 			gameObject_ptr->burning.setVolume(volume);
 
 			if (!gameObject_ptr->burning.isPlaying())
