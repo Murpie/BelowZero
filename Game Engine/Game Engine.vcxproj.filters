@@ -162,9 +162,6 @@
     <ClCompile Include="MainMenuScene.cpp">
       <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
-    <ClCompile Include="SoundMaster.cpp">
-      <Filter>Source Files\Data Types</Filter>
-    </ClCompile>
     <ClCompile Include="VFXFlareShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
@@ -176,6 +173,9 @@
     </ClCompile>
     <ClCompile Include="AI.cpp">
       <Filter>Source Files\GameObject &amp; Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundMaster.cpp">
+      <Filter>Source Files\Data Types</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -302,9 +302,6 @@
     <ClInclude Include="MainMenuScene.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
-    <ClInclude Include="SoundMaster.h">
-      <Filter>Header Files\Data Types</Filter>
-    </ClInclude>
     <ClInclude Include="RefractionShader.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
@@ -316,6 +313,9 @@
     </ClInclude>
     <ClInclude Include="AI.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundMaster.h">
+      <Filter>Header Files\Data Types</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

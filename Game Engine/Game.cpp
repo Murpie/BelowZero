@@ -67,8 +67,6 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 	scene.processEvents(window, deltaTime);
 }
 
-
-
 Game::Game() :
 	shaderProgramLibrary(),
 	gameScene(Scene::ID::LEVEL_1), menuScene(Scene::ID::MENU),

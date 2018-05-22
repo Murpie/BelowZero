@@ -16,10 +16,9 @@ SoundMasterSFML::SoundMasterSFML(const std::string & filePath)
 SoundMasterSFML::~SoundMasterSFML()
 {
 	this->Sound->stop();
-
-	
 	delete this->Buffer;
 	delete this->Sound;
+	
 }
 
 void SoundMasterSFML::addSound(const std::string & filePath)

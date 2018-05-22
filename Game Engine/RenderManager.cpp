@@ -40,6 +40,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 
 RenderManager::~RenderManager()
 {
+
 }
 
 bool zoneTest(GameObject* player, GameObject* object)
@@ -1388,7 +1389,7 @@ void RenderManager::Render() {
 		else if (lightsToRender.at(i)->isFlare == true)
 		{
 			lightUniform = "lights[" + std::to_string(i) + "].Position";
-			glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(flarePosition));
+			glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(flarePosition + glm::vec3(0, 4, 0)));
 		}
 		else
 		{
