@@ -687,14 +687,15 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	}
 	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 1)
 	{
-		equip("LighterIcon");
-		this->currentlyEquipedItem = 1;
-		equipItemMesh();
-		addImageToInventory("InventoryLighterIcon", 1);
-		inInventory[1] = true;
-		isPressed = true;
-		swapItem = true;
-		pullDown = true;
+		if (inInventory[1] == true)
+		{
+			equip("LighterIcon");
+			this->currentlyEquipedItem = 1;
+			equipItemMesh();
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 2)
 	{
@@ -892,6 +893,23 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 			this->equipItem = 33;
 			addImageToInventory("InventoryAxeIcon", 0);
 			inInventory[0] = true;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+			isAlive = false;
+		}
+		else
+			addTextToScreen("Text-ItemAlreadyEquipped");
+	}
+	else if (id == ObjectType::ID::MatchBox)
+	{
+		if (inInventory[1] == false)
+		{
+			equip("LighterIcon");
+			this->currentlyEquipedItem = 1;
+			equipItemMesh();
+			addImageToInventory("InventoryLighterIcon", 1);
+			inInventory[1] = true;
 			isPressed = true;
 			swapItem = true;
 			pullDown = true;
