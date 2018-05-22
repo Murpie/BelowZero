@@ -2,6 +2,7 @@
 layout(location = 0) out vec3 FragColor;
 
 in vec2 TexCoords;
+
 uniform vec3 view_position;
 
 struct Light {
@@ -27,13 +28,17 @@ uniform sampler2D shadowMap2;
 uniform vec3 shadowMapLightPosition;
 uniform float cascadeEndClipSpace[3];
 uniform mat4 lightSpaceMatrix[3];
+uniform mat4 viewMatrix;
+uniform mat4 ProjectionMatrix;
 
 uniform int ScreenX;
 uniform int ScreenY;
 uniform float water;
 
-
+int selected = 0;
 vec4 lightSpacePosition[3];
+float clipSpacePosZ;
+
 vec3 drColor = vec3(0.9f, 1.0f, 0.84f) * daylight;
 vec3 drPosition = vec3(lights[0].Position);
 
@@ -94,7 +99,7 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 no
 	float z;
 	vec3 lightDirForShadow = normalize(shadowMapLightPosition - FragPos);
 	float bias = max(0.05 * (1.0 - dot(normals, lightDirForShadow)), 0.005);
-	vec3 projectionCoordinates = lightSpacePos.xyz / lightSpacePos.w;
+	vec3 projectionCoordinates = lightSpacePos.xyz; // / lightSpacePos.w;
 
 	vec2 UVCoords;
 	UVCoords.x = 0.5 * projectionCoordinates.x + 0.5;
@@ -102,16 +107,18 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 no
 	z = 0.5 * projectionCoordinates.z + 0.5;
 	
 	if (cascadeIndex == 0)							// Check Which ShadowMap To Use
-		depth = texture(shadowMap0, UVCoords.xy).x;
+		depth = texture(shadowMap0, UVCoords).x;
 	if (cascadeIndex == 1)
-		depth = texture(shadowMap1, UVCoords.xy).x;
+		depth = texture(shadowMap1, UVCoords).x;
 	if (cascadeIndex == 2)
-		depth = texture(shadowMap2, UVCoords.xy).x;
+		depth = texture(shadowMap2, UVCoords).x;
 
 	if (z - bias > depth) // Determine If There Shall Be Shadow
 		shadow = 0.35f;
+	else
+		shadow = 0.0;
 	
-	if (depth > 1.0f) // If Shadow Is Outside of range 0-1
+	if (depth > 1.0f) // If Shadow Is Outside of range 0-1 = No Shadow
 		shadow = 0.0f;
 
 	return shadow;
@@ -121,8 +128,11 @@ void main()
 {
 	// retrieve data from G-buffer
 	vec3 FragPos = texture(gPosition, TexCoords).rgb;
+	vec4 FragPosition = texture(gPosition, TexCoords);
 	vec3 Albedo = texture(gAlbedo, TexCoords).rgb;
 	vec3 Normal = texture(gNormal, TexCoords).rgb;
+	clipSpacePosZ = (ProjectionMatrix * viewMatrix * FragPosition).z;
+
 
 	float Thirst = water;
 	float thirstVariable = 1.0;
@@ -195,10 +205,15 @@ void main()
 
 	for (int i = 0; i < 3; i++)
 	{
-		if (FragPos.z <= cascadeEndClipSpace[i]) // Check Which Cascade To Sample from
+		if (clipSpacePosZ <= cascadeEndClipSpace[i])//if (FragPos.z <= cascadeEndClipSpace[i]) // Check Which Cascade To Sample from
 		{
 			shadowFactor = cascadedShadowMapCalculation(i, lightSpacePosition[i], Normal, FragPos);
+			selected = i;
 			break;
+		}
+		else
+		{
+			selected = -1;
 		}
 	}
 
@@ -206,5 +221,13 @@ void main()
 	//FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, FragColor / 1.5, visibility);
 
 	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
+	/*if (selected == 0)
+		FragColor.xyz = FragColor.xyz + vec3(0.5, 0.0, 0.0);
+	if (selected == 1)
+		FragColor.xyz = FragColor.xyz + vec3(0.0, 0.5, 0.0);
+	if (selected == 2)
+		FragColor.xyz = FragColor.xyz + vec3(0.0, 0.0, 0.5);
+	if (selected == -1)
+		FragColor = FragColor;*/
 }
 
