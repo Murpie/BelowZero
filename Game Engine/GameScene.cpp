@@ -8,24 +8,29 @@ GameScene::GameScene(Scene::ID typeOfScene) :
 {
 	this->typeOfScene = typeOfScene;
 	this->directionalLight = nullptr;
+	this->randomLevel = 0;
 }
 
 GameScene::~GameScene()
 {
 	inZone.clear();
 	clearGameObjects();
+	
 }
 
 void GameScene::clearGameObjects()
 {
-	for (GameObject* gameObject_ptr : gameObjects)
+	for (GameObject* gameObject_ptr : gameObjects)												//!Fix this so it deletes everything
 		delete gameObject_ptr;
+
 	gameObjects.clear();
+
 }
 
 void GameScene::update(float deltaTime, float seconds)
 {
-	// Add new Object to scene
+	lightCheck();
+
 	if (addObject)
 	{
 		for (unsigned int i = 0; i < gameObjects.size(); i++)
@@ -119,7 +124,31 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 		// Read from level file and add level objects to scene
-		LeapLevel* level = new LeapLevel("lvl6.leap");
+
+		LeapLevel * level;
+
+		//Randomizer
+		srand(time(NULL));
+		randomLevel = rand() % 4;
+
+		switch (randomLevel)
+		{
+		case 0:
+			level = new LeapLevel("Lvl8.leap");
+			break;
+		case 1:
+			level = new LeapLevel("Lvl9.leap");
+			break;
+		case 2:
+			level = new LeapLevel("Lvl10.leap");
+			break;
+		case 3:
+			level = new LeapLevel("Lvl11.leap");
+			break;
+		default:
+			break;
+		}
+
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		//addAI(*meshLibrary, *matertialLibrary, *level);
 		delete level;
@@ -622,6 +651,29 @@ void GameScene::aiCollisionTest(GameObject & other)
 					}
 				}
 			}
+			break;
+		}
+	}
+}
+
+void GameScene::lightCheck()
+{
+	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		if (gameObject_ptr->getPlayer() != nullptr)
+		{
+			if (gameObject_ptr->getEquippedItem() == 1)
+			{
+				gameObject_ptr->lighterEquipped = true;
+				gameObject_ptr->setLighterEquipped();
+			}
+			else
+			{
+				gameObject_ptr->lighterEquipped = false;
+				gameObject_ptr->resetLighterEquipped();
+			}
+
+			break;
 		}
 	}
 }

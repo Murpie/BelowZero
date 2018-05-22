@@ -67,16 +67,16 @@ void Game::processInput(GLFWwindow *window, float deltaTime, GameScene& scene) /
 	scene.processEvents(window, deltaTime);
 }
 
-
-
 Game::Game() :
 	shaderProgramLibrary(),
-	gameScene(Scene::ID::LEVEL_1), menuScene(Scene::ID::MENU),
 	windowName("Game Engine"),
 	deltaTime(0), seconds(0),
 	meshesLoaded(false), fullscreen(false), stateBool(false), texturesLoaded(false),
 	count(0)
 {
+	this->gameScene = nullptr;
+	this->renderer = nullptr;
+
 	initWindow();
 	initShaderProgramLib();
 	addMeshName();
@@ -85,7 +85,10 @@ Game::Game() :
 
 Game::~Game()
 {
-
+	if (gameScene != nullptr)
+		delete gameScene;
+	if (renderer != nullptr)
+		delete renderer;
 }
 
 void Game::run()
@@ -142,14 +145,8 @@ void Game::run()
 		}
 
 	}
-	clearScene(menuScene);
-	clearScene(gameScene);
-
-	for (int i = 0; i < renderManager.size(); i++)
-	{
-		renderManager[i].deleteData();
-	}
-	renderManager.clear();
+	if (gameScene != nullptr)
+		clearScene();
 
 	glfwTerminate();
 }
@@ -191,24 +188,25 @@ void Game::menuState()
 	if (stateOfGame.state == Gamestate::ID::LOAD_MENU)
 	{
 		printCurrentState(stateOfGame.state);
-		initScene(menuScene);
-		renderManager[0].createMainMenuBuffer();
-		renderManager[0].createButtonQuads();
+		initScene(Scene::ID::MENU);
+		renderer->createMainMenuBuffer();
+		renderer->createButtonQuads();
+		
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		stateOfGame.state = Gamestate::ID::SHOW_MENU;
 		printCurrentState(stateOfGame.state);
 	}
 	else if (stateOfGame.state == Gamestate::ID::SHOW_MENU)
 	{
-		menuScene.update(deltaTime, seconds);
-		processInput(window, deltaTime, menuScene);
-		renderManager[0].setDeltaTime(deltaTime);
-		renderManager[0].setSeconds(seconds);
-		renderManager[0].renderMainMenu();
+		gameScene->update(deltaTime, seconds);
+		processInput(window, deltaTime, *gameScene);
+		renderer->setDeltaTime(deltaTime);
+		renderer->setSeconds(seconds);
+		renderer->renderMainMenu();
 	}
 	else if (stateOfGame.state == Gamestate::ID::CLEAR_MENU)
 	{
-		clearScene(menuScene);
+		clearScene();
 		stateOfGame.state = Gamestate::ID::LOAD_LEVEL;
 	}
 }
@@ -218,33 +216,33 @@ void Game::levelState()
 	if (stateOfGame.state == Gamestate::ID::LOAD_LEVEL)
 	{
 		printCurrentState(stateOfGame.state);
-		initScene(gameScene);
-		renderManager[1].createBuffers();
+		initScene(Scene::ID::LEVEL_1);
+		renderer->createBuffers();
+		
 		renderManager[1].renderDepthQuadsForVisualization();
 		stateOfGame.state = Gamestate::ID::RUN_LEVEL;
 		printCurrentState(stateOfGame.state);
 	}
 	else if (stateOfGame.state == Gamestate::ID::RUN_LEVEL)
 	{
-		processInput(window, deltaTime, gameScene);
-		gameScene.update(deltaTime, seconds);
-		renderManager[1].setDeltaTime(deltaTime);
-		renderManager[1].setSeconds(seconds);
-		renderManager[1].Render();
+		processInput(window, deltaTime, *gameScene);
+		gameScene->update(deltaTime, seconds);
+		renderer->setDeltaTime(deltaTime);
+		renderer->setSeconds(seconds);
+		renderer->Render();
 	}
 	else if (stateOfGame.state == Gamestate::ID::CLEAR_LEVEL)
 	{
 		printCurrentState(stateOfGame.state);
-		clearScene(gameScene);
-		//stateOfGame = Gamestate::ID::LOAD_MENU;
+		clearScene();
+		clearScene();
 		stateOfGame.state = Gamestate::ID::LOAD_MENU;
 	}
 }
 
 void Game::exitState()
 {
-	clearScene(menuScene);
-	renderManager.clear();
+	clearScene();
 	glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
@@ -268,27 +266,35 @@ void Game::initWindow()
 	gl3wInit();
 }
 
-void Game::initScene(GameScene & scene)
+void Game::initScene(Scene::ID sceneID)
 {
 	// RenderManager probably needs a rework when loaded with scene. 
-	if(renderManager.size() < 2)
-		addRenderManager(scene); // return int and set a variable inside the gamescene and use that number when updating in states. 
+	gameScene = new GameScene(sceneID);
+	renderer = new RenderManager(gameScene, window, &shaderProgramLibrary);
 	//... Read OBJ and MTL File
 	if (!meshesLoaded)
 	{
 		//Load the meshes once and store them.
-		readMeshName(scene);
+		readMeshName(*gameScene);
 		meshesLoaded = true;
 	}
 	//...
-	scene.initScene(&meshLibrary, &materialLibrary, shaderProgramLibrary, scene.typeOfScene);
-
-
+	gameScene->initScene(&meshLibrary, &materialLibrary, shaderProgramLibrary, gameScene->typeOfScene);
 }
 
-void Game::clearScene(GameScene & scene)
+void Game::clearScene()
 {
-	scene.clearGameObjects();
+	if (gameScene != nullptr)
+	{
+		gameScene->clearGameObjects();
+		delete gameScene;
+		gameScene = nullptr;
+	}
+	if (renderer != nullptr)
+	{
+		delete renderer;
+		renderer = nullptr;
+	}
 	//renderManager.clear();
 	/* Add function to also clear the renderManager*/
 }
@@ -302,6 +308,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addVFXFireShaders();
 	shaderProgramLibrary.addVFXSnowShaders();
 	shaderProgramLibrary.addVFXFlareShaders();
+	shaderProgramLibrary.addVFXLighterShaders();
 	shaderProgramLibrary.addTerrainShaders();
 	shaderProgramLibrary.addMainMenuShaders();
 	shaderProgramLibrary.addRefractionShaders();
@@ -381,20 +388,17 @@ void Game::addMeshName()
 		"EquipedCanWarm.leap",			//51
 		"EquipedLighterWarm.leap",		//52
 		"EquipedWoodWarm.leap",			//53
-		"Rabbit.leap"					//54
+		"Rabbit.leap",					//54
+		"Cabin_rotate.leap",			//55
+		"BrokenTree_rotate.leap",		//56
+		"Balloon.leap",					//57
+		"MatchBox.leap"					//58
 	};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
 	{
 		meshName.push_back(meshLoader[i]);
 	}
-}
-
-void Game::addRenderManager(GameScene &scene)
-{
-	RenderManager tempRender = RenderManager(&scene, window, &shaderProgramLibrary);
-	renderManager.push_back(tempRender);
-	//renderManager[renderManager.size() - 1].createBuffers();
 }
 
 void Game::readMeshName(GameScene &scene)

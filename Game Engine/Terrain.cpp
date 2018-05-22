@@ -25,14 +25,12 @@ Terrain::~Terrain()
 		{
 			delete[] Heights[i];	
 		}
-	}
-	for (int i = 0; i < this->Length; i++)
-	{
 		if (Positions[i] != nullptr)
 		{
 			delete[] Positions[i];
 		}
 	}
+
 		
 	delete Positions;
 	delete Heights;
@@ -48,8 +46,6 @@ void Terrain::setupVertexData()
 
 	GLubyte pixels[4];// = (GLubyte*)malloc(this->HeightMap.width * this->HeightMap.height * sizeof(GLubyte) * 4);
 
-	glm::vec3 test;
-	float test2;
 
 	int heightTemp = (int)(HeightMap.height / Height);
 	int lengthTemp = (int)(HeightMap.width / Length);

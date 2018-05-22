@@ -11,7 +11,7 @@ uniform sampler2D particleTexture;
 uniform vec3 view_position;
 uniform vec3 particlePivot;
 
-void main(){
+void main() {
 	vec4 bbTexture = texture(particleTexture, uv).rgba;
 
 	float density = 0.02;
@@ -21,8 +21,8 @@ void main(){
 	visibility = clamp(visibility, 0.0, 1.0);
 
 	// Output color = color of the texture at the specified UV
-	color = vec4(bbTexture) * particleColor;
-	
+	color = mix(vec4(0.749, 0.843, 0.823, 0.009), vec4(bbTexture) * particleColor, visibility);
+
 	if (color.w < 0.02f)
 	{
 		discard;

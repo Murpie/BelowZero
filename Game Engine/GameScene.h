@@ -32,6 +32,7 @@ public:
 private:
 	int camerasInScene; //player 
 	int lightsInScene; 
+	int randomLevel;
 
 	void addAI(MeshLib& meshLibrary, MaterialLib& materialLibrary, LeapLevel level);
 	void addLight(glm::vec3 transform, int lightType);
@@ -43,6 +44,7 @@ private:
 	void checkInteractionResponse(GameObject & other, int objectID);
 
 	void interactionTest(GameObject & other, GLFWwindow * window); // Intersection test on mouse click
+	void lightCheck();
 	void collisionTest(GameObject & other, float deltaTime); // Collision test when two AABB overlap
 	void aiCollisionTest(GameObject & other);
 

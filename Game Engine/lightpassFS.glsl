@@ -37,11 +37,11 @@ float clipSpacePosZ;
 vec4 lightSpacePosition;
 
 vec3 drColor = vec3(0.9f, 1.0f, 0.84f) * daylight;
-vec3 drPosition = vec3(lights[0].Position);
+vec3 drPosition = vec3(1.0, 1.0, 0.0);
 
 vec3 getBlur()
 {
-	const float offset = 1.0 / 300.0;
+	const float offset = 1.0 / 50.0;
 
 	vec2 blurOffsets[9] = vec2[](
 		vec2(-offset, offset),
@@ -138,21 +138,21 @@ void main()
 
 	for (int i = 0; i < NR_LIGHTS; ++i)
 	{
-		//dir
-		if (lights[i].lightType == 0) {
-			// diffuse
-			vec3 lightDir = normalize(lights[i].Position - FragPos);
-			vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color;
-			//diffuse = Albedo;
-
-			vec3 halfwayDir = normalize(lightDir + viewDir);
-			float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-
-			// attenuation
-			float distance = length(lights[i].Position - FragPos);
-			float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
-			lighting += diffuse;
-		}
+		////dir
+		//if (lights[i].lightType == 0) {
+		//	// diffuse
+		//	vec3 lightDir = normalize(lights[i].Position - FragPos);
+		//	vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color;
+		//	//diffuse = Albedo;
+		//
+		//	vec3 halfwayDir = normalize(lightDir + viewDir);
+		//	float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
+		//
+		//	// attenuation
+		//	float distance = length(lights[i].Position - FragPos);
+		//	float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
+		//	lighting += diffuse;
+		//}
 
 		//point
 		if (lights[i].lightType == 1) {
