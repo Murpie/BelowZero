@@ -171,6 +171,9 @@
     <ClCompile Include="RefractionShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VFXLighterShaders.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
     <ClCompile Include="AI.cpp">
       <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
@@ -308,6 +311,9 @@
     <ClInclude Include="VFXFlareShaders.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="VFXLighterShaders.h">
+      <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
     <ClInclude Include="AI.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
@@ -380,6 +386,12 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="VFXFlareVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXLighterFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXLighterVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>

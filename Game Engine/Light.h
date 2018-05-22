@@ -18,9 +18,15 @@ public:
 	float Quadratic;
 	float offset;
 	float intensity;
+	bool isLighter;
+	bool isFlare;
 
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
+	glm::vec3 getPosition() {
+		return Transformable::transform.getLighterPosition();
+	}
+
 private:
 
 };

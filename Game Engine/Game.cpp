@@ -306,6 +306,7 @@ void Game::initShaderProgramLib()
 	shaderProgramLibrary.addVFXFireShaders();
 	shaderProgramLibrary.addVFXSnowShaders();
 	shaderProgramLibrary.addVFXFlareShaders();
+	shaderProgramLibrary.addVFXLighterShaders();
 	shaderProgramLibrary.addTerrainShaders();
 	shaderProgramLibrary.addMainMenuShaders();
 	shaderProgramLibrary.addRefractionShaders();
@@ -385,7 +386,11 @@ void Game::addMeshName()
 		"EquipedCanWarm.leap",			//51
 		"EquipedLighterWarm.leap",		//52
 		"EquipedWoodWarm.leap",			//53
-		"Rabbit.leap"					//54
+		"Rabbit.leap",					//54
+		"Cabin_rotate.leap",			//55
+		"BrokenTree_rotate.leap",		//56
+		"Balloon.leap",					//57
+		"MatchBox.leap"					//58
 	};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
