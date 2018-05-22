@@ -40,6 +40,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 
 RenderManager::~RenderManager()
 {
+	deleteData();
 }
 
 bool zoneTest(GameObject* player, GameObject* object)
