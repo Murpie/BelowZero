@@ -381,7 +381,8 @@ void Game::addMeshName()
 		"Rabbit.leap",					//54
 		"Cabin_rotate.leap",			//55
 		"BrokenTree_rotate.leap",		//56
-		"Balloon.leap"					//57
+		"Balloon.leap",					//57
+		"MatchBox.leap"					//58
 	};
 
 	for (int i = 0; i < sizeof(meshLoader) / sizeof(meshLoader[0]); i++)
