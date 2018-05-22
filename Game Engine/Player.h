@@ -5,6 +5,7 @@
 #include <GL/gl3w.h>
 #include "Transformable.h"
 #include "SoundMaster.h"
+#include <time.h>
 
 class Player : public Transformable
 {
@@ -22,6 +23,9 @@ public:
 	SoundMasterSFML Drink;
 	SoundMasterSFML FlareSound;
 	SoundMasterSFML HelicopterSound;
+	SoundMasterSFML wolf1;
+	SoundMasterSFML wolf2;
+	SoundMasterSFML wolf3;
 
 	Gamestate::StateOfGame stateOfGame;
 
@@ -104,6 +108,8 @@ public:
 	float oldYaw;
 	float pickUp;
 
+	void wolfHowl(float nightTimer);
+
 private:
 	bool isColliding = false;
 
@@ -176,4 +182,10 @@ private:
 	void equipItemMesh();
 	void findY();
 	void swingAxe(float deltaTime);
+
+
+	int howlNumber = 2;
+	float howlTime = 0.0;
+	float temphowlTime = 0.0;
+	bool howlReset = true;
 };

@@ -13,6 +13,7 @@
 #include "GameScene.h"
 #include "ShaderProgramLib.h"
 #include "TextureLib.h"
+
 #include <math.h>
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -44,6 +45,7 @@ public:
 
 	GameScene *gameScene;
 	Texture shatteredIce;
+	Texture damageTexture;
 	
 	void FindObjectsToRender();
 	void clearObjectsToRender();
@@ -85,6 +87,8 @@ private:
 	std::vector<GameObject*> gameObjectsToRender;
 	std::vector<Light*> lightsToRender;
 
+
+
 	glm::mat4x4 view_matrix;
 	glm::mat4x4 fpsView_matrix;
 	glm::mat4x4 projection_matrix;
@@ -97,13 +101,12 @@ private:
 
 	//Time constants
 	float deltaTime;
-	float seconds;
+	float seconds = 0.0f;
 	int count;
 	float daylight;
 	float time;
 	bool dayOrNight;
 	bool fireFlicker;
-
 	//Buffer Objects
 	unsigned int finalMainMenuFBO;
 	unsigned int quadVertexArrayObject;

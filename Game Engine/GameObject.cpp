@@ -43,6 +43,7 @@ void GameObject::update(float deltaTime, float seconds)
 		timeAlive += deltaTime;
 		if (timeAlive >= timeToBurn)
 		{
+			burning.stopSound();
 			isBurning = false;
 			if (fireComponent != nullptr)
 			{
@@ -201,6 +202,7 @@ void GameObject::setIsBurning(float timeToBurn)
 	this->timeToBurn = timeToBurn;
 	timeAlive = 0.0f;
 
+	
 	if (fireComponent == nullptr)
 	{
 		fireComponent = new Light(*transform);
@@ -211,6 +213,8 @@ void GameObject::setIsBurning(float timeToBurn)
 		fireComponent->offset = 6;
 		fireComponent->intensity = 0.9;
 	}
+	else
+		delete fireComponent;
 
 	isBurning = true;
 }

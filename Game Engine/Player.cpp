@@ -72,7 +72,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	addTextToScreen("EmptyImageTexture");
 
 	SnowCrunch.addSound("Snow.wav");
-	SnowCrunch.setVolume(50.0f);
+	SnowCrunch.setVolume(30.0f);
 
 	AmbientWind.addSound("Wind.wav");
 	AmbientWind.playSound();
@@ -85,11 +85,19 @@ Player::Player(Transform& transform) : Transformable(transform)
 	Swing.addSound("woosh.wav");
 	pickUpSnowSound.addSound("PickUpSnow.ogg");
 	HitWAxe.addSound("AxeHit.ogg");
+	HitWAxe.setVolume(50.0f);
 	Eat.addSound("Eating.ogg");
 	Drink.addSound("DrinkWater.wav");
 	FlareSound.addSound("FlareSound.ogg");
 	FlareSound.setVolume(100.0f);
 	HelicopterSound.addSound("HelicopterSound.wav");
+
+	wolf1.addSound("WolfHowl1.ogg");
+	wolf2.addSound("WolfHowl2.ogg");
+	wolf3.addSound("WolfHowl3.wav");
+	wolf1.setVolume(70.0f);
+	wolf2.setVolume(70.0f);
+	wolf3.setVolume(70.0f);
 }
 
 Player::~Player()
@@ -517,17 +525,17 @@ void Player::update(float deltaTime, float seconds)
 
 	if (win)
 	{
-		if (flareTimer >= 3.0f && !HelicopterSound.isPlaying())
+		if (flareTimer >= 4.0f && !HelicopterSound.isPlaying())
 		{
 
 			HelicopterSound.playSound();
 		}
 
-		if (flareTimer >= 3.0f && flareTimer <= 10.0)
+		if (flareTimer >= 4.0f && flareTimer <= 10.0)
 		{
 
-			float tempTimer = flareTimer - 3.0f;
-			float volume = glm::mix(0, 100, tempTimer / 3);
+			float tempTimer = flareTimer - 4.0f;
+			float volume = glm::mix(0, 100, tempTimer / 4);
 			HelicopterSound.setVolume(volume);
 		}
 
@@ -1063,6 +1071,36 @@ const int Player::getEquipedID()
 	return this->equipedID;
 }
 
+void Player::wolfHowl(float nightTimer)
+{
+	//srand(std::time(NULL));
+	float wolfTimer = nightTimer / 20;
+	if (nightTimer > 20)
+		wolfTimer = 1;
+	float vol = glm::mix(10, 70, wolfTimer);
+	wolf1.setVolume(vol);
+	wolf2.setVolume(vol);
+	wolf3.setVolume(vol);
+
+	float lasthowl = howlNumber;
+	while(lasthowl != howlNumber)
+		howlNumber = rand() & 3;
+
+
+	if (howlNumber == 0 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	{
+		wolf1.playSound();
+	}
+	else if (howlNumber == 1 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	{
+		wolf2.playSound();
+	}
+	else if (howlNumber == 2 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	{
+		wolf3.playSound();
+	}
+}
+
 void Player::equipItemMesh()
 {
 	switch (currentlyEquipedItem)
@@ -1171,3 +1209,5 @@ void Player::swingAxe(float deltaTime)
 		}
 	}
 }
+
+

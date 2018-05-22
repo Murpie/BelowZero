@@ -234,7 +234,7 @@ void Game::levelState()
 	{
 		printCurrentState(stateOfGame.state);
 		clearScene(gameScene);
-		//stateOfGame = Gamestate::ID::LOAD_MENU;
+		clearScene(menuScene);
 		stateOfGame.state = Gamestate::ID::LOAD_MENU;
 	}
 }
@@ -242,6 +242,7 @@ void Game::levelState()
 void Game::exitState()
 {
 	clearScene(menuScene);
+	clearScene(gameScene);
 	renderManager.clear();
 	glfwSetWindowShouldClose(window, GL_TRUE);
 }

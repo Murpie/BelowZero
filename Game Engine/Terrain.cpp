@@ -25,14 +25,12 @@ Terrain::~Terrain()
 		{
 			delete[] Heights[i];	
 		}
-	}
-	for (int i = 0; i < this->Length; i++)
-	{
 		if (Positions[i] != nullptr)
 		{
 			delete[] Positions[i];
 		}
 	}
+
 		
 	delete Positions;
 	delete Heights;

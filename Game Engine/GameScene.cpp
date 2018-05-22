@@ -14,12 +14,18 @@ GameScene::~GameScene()
 {
 	inZone.clear();
 	clearGameObjects();
+	
 }
 
 void GameScene::clearGameObjects()
 {
 	for (GameObject* gameObject_ptr : gameObjects)
+	{
+		
+
 		delete gameObject_ptr;
+		
+	}
 	gameObjects.clear();
 }
 

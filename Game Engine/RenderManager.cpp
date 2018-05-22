@@ -32,9 +32,11 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	oldYaw = 0;
 	//createBuffers();
 
+
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
 	//createMainMenuBuffer();
 	shatteredIce.CreateTextureData("iceNormal2.jpg");
+	damageTexture.CreateTextureData("damage1.png");
 }
 
 RenderManager::~RenderManager()
@@ -401,7 +403,6 @@ void RenderManager::deleteData()
 	{
 		delete flareParticleColorData;
 	}
-
 }
 
 void RenderManager::createMainMenuBuffer()
@@ -1250,6 +1251,9 @@ void RenderManager::Render() {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, PPFBO);
 	glBlitFramebuffer(0, 0, display_w, display_h, 0, 0, display_w, display_h, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
+	if (this->seconds > 2.0)
+		this->seconds = 0.0f;
+
 	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
 	glUseProgram(refractionShaderProgram);
 
@@ -1271,7 +1275,11 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, finalColorBuffer);
 
+	glUniform1i(glGetUniformLocation(refractionShaderProgram, "DamageTexture"), 4);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, damageTexture.gTexture);
 
+	glUniform1f(glGetUniformLocation(refractionShaderProgram, "healthSeconds"), this->seconds);
 	glUniform1f(glGetUniformLocation(refractionShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
 	glUniform1f(glGetUniformLocation(refractionShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
 	glUniform1f(glGetUniformLocation(refractionShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
@@ -1696,6 +1704,9 @@ void RenderManager::dayNightCycle()
 {
 	if (time > 120 && dayOrNight)
 	{
+		
+
+
 		daylight -= deltaTime * 0.02;
 		if (daylight < 0.1)
 		{
@@ -1717,6 +1728,8 @@ void RenderManager::dayNightCycle()
 	else
 	{
 		time += deltaTime;
+		if(!dayOrNight)
+			gameScene->gameObjects[0]->getPlayer()->wolfHowl(time);
 	}
 }
 
@@ -1769,5 +1782,6 @@ void RenderManager::setDeltaTime(float deltaTime)
 
 void RenderManager::setSeconds(float seconds)
 {
-	this->seconds = seconds;
+	float tempSec = seconds / 1000;
+	this->seconds += tempSec;
 }

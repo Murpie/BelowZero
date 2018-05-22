@@ -41,7 +41,7 @@ vec3 gridSamplingDisk[20] = vec3[]
 
 vec3 getBlur()
 {
-	const float offset = 1.0 / 300.0;
+	const float offset = 1.0 / 50.0;
 
 	vec2 blurOffsets[9] = vec2[](
 		vec2(-offset, offset),
