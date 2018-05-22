@@ -267,9 +267,9 @@ bool Player::checkInventory(std::string item)
 void Player::addTextToScreen(std::string item)
 {
 	if (item == "Text-ItemAlreadyEquipped")
-		textureTimer = 2.0;
+		textureTimer = 3.0;
 	else
-		textureTimer = 5.0;
+		textureTimer = 10.0;
 
 	std::string texturePNG = ".png";
 	std::string filePath = item + texturePNG;
@@ -923,6 +923,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 			this->currentlyEquipedItem = 1;
 			equipItemMesh();
 			addImageToInventory("InventoryLighterIcon", 1);
+			addTextToScreen("TipTextureLighter");
 			inInventory[1] = true;
 			isPressed = true;
 			swapItem = true;
@@ -978,7 +979,12 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		isAlive = false;
 		this->coldTick = 0.3;
 	}
-	if (id == ObjectType::ID::FlareGun)
+	else if (id == ObjectType::ID::FlareGunBox)
+	{
+		addTextToScreen("MissingFlareGunTexture");
+	}
+
+	else if (id == ObjectType::ID::FlareGun)
 	{
 		if (!FlareSound.isPlaying())
 		{
