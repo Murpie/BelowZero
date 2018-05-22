@@ -16,9 +16,11 @@ SoundMasterSFML::SoundMasterSFML(const std::string & filePath)
 SoundMasterSFML::~SoundMasterSFML()
 {
 	this->Sound->stop();
+
+	if(Buffer != nullptr)
 	delete this->Buffer;
+	if(Sound != nullptr)
 	delete this->Sound;
-	
 }
 
 void SoundMasterSFML::addSound(const std::string & filePath)
@@ -27,7 +29,7 @@ void SoundMasterSFML::addSound(const std::string & filePath)
 	if (!this->Buffer->loadFromFile(filePath))
 		std::cout << "Cant Load File" << std::endl;
 
-	this->Sound->setBuffer(*this->Buffer);
+	this->Sound->setBuffer(*Buffer);
 }
 
 bool SoundMasterSFML::isPlaying()

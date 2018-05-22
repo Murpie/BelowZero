@@ -17,6 +17,9 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->swing = false;
 	this->axeSwing = 0;
 	this->pickUpSnow = false;
+	this->warning = false;
+	this->textureTimer = 2;
+
 	this->hp = 80;
 	this->cold = 100;
 	this->coldMeter = 0;
@@ -72,7 +75,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	addTextToScreen("EmptyImageTexture");
 
 	SnowCrunch.addSound("Snow.wav");
-	SnowCrunch.setVolume(50.0f);
+	SnowCrunch.setVolume(30.0f);
 
 	AmbientWind.addSound("Wind.wav");
 	AmbientWind.playSound();
@@ -85,11 +88,19 @@ Player::Player(Transform& transform) : Transformable(transform)
 	Swing.addSound("woosh.wav");
 	pickUpSnowSound.addSound("PickUpSnow.ogg");
 	HitWAxe.addSound("AxeHit.ogg");
+	HitWAxe.setVolume(50.0f);
 	Eat.addSound("Eating.ogg");
 	Drink.addSound("DrinkWater.wav");
 	FlareSound.addSound("FlareSound.ogg");
 	FlareSound.setVolume(100.0f);
 	HelicopterSound.addSound("HelicopterSound.wav");
+
+	wolf1.addSound("WolfHowl1.ogg");
+	wolf2.addSound("WolfHowl2.ogg");
+	wolf3.addSound("WolfHowl3.wav");
+	wolf1.setVolume(70.0f);
+	wolf2.setVolume(70.0f);
+	wolf3.setVolume(70.0f);
 }
 
 Player::~Player()
@@ -205,7 +216,7 @@ void Player::addImageToInventory(std::string item, int inventorySlot)
 {
 	if (checkInventory(item) && item != "EmptyImage")
 	{
-		if (this->textTimer >= 1.0f || this->textOnScreen == false && currentlyEquipedItem != 1)
+		if (this->textTimer >= textureTimer || this->textOnScreen == false && currentlyEquipedItem != 1)
 		{
 			std::cout << "Item already exists in players inventory" << std::endl;
 			addTextToScreen("Text-ItemAlreadyEquipped");
@@ -263,6 +274,11 @@ bool Player::checkInventory(std::string item)
 
 void Player::addTextToScreen(std::string item)
 {
+	if (item == "Text-ItemAlreadyEquipped")
+		textureTimer = 3.0;
+	else
+		textureTimer = 10.0;
+
 	std::string texturePNG = ".png";
 	std::string filePath = item + texturePNG;
 	int width, height, nrOfChannels;
@@ -440,6 +456,8 @@ void Player::update(float deltaTime, float seconds)
 	//update velocity
 	//Transformable::transform.velocity = Transformable::transform.forward * deltaTime;
 	//...
+	textWarnings();
+
 	if (isColliding && lastPos.y < currentY)
 	{
 		Transformable::transform.position = lastPos;
@@ -517,24 +535,24 @@ void Player::update(float deltaTime, float seconds)
 
 	if (win)
 	{
-		if (flareTimer >= 3.0f && !HelicopterSound.isPlaying())
+		if (flareTimer >= 4.0f && !HelicopterSound.isPlaying())
 		{
 
 			HelicopterSound.playSound();
 		}
 
-		if (flareTimer >= 3.0f && flareTimer <= 10.0)
+		if (flareTimer >= 4.0f && flareTimer <= 10.0)
 		{
 
-			float tempTimer = flareTimer - 3.0f;
-			float volume = glm::mix(0, 100, tempTimer / 3);
+			float tempTimer = flareTimer - 4.0f;
+			float volume = glm::mix(0, 100, tempTimer / 4);
 			HelicopterSound.setVolume(volume);
 		}
 
 		if (flareTimer >= 10.0f)
 			stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
 	}
-	else if (fade >= 1.0f)
+	else if (fade >= 2.0f)
 	{
 		stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
 	}
@@ -547,7 +565,7 @@ void Player::update(float deltaTime, float seconds)
 	this->waterTimer += tempSeconds;
 
 	this->textTimer += tempSeconds;
-	if (this->textTimer >= 1.0f && this->textOnScreen == true)
+	if (this->textTimer >= textureTimer && this->textOnScreen == true)
 	{
 		addTextToScreen("EmptyImageTexture");
 	}
@@ -603,8 +621,11 @@ void Player::update(float deltaTime, float seconds)
 			this->startGame = false;
 	}
 
-	if (this->hp <= 0 && this->fade < 1)
+	if (this->hp <= 0 && this->fade < 2)
+	{
 		this->fade += deltaTime;
+		addTextToScreen("YouDiedTexture");
+	}
 
 	//Winning
 
@@ -687,14 +708,15 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	}
 	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 1)
 	{
-		equip("LighterIcon");
-		this->currentlyEquipedItem = 1;
-		equipItemMesh();
-		addImageToInventory("InventoryLighterIcon", 1);
-		inInventory[1] = true;
-		isPressed = true;
-		swapItem = true;
-		pullDown = true;
+		if (inInventory[1] == true)
+		{
+			equip("LighterIcon");
+			this->currentlyEquipedItem = 1;
+			equipItemMesh();
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+		}
 	}
 	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 2)
 	{
@@ -889,9 +911,31 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		{
 			equip("Axe");
 			this->currentlyEquipedItem = 0;
-			this->equipItem = 33;
+			equipItemMesh();
 			addImageToInventory("InventoryAxeIcon", 0);
+			addTextToScreen("TipTextureAxe");
 			inInventory[0] = true;
+			isPressed = true;
+			swapItem = true;
+			pullDown = true;
+			isAlive = false;
+		}
+		else
+		{
+			addTextToScreen("Text-ItemAlreadyEquipped");
+		}
+			
+	}
+	else if (id == ObjectType::ID::MatchBox)
+	{
+		if (inInventory[1] == false)
+		{
+			equip("LighterIcon");
+			this->currentlyEquipedItem = 1;
+			equipItemMesh();
+			addImageToInventory("InventoryLighterIcon", 1);
+			addTextToScreen("TipTextureLighter");
+			inInventory[1] = true;
 			isPressed = true;
 			swapItem = true;
 			pullDown = true;
@@ -907,8 +951,9 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 			this->foodTimer = 0.0f;
 			equip("FoodIcon");
 			this->currentlyEquipedItem = 3;
-			this->equipItem = 46;
+			equipItemMesh();
 			addImageToInventory("InventoryFoodIcon", 3);
+			addTextToScreen("TipTextureCan");
 			inInventory[3] = true;
 			isPressed = true;
 			swapItem = true;
@@ -924,8 +969,9 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		{
 			equip("BucketIcon");
 			this->currentlyEquipedItem = 4;
-			this->equipItem = 34;
+			equipItemMesh();
 			addImageToInventory("InventoryBucketIcon", 4);
+			addTextToScreen("TipTextureBucket");
 			inInventory[4] = true;
 			isPressed = true;
 			swapItem = true;
@@ -939,12 +985,18 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 	{
 		jacket = true;
 		equipItemMesh();
+		addTextToScreen("TipJacketTexture");
 		swapItem = true;
 		pullDown = true;
 		isAlive = false;
 		this->coldTick = 0.3;
 	}
-	if (id == ObjectType::ID::FlareGun)
+	else if (id == ObjectType::ID::FlareGunBox)
+	{
+		addTextToScreen("MissingFlareGunTexture");
+	}
+
+	else if (id == ObjectType::ID::FlareGun)
 	{
 		if (!FlareSound.isPlaying())
 		{
@@ -953,10 +1005,6 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 
 		this->win = true;
 		return 42;
-	}
-	else if (id == ObjectType::ID::Axe)
-	{
-		isAlive = false;
 	}
 	/*
 	if(id == fallenTree && axeIsEquiped)
@@ -985,9 +1033,10 @@ int Player::actionResponse(const ObjectType::ID id, bool & isAlive, int & counte
 				equip("WoodIcon");
 				this->currentlyEquipedItem = 2;
 				addImageToInventory("InventoryWoodIcon", 2);
+				addTextToScreen("TipTextureWood");
 				inInventory[2] = true;
 				this->currentlyEquipedItem = 2;
-				this->equipItem = 45;
+				equipItemMesh();
 				swapItem = true;
 				pullDown = true;
 				isAlive = false;
@@ -1057,72 +1106,113 @@ const int Player::getEquipedID()
 	return this->equipedID;
 }
 
+void Player::wolfHowl(float nightTimer)
+{
+	//srand(std::time(NULL));
+	float wolfTimer = nightTimer / 20;
+	if (nightTimer > 20)
+		wolfTimer = 1;
+	float vol = glm::mix(10, 50, wolfTimer);
+	wolf1.setVolume(vol);
+	wolf2.setVolume(vol);
+	wolf3.setVolume(vol);
+
+	float lasthowl = howlNumber;
+	while(lasthowl == howlNumber)
+		howlNumber = rand() & 3;
+
+
+	if (howlNumber == 0 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	{
+		wolf1.playSound();
+	}
+	else if (howlNumber == 1 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	{
+		wolf2.playSound();
+	}
+	else if (howlNumber == 2 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	{
+		wolf3.playSound();
+	}
+}
+
 void Player::equipItemMesh()
 {
 	switch (currentlyEquipedItem)
 	{
-	case 0:
-	{
-		if (jacket)
-			this->equipItem = 50;
-		else
-			this->equipItem = 33;
-		break;
-	}
-	case 1:
-	{
-		if (jacket)
-			this->equipItem = 52;
-		else
-			this->equipItem = 44;
-		break;
-	}
-	case 2:
-	{
-		if (jacket)
-			this->equipItem = 53;
-		else
-			this->equipItem = 45;
-		break;
-	}
-	case 3:
-	{
-		if (jacket)
-			this->equipItem = 51;
-		else
-			this->equipItem = 46;
-		break;
-	}
-	case 4:
-	{
-		if (jacket)
+		case 0:
 		{
-			if (bucketContent == 0)
-				this->equipItem = 47;
-			else if (bucketContent == 1)
+			if (jacket)
+				this->equipItem = 50;
+			else
+				this->equipItem = 33;
+			break;
+		}
+		case 1:
+		{
+			if (jacket)
+				this->equipItem = 52;
+			else
+				this->equipItem = 44;
+			break;
+		}
+		case 2:
+		{
+			if (jacket)
+				this->equipItem = 53;
+			else
+				this->equipItem = 45;
+			break;
+		}
+		case 3:
+		{
+			if (jacket)
+				this->equipItem = 51;
+			else
+				this->equipItem = 46;
+			break;
+		}
+		case 4:
+		{
+			if (jacket)
 			{
-				this->equipItem = 48;
-				pickUpSnow = false;
+				if (bucketContent == 0)
+					this->equipItem = 47;
+				else if (bucketContent == 1)
+				{
+					this->equipItem = 48;
+					pickUpSnow = false;
+				}
+				else
+					this->equipItem = 49;
 			}
 			else
-				this->equipItem = 49;
-		}
-		else
-		{
-			if (bucketContent == 0)
-				this->equipItem = 34;
-			else if (bucketContent == 1)
 			{
-				this->equipItem = 35;
-				pickUpSnow = false;
+				if (bucketContent == 0)
+					this->equipItem = 34;
+				else if (bucketContent == 1)
+				{
+					this->equipItem = 35;
+					pickUpSnow = false;
+				}
+				else
+					this->equipItem = 36;
 			}
-			else
-				this->equipItem = 36;
 		}
 	}
+}
+
+void Player::textWarnings()
+{
+	if (transform.position.y > 10 && !jacket && !warning)
+	{
+		addTextToScreen("ColdWarning");
+		warning = true;
 	}
-
-
+	else if (transform.position.y < 10 && warning)
+	{
+		warning = false;
+	}
 }
 
 void Player::findY()
@@ -1165,3 +1255,5 @@ void Player::swingAxe(float deltaTime)
 		}
 	}
 }
+
+
