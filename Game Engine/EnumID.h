@@ -109,6 +109,7 @@ namespace ObjectType
 		Rabbit						= 54,
 		Cabin_rotate				= 55,
 		BrokenTree_rotate			= 56,
-		Balloon						= 57
+		Balloon						= 57,
+		MatchBox					= 58
 	};
 }

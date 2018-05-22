@@ -51,6 +51,7 @@ public:
 
 	void Render();
 	void renderMainMenu();
+
 	void createBuffers();
 	void createMainMenuBuffer();
 	void createButtonQuads();
