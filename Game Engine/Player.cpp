@@ -544,7 +544,7 @@ void Player::update(float deltaTime, float seconds)
 		if (flareTimer >= 10.0f)
 			stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
 	}
-	else if (fade >= 1.0f)
+	else if (fade >= 2.0f)
 	{
 		stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
 	}
@@ -613,8 +613,11 @@ void Player::update(float deltaTime, float seconds)
 			this->startGame = false;
 	}
 
-	if (this->hp <= 0 && this->fade < 1)
+	if (this->hp <= 0 && this->fade < 2)
+	{
 		this->fade += deltaTime;
+		addTextToScreen("YouDiedTexture");
+	}
 
 	//Winning
 

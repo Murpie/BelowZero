@@ -63,7 +63,6 @@ void main()
 	{
 		color.xyz = texture(SceneTexture, texCoords).xyz * abs(texture(textTexture, texCoords).w - 1);
 		color.w = texture(SceneTexture, texCoords).w;
-
 	}
 	else
 	{
@@ -106,9 +105,15 @@ void main()
 		color.xyz += texture(textTexture, texCoords).xyz;
 
 	if (fade < 1 && fade > 0)
-		color.xyz = color.xyz + fade;
-	else if (fade >= 1)
+	{
+		if (texture(textTexture, texCoords).w < 0.01)
+			color.xyz = color.xyz + fade;
+	}
+
+	else if (fade >= 1 && texture(textTexture, texCoords).w < 0.01)
 		color.xyz = vec3(1.0, 1.0, 1.0);
+
+
 
 	if (flareTimer > 0)
 	{
