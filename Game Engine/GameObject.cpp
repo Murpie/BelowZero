@@ -218,10 +218,10 @@ void GameObject::setIsBurning(float timeToBurn)
 		fireComponent = new Light(*transform);
 		fireComponent->lightType = 1;
 		fireComponent->color = glm::vec4(0.9f, 0.2f, 0, 0.5f);
-		fireComponent->Linear = 25;
+		fireComponent->Linear = 10;
 		fireComponent->Quadratic = 0.15f;
-		fireComponent->offset = 6;
-		fireComponent->intensity = 0.9f;
+		fireComponent->offset = 2;
+		fireComponent->intensity = 0.6f;
 	}
 	isBurning = true;
 }
@@ -251,7 +251,7 @@ void GameObject::setLighterEquipped()
 		lighterComponent->Linear = 25;
 		lighterComponent->Quadratic = 0.15f;
 		lighterComponent->offset = 9;
-		lighterComponent->intensity = 0.5f;
+		lighterComponent->intensity = 0.3f;
 		lighterComponent->isLighter = true;
 	}
 }
