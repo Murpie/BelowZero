@@ -89,9 +89,9 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 no
 	vec3 projectionCoordinates = lightSpacePos.xyz; // / lightSpacePos.w;
 
 	vec2 UVCoords;
-	UVCoords.x = 0.5 * projectionCoordinates.x + 0.5;
-	UVCoords.y = 0.5 * projectionCoordinates.y + 0.5;
-	z = 0.5 * projectionCoordinates.z + 0.5;
+	UVCoords.x = projectionCoordinates.x * 0.5 + 0.5;
+	UVCoords.y = projectionCoordinates.y * 0.5 + 0.5;
+	z = projectionCoordinates.z * 0.5 + 0.5;
 	
 	if (cascadeIndex == 0)							// Check Which ShadowMap To Use
 		depth = texture(shadowMap0, UVCoords).x;
@@ -100,13 +100,11 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 no
 	if (cascadeIndex == 2)
 		depth = texture(shadowMap2, UVCoords).x;
 
-	if (z - bias > depth) // Determine If There Shall Be Shadow
-		shadow = 0.35f;
+	if (z + 0.0001f  > depth) // Determine If There Shall Be Shadow
+		shadow = 0.4f;
 	else
 		shadow = 0.0;
-	
-	if (depth > 1.0f) // If Shadow Is Outside of range 0-1 = No Shadow
-		shadow = 0.0f;
+
 
 	return shadow;
 }

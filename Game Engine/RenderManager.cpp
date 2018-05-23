@@ -38,11 +38,9 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//createMainMenuBuffer();
 
 	cascadePlaneEnds[0] = 0.1f;
-	cascadePlaneEnds[1] = 40.0f;
-	cascadePlaneEnds[2] = 80.0f;
-	cascadePlaneEnds[3] = 130.0f;
-
-	
+	cascadePlaneEnds[1] = 25.0f;
+	cascadePlaneEnds[2] = 70.0f;
+	cascadePlaneEnds[3] = 120.0f;
 
 	
 	shatteredIce.CreateTextureData("iceNormal2.jpg");
@@ -128,7 +126,7 @@ void RenderManager::createBuffers()
 	glGenTextures(3, shadowMaps);
 	for (int i = 0; i < 3; i++) {
 		glBindTexture(GL_TEXTURE_2D, shadowMaps[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, HIGH_SHADOW, HIGH_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, MEDIUM_SHADOW, MEDIUM_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
@@ -622,7 +620,7 @@ void RenderManager::Render() {
 			break;
 		}
 	}
-	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 150.0f);
+	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 320.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
 	//world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -647,7 +645,7 @@ void RenderManager::Render() {
 
 	glUseProgram(shadowMapShaderProgram);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-	glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
+	glViewport(0, 0, MEDIUM_SHADOW, MEDIUM_SHADOW);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
@@ -692,7 +690,7 @@ void RenderManager::Render() {
 			glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 		}
 
-		/*for (int i = 0; i < gameScene->gameObjects.size(); i++)
+		for (int i = 0; i < gameScene->gameObjects.size(); i++)
 		{
 			if (gameScene->gameObjects[i]->getTerrain() != nullptr)
 			{
@@ -703,7 +701,7 @@ void RenderManager::Render() {
 				glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
 				break;
 			}
-		}*/
+		}
 	}
 
 	glCullFace(GL_BACK);
@@ -1881,8 +1879,9 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 	tempView = glm::lookAt(gameScene->gameObjects[0]->transform->position, gameScene->gameObjects[0]->transform->forward, gameScene->gameObjects[0]->transform->up);
 	inverseViewMatrix = glm::inverse(tempView);
 	
-	shadowMapLightPosition = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y + 20.0f, gameScene->gameObjects[0]->transform->position.z);
+	shadowMapLightPosition = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y + 15.0f, gameScene->gameObjects[0]->transform->position.z);
 	shadowMapDirection = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y, gameScene->gameObjects[0]->transform->position.z);
+
 
 	lightView = glm::lookAt(
 		glm::vec3(shadowMapLightPosition), // Position, 8 units above PlayerPos
@@ -1903,8 +1902,6 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 		float yn = cascadePlaneEnds[i] * tanHalfWidthFOV;
 		float yf = cascadePlaneEnds[i + 1] * tanHalfWidthFOV;
 
-		
-
 		glm::vec4 frustrumCorners[8]
 		{
 			// Near Plane
@@ -1920,12 +1917,19 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 			glm::vec4(-xf, -yf, cascadePlaneEnds[i + 1], 1.0f)
 		};
 
-		float minX = std::numeric_limits<float>::max();
-		float maxX = std::numeric_limits<float>::min();
-		float minY = std::numeric_limits<float>::max();
-		float maxY = std::numeric_limits<float>::min();
-		float minZ = std::numeric_limits<float>::max();
-		float maxZ = std::numeric_limits<float>::min();
+		float minX = 200000.0;
+		float maxX = -200000.0;
+		float minY = 200000.0;
+		float maxY = -200000.0;
+		float minZ = 200000.0;
+		float maxZ = -200000.0;
+
+		//float minX = std::numeric_limits<float>::max();
+		//float maxX = std::numeric_limits<float>::min();
+		//float minY = std::numeric_limits<float>::max();
+		//float maxY = std::numeric_limits<float>::min();
+		//float minZ = std::numeric_limits<float>::max();
+		//float maxZ = std::numeric_limits<float>::min();
 
 		for (int j = 0; j < 8; j++)
 		{

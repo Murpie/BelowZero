@@ -71,7 +71,8 @@ void Terrain::setupVertexData()
 			tempY = glm::mix(MIN_HEIGHT, MAX_HEIGHT, tempY);
 			tempY -= offset;
 
-			temp.y = tempY;
+			//temp.y = tempY;
+			temp.y = 0.0;
 			temp.z = ((float)i * offset);
 
 			temp.r = 0.0f;
@@ -80,7 +81,8 @@ void Terrain::setupVertexData()
 
 			this->terrainVertices.push_back(temp);
 
-			Heights[i][j] = tempY;
+			//Heights[i][j] = tempY;
+			Heights[i][j] = 0.0;
 			Positions[i][j] = glm::vec3(temp.x, temp.y, temp.z);
 		}
 	}
