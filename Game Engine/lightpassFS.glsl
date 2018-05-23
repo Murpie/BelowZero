@@ -124,12 +124,17 @@ void main()
 		if (lights[i].lightType == 1) {
 			// diffuse
 			vec3 lightDir = normalize(lights[i].Position - FragPos);
-			vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Albedo * lights[i].Color;
+			float diffuse = max(dot(Normal, lightDir), 0.0);
 			// attenuation
 			float distance = length(lights[i].Position - FragPos);
-			float attenuation = 1.0 / ((distance * distance) / (lights[i].Linear * lights[i].Linear));
+			float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * (distance * distance));
+			//float attenuation = 1.0 / ((distance * distance) / (lights[i].Linear * lights[i].Linear));
 
-			lighting += (diffuse * attenuation) * lights[i].intensity;
+			vec3 diff = lights[i].Color * diffuse * Albedo;
+
+			diff *= attenuation;
+
+			lighting += diff * lights[i].intensity;
 		}
 	}
 	
