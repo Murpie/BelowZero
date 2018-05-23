@@ -111,6 +111,7 @@ namespace ObjectType
 		BrokenTree_rotate			= 56,
 		Balloon						= 57,
 		MatchBox					= 58,
-		Wooden_Step					= 59
+		Wooden_Step					= 59,
+		Backpack					= 60
 	};
 }

@@ -134,21 +134,21 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		switch (randomLevel)
 		{
 		case 0:
-			level = new LeapLevel("Lvl8.leap");
+			level = new LeapLevel("Lvl0.leap");
 			break;
 		case 1:
-			level = new LeapLevel("Lvl9.leap");
+			level = new LeapLevel("Lvl1.leap");
 			break;
 		case 2:
-			level = new LeapLevel("Lvl10.leap");
+			level = new LeapLevel("Lvl2.leap");
 			break;
 		case 3:
-			level = new LeapLevel("Lvl11.leap");
+			level = new LeapLevel("Lvl3.leap");
 			break;
 		default:
 			break;
 		}
-		//level = new LeapLevel("Lvl12.leap");
+		
 
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		//addAI(*meshLibrary, *matertialLibrary, *level);
@@ -165,7 +165,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		std::string heightMap = "test1234.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
 
-		LeapLevel* level = new LeapLevel("Lvl4.leap");
+		LeapLevel* level = new LeapLevel("Lvl0.leap");
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		delete level;
 	}
@@ -424,8 +424,10 @@ void GameScene::addLevelObjects(MeshLib & meshLibrary, MaterialLib& materialLibr
 				|| level->levelObjects[i]->id == ObjectType::ID::Cliffside_3
 				|| level->levelObjects[i]->id == ObjectType::ID::Cliffside_4)
 			{
-				meshObject->transform->position.y = -10;
+				meshObject->transform->position.y = -10.0f;
 			}
+			//if (level->levelObjects[i]->id == ObjectType::ID::Wooden_Step)
+			//	meshObject->transform->position.y = level->levelObjects[i]->y -8.0f;
 			else
 			{
 				float newPositionY = terrain->calculateY(meshObject->transform->position.x, meshObject->transform->position.z);
