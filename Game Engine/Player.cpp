@@ -636,8 +636,6 @@ void Player::update(float deltaTime, float seconds)
 	}
 
 	// Text Fade
-	if (this->textOnScreen == true)
-		this->textFade -= 0.05f;
 	//else if (this->textOnScreen == false)
 	//this->textFade = 1.0;
 

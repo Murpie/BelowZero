@@ -86,7 +86,7 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 no
 	float z;
 	vec3 lightDirForShadow = normalize(shadowMapLightPosition - FragPos);
 	float bias = max(0.05 * (1.0 - dot(normals, lightDirForShadow)), 0.005);
-	vec3 projectionCoordinates = lightSpacePos.xyz; // / lightSpacePos.w;
+	vec3 projectionCoordinates = lightSpacePos.xyz / lightSpacePos.w;
 
 	vec2 UVCoords;
 	UVCoords.x = projectionCoordinates.x * 0.5 + 0.5;

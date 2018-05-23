@@ -53,7 +53,6 @@ RenderManager::~RenderManager()
 
 	glDeleteBuffers(1, &UIFBO);
 	glDeleteBuffers(1, &UITexture);
-	glDeleteBuffers(1, &shadowMap);
 	glDeleteBuffers(1, &shadowFBO);
 	glDeleteBuffers(1, &animationVAO);
 	glDeleteBuffers(1, &animationVBO);
@@ -671,7 +670,7 @@ void RenderManager::Render() {
 			break;
 		}
 	}
-	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 320.0f);
+	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 150.0f);
 
 	glm::mat4 world_matrix = glm::mat4(1);
 	//world_matrix = glm::translate(world_matrix, glm::vec3(0.0f, 0.0f, 0.0f));
