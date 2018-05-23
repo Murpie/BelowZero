@@ -1108,32 +1108,18 @@ const int Player::getEquipedID()
 
 void Player::wolfHowl(float nightTimer)
 {
-	//srand(std::time(NULL));
 	float wolfTimer = nightTimer / 20;
-	if (nightTimer > 20)
-		wolfTimer = 1;
-	float vol = glm::mix(10.0f, 50.0f, wolfTimer);
-	wolf1.setVolume(vol);
-	wolf2.setVolume(vol);
-	wolf3.setVolume(vol);
-
-	int lasthowl = howlNumber;
-	while(lasthowl == howlNumber)
-		howlNumber = rand() & 3;
-
-
-	if (howlNumber == 0 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
-	{
+	if (nightTimer > 20 && nightTimer < 21 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
 		wolf1.playSound();
-	}
-	else if (howlNumber == 1 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
-	{
+	
+	if (nightTimer > 38 && nightTimer < 39 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
 		wolf2.playSound();
-	}
-	else if (howlNumber == 2 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
-	{
+
+	if (nightTimer > 80 && nightTimer < 81 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
 		wolf3.playSound();
-	}
+
+	if (nightTimer > 90 && nightTimer < 91 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+		wolf2.playSound();
 }
 
 void Player::equipItemMesh()
