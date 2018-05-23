@@ -38,6 +38,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//createMainMenuBuffer();
 	shatteredIce.CreateTextureData("iceNormal2.jpg");
 	damageTexture.CreateTextureData("damage1.png");
+	UiMeterTexture.CreateTextureData("UItest1.jpg");
 }
 
 RenderManager::~RenderManager()
@@ -634,15 +635,20 @@ void RenderManager::Render() {
 	glCullFace(GL_BACK);
 
 	glUseProgram(shadowMapShaderProgram);
-	setupMatrices(shadowMapShaderProgram, gameScene->gameObjects[2]->transform->position); //? what is gameObject[2] supposed to be?
+	setupMatrices(shadowMapShaderProgram, glm::vec3(1.0f, 1.0f, 0.0f)); //? what is gameObject[2] supposed to be?
 	glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
+	
 
 	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 	{
+		tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
+		//... Rotation
+		tempMatrix = glm::rotate(tempMatrix, glm::radians(gameObjectsToRender[i]->transform->rotation.y), gameObjectsToRender[i]->transform->up);
+		glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
+
 		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
@@ -650,6 +656,7 @@ void RenderManager::Render() {
 	{
 		if (gameScene->gameObjects[i]->getTerrain() != nullptr)
 		{
+			glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
 			gameScene->gameObjects[i]->getTerrain()->bindVertexArray();
 			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
 		}
@@ -1371,7 +1378,7 @@ void RenderManager::Render() {
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glUseProgram(lightpassShaderProgram);
-	setupMatrices(lightpassShaderProgram, gameScene->gameObjects[2]->transform->position);
+	setupMatrices(lightpassShaderProgram, glm::vec3(1.0f, 1.0f, 0.0f));
 
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
@@ -1538,6 +1545,10 @@ void RenderManager::Render() {
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "SceneTexture"), 8);
 	glActiveTexture(GL_TEXTURE8);
 	glBindTexture(GL_TEXTURE_2D, finalPPFBO);
+
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "emilFusk"), 9);
+	glActiveTexture(GL_TEXTURE9);
+	glBindTexture(GL_TEXTURE_2D, UiMeterTexture.gTexture);
 
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
@@ -1769,8 +1780,9 @@ void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
 {
 	glUseProgram(shaderToUse);
 
-	glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 45.0f);
-	glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	glm::mat4 lightProjection = glm::ortho(-10, 10, -10, 10, -10, 20);
+	lightProjection = projection_matrix;
+	glm::mat4 lightView = glm::lookAt(glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));

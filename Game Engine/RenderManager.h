@@ -47,6 +47,7 @@ public:
 	GameScene *gameScene;
 	Texture shatteredIce;
 	Texture damageTexture;
+	Texture UiMeterTexture;
 	
 	void FindObjectsToRender();
 	void clearObjectsToRender();
