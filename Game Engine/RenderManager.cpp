@@ -747,7 +747,7 @@ void RenderManager::Render() {
 			if (mixVar >= 50.0f)
 				mixVar = 50.0f;
 
-			float volume = glm::mix(60, 0, mixVar / 50);
+			float volume = glm::mix(60.0f, 0.0f, mixVar / 50.0f);
 			gameObject_ptr->burning.setVolume(volume);
 
 			if (!gameObject_ptr->burning.isPlaying())
@@ -1570,7 +1570,7 @@ void RenderManager::renderMainMenu()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, display_w, display_h);
-	glClearColor(0.749, 0.843, 0.823, 1.0f);
+	glClearColor(0.749f, 0.843f, 0.823f, 1.0f);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(mainMenuShaderProgram);
@@ -1955,17 +1955,17 @@ void RenderManager::dayNightCycle()
 		
 
 
-		daylight -= deltaTime * 0.02;
-		if (daylight < 0.1)
+		daylight -= deltaTime * 0.02f;
+		if (daylight < 0.1f)
 		{
-			daylight = 0.1;
+			daylight = 0.1f;
 			dayOrNight = false;
 			time = 0;
 		}
 	}
 	else if (time > 120 && !dayOrNight)
 	{
-		daylight += deltaTime * 0.02;
+		daylight += deltaTime * 0.02f;
 		if (daylight > 1)
 		{
 			daylight = 1;
@@ -1983,7 +1983,8 @@ void RenderManager::dayNightCycle()
 
 void RenderManager::ParticleLinearSort(Particle* arr, int size)
 {
-	int a, b, key;
+	int a, b;
+	float key;
 	for (a = 0; a < size; a++)
 	{
 		key = arr[a].life;
