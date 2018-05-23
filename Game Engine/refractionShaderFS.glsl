@@ -10,9 +10,11 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D iceNormal;
 uniform sampler2D SceneTexture;
+uniform sampler2D DamageTexture;
 
 uniform mat4 vMatrix;
 
+uniform float healthSeconds;
 uniform float hp;
 uniform float cold;
 uniform float water;
@@ -38,6 +40,8 @@ void main()
 	float Cold = cold;
 	float Hunger = food;
 	float Thirst = water;
+	float Health = hp;
+
 
 	vec2 texCoords = vec2((gl_FragCoord.x / ScreenX), (gl_FragCoord.y / ScreenY));
 
@@ -80,43 +84,86 @@ void main()
 	bump = vec4(vMatrix * vec4(-bump, 1.0)).xyz;;
 	vec3 itsADir = cornerPos - FragPos;
 
-	vec3 Refract = normalize(refract(itsADir, -bumpTex, 1.35));
+	vec3 Refract = normalize(refract(itsADir, -ice, 1.35));
 	vec3 Reflect = normalize(reflect(itsADir, -bumpTex));
 	vec3 testAlbedo1 = texture(SceneTexture, Refract.xy).rgb;
 	vec3 testAlbedo2 = texture(SceneTexture, Reflect.xy).rgb;
 
 	vec3 testAlbedo = (testAlbedo2 * testAlbedo1);
 	vec3 Mix = mix(testAlbedo, Albedo, 0.7);
-	Mix *= vec3(0.33, 0.9, 1.0);
-
-	vec3 itsagoodashow = texture(SceneTexture, newUV).rgb;
-
+	//Mix *= vec3(0.33, 0.9, 1.0);
 
 	float coldVariable = 1.0;
 	if (Cold <= 50)
 	{
-		coldVariable = Cold / 100;
+		coldVariable = (Cold -25) / 25;
 	}
+	if (Cold <= 25)
+		coldVariable = 0;
 
 	float hungerVariable = 1.0;
 	if (Hunger <= 50)
 	{
-		hungerVariable = Hunger / 100;
+		hungerVariable = (Hunger - 25) / 25;
 	}
-
-	
-
+	if (Hunger <= 25)
+		hungerVariable = 0;
+   //
+	//if (gl_FragCoord.x > ScreenX * 0.8)
+	//	coldTexture = mix(Mix2, Albedo, coldVariable);
+	//else if (gl_FragCoord.y > ScreenY * 0.7)
+	//	coldTexture = mix(Mix2, Albedo, coldVariable);
+	//else if (gl_FragCoord.x < ScreenX * 0.2)
+	//	coldTexture = mix(Mix2, Albedo, coldVariable);
+	//else if (gl_FragCoord.y < ScreenY * 0.3)
+	//	coldTexture = mix(Mix2, Albedo, coldVariable);
+   //
 	vec3 coldTexture = mix(Mix, Albedo, coldVariable);
 
 	float grayScale = dot(coldTexture, vec3(0.299, 0.587, 0.114));
-	vec3 grayScaleTexture = vec3(grayScale);
+	vec3 grayScaleTexture = vec3(grayScale, grayScale, grayScale);
 
 	grayScaleTexture = mix(grayScaleTexture, coldTexture, hungerVariable);
 
 
+	float healthVariable = 1.0;
+	if (Health <= 30)
+	{
+		healthVariable = (Health) / 30;
+
+
+	}
+	
+	vec4 healthColor = texture(DamageTexture, texCoords).rgba;
+
+	vec3 mixHealth = mix(healthColor.xyz, grayScaleTexture, healthVariable);
+
+	if (healthSeconds < 1.0f)
+	{
+		float healthVar = 1.0;
+		healthVar = (healthSeconds) / 1.0;
+
+		mixHealth = mix(grayScaleTexture, mixHealth, healthVar);
+	}
+	else if (healthSeconds >= 1.0f)
+	{
+		float healthVar = 1.0;
+		healthVar = (healthSeconds-1) / 1.0;
+
+		mixHealth = mix(mixHealth, grayScaleTexture, healthVar);
+	}
+
+
+
+	//healthColor = Albedo + healthColor;
+	if (healthColor.r < 0.1 && healthColor.g < 0.1 && healthColor.b < 0.1)
+		FragColor = grayScaleTexture;
+	else
+		FragColor = mixHealth.xyz;
+
 
 	//vec3 finalTexture = mix(blurTexture, grayScaleTexture, thirstVariable);
 
-	FragColor = grayScaleTexture;
+
 
 }

@@ -10,6 +10,7 @@ GameObject::GameObject()
 	isInteractable = false;
 	isBurning = false;
 	gameEnd = false;
+	lighterEquipped = false;
 	this->moveBelowTerrain = false;
 	timeLimit = 0.f;
 	timeAlive = 0.0f;
@@ -17,6 +18,9 @@ GameObject::GameObject()
 	modelMatrix = glm::mat4();
 	objectID = ObjectType::ID::Stone_1;
 	fireComponent = nullptr;
+	lighterComponent = nullptr;
+	flareComponent = nullptr;
+	playerHitCounter = 0;
 }
 
 GameObject::~GameObject()
@@ -33,6 +37,14 @@ GameObject::~GameObject()
 	{
 		delete fireComponent;
 	}
+	if (lighterComponent != nullptr)
+	{
+		delete lighterComponent;
+	}
+	if (flareComponent != nullptr)
+	{
+		delete flareComponent;
+	}
 }
 
 void GameObject::update(float deltaTime, float seconds)
@@ -42,6 +54,7 @@ void GameObject::update(float deltaTime, float seconds)
 		timeAlive += deltaTime;
 		if (timeAlive >= timeToBurn)
 		{
+			burning.stopSound();
 			isBurning = false;
 			if (fireComponent != nullptr)
 			{
@@ -50,6 +63,7 @@ void GameObject::update(float deltaTime, float seconds)
 			}
 		}
 	}
+
 	if (moveBelowTerrain)
 		moveDown(deltaTime);
 
@@ -199,29 +213,83 @@ void GameObject::setIsBurning(float timeToBurn)
 {
 	this->timeToBurn = timeToBurn;
 	timeAlive = 0.0f;
-
 	if (fireComponent == nullptr)
 	{
 		fireComponent = new Light(*transform);
 		fireComponent->lightType = 1;
-		fireComponent->color = glm::vec4(0.9, 0.2, 0, .5);
+		fireComponent->color = glm::vec4(0.9f, 0.2f, 0, 0.5f);
 		fireComponent->Linear = 25;
-		fireComponent->Quadratic = 0.15;
-		fireComponent->offset = 9;
-		fireComponent->intensity = 0.9;
+		fireComponent->Quadratic = 0.15f;
+		fireComponent->offset = 6;
+		fireComponent->intensity = 0.9f;
 	}
-
 	isBurning = true;
 }
 
 void GameObject::setGameEnd()
 {
+	if (flareComponent == nullptr)
+	{
+		flareComponent = new Light(*transform);
+		flareComponent->lightType = 1;
+		flareComponent->color = glm::vec4(0.9f, 0, 0, 0.5f);
+		flareComponent->Linear = 50;
+		flareComponent->Quadratic = 0.3f;
+		flareComponent->offset = 9;
+		flareComponent->intensity = 2.0f;
+	}
 	gameEnd = true;
+}
+
+void GameObject::setLighterEquipped()
+{
+	if (lighterComponent == nullptr)
+	{
+		lighterComponent = new Light(*transform);
+		lighterComponent->lightType = 1;
+		lighterComponent->color = glm::vec4(0.9f, 0.2f, 0, 0.5f);
+		lighterComponent->Linear = 25;
+		lighterComponent->Quadratic = 0.15f;
+		lighterComponent->offset = 9;
+		lighterComponent->intensity = 0.5f;
+		lighterComponent->isLighter = true;
+	}
 }
 
 const bool GameObject::getIsBurning()
 {
 	return this->isBurning;
+}
+
+void GameObject::resetLighterEquipped()
+{
+	if (!lighterEquipped)
+	{
+		if (lighterComponent != nullptr)
+		{
+			delete lighterComponent;
+			lighterComponent = nullptr;
+		}
+	}
+}
+
+void GameObject::resetFlareLight()
+{
+	if (!gameEnd)
+	{
+		if (flareComponent != nullptr)
+		{
+			delete flareComponent;
+			flareComponent = nullptr;
+		}
+	}
+}
+
+int GameObject::getEquippedItem()
+{
+	Player* tempPlayer = getPlayer();
+	
+	return tempPlayer->currentlyEquipedItem;
 }
 
 Player * GameObject::getPlayer()
@@ -234,6 +302,7 @@ Player * GameObject::getPlayer()
 			return player;
 		}
 	}
+	return false;
 }
 
 MainMenuScene * GameObject::getMenuScene()
@@ -244,6 +313,19 @@ MainMenuScene * GameObject::getMenuScene()
 		{
 			MainMenuScene* mainMenu = static_cast<MainMenuScene*>(component_ptr);
 			return mainMenu;
+		}
+	}
+	return nullptr;
+}
+
+AI * GameObject::getAI()
+{
+	for (Component* component_ptr : components)
+	{
+		if (component_ptr->id == ComponentType::ID::AI)
+		{
+			AI* ai = static_cast<AI*>(component_ptr);
+			return ai;
 		}
 	}
 	return nullptr;
@@ -281,4 +363,5 @@ Terrain * GameObject::getTerrain()
 			return terrain;
 		}
 	}
+	return false;
 }

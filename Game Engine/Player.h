@@ -5,6 +5,7 @@
 #include <GL/gl3w.h>
 #include "Transformable.h"
 #include "SoundMaster.h"
+#include <time.h>
 
 class Player : public Transformable
 {
@@ -13,9 +14,20 @@ public:
 	~Player();
 
 	SoundMasterSFML SnowCrunch;
-	SoundMasterSFML AmbientMusic;
 	SoundMasterSFML AmbientWind;
+	SoundMasterSFML HeavySnow;
 	SoundMasterSFML Swing;
+	SoundMasterSFML pickUpSnowSound;
+	SoundMasterSFML HitWAxe;
+	SoundMasterSFML Eat;
+	SoundMasterSFML Drink;
+	SoundMasterSFML FlareSound;
+	SoundMasterSFML HelicopterSound;
+	SoundMasterSFML wolf1;
+	SoundMasterSFML wolf2;
+	SoundMasterSFML wolf3;
+
+	Gamestate::StateOfGame stateOfGame;
 
 	bool click;
 
@@ -39,8 +51,9 @@ public:
 
 	bool startGame;
 	bool textOnScreen;
+	bool inInventory[5];
 	bool win;
-	
+
 	int currentlyEquipedItem;
 	int initializer;
 	int textInitializer;
@@ -48,7 +61,7 @@ public:
 	int maxAmountOfItems;
 	int inventoryCount;
 
-	std::string imageNames[5] = { "InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "MainMenuConcept" };
+	std::string imageNames[5] = { "InventoryAxeIcon", "InventoryLighterIcon", "InventoryLogIcon", "InventoryFoodIcon", "InventoryBucketIconTexture" };
 	std::string imagesCurrentlyInInventory[5] = { "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage", "EmptyImage" };
 
 	unsigned int equipedFBO;
@@ -69,18 +82,24 @@ public:
 	bool checkInventory(std::string item);
 	void addTextToScreen(std::string item);
 	void swappingItem(float deltaTime);
+	void dropItem();
+	void useItem(GLFWwindow * window);
 
 	void recieveTerrainInformation(float currentHeight, float frontV, float backV, float leftV, float rightV, float distance, int nrof);
 	void setCurrentHeight(float height);
+	void setIsWalkable(bool walkable);
 	glm::vec2 setXZ();
 	//Physics
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
 
 	//glm::mat4 getViewMatrix()const;
+	void swingTest();
+	void eatFood();
 	int interactionResponse(const ObjectType::ID id, bool & isAlive);
+	int actionResponse(const ObjectType::ID id, bool & isAlive, int & counter);
 	int collisionResponse(const ObjectType::ID);
-	void heatResponse();
+	void heatResponse(float deltaTime);
 	void takeDamange(float damage, float deltaTime);
 	int getEquipedItem();
 	const int getEquipedID();
@@ -90,17 +109,19 @@ public:
 	float oldYaw;
 	float pickUp;
 
+	void wolfHowl(float nightTimer);
+
 private:
-	float previousY;
-	bool isColliding;
+	bool isColliding = false;
+
+	float foodTimer = 0.0f;
+	float waterTimer = 0.0f;
 
 	bool movingForward = false;
 	bool movingBackwards = false;
 	bool movingLeft = false;
 	bool movingRight = false;
-	bool backCollision = false;
-	bool topCollision = false;
-	bool inInventory[5];
+
 	bool isPressed;
 
 	glm::vec3 cameraPos;
@@ -114,6 +135,13 @@ private:
 	bool swapItem;
 	bool pullDown;
 	int equipItem;
+	bool jacket;
+	int bucketContent;
+	bool swing;
+	int axeSwing;
+	bool pickUpSnow;
+	bool warning;
+	float textureTimer;
 
 	bool firstMouse;
 	float lastX, lastY;
@@ -125,23 +153,25 @@ private:
 	float pitch;
 	float yaw;
 
-	float time = 0.0;
-	float textTimer = 0.0;
+	float time = 0.0f;
+	float textTimer = 0.0f;
+	float meltTimer = 0.0f;
 
-	float jumpSpeed = 7.64;
-	float cameraSpeed = 7.06;
-	float fallSpeed = 9.82;
+	float jumpSpeed = 7.64f;
+	float cameraSpeed = 7.06f;
+	float fallSpeed = 9.82f;
 	//--------=====Jumping=====-----------
 
 	bool jumpReady = true;
 	bool inAir = false;
-	float timeInAir = 0.3;
+	float timeInAir = 0.3f;
 	bool gravity = false;
 
 	//------=====Walking=====----
 	bool isWalking = false;
 
 	//Terrain
+	float previousY;
 	float currentY;
 	float frontVertexHeight;
 	float backVertexHeight;
@@ -151,5 +181,14 @@ private:
 
 	int vertexLength;
 
+	void equipItemMesh();
+	void textWarnings();
 	void findY();
+	void swingAxe(float deltaTime);
+
+
+	int howlNumber = 2;
+	float howlTime = 0.0f;
+	float temphowlTime = 0.0f;
+	bool howlReset = true;
 };

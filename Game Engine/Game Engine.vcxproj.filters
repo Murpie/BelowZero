@@ -162,14 +162,20 @@
     <ClCompile Include="MainMenuScene.cpp">
       <Filter>Source Files\GameObject &amp; Components</Filter>
     </ClCompile>
-    <ClCompile Include="SoundMaster.cpp">
-      <Filter>Source Files\Data Types</Filter>
-    </ClCompile>
     <ClCompile Include="VFXFlareShaders.cpp">
       <Filter>Source Files\Shaders</Filter>
     </ClCompile>
     <ClCompile Include="RefractionShader.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VFXLighterShaders.cpp">
+      <Filter>Source Files\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="AI.cpp">
+      <Filter>Source Files\GameObject &amp; Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundMaster.cpp">
+      <Filter>Source Files\Data Types</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -296,14 +302,23 @@
     <ClInclude Include="MainMenuScene.h">
       <Filter>Header Files\GameObject &amp; Components</Filter>
     </ClInclude>
-    <ClInclude Include="SoundMaster.h">
-      <Filter>Header Files\Data Types</Filter>
-    </ClInclude>
     <ClInclude Include="RefractionShader.h">
       <Filter>Header Files\Shaders</Filter>
     </ClInclude>
     <ClInclude Include="VFXFlareShaders.h">
       <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="VFXLighterShaders.h">
+      <Filter>Header Files\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="AI.h">
+      <Filter>Header Files\GameObject &amp; Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundMaster.h">
+      <Filter>Header Files\Data Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -374,6 +389,12 @@
       <Filter>Header Files\GLSL</Filter>
     </None>
     <None Include="VFXFlareVS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXLighterFS.glsl">
+      <Filter>Header Files\GLSL</Filter>
+    </None>
+    <None Include="VFXLighterVS.glsl">
       <Filter>Header Files\GLSL</Filter>
     </None>
   </ItemGroup>

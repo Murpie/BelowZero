@@ -28,7 +28,7 @@ uniform int ScreenY;
 uniform float water;
 
 vec3 drColor = vec3(0.9f, 1.0f, 0.84f) * daylight;
-vec3 drPosition = vec3(lights[0].Position);
+vec3 drPosition = vec3(1.0, 1.0, 0.0);
 
 vec3 gridSamplingDisk[20] = vec3[]
 (
@@ -41,7 +41,7 @@ vec3 gridSamplingDisk[20] = vec3[]
 
 vec3 getBlur()
 {
-	const float offset =10.0 / 300.0;
+	const float offset = 1.0 / 50.0;
 
 	vec2 blurOffsets[9] = vec2[](
 		vec2(-offset, offset),
@@ -76,7 +76,7 @@ vec3 getBlur()
 // ----------========== DIRECTIONAL LIGHT SHADOW CALCULATION ==========----------
 float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 {
-	vec3 lightDirForShadow = normalize(vec3(lightPos) - FragPos);
+	vec3 lightDirForShadow = normalize(normalize(vec3(lightPos)) - normalize(FragPos));
 	vec4 shadowCoordinates = LightSpaceMatrix * vec4(FragPos, 1.0);
 	vec3 projectionCoordinates = shadowCoordinates.xyz / shadowCoordinates.w;
 	projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
@@ -116,61 +116,64 @@ void main()
 	float thirstVariable = 1.0;
 	if (Thirst <= 50)
 	{
-		thirstVariable = Thirst / 100;
+		thirstVariable = Thirst / 50;
 	}
 	Albedo = mix(getBlur(), Albedo, thirstVariable);
 
-
+	vec3 testLighting = Albedo;
 
 
 	// then calculate lighting as usual
-	vec3 lighting = vec3(0.0, 0.0, 0.0);
+	float epsilon = 0.001;
+	vec3 ambientStrength = Albedo * 0.3;
+	vec3 lighting = ambientStrength;
+
 	vec3 viewDir = normalize(view_position - FragPos);
 
 	float shadowFactor = 0.0f;
 
 	for (int i = 0; i < NR_LIGHTS; ++i)
 	{
-		//dir
-		if (lights[i].lightType == 0) {
-			// diffuse
-			vec3 lightDir = normalize(lights[i].Position - FragPos);
-			vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * lights[i].Color;
-			//diffuse = Albedo;
-
-			vec3 halfwayDir = normalize(lightDir + viewDir);
-			float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-
-			// attenuation
-			float distance = length(lights[i].Position - FragPos);
-			float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
-			lighting += diffuse;
-		}
-
 		//point
 		if (lights[i].lightType == 1) {
 			// diffuse
-			vec3 lightDir = normalize(lights[i].Position - FragPos);
-			vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Albedo * lights[i].Color;
+
+			
+
+			vec3 lightDir = (lights[i].Position - FragPos);
+			//float diffuseFactor = max(dot(lightDir, Normal), 0.0);
+			float diffuseFactor = dot(normalize(lightDir), normalize(Normal));
+			diffuseFactor = max(diffuseFactor, 0);
+			vec3 diffuse = diffuseFactor * Albedo;
+
+
+
 			// attenuation
 			float distance = length(lights[i].Position - FragPos);
-			float attenuation = 1.0 / ((distance * distance) / (lights[i].Linear * lights[i].Linear));
+			float attenuation = 1.0 / (distance / lights[i].Linear);
 			//diffuse *= attenuation;
 
-			lighting += (diffuse * attenuation) * lights[i].intensity;
+			lighting += diffuse * attenuation * lights[i].intensity * lights[i].Color;
+			//lighting += AmbientL * diffuse *  attenuation * lights[i].intensity;
+			//vec3 C = lights[i].Color * Albedo * diffuseFactor * lights[i].intensity * (1 / length(lightDir));
+			//lighting += C;
+
+			
+			testLighting = lighting;
 		}
 	}
 
 	//Test Directional Light
 	vec3 lightDir = normalize(drPosition - vec3(0.0, 0.0, 0.0));
-	vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * drColor;
+	vec3 diffuse = max(dot(Normal, lightDir), 0.5) * Albedo * drColor;
 
 	vec3 halfwayDir = normalize(lightDir + viewDir);
 	float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
 	// attenuation
 	float distance = length(drPosition - vec3(0.0, 0.0, 0.0));
-	float attenuation = 1.0;
+
 	lighting += diffuse;
+	lighting = min(lighting, vec3(1.0f));
 
 	float density = 0.02;
 	float gradient = 3.0;
@@ -178,13 +181,14 @@ void main()
 	float visibility = exp(-pow((distanceToPos * density), gradient));
 	visibility = clamp(visibility, 0.0, 1.0);
 
-	if (lights[1].lightType == 0)
-		shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal, lights[1].Position);
+	//shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal, vec3(1.0f, 1.0f, 0.0f));
 
 
+	//vec3 depthColor = vec3(texture(depthMap, TexCoords).r);
 
-
-	FragColor = lighting * (1.0f - shadowFactor);
-	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, FragColor / 1.5, visibility);
+	//FragColor = lighting * (1.0f - shadowFactor);
+	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, lighting, visibility);
+	//FragColor = lighting;
 	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
+	//FragColor = testLighting;
 }

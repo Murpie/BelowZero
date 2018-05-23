@@ -14,6 +14,7 @@
 #include "VFXFireShaders.h"
 #include "VFXSnowShaders.h"
 #include "VFXFlareShaders.h"
+#include "VFXLighterShaders.h"
 #include "RefractionShader.h"
 
 class ShaderProgramLib
@@ -30,6 +31,7 @@ public:
 	void addVFXFireShaders();
 	void addVFXSnowShaders();
 	void addVFXFlareShaders();
+	void addVFXLighterShaders();
 	void addTerrainShaders();
 	void addMainMenuShaders();
 	void addRefractionShaders();

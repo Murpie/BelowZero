@@ -11,11 +11,18 @@
 #include "glm/glm/glm.hpp"
 #include "Player.h"
 #include "Terrain.h"
+#include "AI.h"
 #include "MainMenuScene.h"
+#include "SoundMaster.h"
 
 #include "Ray.h"
 #include "Intersection.h"
 #include <list>
+
+struct Zone
+{
+	glm::ivec2 zoneXY = glm::ivec2(-1, -1);
+};
 
 class Component;
 
@@ -25,6 +32,9 @@ public:
 	GameObject();
 	~GameObject();
 
+	SoundMasterSFML burning;
+	Zone zone;
+
 	void update(float deltaTime, float seconds);
 	void processEvents(GLFWwindow *window, float deltaTime);
 
@@ -32,8 +42,12 @@ public:
     bool hasLight;
 	bool isInteractable;
 	bool gameEnd;
+	bool lighterEquipped;
 	bool moveBelowTerrain;
 	float timeAlive;
+	
+	int playerHitCounter; //used to count how many hits the object has taken from player
+	
 	ObjectType::ID objectID;
 	std::string name;
 	Transform *transform;
@@ -45,6 +59,8 @@ public:
     MeshFilter *meshFilterComponent; 
 	Light *lightComponent;
 	Light *fireComponent;
+	Light* lighterComponent;
+	Light* flareComponent;
 
     void updateMaterialAndMeshFilterPointers();
     void updateHasLight();
@@ -58,15 +74,20 @@ public:
 	void setIsRenderable(bool isRenderable);
 	void setIsBurning(float timeToBurn);
 	void setGameEnd();
+	void setLighterEquipped();
 
+	bool hasSoundAttatched = false;
 	const bool getIsBurning();
-	const bool getGameEnd();
+	void resetLighterEquipped();
+	void resetFlareLight();
+	int getEquippedItem();
 	
 	Player* getPlayer();
 	glm::mat4 getModelMatrix();
 	glm::mat4 getViewMatrix();
 	Terrain* getTerrain();
 	MainMenuScene* getMenuScene();
+	AI* getAI();
 
 	template <class T>
 	T* getComponent() {

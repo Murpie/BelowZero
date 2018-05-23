@@ -110,7 +110,7 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)glfw\include;$(SolutionDir)glm;$(SolutionDir)Game Engine\LeapImporter\LeapImporter;%(AdditionalIncludeDirectories);SFML-2.4.2\include;$(SolutionDir)Externals\SFML 64-bit\include</AdditionalIncludeDirectories>
@@ -162,6 +162,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AI.cpp" />
     <ClCompile Include="AnimationShaders.cpp" />
     <ClCompile Include="Attributes.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -203,14 +204,17 @@
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="VFXFireShaders.cpp" />
     <ClCompile Include="VFXFlareShaders.cpp" />
+    <ClCompile Include="VFXLighterShaders.cpp" />
     <ClCompile Include="VFXSnowShaders.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Desktop\Game Engine - 2.0\Game Engine\GeometryShaders.h" />
+    <ClInclude Include="AI.h" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimationShaders.h" />
     <ClInclude Include="Attributes.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="EnumID.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
@@ -251,6 +255,7 @@
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VFXFireShaders.h" />
     <ClInclude Include="VFXFlareShaders.h" />
+    <ClInclude Include="VFXLighterShaders.h" />
     <ClInclude Include="VFXSnowShaders.h" />
   </ItemGroup>
   <ItemGroup>
@@ -275,6 +280,8 @@
     <None Include="VFXFireVS.glsl" />
     <None Include="VFXFlareFS.glsl" />
     <None Include="VFXFlareVS.glsl" />
+    <None Include="VFXLighterFS.glsl" />
+    <None Include="VFXLighterVS.glsl" />
     <None Include="VFXSnowFS.glsl" />
     <None Include="VFXSnowVS.glsl" />
   </ItemGroup>

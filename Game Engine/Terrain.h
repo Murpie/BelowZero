@@ -31,6 +31,7 @@ private:
 	int Height = 40;
 
 	float **Heights;
+	glm::vec3 **Positions;
 
 	GLuint VAO;
 	GLuint VBO;
@@ -74,7 +75,8 @@ public:
 	void bindTextures(GLuint shader);
 
 	float calculateY(float x, float z);
+	bool calculateNormal(float x, float z);
 
-	float distanceBetweenVertices();
+	int distanceBetweenVertices();
 	float barryCentric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos);
 };
