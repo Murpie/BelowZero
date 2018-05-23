@@ -317,6 +317,9 @@
     <ClInclude Include="SoundMaster.h">
       <Filter>Header Files\Data Types</Filter>
     </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="lightpassFS.glsl">

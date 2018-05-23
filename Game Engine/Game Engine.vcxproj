@@ -214,6 +214,7 @@
     <ClInclude Include="AnimationShaders.h" />
     <ClInclude Include="Attributes.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="EnumID.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />

@@ -105,6 +105,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 
 Player::~Player()
 {
+
 }
 
 void Player::setCold(float value)

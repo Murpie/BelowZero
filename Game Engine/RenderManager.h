@@ -13,6 +13,7 @@
 #include "GameScene.h"
 #include "ShaderProgramLib.h"
 #include "TextureLib.h"
+#include "Debug.h"
 
 #include <math.h>
 #define STB_IMAGE_IMPLEMENTATION

@@ -34,6 +34,13 @@ Terrain::~Terrain()
 		
 	delete Positions;
 	delete Heights;
+
+	glDeleteFramebuffers(1, &VAO);
+	glDeleteFramebuffers(1, &VBO);
+	glDeleteFramebuffers(1, &IBO);
+	glDeleteFramebuffers(1, &EBO);
+	glDeleteFramebuffers(1, &PBO);
+	glDeleteFramebuffers(1, &FBO);
 }
 
 void Terrain::setupVertexData()

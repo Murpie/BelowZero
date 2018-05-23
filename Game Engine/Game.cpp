@@ -291,8 +291,6 @@ void Game::clearScene()
 		delete renderer;
 		renderer = nullptr;
 	}
-	//renderManager.clear();
-	/* Add function to also clear the renderManager*/
 }
 
 void Game::initShaderProgramLib()

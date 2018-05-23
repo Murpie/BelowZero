@@ -213,8 +213,6 @@ void GameObject::setIsBurning(float timeToBurn)
 {
 	this->timeToBurn = timeToBurn;
 	timeAlive = 0.0f;
-
-	
 	if (fireComponent == nullptr)
 	{
 		fireComponent = new Light(*transform);
@@ -225,9 +223,6 @@ void GameObject::setIsBurning(float timeToBurn)
 		fireComponent->offset = 6;
 		fireComponent->intensity = 0.9f;
 	}
-	else
-		delete fireComponent;
-
 	isBurning = true;
 }
 

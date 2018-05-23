@@ -81,6 +81,19 @@ RenderManager::~RenderManager()
 	glDeleteBuffers(1, &lighterParticleColorBuffer);
 	glDeleteBuffers(1, &PPFBO);
 	glDeleteBuffers(1, &finalPPFBO);
+
+	glDeleteShader(shadowMapShaderProgram);
+	glDeleteShader(geometryShaderProgram);
+	glDeleteShader(lightpassShaderProgram);
+	glDeleteShader(animationShaderProgram);
+	glDeleteShader(UIShaderProgram);
+	glDeleteShader(terrainShaderProgram);
+	glDeleteShader(vfxFireShaderProgram);
+	glDeleteShader(vfxSnowShaderProgram);
+	glDeleteShader(vfxFlareShaderProgram);
+	glDeleteShader(vfxLighterShaderProgram);
+	glDeleteShader(mainMenuShaderProgram);
+	glDeleteShader(refractionShaderProgram);
 }
 
 bool zoneTest(GameObject* player, GameObject* object)
@@ -980,7 +993,7 @@ void RenderManager::Render() {
 	}
 
 	//!...LIGHTER
-	glUseProgram(vfxLighterShaderProgram);
+	GLCall(glUseProgram(vfxLighterShaderProgram));
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
 		if (gameObject_ptr->lighterEquipped)
@@ -1121,11 +1134,11 @@ void RenderManager::Render() {
 			glUniform3fv(glGetUniformLocation(vfxLighterShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
 			glUniformMatrix4fv(glGetUniformLocation(vfxLighterShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
 			glUniform3fv(glGetUniformLocation(vfxLighterShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
-			glUniform3fv(glGetUniformLocation(vfxLighterShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint));
+			GLCall(glUniform3fv(glGetUniformLocation(vfxLighterShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint)));
 
 			//Draw Particles
 			renderLighterParticles();
-			glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
+			GLCall(glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount));
 			break;
 		}
 	}

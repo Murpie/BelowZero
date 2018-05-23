@@ -85,8 +85,8 @@ void AI::setRotation()
 	else if (direction.x < 0.f && direction.z < 0.f)		// - , -
 		Transformable::transform.rotation.y = angle;
 
-	std::cout << "Rabbit Angle: " << angle << std::endl;
-	std::cout << "Rabbit Direction: " << direction.x << ", " << direction.y << ", " << direction.z << std::endl;
+	//std::cout << "Rabbit Angle: " << angle << std::endl;
+	//std::cout << "Rabbit Direction: " << direction.x << ", " << direction.y << ", " << direction.z << std::endl;
 }
 
 void AI::setBounce(float deltaTime)
