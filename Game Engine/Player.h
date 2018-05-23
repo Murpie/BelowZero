@@ -115,8 +115,8 @@ public:
 private:
 	bool isColliding = false;
 
-	float foodTimer = 0.0;
-	float waterTimer = 0.0;
+	float foodTimer = 0.0f;
+	float waterTimer = 0.0f;
 
 	bool movingForward = false;
 	bool movingBackwards = false;
@@ -154,18 +154,18 @@ private:
 	float pitch;
 	float yaw;
 
-	float time = 0.0;
-	float textTimer = 0.0;
-	float meltTimer = 0.0;
+	float time = 0.0f;
+	float textTimer = 0.0f;
+	float meltTimer = 0.0f;
 
-	float jumpSpeed = 7.64;
-	float cameraSpeed = 7.06;
-	float fallSpeed = 9.82;
+	float jumpSpeed = 7.64f;
+	float cameraSpeed = 7.06f;
+	float fallSpeed = 9.82f;
 	//--------=====Jumping=====-----------
 
 	bool jumpReady = true;
 	bool inAir = false;
-	float timeInAir = 0.3;
+	float timeInAir = 0.3f;
 	bool gravity = false;
 
 	//------=====Walking=====----
@@ -189,7 +189,7 @@ private:
 
 
 	int howlNumber = 2;
-	float howlTime = 0.0;
-	float temphowlTime = 0.0;
+	float howlTime = 0.0f;
+	float temphowlTime = 0.0f;
 	bool howlReset = true;
 };

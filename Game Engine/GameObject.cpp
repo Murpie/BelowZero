@@ -213,21 +213,16 @@ void GameObject::setIsBurning(float timeToBurn)
 {
 	this->timeToBurn = timeToBurn;
 	timeAlive = 0.0f;
-
-	
 	if (fireComponent == nullptr)
 	{
 		fireComponent = new Light(*transform);
 		fireComponent->lightType = 1;
-		fireComponent->color = glm::vec4(0.9, 0.2, 0, .5);
+		fireComponent->color = glm::vec4(0.9f, 0.2f, 0, 0.5f);
 		fireComponent->Linear = 25;
-		fireComponent->Quadratic = 0.15;
+		fireComponent->Quadratic = 0.15f;
 		fireComponent->offset = 6;
-		fireComponent->intensity = 0.9;
+		fireComponent->intensity = 0.9f;
 	}
-	else
-		delete fireComponent;
-
 	isBurning = true;
 }
 
@@ -237,11 +232,11 @@ void GameObject::setGameEnd()
 	{
 		flareComponent = new Light(*transform);
 		flareComponent->lightType = 1;
-		flareComponent->color = glm::vec4(0.9, 0, 0, 0.5);
+		flareComponent->color = glm::vec4(0.9f, 0, 0, 0.5f);
 		flareComponent->Linear = 50;
-		flareComponent->Quadratic = 0.3;
+		flareComponent->Quadratic = 0.3f;
 		flareComponent->offset = 9;
-		flareComponent->intensity = 2.0;
+		flareComponent->intensity = 2.0f;
 	}
 	gameEnd = true;
 }
@@ -252,11 +247,11 @@ void GameObject::setLighterEquipped()
 	{
 		lighterComponent = new Light(*transform);
 		lighterComponent->lightType = 1;
-		lighterComponent->color = glm::vec4(0.9, 0.2, 0, .5);
+		lighterComponent->color = glm::vec4(0.9f, 0.2f, 0, 0.5f);
 		lighterComponent->Linear = 25;
-		lighterComponent->Quadratic = 0.15;
+		lighterComponent->Quadratic = 0.15f;
 		lighterComponent->offset = 9;
-		lighterComponent->intensity = 0.5;
+		lighterComponent->intensity = 0.5f;
 		lighterComponent->isLighter = true;
 	}
 }
@@ -307,6 +302,7 @@ Player * GameObject::getPlayer()
 			return player;
 		}
 	}
+	return false;
 }
 
 MainMenuScene * GameObject::getMenuScene()
@@ -367,4 +363,5 @@ Terrain * GameObject::getTerrain()
 			return terrain;
 		}
 	}
+	return false;
 }

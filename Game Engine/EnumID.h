@@ -1,7 +1,7 @@
 #pragma once
 #define _CRTDBG_MAP_ALLOC
-#define SCREEN_WIDTH 1280.0
-#define SCREEN_HEIGHT 720.0
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 
 namespace Gamestate
 {
@@ -110,6 +110,7 @@ namespace ObjectType
 		Cabin_rotate				= 55,
 		BrokenTree_rotate			= 56,
 		Balloon						= 57,
-		MatchBox					= 58
+		MatchBox					= 58,
+		Wooden_Step					= 59
 	};
 }

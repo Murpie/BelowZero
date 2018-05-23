@@ -50,6 +50,57 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 RenderManager::~RenderManager()
 {
 	deleteData();
+
+	glDeleteBuffers(1, &UIFBO);
+	glDeleteBuffers(1, &UITexture);
+	glDeleteBuffers(1, &shadowMap);
+	glDeleteBuffers(1, &shadowFBO);
+	glDeleteBuffers(1, &animationVAO);
+	glDeleteBuffers(1, &animationVBO);
+	glDeleteBuffers(1, &animationEBO);
+	glDeleteBuffers(1, &ebo);
+	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &vao);
+	glDeleteBuffers(1, &gbo);
+	glDeleteBuffers(1, &rboDepth);
+	glDeleteBuffers(1, &finalFBO);
+	glDeleteBuffers(1, &finalColorBuffer);
+	glDeleteBuffers(1, &finalDepthStensil);
+	glDeleteBuffers(1, &fireTexture);
+	glDeleteBuffers(1, &snowTexture);
+	glDeleteBuffers(1, &flareTexture);
+	glDeleteBuffers(1, &lighterTexture);
+	glDeleteBuffers(1, &fireVAO);
+	glDeleteBuffers(1, &snowVAO);
+	glDeleteBuffers(1, &flareVAO);
+	glDeleteBuffers(1, &lighterVAO);
+	glDeleteBuffers(1, &fireVBO);
+	glDeleteBuffers(1, &snowVBO);
+	glDeleteBuffers(1, &flareVBO);
+	glDeleteBuffers(1, &lighterVBO);
+	glDeleteBuffers(1, &fireParticlePositionBuffer);
+	glDeleteBuffers(1, &snowParticlePositionBuffer);
+	glDeleteBuffers(1, &flareParticlePositionBuffer);
+	glDeleteBuffers(1, &lighterParticlePositionBuffer);
+	glDeleteBuffers(1, &fireParticleColorBuffer);
+	glDeleteBuffers(1, &snowParticleColorBuffer);
+	glDeleteBuffers(1, &flareParticleColorBuffer);
+	glDeleteBuffers(1, &lighterParticleColorBuffer);
+	glDeleteBuffers(1, &PPFBO);
+	glDeleteBuffers(1, &finalPPFBO);
+
+	glDeleteShader(shadowMapShaderProgram);
+	glDeleteShader(geometryShaderProgram);
+	glDeleteShader(lightpassShaderProgram);
+	glDeleteShader(animationShaderProgram);
+	glDeleteShader(UIShaderProgram);
+	glDeleteShader(terrainShaderProgram);
+	glDeleteShader(vfxFireShaderProgram);
+	glDeleteShader(vfxSnowShaderProgram);
+	glDeleteShader(vfxFlareShaderProgram);
+	glDeleteShader(vfxLighterShaderProgram);
+	glDeleteShader(mainMenuShaderProgram);
+	glDeleteShader(refractionShaderProgram);
 }
 
 bool zoneTest(GameObject* player, GameObject* object)
@@ -796,7 +847,7 @@ void RenderManager::Render() {
 			if (mixVar >= 50.0f)
 				mixVar = 50.0f;
 
-			float volume = glm::mix(60, 0, mixVar / 50);
+			float volume = glm::mix(60.0f, 0.0f, mixVar / 50.0f);
 			gameObject_ptr->burning.setVolume(volume);
 
 			if (!gameObject_ptr->burning.isPlaying())
@@ -991,7 +1042,7 @@ void RenderManager::Render() {
 	}
 
 	//!...LIGHTER
-	glUseProgram(vfxLighterShaderProgram);
+	GLCall(glUseProgram(vfxLighterShaderProgram));
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
 		if (gameObject_ptr->lighterEquipped)
@@ -1132,11 +1183,11 @@ void RenderManager::Render() {
 			glUniform3fv(glGetUniformLocation(vfxLighterShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
 			glUniformMatrix4fv(glGetUniformLocation(vfxLighterShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
 			glUniform3fv(glGetUniformLocation(vfxLighterShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
-			glUniform3fv(glGetUniformLocation(vfxLighterShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint));
+			GLCall(glUniform3fv(glGetUniformLocation(vfxLighterShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint)));
 
 			//Draw Particles
 			renderLighterParticles();
-			glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
+			GLCall(glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount));
 			break;
 		}
 	}
@@ -1674,7 +1725,7 @@ void RenderManager::renderMainMenu()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, display_w, display_h);
-	glClearColor(0.749, 0.843, 0.823, 1.0f);
+	glClearColor(0.749f, 0.843f, 0.823f, 1.0f);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(mainMenuShaderProgram);
@@ -2212,17 +2263,17 @@ void RenderManager::dayNightCycle()
 		
 
 
-		daylight -= deltaTime * 0.02;
-		if (daylight < 0.1)
+		daylight -= deltaTime * 0.02f;
+		if (daylight < 0.1f)
 		{
-			daylight = 0.1;
+			daylight = 0.1f;
 			dayOrNight = false;
 			time = 0;
 		}
 	}
 	else if (time > 120 && !dayOrNight)
 	{
-		daylight += deltaTime * 0.02;
+		daylight += deltaTime * 0.02f;
 		if (daylight > 1)
 		{
 			daylight = 1;
@@ -2240,7 +2291,8 @@ void RenderManager::dayNightCycle()
 
 void RenderManager::ParticleLinearSort(Particle* arr, int size)
 {
-	int a, b, key;
+	int a, b;
+	float key;
 	for (a = 0; a < size; a++)
 	{
 		key = arr[a].life;

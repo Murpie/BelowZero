@@ -104,6 +104,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 
 Player::~Player()
 {
+
 }
 
 void Player::setCold(float value)
@@ -504,17 +505,17 @@ void Player::update(float deltaTime, float seconds)
 
 		float mixVar = 89.0f - 47.0f;
 		float volumeVar = Transformable::transform.position.y - 47.0f;
-		float volume = glm::mix(0, 100, volumeVar / mixVar);
-		volume *= 0.7;
+		float volume = glm::mix(0.0f, 100.0f, volumeVar / mixVar);
+		volume *= 0.7f;
 		HeavySnow.setVolume(volume);
 
 		if (!jacket)
 		{
-			float coldStrength = glm::mix(0, 8, volumeVar / mixVar);
-			this->cold = this->cold - (this->coldTick * 8 * deltaTime);
+			float coldStrength = glm::mix(0.0f, 8.0f, volumeVar / mixVar);
+			this->cold = this->cold - (this->coldTick * 8.0f * deltaTime);
 
 			//this->damage = this->coldMeter + this->waterMeter + this->foodMeter;
-			this->hp = this->hp - (this->coldTick * 8 * deltaTime);
+			this->hp = this->hp - (this->coldTick * 8.0f * deltaTime);
 
 		}
 	}
@@ -537,11 +538,11 @@ void Player::update(float deltaTime, float seconds)
 			HelicopterSound.playSound();
 		}
 
-		if (flareTimer >= 4.0f && flareTimer <= 10.0)
+		if (flareTimer >= 4.0f && flareTimer <= 10.0f)
 		{
 
 			float tempTimer = flareTimer - 4.0f;
-			float volume = glm::mix(0, 100, tempTimer / 4);
+			float volume = glm::mix(0.0f, 100.0f, tempTimer / 4.0f);
 			HelicopterSound.setVolume(volume);
 		}
 
@@ -553,7 +554,7 @@ void Player::update(float deltaTime, float seconds)
 		stateOfGame.state = Gamestate::ID::CLEAR_LEVEL;
 	}
 
-	float tempSeconds = seconds / 1000;
+	float tempSeconds = seconds / 1000.0f;
 	time += tempSeconds;
 
 
@@ -612,7 +613,7 @@ void Player::update(float deltaTime, float seconds)
 	// SPAWN & GAME OVER FADE
 	if (this->startGame && this->fade > 0)
 	{
-		this->fade -= 0.005;
+		this->fade -= 0.005f;
 		if (this->fade <= 0)
 			this->startGame = false;
 	}
@@ -634,6 +635,9 @@ void Player::update(float deltaTime, float seconds)
 		}
 	}
 
+	// Text Fade
+	if (this->textOnScreen == true)
+		this->textFade -= 0.05f;
 	//else if (this->textOnScreen == false)
 	//this->textFade = 1.0;
 
@@ -824,10 +828,10 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		shift = true;
 		SnowCrunch.setPitch(1.5f);
-		setWater(-0.01);
+		setWater(-0.01f);
 	}
 	else
-		SnowCrunch.setPitch(1.0);
+		SnowCrunch.setPitch(1.0f);
 
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -998,7 +1002,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		swapItem = true;
 		pullDown = true;
 		isAlive = false;
-		this->coldTick = 0.3;
+		this->coldTick = 0.3f;
 	}
 	else if (id == ObjectType::ID::FlareGunBox)
 	{

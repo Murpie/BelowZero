@@ -274,9 +274,9 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 		this->whichButtonIsSelected = 1;
 		this->mouseIsOverButton = true;
 
-		if (this->scaling1 <= 1.3)
+		if (this->scaling1 <= 1.3f)
 		{
-			this->scaling1 += 0.01;
+			this->scaling1 += 0.02f;
 			this->buttonIsUpScaled1 = true;
 		}
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
@@ -292,11 +292,11 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		if (this->buttonIsUpScaled1 == true)
 		{
-			if (scaling1 > 1.0)
-				scaling1 -= 0.01;
-			else if (scaling1 < 1.0)
+			if (scaling1 > 1.0f)
+				scaling1 -= 0.01f;
+			else if (scaling1 < 1.0f)
 			{
-				scaling1 = 1.0;
+				scaling1 = 1.0f;
 				this->buttonIsUpScaled1 = false;
 			}
 		}
@@ -308,9 +308,9 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 		this->whichButtonIsSelected = 2;
 		this->mouseIsOverButton = true;
 
-		if (this->scaling2 <= 1.3)
+		if (this->scaling2 <= 1.3f)
 		{
-			this->scaling2 += 0.01;
+			this->scaling2 += 0.01f;
 			this->buttonIsUpScaled2 = true;
 		}
 
@@ -327,11 +327,11 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		if (this->buttonIsUpScaled2 == true)
 		{
-			if (scaling2 > 1.0)
-				scaling2 -= 0.01;
-			else if (scaling2 < 1.0)
+			if (scaling2 > 1.0f)
+				scaling2 -= 0.01f;
+			else if (scaling2 < 1.0f)
 			{
-				scaling2 = 1.0;
+				scaling2 = 1.0f;
 				this->buttonIsUpScaled2 = false;
 			}
 		}
@@ -343,9 +343,9 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 		this->whichButtonIsSelected = 3;
 		this->mouseIsOverButton = true;
 
-		if (this->scaling3 <= 1.3)
+		if (this->scaling3 <= 1.3f)
 		{
-			this->scaling3 += 0.01;
+			this->scaling3 += 0.01f;
 			this->buttonIsUpScaled3 = true;
 		}
 
@@ -362,11 +362,11 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		if (this->buttonIsUpScaled3 == true)
 		{
-			if (scaling3 > 1.0)
-				scaling3 -= 0.01;
-			else if (scaling3 < 1.0)
+			if (scaling3 > 1.0f)
+				scaling3 -= 0.01f;
+			else if (scaling3 < 1.0f)
 			{
-				scaling3 = 1.0;
+				scaling3 = 1.0f;
 				this->buttonIsUpScaled3 = false;
 			}
 		}
