@@ -6,7 +6,7 @@
 #include "glm/glm/glm.hpp"
 
 #define MAX_DISTANCE 50
-#define SPAWN_OFFSET 20
+#define SPAWN_OFFSET 12
 #define SPEED 3.0f
 #define JUMP_HEIGHT 0.75f
 #define JUMP_SPEED 2.0f

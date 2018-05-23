@@ -43,6 +43,44 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 RenderManager::~RenderManager()
 {
 	deleteData();
+
+	glDeleteBuffers(1, &UIFBO);
+	glDeleteBuffers(1, &UITexture);
+	glDeleteBuffers(1, &shadowMap);
+	glDeleteBuffers(1, &shadowFBO);
+	glDeleteBuffers(1, &animationVAO);
+	glDeleteBuffers(1, &animationVBO);
+	glDeleteBuffers(1, &animationEBO);
+	glDeleteBuffers(1, &ebo);
+	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &vao);
+	glDeleteBuffers(1, &gbo);
+	glDeleteBuffers(1, &rboDepth);
+	glDeleteBuffers(1, &finalFBO);
+	glDeleteBuffers(1, &finalColorBuffer);
+	glDeleteBuffers(1, &finalDepthStensil);
+	glDeleteBuffers(1, &fireTexture);
+	glDeleteBuffers(1, &snowTexture);
+	glDeleteBuffers(1, &flareTexture);
+	glDeleteBuffers(1, &lighterTexture);
+	glDeleteBuffers(1, &fireVAO);
+	glDeleteBuffers(1, &snowVAO);
+	glDeleteBuffers(1, &flareVAO);
+	glDeleteBuffers(1, &lighterVAO);
+	glDeleteBuffers(1, &fireVBO);
+	glDeleteBuffers(1, &snowVBO);
+	glDeleteBuffers(1, &flareVBO);
+	glDeleteBuffers(1, &lighterVBO);
+	glDeleteBuffers(1, &fireParticlePositionBuffer);
+	glDeleteBuffers(1, &snowParticlePositionBuffer);
+	glDeleteBuffers(1, &flareParticlePositionBuffer);
+	glDeleteBuffers(1, &lighterParticlePositionBuffer);
+	glDeleteBuffers(1, &fireParticleColorBuffer);
+	glDeleteBuffers(1, &snowParticleColorBuffer);
+	glDeleteBuffers(1, &flareParticleColorBuffer);
+	glDeleteBuffers(1, &lighterParticleColorBuffer);
+	glDeleteBuffers(1, &PPFBO);
+	glDeleteBuffers(1, &finalPPFBO);
 }
 
 bool zoneTest(GameObject* player, GameObject* object)

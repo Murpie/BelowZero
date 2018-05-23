@@ -93,9 +93,7 @@ private:
 	bool texturesLoaded;
 
 	int count;
-
 	// bool in processInput for state swapping
 	bool stateBool;
-
 };
 

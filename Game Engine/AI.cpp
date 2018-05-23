@@ -76,17 +76,17 @@ void AI::setRotation()
 	float angle = dot / (directionMag * forwardMag);
 	angle = glm::degrees(glm::acos(angle));
 	// Set new rotation.y angle
-	if (direction.x > 0.f && direction.z > 0.f)
-		Transformable::transform.rotation.y = angle * -1;
-	else if (direction.x < 0.f && direction.z > 0.f)
+	if (direction.x > 0.f && direction.z > 0.f)				// + , +
+		Transformable::transform.rotation.y = angle * -1.f;	// -1.f
+	else if (direction.x < 0.f && direction.z > 0.f)		// - , +
+		Transformable::transform.rotation.y = angle * -1.f;		
+	else if (direction.x > 0.f && direction.z < 0.f)		// + , -
 		Transformable::transform.rotation.y = angle;
-	else if (direction.x > 0.f && direction.z > 0.f)
-		Transformable::transform.rotation.y = angle * -1;
-	else
+	else if (direction.x < 0.f && direction.z < 0.f)		// - , -
 		Transformable::transform.rotation.y = angle;
 
-	//std::cout << "Rabbit Angle: " << angle << std::endl;
-	//std::cout << "Rabbit Direction: " << direction.x << ", " << direction.y << ", " << direction.z << std::endl;
+	std::cout << "Rabbit Angle: " << angle << std::endl;
+	std::cout << "Rabbit Direction: " << direction.x << ", " << direction.y << ", " << direction.z << std::endl;
 }
 
 void AI::setBounce(float deltaTime)
