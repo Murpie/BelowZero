@@ -687,6 +687,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		setFood(-10);
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		hp -= 10;
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+		hp += 10;
+
 
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 	{
