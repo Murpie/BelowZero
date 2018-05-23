@@ -148,6 +148,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		default:
 			break;
 		}
+		//level = new LeapLevel("Lvl12.leap");
 
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		//addAI(*meshLibrary, *matertialLibrary, *level);

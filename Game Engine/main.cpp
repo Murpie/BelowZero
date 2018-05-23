@@ -1,4 +1,5 @@
-#pragma warning
+//#pragma warning //(??)
+
 #include "Game.h"
 #include "EnumID.h"
 #define _CRTDBG_MAP_ALLOC
