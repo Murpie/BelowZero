@@ -252,11 +252,11 @@ void GameObject::setLighterEquipped()
 	{
 		lighterComponent = new Light(*transform);
 		lighterComponent->lightType = 1;
-		lighterComponent->color = glm::vec4(0.9, 0.2, 0, .5);
-		lighterComponent->Linear = 25;
-		lighterComponent->Quadratic = 0.15;
+		lighterComponent->color = glm::vec4(0.9, 0.2, 0, 0.5);
+		lighterComponent->Linear = 0.09;
+		lighterComponent->Quadratic = 0.032;
 		lighterComponent->offset = 9;
-		lighterComponent->intensity = 0.5;
+		lighterComponent->intensity = 1;
 		lighterComponent->isLighter = true;
 	}
 }
