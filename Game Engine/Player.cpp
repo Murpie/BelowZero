@@ -1045,8 +1045,15 @@ int Player::actionResponse(const ObjectType::ID id, bool & isAlive, int & counte
 			else
 				counter++;
 		}
-		else
-			addTextToScreen("Text-ItemAlreadyEquipped");
+		else if (inInventory[2] == true)
+		{
+			if (counter >= 4)
+				isAlive = false;
+			else
+				counter++;
+		}
+		//else
+		//	addTextToScreen("Text-ItemAlreadyEquipped");
 	}
 	else if (id == ObjectType::ID::Campfire && currentlyEquipedItem == 1)
 	{
