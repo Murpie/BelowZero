@@ -230,4 +230,11 @@ private:
 	int display_w, display_h;
 	unsigned int vertexPos;
 	unsigned int uvPos;
+
+	void shadowmapPass();
+	void terrainPass();
+	void geometryPass();
+	void vfxPass();
+	void lightPass();
+	void uiPass();
 };
