@@ -569,6 +569,10 @@ void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
 									other.setIsBurning(60.0f);
 									meltIceWall(other);
 								}
+								else if (gameObject_ptr->getPlayer()->actionResponse(other.objectID, other.isActive, other.playerHitCounter) == ObjectType::ID::Rabbit)
+								{
+									other.setIsBurning(5.0f);
+								}
 							}
 						}
 					}

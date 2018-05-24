@@ -794,7 +794,8 @@ void RenderManager::Render() {
 	glUseProgram(vfxFireShaderProgram);
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
-		if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire || gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player)
+		if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire || gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player ||
+			gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Rabbit)
 		{
 			gameObject_ptr->hasSoundAttatched = true;
 			gameObject_ptr->burning.addSound("fireplace.wav");

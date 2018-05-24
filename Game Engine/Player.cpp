@@ -1062,7 +1062,18 @@ int Player::actionResponse(const ObjectType::ID id, bool & isAlive, int & counte
 	{
 		return 3;
 	}
-
+	else if (id == ObjectType::ID::Rabbit && currentlyEquipedItem == 0)
+	{
+		//todo play sound
+		if (counter >= 2)
+			isAlive = false;
+		else
+			counter++;
+	}
+	else if (id == ObjectType::ID::Rabbit && currentlyEquipedItem == 1)
+	{
+		return 54;
+	}
 	return -1;
 }
 
