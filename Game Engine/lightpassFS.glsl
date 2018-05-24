@@ -86,7 +86,7 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 no
 	float z;
 	vec3 lightDirForShadow = normalize(shadowMapLightPosition - FragPos);
 	float bias = max(0.05 * (1.0 - dot(normals, lightDirForShadow)), 0.005);
-	vec3 projectionCoordinates = lightSpacePos.xyz / lightSpacePos.w;
+	vec3 projectionCoordinates = lightSpacePos.xyz;
 
 	vec2 UVCoords;
 	UVCoords.x = projectionCoordinates.x * 0.5 + 0.5;
@@ -100,10 +100,10 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 no
 	if (cascadeIndex == 2)
 		depth = texture(shadowMap2, UVCoords).x;
 
-	if (z + 0.0001f  > depth) // Determine If There Shall Be Shadow
-		shadow = 0.4f;
+	if (z -bias  > depth) // Determine If There Shall Be Shadow
+		shadow = 0.35f;
 	else
-		shadow = 0.0;
+		shadow = 0.0f;
 
 
 	return shadow;
@@ -205,11 +205,11 @@ void main()
 
 	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
 	if (selected == 0)
-		FragColor.xyz = FragColor.xyz + vec3(0.5, 0.0, 0.0);
+		FragColor.xyz = FragColor.xyz + vec3(0.1, 0.0, 0.0);
 	if (selected == 1)
-		FragColor.xyz = FragColor.xyz + vec3(0.0, 0.5, 0.0);
+		FragColor.xyz = FragColor.xyz + vec3(0.0, 0.1, 0.0);
 	if (selected == 2)
-		FragColor.xyz = FragColor.xyz + vec3(0.0, 0.0, 0.5);
+		FragColor.xyz = FragColor.xyz + vec3(0.0, 0.0, 0.1);
 	if (selected == -1)
 		FragColor = FragColor;
 }

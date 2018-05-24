@@ -37,11 +37,16 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
 	//createMainMenuBuffer();
 
+	//cascadePlaneEnds[0] = 0.1f;
+	//cascadePlaneEnds[1] = 25.0f; RIGHT SHIT
+	//cascadePlaneEnds[2] = 50.0f;
+	//cascadePlaneEnds[3] = 70.0f;
+
+
 	cascadePlaneEnds[0] = 0.1f;
 	cascadePlaneEnds[1] = 25.0f;
-	cascadePlaneEnds[2] = 70.0f;
-	cascadePlaneEnds[3] = 120.0f;
-
+	cascadePlaneEnds[2] = 50.0f;
+	cascadePlaneEnds[3] = 90.0f;
 	
 	shatteredIce.CreateTextureData("iceNormal2.jpg");
 	damageTexture.CreateTextureData("damage1.png");
@@ -176,7 +181,14 @@ void RenderManager::createBuffers()
 	glGenTextures(3, shadowMaps);
 	for (int i = 0; i < 3; i++) {
 		glBindTexture(GL_TEXTURE_2D, shadowMaps[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, MEDIUM_SHADOW, MEDIUM_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		if (i == 0)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, SUPER_SHADOW, SUPER_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		if (i == 1)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, HIGH_SHADOW, HIGH_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		if (i == 2)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, MEDIUM_SHADOW, MEDIUM_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, MEDIUM_SHADOW, MEDIUM_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
@@ -695,7 +707,7 @@ void RenderManager::Render() {
 
 	glUseProgram(shadowMapShaderProgram);
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-	glViewport(0, 0, MEDIUM_SHADOW, MEDIUM_SHADOW);
+	//glViewport(0, 0, MEDIUM_SHADOW, MEDIUM_SHADOW);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
@@ -705,6 +717,13 @@ void RenderManager::Render() {
 
 	for (int i = 0; i < CASCADESPLITS; i++)
 	{
+		if (i == 0)
+			glViewport(0, 0, SUPER_SHADOW, SUPER_SHADOW);
+		if (i == 1)
+			glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);		
+		if (i == 2)
+			glViewport(0, 0, MEDIUM_SHADOW, MEDIUM_SHADOW);		
+		
 		bindForWriting(i);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -740,7 +759,7 @@ void RenderManager::Render() {
 			glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 		}
 
-		for (int i = 0; i < gameScene->gameObjects.size(); i++)
+	/*	for (int i = 0; i < gameScene->gameObjects.size(); i++)
 		{
 			if (gameScene->gameObjects[i]->getTerrain() != nullptr)
 			{
@@ -751,7 +770,7 @@ void RenderManager::Render() {
 				glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
 				break;
 			}
-		}
+		}*/
 	}
 
 	glCullFace(GL_BACK);
@@ -1926,10 +1945,13 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 
 	glUseProgram(shaderToUse);
 
-	tempView = glm::lookAt(gameScene->gameObjects[0]->transform->position, gameScene->gameObjects[0]->transform->forward, gameScene->gameObjects[0]->transform->up);
+	//tempView = glm::lookAt(gameScene->gameObjects[0]->transform->position, gameScene->gameObjects[0]->transform->forward - gameScene->gameObjects[0]->transform->position, gameScene->gameObjects[0]->transform->up); // RIGHT
+	tempView = glm::lookAt(gameScene->gameObjects[0]->transform->position, gameScene->gameObjects[0]->transform->position - gameScene->gameObjects[0]->transform->forward, gameScene->gameObjects[0]->transform->up);
+
 	inverseViewMatrix = glm::inverse(tempView);
 	
-	shadowMapLightPosition = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y + 15.0f, gameScene->gameObjects[0]->transform->position.z);
+	//shadowMapLightPosition = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y + 3.0f, gameScene->gameObjects[0]->transform->position.z );// WORKS
+	shadowMapLightPosition = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y + 5.0, gameScene->gameObjects[0]->transform->position.z);
 	shadowMapDirection = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y, gameScene->gameObjects[0]->transform->position.z);
 
 
