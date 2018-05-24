@@ -118,8 +118,6 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 	{
 		// Camera - (modify position with level file?)
 		addPlayer(*meshLibrary, *matertialLibrary);
-		// Lights - (add lights with level file?)
-		addLight(glm::vec3(7, 9, -4), 0);
 		// Terrain
 		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
@@ -856,8 +854,7 @@ void GameScene::setZone(GameObject & other, const bool forceUpdate)
 	if (previousZone != other.zone.zoneXY && other.getPlayer() != nullptr)
 	{
 		inZone.clear();
-		// Update directional light to follow player into new zone;
-		directionalLight->zone.zoneXY = other.zone.zoneXY;
+
 		//..
 		std::cout << other.name << " " << "new zone: " << other.zone.zoneXY.x << " " << other.zone.zoneXY.y << std::endl;
 		for (GameObject* gameObject_ptr : gameObjects)

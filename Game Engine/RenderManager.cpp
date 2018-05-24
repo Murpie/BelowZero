@@ -122,12 +122,11 @@ void RenderManager::FindObjectsToRender() {
 			glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->inZone[i]->transform->position;
 			float distance = length(vectorToObject);
 
-			if (gameScene->inZone[i]->getIsRenderable() == true && distance < 100) {
+			if (gameScene->inZone[i]->getIsRenderable() == true && distance < 110) {
 				gameObjectsToRender.push_back(gameScene->inZone[i]);
 			}
 
 			if (gameScene->inZone[i]->hasLight == true) {
-				gameScene->inZone[i]->lightComponent->color = glm::vec4(0.85, 0.85, 1.0, 1)*daylight;
 				lightsToRender.push_back(gameScene->inZone[i]->lightComponent);
 			}
 			if (gameScene->inZone[i]->fireComponent != nullptr)
@@ -366,7 +365,7 @@ void RenderManager::createBuffers()
 	//g-buffer position
 	glGenTextures(1, &gPosition);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -378,7 +377,7 @@ void RenderManager::createBuffers()
 	//g-buffer albedo
 	glGenTextures(1, &gAlbedo);
 	glBindTexture(GL_TEXTURE_2D, gAlbedo);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_w, display_h, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -1434,8 +1433,9 @@ void RenderManager::Render() {
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
 
+	//Nr Of Lights
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "nrOfLights"), lightsToRender.size());
 
-	//Lights
 	for (unsigned int i = 0; i < lightsToRender.size(); i++)
 	{
 		std::string lightUniform;
@@ -1501,7 +1501,6 @@ void RenderManager::Render() {
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_EQUAL, 1, 0xFF);
 	glStencilMask(0x00); // disable writing to the stencil buffer
-
 	renderQuad();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -2013,8 +2012,9 @@ void RenderManager::renderFlareParticles()
 
 void RenderManager::dayNightCycle()
 {
-	if (time > 120 && dayOrNight)
+	if (time > 180 && dayOrNight)
 	{
+
 		daylight -= deltaTime * 0.02f;
 		if (daylight < 0.1f)
 		{
@@ -2023,7 +2023,7 @@ void RenderManager::dayNightCycle()
 			time = 0;
 		}
 	}
-	else if (time > 120 && !dayOrNight)
+	else if (time > 90 && !dayOrNight)
 	{
 		daylight += deltaTime * 0.02f;
 		if (daylight > 1)

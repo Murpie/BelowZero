@@ -6,7 +6,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 
 	click = false;
 	addClick = false;
-
+	this->coldResistance = 1.0f;
 	this->currentlyEquipedItem = -1;
 	this->equipedID = -1;
 	this->pickUp = -1;
@@ -95,10 +95,10 @@ Player::Player(Transform& transform) : Transformable(transform)
 	FlareSound.setVolume(100.0f);
 	HelicopterSound.addSound("HelicopterSound.wav");
 
-	wolf1.addSound("WolfHowl1.ogg");
+	
 	wolf2.addSound("WolfHowl2.ogg");
 	wolf3.addSound("WolfHowl3.wav");
-	wolf1.setVolume(70.0f);
+
 	wolf2.setVolume(70.0f);
 	wolf3.setVolume(70.0f);
 }
@@ -513,11 +513,11 @@ void Player::update(float deltaTime, float seconds)
 		volume *= 0.7f;
 		HeavySnow.setVolume(volume);
 
+
+		this->cold = this->cold - (this->coldTick * 8.0f * deltaTime * this->coldResistance);
+		
 		if (!jacket)
 		{
-			float coldStrength = glm::mix(0.0f, 8.0f, volumeVar / mixVar);
-			this->cold = this->cold - (this->coldTick * 8.0f * deltaTime);
-
 			//this->damage = this->coldMeter + this->waterMeter + this->foodMeter;
 			this->hp = this->hp - (this->coldTick * 8.0f * deltaTime);
 
@@ -598,7 +598,7 @@ void Player::update(float deltaTime, float seconds)
 
 	// DECREASE OVER TIME
 	if (this->cold <= 100)
-		this->cold = this->cold - (this->coldTick * deltaTime);
+		this->cold = this->cold - (this->coldTick * deltaTime * this->coldResistance);
 
 	if (this->water <= 100)
 		this->water = this->water - (this->waterTick * deltaTime);
@@ -993,7 +993,7 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		swapItem = true;
 		pullDown = true;
 		isAlive = false;
-		this->coldTick = 0.3f;
+		this->coldResistance = 0.3f;
 	}
 	else if (id == ObjectType::ID::FlareGunBox)
 	{
@@ -1120,17 +1120,17 @@ const int Player::getEquipedID()
 void Player::wolfHowl(float nightTimer)
 {
 	float wolfTimer = nightTimer / 20;
-	if (nightTimer > 20 && nightTimer < 21 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
-		wolf1.playSound();
-	
-	if (nightTimer > 38 && nightTimer < 39 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
-		wolf2.playSound();
-
-	if (nightTimer > 80 && nightTimer < 81 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	if (nightTimer > 10 && nightTimer < 11 &&  !wolf2.isPlaying() && !wolf3.isPlaying())
 		wolf3.playSound();
-
-	if (nightTimer > 90 && nightTimer < 91 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	
+	if (nightTimer > 28 && nightTimer < 29 && !wolf2.isPlaying() && !wolf3.isPlaying())
 		wolf2.playSound();
+
+	if (nightTimer > 80 && nightTimer < 81 && !wolf2.isPlaying() && !wolf3.isPlaying())
+		wolf2.playSound();
+
+	if (nightTimer > 78 && nightTimer < 79 && !wolf2.isPlaying() && !wolf3.isPlaying())
+		wolf3.playSound();
 }
 
 void Player::equipItemMesh()
@@ -1201,12 +1201,12 @@ void Player::equipItemMesh()
 
 void Player::textWarnings()
 {
-	if (transform.position.y > 10 && !jacket && !warning)
+	if (transform.position.y > 42 && !jacket && !warning)
 	{
 		addTextToScreen("ColdWarning");
 		warning = true;
 	}
-	else if (transform.position.y < 10 && warning)
+	else if (transform.position.y < 42 && warning)
 	{
 		warning = false;
 	}
