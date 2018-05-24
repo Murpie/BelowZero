@@ -33,13 +33,13 @@ void AI::update(float deltaTime, float seconds)
 	time += deltaTime;
 	setBounce(deltaTime);
 
-	if (time > 10.f || collision == true)
+	if (time > 7.f || collision == true)
 	{
 		setNewTarget();
 	}
-	if (time > 4.5f && time < 6.f)
+	if (time > 3.5f && time < 5.f)
 	{
-
+		// Do nothing
 	}
 	else
 		move(deltaTime);
@@ -77,7 +77,7 @@ void AI::setRotation()
 	angle = glm::degrees(glm::acos(angle));
 	// Set new rotation.y angle
 	if (direction.x > 0.f && direction.z > 0.f)				// + , +
-		Transformable::transform.rotation.y = angle * -1.f;	// -1.f
+		Transformable::transform.rotation.y = angle * -1.f;
 	else if (direction.x < 0.f && direction.z > 0.f)		// - , +
 		Transformable::transform.rotation.y = angle * -1.f;		
 	else if (direction.x > 0.f && direction.z < 0.f)		// + , -
@@ -133,8 +133,8 @@ void AI::setNewTarget()
 	glm::vec3 currentPosition = Transformable::transform.position;
 	lastTarget = target;
 	// Get new target coords
-	float x = rand() % SPAWN_OFFSET - SPAWN_OFFSET * 0.5;
-	float z = rand() % SPAWN_OFFSET - SPAWN_OFFSET * 0.5;
+	float x = rand() % SPAWN_OFFSET * 0.5;
+	float z = rand() % SPAWN_OFFSET * 0.5;
 	// Update target
 	target = glm::vec3(startPosition.x + x, startPosition.y, startPosition.z + z);
 	// Direction

@@ -29,8 +29,6 @@ void GameScene::clearGameObjects()
 
 void GameScene::update(float deltaTime, float seconds)
 {
-	lightCheck();
-
 	if (addObject)
 	{
 		for (unsigned int i = 0; i < gameObjects.size(); i++)
@@ -43,6 +41,7 @@ void GameScene::update(float deltaTime, float seconds)
 			}
 		}
 	}
+	lightCheck();
 	// Update player position, AI collision and Active gameObjects
 	for (unsigned int i = 0; i < gameObjects.size(); i++)
 	{
@@ -724,12 +723,10 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 				gameObject_ptr->getPlayer()->dropItem();
 				gameObject_ptr->getPlayer()->equip("EmptyImage");
 			}
-
 			offsetVector = gameObject_ptr->transform->forward;
 			break;
 		}
 	}
-
 	//Create new mesh object
 	GameObject* meshObject = new GameObject();
 	//Set mesh object position in world
@@ -757,7 +754,6 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 //	if ((int)meshLibrary.getMesh(level->levelObjects[i]->id)->leapMesh->customMayaAttribute->meshType == 1)
 	meshObject->isInteractable = true;
 	//Add BBox from leapmesh to gameObject
-
 	for (int i = 0; i < meshes->getMesh(key)->leapMesh->boundingBoxes.size(); i++)
 	{
 		bBox* box = new bBox();
@@ -778,15 +774,14 @@ void GameScene::addGameObject(const glm::vec3 position, const int key)
 	}
 	meshObject->setIsRenderable(true);
 	// Set Zone
-	setZone(*meshObject, false);
+	setZone(*meshObject);
 	//Add to scene
 	gameObjects.push_back(meshObject);
-	//...
-	//Check if we created a new campfire and makes stuff happen if true
+	//Check which object we created
 	if (gameObjects[gameObjects.size() - 1]->objectID == ObjectType::ID::Campfire)
 	{
-		setBurningByDistance(5.f, *gameObjects[gameObjects.size() - 1]);
-		//push to inZone
+		//setBurningByDistance(5.5f, *gameObjects[gameObjects.size() - 1]);
+		//push to inZone so we can render the object
 		inZone.push_back(gameObjects[gameObjects.size() - 1]);
 	}
 }
@@ -803,10 +798,14 @@ void GameScene::addNewObjectTest(GLFWwindow * window)
 				if (gameObject_ptr->getPlayer()->getEquipedItem() == 2)
 				{
 					addObject = true;
+					break;
 				}
 			}
 			if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) && gameObject_ptr->getPlayer()->addClick == true)
+			{
 				gameObject_ptr->getPlayer()->addClick = false;
+				break;
+			}
 			break;
 		}
 	}
@@ -823,8 +822,11 @@ void GameScene::setBurningByDistance(const float distance, GameObject & other)
 			other.objectID == ObjectType::ID::Campfire &&
 			glm::distance(gameObject_ptr->transform->position, other.transform->position) < distance)
 		{
-			if(gameObject_ptr->getIsBurning())
-				other.setIsBurning(60);
+			if (gameObject_ptr->getIsBurning())
+			{
+				other.setIsBurning(60.f);
+				break;
+			}
 		}
 	}
 }
@@ -852,7 +854,6 @@ void GameScene::setZone(GameObject & other, const bool forceUpdate)
 
 	float X = other.transform->position.x;
 	float Z = other.transform->position.z;
-
 	other.zone.zoneXY.x = (int)(X / 128.0f) + 0.5f;
 	other.zone.zoneXY.y = (int)(Z / 128.0f) + 0.5f;
 
@@ -884,6 +885,16 @@ void GameScene::setZone(GameObject & other, const bool forceUpdate)
 			}
 		}
 	}
+}
+
+void GameScene::setZone(GameObject & other)
+{
+	// Slim version
+	float X = other.transform->position.x;
+	float Z = other.transform->position.z;
+
+	other.zone.zoneXY.x = (int)(X / 128.0f) + 0.5f;
+	other.zone.zoneXY.y = (int)(Z / 128.0f) + 0.5f;
 }
 
 bool GameScene::zoneTest(GameObject* target1, GameObject* target2)
