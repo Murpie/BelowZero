@@ -180,8 +180,10 @@ private:
 	float defaultY;
 	float defaultZ;
 	float offset;
+	float flareShotTimer = 0;
 	int distanceToParticles = 0;
 	bool flareAlive = false;
+	bool pickedUpFlare = false;
 	glm::mat4 viewProjectionMatrix;
 	glm::vec3 startPoint;
 	glm::vec3 lighterPosition;
@@ -192,7 +194,6 @@ private:
 	glm::vec3 tempDistance;
 	glm::vec3 cameraRight_vector;
 	glm::vec3 cameraUp_vector;
-	glm::vec3 flarePosition;
 
 	GLfloat* fireParticlePositionData = 0;
 	GLfloat* snowParticlePositionData = 0;

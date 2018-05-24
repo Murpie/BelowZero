@@ -10,6 +10,7 @@ GameObject::GameObject()
 	isInteractable = false;
 	isBurning = false;
 	gameEnd = false;
+	delayFlare = false;
 	lighterEquipped = false;
 	this->moveBelowTerrain = false;
 	timeLimit = 0.f;
@@ -61,6 +62,21 @@ void GameObject::update(float deltaTime, float seconds)
 				delete fireComponent;
 				fireComponent = nullptr;
 			}
+		}
+	}
+
+	if (delayFlare)
+	{
+		if (flareComponent == nullptr)
+		{
+			flareComponent = new Light(*transform);
+			flareComponent->lightType = 1;
+			flareComponent->color = glm::vec4(0.9, 0, 0, 0.5);
+			flareComponent->Linear = 0.0009;
+			flareComponent->Quadratic = 0.0032;
+			flareComponent->offset = 9;
+			flareComponent->intensity = 3.0;
+			flareComponent->isFlare = true;
 		}
 	}
 
@@ -228,16 +244,6 @@ void GameObject::setIsBurning(float timeToBurn)
 
 void GameObject::setGameEnd()
 {
-	if (flareComponent == nullptr)
-	{
-		flareComponent = new Light(*transform);
-		flareComponent->lightType = 1;
-		flareComponent->color = glm::vec4(0.9, 0, 0, 0.5);
-		flareComponent->Linear = 0.0009;
-		flareComponent->Quadratic = 0.0032;
-		flareComponent->offset = 9;
-		flareComponent->intensity = 3.0;
-	}
 	gameEnd = true;
 }
 

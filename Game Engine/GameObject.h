@@ -42,6 +42,7 @@ public:
     bool hasLight;
 	bool isInteractable;
 	bool gameEnd;
+	bool delayFlare;
 	bool lighterEquipped;
 	bool moveBelowTerrain;
 	float timeAlive;

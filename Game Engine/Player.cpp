@@ -95,10 +95,8 @@ Player::Player(Transform& transform) : Transformable(transform)
 	FlareSound.setVolume(100.0f);
 	HelicopterSound.addSound("HelicopterSound.wav");
 
-	
 	wolf2.addSound("WolfHowl2.ogg");
 	wolf3.addSound("WolfHowl3.wav");
-
 	wolf2.setVolume(70.0f);
 	wolf3.setVolume(70.0f);
 }
@@ -633,9 +631,9 @@ void Player::update(float deltaTime, float seconds)
 	if (this->win == true)
 	{
 		this->flareTimer += deltaTime;
-		if (flareTimer <= 10.0f)
+		if (flareTimer >= 2.0f)
 		{
-			this->winFade += deltaTime / 10.0f;
+			this->winFade += deltaTime / 8.0f;
 		}
 	}
 
@@ -689,7 +687,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		hp -= 10;
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
 		hp += 10;
-
 
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 	{
@@ -1006,17 +1003,10 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		{
 			FlareSound.playSound();
 		}
-
+		
 		this->win = true;
 		return 42;
 	}
-	/*
-	if(id == fallenTree && axeIsEquiped)
-	{
-	logs++;
-	isAlive = false;
-	}
-	*/
 
 	return -1;
 }
