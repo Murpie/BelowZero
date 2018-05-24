@@ -95,7 +95,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	FlareSound.setVolume(100.0f);
 	HelicopterSound.addSound("HelicopterSound.wav");
 
-	
+	JacketSound.addSound("JacketSwoosh.wav");
 	wolf2.addSound("WolfHowl2.ogg");
 	wolf3.addSound("WolfHowl3.wav");
 
@@ -994,6 +994,8 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		pullDown = true;
 		isAlive = false;
 		this->coldResistance = 0.3f;
+		if (!JacketSound.isPlaying())
+			JacketSound.playSound();
 	}
 	else if (id == ObjectType::ID::FlareGunBox)
 	{

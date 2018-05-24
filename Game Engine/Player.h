@@ -23,6 +23,7 @@ public:
 	SoundMasterSFML Drink;
 	SoundMasterSFML FlareSound;
 	SoundMasterSFML HelicopterSound;
+	SoundMasterSFML JacketSound;
 	SoundMasterSFML wolf2;
 	SoundMasterSFML wolf3;
 

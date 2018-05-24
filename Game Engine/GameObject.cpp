@@ -337,6 +337,14 @@ void GameObject::moveDown(float deltaTime)
 	if (timeLimit > 20)
 		isActive = false;
 
+	if (!addedWallSound) {
+		moveWallSound.addSound("meltWall.wav");
+		moveWallSound.setVolume(60.0f);
+		addedWallSound = true;
+	}
+	if (!moveWallSound.isPlaying())
+		moveWallSound.playSound();
+
 	transform->position.y -= 2 * deltaTime;
 }
 

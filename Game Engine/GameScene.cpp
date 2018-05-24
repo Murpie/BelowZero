@@ -493,6 +493,7 @@ void GameScene::addMainMenu()
 	MainMenuObject->addComponent(mainMenuScene);
 	MainMenuObject->setIsRenderable(true);
 	
+	
 	gameObjects.push_back(MainMenuObject);
 }
 
