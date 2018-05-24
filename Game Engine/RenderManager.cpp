@@ -793,11 +793,17 @@ void RenderManager::Render() {
 	glUseProgram(vfxFireShaderProgram);
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
-		if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire || gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player)
+		if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire)
+		{
+			gameObject_ptr->hasSoundAttatched = true;
+			gameObject_ptr->burning.addSound("fireplace2.0.wav");
+		}
+		else if(gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player)
 		{
 			gameObject_ptr->hasSoundAttatched = true;
 			gameObject_ptr->burning.addSound("fireplace.wav");
 		}
+			
 		if (gameObject_ptr->getIsBurning())
 		{
 			float mixVar = glm::length(gameScene->gameObjects[0]->getPlayer()->transform.position - gameObject_ptr->transform->position);
@@ -806,6 +812,9 @@ void RenderManager::Render() {
 
 			float volume = glm::mix(60.0f, 0.0f, mixVar / 50.0f);
 			gameObject_ptr->burning.setVolume(volume);
+
+			if(gameObject_ptr->getPlayer()!=nullptr)
+				gameObject_ptr->burning.setVolume(40);
 
 			if (!gameObject_ptr->burning.isPlaying())
 			{
@@ -1631,6 +1640,17 @@ void RenderManager::Render() {
 void RenderManager::renderMainMenu()
 {
 	FindObjectsToRender();
+
+	if (!gameScene->gameObjects[0]->addedMenuMusic)
+	{
+		gameScene->gameObjects[0]->menuMusic.addSound("subtext.ogg");
+		gameScene->gameObjects[0]->addedMenuMusic = true;
+	}
+	if(!gameScene->gameObjects[0]->menuMusic.isPlaying())
+	{
+		gameScene->gameObjects[0]->menuMusic.playSound();
+		gameScene->gameObjects[0]->menuMusic.setVolume(15.0f);
+	}
 
 	view_matrix = gameScene->gameObjects[0]->getViewMatrix();
 	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
