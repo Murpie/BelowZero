@@ -28,18 +28,6 @@ uniform int ScreenX;
 uniform int ScreenY;
 uniform float water;
 
-vec3 drColor = vec3(0.9f, 1.0f, 0.84f) * daylight;
-vec3 drPosition = vec3(1.0, 1.0, 0.0);
-
-vec3 gridSamplingDisk[20] = vec3[]
-(
-	vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
-	vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
-	vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
-	vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
-	vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
-	);
-
 vec3 getBlur()
 {
 	const float offset = 1.0 / 50.0;
@@ -77,7 +65,7 @@ vec3 getBlur()
 // ----------========== DIRECTIONAL LIGHT SHADOW CALCULATION ==========----------
 float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 {
-	vec3 lightDirForShadow = normalize(normalize(vec3(lightPos)) - normalize(FragPos));
+	vec3 lightDirForShadow = normalize(vec3(lightPos) - FragPos);
 	vec4 shadowCoordinates = LightSpaceMatrix * vec4(FragPos, 1.0);
 	vec3 projectionCoordinates = shadowCoordinates.xyz / shadowCoordinates.w;
 	projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
@@ -86,7 +74,7 @@ float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 	float directionalLightshadowFactor = 0.0f;
 	float bias = 0.005;
 	directionalLightshadowFactor += projectionCoordinates.z - bias > closestDepth ? 0.35 : 0.0;
-	
+
 	//float bias = max(0.0005 * (1.0 - dot(Normal, lightDirForShadow)), 0.005);
 	//vec4 shadowCoordinates = LightSpaceMatrix * (vec4(FragPos, 1.0) + (vec4(Normal, 1.0) * 0.03));
 	/*vec2 texelSize = 1.0 / textureSize(depthMap, 0);
@@ -98,7 +86,7 @@ float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
 	directionalLightshadowFactor += projectionCoordinates.z - bias > pcfDepth ? 0.7 : 0.0;
 	}
 	}
-	directionalLightshadowFactor /= 9.0;*/ 
+	directionalLightshadowFactor /= 9.0;*/
 
 	if (projectionCoordinates.z > 1.0)
 		directionalLightshadowFactor = 0.0;
@@ -117,18 +105,15 @@ void main()
 	float thirstVariable = 1.0;
 	if (Thirst <= 50)
 	{
-		thirstVariable = Thirst / 50;
+		thirstVariable = Thirst / 100;
 	}
 	Albedo = mix(getBlur(), Albedo, thirstVariable);
 
-	vec3 testLighting = Albedo;
+
 
 
 	// then calculate lighting as usual
-	float epsilon = 0.001;
-	vec3 ambientStrength = Albedo * 0.3;
 	vec3 lighting = vec3(0.0, 0.0, 0.0);
-
 	vec3 viewDir = normalize(view_position - FragPos);
 
 	float shadowFactor = 0.0f;
@@ -138,43 +123,26 @@ void main()
 		//point
 		if (lights[i].lightType == 1) {
 			// diffuse
-
-			
-
-			vec3 lightDir = (lights[i].Position - FragPos);
-			//float diffuseFactor = max(dot(lightDir, Normal), 0.0);
-			float diffuseFactor = dot(normalize(lightDir), normalize(Normal));
-			diffuseFactor = max(diffuseFactor, 0);
-			vec3 diffuse = diffuseFactor * Albedo;
-
-
-
+			vec3 lightDir = normalize(lights[i].Position - FragPos);
+			float diffuse = max(dot(Normal, lightDir), 0.0);
 			// attenuation
 			float distance = length(lights[i].Position - FragPos);
-			float attenuation = 1.0 / (distance / lights[i].Linear);
-			//diffuse *= attenuation;
+			float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * (distance * distance));
+			//float attenuation = 1.0 / ((distance * distance) / (lights[i].Linear * lights[i].Linear));
 
-			lighting += diffuse * attenuation * lights[i].intensity * lights[i].Color;
-			//lighting += AmbientL * diffuse *  attenuation * lights[i].intensity;
-			//vec3 C = lights[i].Color * Albedo * diffuseFactor * lights[i].intensity * (1 / length(lightDir));
-			//lighting += C;
+			vec3 diff = lights[i].Color * diffuse * Albedo;
 
-			
-			testLighting = lighting;
+			diff *= attenuation;
+
+			lighting += diff * lights[i].intensity;
 		}
 	}
 
-	//Test Directional Light
-	vec3 lightDir = normalize(drPosition - vec3(0.0, 0.0, 0.0));
-	vec3 diffuse = max(dot(Normal, lightDir), 0.5) * Albedo * drColor;
-
-	vec3 halfwayDir = normalize(lightDir + viewDir);
-	float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-	// attenuation
-	float distance = length(drPosition - vec3(0.0, 0.0, 0.0));
-
-	lighting += diffuse;
-	lighting = min(lighting, vec3(1.0f));
+	//Directional Light
+	// diffuse
+	vec3 lightDir = normalize(vec3(7, 9, -5) - vec3(0.0, 0.0, 0.0));
+	vec3 diffuse = max(dot(Normal, lightDir), 0.5) * Albedo * vec3(1, 1, 1);
+	lighting += (diffuse * daylight);
 
 
 	float density = 0.02;
@@ -183,14 +151,10 @@ void main()
 	float visibility = exp(-pow((distanceToPos * density), gradient));
 	visibility = clamp(visibility, 0.0, 1.0);
 
-	//shadowFactor = DirectionalShadowMapCalculation(FragPos, Normal, vec3(1.0f, 1.0f, 0.0f));
 
 
-	//vec3 depthColor = vec3(texture(depthMap, TexCoords).r);
 
-	//FragColor = lighting * (1.0f - shadowFactor);
-	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, lighting, visibility);
 	//FragColor = lighting;
+	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, lighting, visibility);
 	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
-	//FragColor = testLighting;
 }

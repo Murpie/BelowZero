@@ -118,8 +118,6 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 	{
 		// Camera - (modify position with level file?)
 		addPlayer(*meshLibrary, *matertialLibrary);
-		// Lights - (add lights with level file?)
-		//addLight(glm::vec3(7, 9, -5), 0);
 		// Terrain
 		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
