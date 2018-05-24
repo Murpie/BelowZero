@@ -232,11 +232,11 @@ void GameObject::setGameEnd()
 	{
 		flareComponent = new Light(*transform);
 		flareComponent->lightType = 1;
-		flareComponent->color = glm::vec4(0.9f, 0, 0, 0.5f);
-		flareComponent->Linear = 50;
-		flareComponent->Quadratic = 0.3f;
+		flareComponent->color = glm::vec4(0.9, 0, 0, 0.5);
+		fireComponent->Linear = 0.0009;
+		fireComponent->Quadratic = 0.0032;
 		flareComponent->offset = 9;
-		flareComponent->intensity = 2.0f;
+		flareComponent->intensity = 2.0;
 	}
 	gameEnd = true;
 }
@@ -247,11 +247,10 @@ void GameObject::setLighterEquipped()
 	{
 		lighterComponent = new Light(*transform);
 		lighterComponent->lightType = 1;
-		lighterComponent->color = glm::vec4(0.9f, 0.2f, 0, 0.5f);
-		lighterComponent->Linear = 25;
-		lighterComponent->Quadratic = 0.15f;
-		lighterComponent->offset = 9;
-		lighterComponent->intensity = 0.5f;
+		lighterComponent->color = glm::vec4(0.9, 0.2, 0, 0.5);
+		lighterComponent->Linear = 0.0009;
+		lighterComponent->Quadratic = 0.0032;
+		lighterComponent->intensity = 1;
 		lighterComponent->isLighter = true;
 	}
 }
