@@ -218,7 +218,7 @@ void Game::levelState()
 		printCurrentState(stateOfGame.state);
 		initScene(Scene::ID::LEVEL_1);
 		renderer->createBuffers();
-		renderer->renderDepthQuadsForVisualization();
+		//renderer->renderDepthQuadsForVisualization();
 		stateOfGame.state = Gamestate::ID::RUN_LEVEL;
 		printCurrentState(stateOfGame.state);
 	}

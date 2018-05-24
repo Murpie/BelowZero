@@ -807,8 +807,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		firstMouse = false;
 	}
 
-	
-
 	xoffset = lastX - (float)xpos;
 	yoffset = lastY - (float)ypos;
 	lastX = (float)xpos;
@@ -1125,16 +1123,16 @@ const int Player::getEquipedID()
 void Player::wolfHowl(float nightTimer)
 {
 	float wolfTimer = nightTimer / 20;
-	if (nightTimer > 10 && nightTimer < 11 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	if (nightTimer > 10 && nightTimer < 11 && !wolf2.isPlaying() && !wolf3.isPlaying())
 		wolf3.playSound();
 	
-	if (nightTimer > 28 && nightTimer < 29 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	if (nightTimer > 28 && nightTimer < 29 && !wolf2.isPlaying() && !wolf3.isPlaying())
 		wolf2.playSound();
 
-	if (nightTimer > 80 && nightTimer < 81 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	if (nightTimer > 80 && nightTimer < 81 && !wolf2.isPlaying() && !wolf3.isPlaying())
 		wolf2.playSound();
 
-	if (nightTimer > 78 && nightTimer < 79 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	if (nightTimer > 78 && nightTimer < 79 && !wolf2.isPlaying() && !wolf3.isPlaying())
 		wolf3.playSound();
 }
 

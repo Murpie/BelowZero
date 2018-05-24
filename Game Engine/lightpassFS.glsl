@@ -33,7 +33,6 @@ uniform mat4 viewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform float water;
 
-int selected = 0;
 float clipSpacePosZ;
 vec4 lightSpacePosition;
 
@@ -100,7 +99,7 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 no
 	if (cascadeIndex == 2)
 		depth = texture(shadowMap2, UVCoords).x;
 
-	if (z -bias  > depth) // Determine If There Shall Be Shadow
+	if (z - bias > depth) // Determine If There Shall Be Shadow
 		shadow = 0.35f;
 	else
 		shadow = 0.0f;
@@ -195,23 +194,13 @@ void main()
 		{
 			calculateLightSpacePositions(FragPosition, i);
 			shadowFactor = cascadedShadowMapCalculation(i, lightSpacePosition, Normal, FragPos);
-			selected = i;
 			break;
 		}
-		else
-			selected = -1;
 	}
 
-	//FragColor = lighting * (1.0f - shadowFactor);;
-	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, lighting, visibility);
-	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
-	if (selected == 0)
-		FragColor.xyz = FragColor.xyz + vec3(0.1, 0.0, 0.0);
-	if (selected == 1)
-		FragColor.xyz = FragColor.xyz + vec3(0.0, 0.1, 0.0);
-	if (selected == 2)
-		FragColor.xyz = FragColor.xyz + vec3(0.0, 0.0, 0.1);
-	if (selected == -1)
-		FragColor = FragColor;
+	FragColor = lighting * (1.0f - shadowFactor);;
+	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, FragColor, visibility);
+
+	
 }
 

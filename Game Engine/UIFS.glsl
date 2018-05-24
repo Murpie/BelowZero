@@ -2,7 +2,7 @@
 layout(location = 0) out vec4 color;
 
 in vec2 texCoords;
-uniform int depthMapTransformation;
+//uniform int depthMapTransformation;
 
 uniform sampler2D theTexture;
 uniform sampler2D equipedTexture;
@@ -13,10 +13,11 @@ uniform sampler2D inventoryTexture4;
 uniform sampler2D inventoryTexture5;
 uniform sampler2D textTexture;
 uniform sampler2D SceneTexture;
-uniform sampler2D shadowMap1;
-uniform sampler2D shadowMap2;
-uniform sampler2D shadowMap3;
 uniform sampler2D emilFusk;
+//uniform sampler2D shadowMap1;
+//uniform sampler2D shadowMap2;
+//uniform sampler2D shadowMap3;
+
 
 uniform float hp;
 uniform float cold;
@@ -70,7 +71,7 @@ void main()
 		color.xyz = texture(SceneTexture, texCoords).xyz * abs(texture(textTexture, texCoords).w - 1);
 		color.w = texture(SceneTexture, texCoords).w;
 	}
-	else if (texture(shadowMap1, texCoords).w >= 0.01 && depthMapTransformation == 1)
+	/*else if (texture(shadowMap1, texCoords).w >= 0.01 && depthMapTransformation == 1)
 	{
 		float depth = texture(shadowMap1, texCoords).x;
 		color = vec4(depth, depth, depth, 1.0);
@@ -84,7 +85,7 @@ void main()
 	{
 		float depth = texture(shadowMap3, texCoords).x;
 		color = vec4(depth, depth, depth, 1.0);
-	}
+	}*/
 	else
 	{
 		color = texture(SceneTexture, texCoords);
