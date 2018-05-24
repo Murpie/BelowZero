@@ -17,6 +17,7 @@ const int NR_LIGHTS = 32;
 uniform Light lights[NR_LIGHTS];
 
 uniform float daylight;
+uniform int nrOfLights;
 
 uniform sampler2D gPosition;
 uniform sampler2D gAlbedo;
@@ -36,8 +37,7 @@ int selected = 0;
 float clipSpacePosZ;
 vec4 lightSpacePosition;
 
-vec3 drColor = vec3(0.9f, 1.0f, 0.84f) * daylight;
-vec3 drPosition = vec3(1.0, 1.0, 0.0);
+
 
 vec3 getBlur()
 {
@@ -134,7 +134,9 @@ void main()
 	vec3 lighting = vec3(0.0, 0.0, 0.0);
 	vec3 viewDir = normalize(view_position - FragPos);
 
-	for (int i = 0; i < NR_LIGHTS; ++i)
+
+
+	for (int i = 0; i < nrOfLights; i++)
 	{
 		////dir
 		//if (lights[i].lightType == 0) {
@@ -156,26 +158,26 @@ void main()
 		if (lights[i].lightType == 1) {
 			// diffuse
 			vec3 lightDir = normalize(lights[i].Position - FragPos);
-			vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Albedo * lights[i].Color;
+			float diffuse = max(dot(Normal, lightDir), 0.0);
 			// attenuation
 			float distance = length(lights[i].Position - FragPos);
-			float attenuation = 1.0 / ((distance * distance) / (lights[i].Linear * lights[i].Linear));
-			//diffuse *= attenuation;
+			float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * (distance * distance));
+			//float attenuation = 1.0 / ((distance * distance) / (lights[i].Linear * lights[i].Linear));
 
-			lighting += (diffuse * attenuation) * lights[i].intensity;
+			vec3 diff = lights[i].Color * diffuse * Albedo;
+
+			diff *= attenuation;
+
+			lighting += diff * lights[i].intensity;
 		}
 	}
 
-	//Test Directional Light
-	vec3 lightDir = normalize(drPosition - vec3(0.0, 0.0, 0.0));
-	vec3 diffuse = max(dot(Normal, lightDir), 0.3) * Albedo * drColor;
+	//Directional Light
+	// diffuse
+	vec3 lightDir = normalize(vec3(7, 9, -5) - vec3(0.0, 0.0, 0.0));
+	vec3 diffuse = max(dot(Normal, lightDir), 0.5) * Albedo * vec3(1, 1, 1);
+	lighting += (diffuse * daylight);
 
-	vec3 halfwayDir = normalize(lightDir + viewDir);
-	float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-	// attenuation
-	float distance = length(drPosition - vec3(0.0, 0.0, 0.0));
-	float attenuation = 1.0;
-	lighting += diffuse;
 
 	float density = 0.02;
 	float gradient = 3.0;
@@ -200,9 +202,8 @@ void main()
 			selected = -1;
 	}
 
-	FragColor = lighting * (1.0f - shadowFactor);
-	//FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, FragColor / 1.5, visibility);
-
+	//FragColor = lighting * (1.0f - shadowFactor);;
+	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, lighting, visibility);
 	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
 	if (selected == 0)
 		FragColor.xyz = FragColor.xyz + vec3(0.1, 0.0, 0.0);

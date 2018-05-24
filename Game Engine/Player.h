@@ -23,7 +23,6 @@ public:
 	SoundMasterSFML Drink;
 	SoundMasterSFML FlareSound;
 	SoundMasterSFML HelicopterSound;
-	SoundMasterSFML wolf1;
 	SoundMasterSFML wolf2;
 	SoundMasterSFML wolf3;
 
@@ -143,6 +142,8 @@ private:
 	bool pickUpSnow;
 	bool warning;
 	float textureTimer;
+
+	float coldResistance;
 
 	bool firstMouse;
 	float lastX, lastY;

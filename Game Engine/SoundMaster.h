@@ -15,11 +15,12 @@ private:
 public:
 
 	SoundMasterSFML();
-	SoundMasterSFML(const std::string & filePath);
 
 	~SoundMasterSFML();
 
 	void addSound(const std::string & filePath);
+	
+	bool existSound;
 
 	bool isPlaying();
 	void playSound();

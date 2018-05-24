@@ -1,35 +1,34 @@
 #include "SoundMaster.h"
 
 SoundMasterSFML::SoundMasterSFML()
-{
-	this->Sound = new sf::Sound;
-	this->Buffer = new sf::SoundBuffer;
-}
-
-SoundMasterSFML::SoundMasterSFML(const std::string & filePath)
-{
-	this->Sound = new sf::Sound;
-	this->Buffer = new sf::SoundBuffer;
-	addSound(filePath);
+{	
+	existSound = false;
 }
 
 SoundMasterSFML::~SoundMasterSFML()
 {
-	this->Sound->stop();
+	//this->Sound->stop();
 
-	if(Buffer != nullptr)
-	delete this->Buffer;
-	if(Sound != nullptr)
-	delete this->Sound;
+	if (existSound)
+	{
+		if(Buffer != nullptr)
+			delete this->Buffer;
+		if(Sound != nullptr)
+			delete this->Sound;
+		existSound = false;
+	}
 }
 
 void SoundMasterSFML::addSound(const std::string & filePath)
 {
+	this->Sound = new sf::Sound;
+	this->Buffer = new sf::SoundBuffer;
 
 	if (!this->Buffer->loadFromFile(filePath))
 		std::cout << "Cant Load File" << std::endl;
 
 	this->Sound->setBuffer(*Buffer);
+	existSound = true;
 }
 
 bool SoundMasterSFML::isPlaying()
