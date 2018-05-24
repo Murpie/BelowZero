@@ -793,30 +793,37 @@ void RenderManager::Render() {
 	glUseProgram(vfxFireShaderProgram);
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
-		if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire)
-		{
-			gameObject_ptr->hasSoundAttatched = true;
-			gameObject_ptr->burning.addSound("fireplace2.0.wav");
-		}
-		else if(gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player)
-		{
-			gameObject_ptr->hasSoundAttatched = true;
-			gameObject_ptr->burning.addSound("fireplace.wav");
-		}
+
 			
 		if (gameObject_ptr->getIsBurning())
 		{
-			float mixVar = glm::length(gameScene->gameObjects[0]->getPlayer()->transform.position - gameObject_ptr->transform->position);
-			if (mixVar >= 50.0f)
-				mixVar = 50.0f;
-
-			float volume = glm::mix(60.0f, 0.0f, mixVar / 50.0f);
-			gameObject_ptr->burning.setVolume(volume);
-
-			if(gameObject_ptr->getPlayer()!=nullptr)
+			if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire)
+			{
+				gameObject_ptr->hasSoundAttatched = true;
+				gameObject_ptr->burning.addSound("fireplace2.0.ogg");
+			}
+			else if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player)
+			{
+				gameObject_ptr->hasSoundAttatched = true;
+				gameObject_ptr->burning.addSound("fireplace.ogg");
 				gameObject_ptr->burning.setVolume(40);
+			}
 
-			if (!gameObject_ptr->burning.isPlaying())
+			if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire)
+			{
+				float mixVar = glm::length(gameScene->gameObjects[0]->getPlayer()->transform.position - gameObject_ptr->transform->position);
+				if (mixVar >= 50.0f)
+					mixVar = 50.0f;
+
+				float volume = glm::mix(60.0f, 0.0f, mixVar / 50.0f);
+				gameObject_ptr->burning.setVolume(volume);
+			}
+
+
+
+
+			if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire && !gameObject_ptr->burning.isPlaying()
+				|| gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player && !gameObject_ptr->burning.isPlaying())
 			{
 				gameObject_ptr->burning.loop(true);
 				gameObject_ptr->burning.playSound();
