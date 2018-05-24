@@ -633,9 +633,9 @@ void Player::update(float deltaTime, float seconds)
 	if (this->win == true)
 	{
 		this->flareTimer += deltaTime;
-		if (flareTimer <= 10.0f)
+		if (flareTimer >= 2.0f)
 		{
-			this->winFade += deltaTime / 10.0f;
+			this->winFade += deltaTime / 8.0f;
 		}
 	}
 
@@ -1005,18 +1005,10 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		{
 			FlareSound.playSound();
 		}
-
-		isAlive = false;
+		
 		this->win = true;
 		return 42;
 	}
-	/*
-	if(id == fallenTree && axeIsEquiped)
-	{
-	logs++;
-	isAlive = false;
-	}
-	*/
 
 	return -1;
 }

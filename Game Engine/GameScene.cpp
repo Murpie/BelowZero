@@ -131,7 +131,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		srand(time(NULL));
 		randomLevel = rand() % 4;
 
-		switch (randomLevel)
+		/*switch (randomLevel)
 		{
 		case 0:
 			level = new LeapLevel("Lvl8.leap");
@@ -147,8 +147,8 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 			break;
 		default:
 			break;
-		}
-		//level = new LeapLevel("Lvl12.leap");
+		}*/
+		level = new LeapLevel("Lvl2.leap");
 
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
 		//addAI(*meshLibrary, *matertialLibrary, *level);
