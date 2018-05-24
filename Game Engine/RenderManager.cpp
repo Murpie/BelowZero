@@ -2012,35 +2012,36 @@ void RenderManager::renderFlareParticles()
 
 void RenderManager::dayNightCycle()
 {
-	if (time > 120 && dayOrNight)
-	{
-		
-
-
-		daylight -= deltaTime * 0.02f;
-		if (daylight < 0.1f)
-		{
-			daylight = 0.1f;
-			dayOrNight = false;
-			time = 0;
-		}
-	}
-	else if (time > 120 && !dayOrNight)
-	{
-		daylight += deltaTime * 0.02f;
-		if (daylight > 1)
-		{
-			daylight = 1;
-			dayOrNight = true;
-			time = 0;
-		}
-	}
-	else
-	{
-		time += deltaTime;
-		if(!dayOrNight)
-			gameScene->gameObjects[0]->getPlayer()->wolfHowl(time);
-	}
+	//if (time > 120 && dayOrNight)
+	//{
+	//	
+	//
+	//
+	//	daylight -= deltaTime * 0.02f;
+	//	if (daylight < 0.1f)
+	//	{
+	//		daylight = 0.1f;
+	//		dayOrNight = false;
+	//		time = 0;
+	//	}
+	//}
+	//else if (time > 120 && !dayOrNight)
+	//{
+	//	daylight += deltaTime * 0.02f;
+	//	if (daylight > 1)
+	//	{
+	//		daylight = 1;
+	//		dayOrNight = true;
+	//		time = 0;
+	//	}
+	//}
+	//else
+	//{
+	//	time += deltaTime;
+	//	if(!dayOrNight)
+	//		gameScene->gameObjects[0]->getPlayer()->wolfHowl(time);
+	//}
+	daylight = 0.1;
 }
 
 void RenderManager::ParticleLinearSort(Particle* arr, int size)

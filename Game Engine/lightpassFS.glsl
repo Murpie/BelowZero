@@ -127,7 +127,7 @@ void main()
 	// then calculate lighting as usual
 	float epsilon = 0.001;
 	vec3 ambientStrength = Albedo * 0.3;
-	vec3 lighting = ambientStrength;
+	vec3 lighting = vec3(0.0, 0.0, 0.0);
 
 	vec3 viewDir = normalize(view_position - FragPos);
 
