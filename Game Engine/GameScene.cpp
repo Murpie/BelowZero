@@ -126,7 +126,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		LeapLevel * level;
 
 		//Randomizer
-		srand(time(NULL));
+		/*srand(time(NULL));
 		randomLevel = rand() % 4;
 
 		switch (randomLevel)
@@ -145,8 +145,8 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 			break;
 		default:
 			break;
-		}
-		//level = new LeapLevel("TestLvl.leap");
+		}*/
+		level = new LeapLevel("TestLvl.leap");
 		
 
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
