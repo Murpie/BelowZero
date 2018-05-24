@@ -17,6 +17,7 @@ const int NR_LIGHTS = 32;
 uniform Light lights[NR_LIGHTS];
 
 uniform float daylight;
+uniform int nrOfLights;
 
 uniform sampler2D gPosition;
 uniform sampler2D gAlbedo;
@@ -132,7 +133,7 @@ void main()
 
 	float shadowFactor = 0.0f;
 
-	for (int i = 0; i < NR_LIGHTS; ++i)
+	for (int i = 0; i < nrOfLights; i++)
 	{
 		//point
 		if (lights[i].lightType == 1) {
@@ -174,6 +175,7 @@ void main()
 
 	lighting += diffuse;
 	lighting = min(lighting, vec3(1.0f));
+
 
 	float density = 0.02;
 	float gradient = 3.0;

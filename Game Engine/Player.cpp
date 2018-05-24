@@ -1198,12 +1198,12 @@ void Player::equipItemMesh()
 
 void Player::textWarnings()
 {
-	if (transform.position.y > 10 && !jacket && !warning)
+	if (transform.position.y > 42 && !jacket && !warning)
 	{
 		addTextToScreen("ColdWarning");
 		warning = true;
 	}
-	else if (transform.position.y < 10 && warning)
+	else if (transform.position.y < 42 && warning)
 	{
 		warning = false;
 	}

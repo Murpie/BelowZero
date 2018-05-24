@@ -5,8 +5,8 @@ layout(location = 2) out vec3 gNormal;
 
 in GS_OUT{
 	vec4 vertex_normal;
-vec4 FragPos;
-vec2 TexCoords;
+	vec4 FragPos;
+	vec2 TexCoords;
 } fs_in;
 
 uniform sampler2D gAlbedoIn;
@@ -19,5 +19,5 @@ void main()
 	//gAlbedo = vec3(0.5, 0.3, 0.2);
 	gAlbedo = texture(gAlbedoIn, fs_in.TexCoords).xyz;
 
-	gNormal = normalize(fs_in.vertex_normal.xyz);
+	gNormal = fs_in.vertex_normal.xyz;
 }
