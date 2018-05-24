@@ -233,10 +233,10 @@ void GameObject::setGameEnd()
 		flareComponent = new Light(*transform);
 		flareComponent->lightType = 1;
 		flareComponent->color = glm::vec4(0.9, 0, 0, 0.5);
-		fireComponent->Linear = 0.0009;
-		fireComponent->Quadratic = 0.0032;
+		flareComponent->Linear = 0.0009;
+		flareComponent->Quadratic = 0.0032;
 		flareComponent->offset = 9;
-		flareComponent->intensity = 2.0;
+		flareComponent->intensity = 3.0;
 	}
 	gameEnd = true;
 }
