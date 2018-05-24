@@ -122,7 +122,7 @@ void RenderManager::FindObjectsToRender() {
 			glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->inZone[i]->transform->position;
 			float distance = length(vectorToObject);
 
-			if (gameScene->inZone[i]->getIsRenderable() == true && distance < 100) {
+			if (gameScene->inZone[i]->getIsRenderable() == true && distance < 110) {
 				gameObjectsToRender.push_back(gameScene->inZone[i]);
 			}
 
