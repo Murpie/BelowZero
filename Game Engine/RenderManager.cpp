@@ -766,7 +766,18 @@ void RenderManager::Render() {
 			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
 			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
 			tempMatrix = glm::rotate(tempMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
-			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldPitch + gameObjectsToRender[0]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
+			if (gameObjectsToRender[0]->getPlayer()->swing)
+			{
+				if ((gameObjectsToRender[0]->getPlayer()->axeSwing) == 0 || (gameObjectsToRender[0]->getPlayer()->axeSwing) == 3)
+				{
+					tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->rotateSwing, glm::vec3(0, 0, 1));
+				}
+				tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->pickUp, glm::vec3(1, 0, 0));
+			}
+			else
+			{
+				tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldPitch + gameObjectsToRender[0]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
+			}
 		}
 		else
 		{

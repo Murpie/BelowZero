@@ -1224,19 +1224,21 @@ void Player::swingAxe(float deltaTime)
 	}
 	else if (pickUp < 0.4 && axeSwing == 0)
 	{
+		swing = true;
 		pickUp += deltaTime * 2;
+
 		if (pickUp >= 0.4)
 			axeSwing = 1;
 	}
 	else if (pickUp > -0.3 && axeSwing == 1)
 	{
-		pickUp -= deltaTime * 7;
+		rotateSwing += deltaTime * 3;
 		if (pickUp <= -0.3)
 			axeSwing = 3;
 	}
 	else if (pickUp < 0 && axeSwing == 3)
 	{
-		pickUp += deltaTime;
+		pickUp -= deltaTime * 7;
 		if (pickUp >= 0)
 		{
 			pickUp = 0;
