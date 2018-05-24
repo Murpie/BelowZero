@@ -148,6 +148,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		default:
 			break;
 		}
+		//level = new LeapLevel("TestLvl.leap");
 		
 
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
