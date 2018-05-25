@@ -16,6 +16,10 @@ MainMenuScene::MainMenuScene()
 	this->scaling3 = 1.0;
 	this->whichButtonIsSelected = -1;
 
+	this->fade = 0.0f;
+	this->fadeTimer = 0.0f;
+	this->fadeMenuBool = false;
+
 	this->startButtonMinMax[0].x = 30;
 	this->startButtonMinMax[0].y = 381;
 	this->startButtonMinMax[1].x = 250;
@@ -58,10 +62,31 @@ MainMenuScene::~MainMenuScene()
 	deleteObjects();
 }
 
-int MainMenuScene::randomizeBackgroundImage()
+void MainMenuScene::loadLoadingTexture(std::string loadingTextureName)
 {
-	srand(time(NULL));
-	return (rand() % 2);
+	std::string texturePNG = ".png";
+	std::string filePath = loadingTextureName + texturePNG;
+	int width, height, nrOfChannels;
+	// ----------========== Equipment FrameBuffer ==========----------
+	unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
+	glGenFramebuffers(1, &loadingFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, loadingFBO);
+	glGenTextures(1, &loadingTexture);
+	glBindTexture(GL_TEXTURE_2D, loadingTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (data)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	else
+		std::cout << "Failed to load Loading Texture from path" << std::endl;
+
+	stbi_image_free(data);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, loadingTexture, 0);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Loading Framebuffer not complete!" << std::endl;
+
 }
 
 void MainMenuScene::loadBackgroundTexture(std::string backgroundTextureName)
@@ -272,6 +297,19 @@ void MainMenuScene::renderFrameQuad(GLuint shader)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 }
 
+void MainMenuScene::fadeMenu(float deltaTime)
+{
+	fadeTimer += deltaTime;
+	fade += deltaTime / 2;
+	
+	if (fadeTimer >= 2.0f)
+	{
+		printf("STATE OF GAME: %d", stateOfGame);
+		stateOfGame.state = Gamestate::ID::CLEAR_MENU;
+		printf("STATE OF GAME: %d", stateOfGame);
+	}
+}
+
 void MainMenuScene::deleteObjects()
 {
 	glDeleteVertexArrays(1, &VAO);
@@ -287,6 +325,11 @@ void MainMenuScene::update(float deltaTime, float seconds)
 void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 {
 	glfwGetCursorPos(window, &xPos, &yPos);
+
+	if (fadeMenuBool)
+	{
+		fadeMenu(deltaTime);
+	}
 
 	if (startButtonMinMax[0].x < xPos && xPos < startButtonMinMax[1].x && startButtonMinMax[0].y < yPos && yPos < startButtonMinMax[1].y)
 	{
@@ -397,10 +440,8 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 		 pressed = false;
 		if (whichButtonIsSelected == 1 && pressed == false)
 		{
-				printf("STATE OF GAME: %d", stateOfGame);
-				stateOfGame.state = Gamestate::ID::CLEAR_MENU;
-				printf("STATE OF GAME: %d", stateOfGame);
-				pressed = true;
+			fadeMenuBool = true;
+			pressed = true;
 		}
 		
 		else if (whichButtonIsSelected == 2 && pressed == false)

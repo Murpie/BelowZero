@@ -135,7 +135,7 @@ void RenderManager::FindObjectsToRender() {
 			glm::vec3 vectorToObject = gameScene->gameObjects[0]->transform->position - gameScene->inZone[i]->transform->position;
 			float distance = length(vectorToObject);
 
-			if (gameScene->inZone[i]->getIsRenderable() == true && distance < 100) {
+			if (gameScene->inZone[i]->getIsRenderable() == true && distance < 110) {
 				gameObjectsToRender.push_back(gameScene->inZone[i]);
 			}
 
@@ -812,6 +812,7 @@ void RenderManager::Render() {
 			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
 			tempMatrix = glm::rotate(tempMatrix, -gameObjectsToRender[i]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
 			tempMatrix = glm::rotate(tempMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
+			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->rotateSwing, glm::vec3(1, 0, 0));
 			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldPitch + gameObjectsToRender[0]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
 		}
 		else
@@ -841,21 +842,37 @@ void RenderManager::Render() {
 	glUseProgram(vfxFireShaderProgram);
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
-		if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire || gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player)
-		{
-			gameObject_ptr->hasSoundAttatched = true;
-			gameObject_ptr->burning.addSound("fireplace.wav");
-		}
+
+			
 		if (gameObject_ptr->getIsBurning())
 		{
-			float mixVar = glm::length(gameScene->gameObjects[0]->getPlayer()->transform.position - gameObject_ptr->transform->position);
-			if (mixVar >= 50.0f)
-				mixVar = 50.0f;
+			if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire)
+			{
+				gameObject_ptr->hasSoundAttatched = true;
+				gameObject_ptr->burning.addSound("fireplace2.0.ogg");
+			}
+			else if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player)
+			{
+				gameObject_ptr->hasSoundAttatched = true;
+				gameObject_ptr->burning.addSound("fireplace.ogg");
+				gameObject_ptr->burning.setVolume(40);
+			}
 
-			float volume = glm::mix(60.0f, 0.0f, mixVar / 50.0f);
-			gameObject_ptr->burning.setVolume(volume);
+			if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire)
+			{
+				float mixVar = glm::length(gameScene->gameObjects[0]->getPlayer()->transform.position - gameObject_ptr->transform->position);
+				if (mixVar >= 50.0f)
+					mixVar = 50.0f;
 
-			if (!gameObject_ptr->burning.isPlaying())
+				float volume = glm::mix(60.0f, 0.0f, mixVar / 50.0f);
+				gameObject_ptr->burning.setVolume(volume);
+			}
+
+
+
+
+			if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire && !gameObject_ptr->burning.isPlaying()
+				|| gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player && !gameObject_ptr->burning.isPlaying())
 			{
 				gameObject_ptr->burning.loop(true);
 				gameObject_ptr->burning.playSound();
@@ -1111,7 +1128,7 @@ void RenderManager::Render() {
 				{
 					//Control the movement with the wind
 					
-					lighterParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//0.016 as a universal "fake" DT
+					lighterParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * deltaTime;
 					
 					if (lighterParticleContainer[i].life >= 0.6f)
 					{
@@ -1344,125 +1361,135 @@ void RenderManager::Render() {
 	glUseProgram(vfxFlareShaderProgram);
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
-		if (gameObject_ptr->gameEnd)
+		if (gameObject_ptr->gameEnd || pickedUpFlare == true)
 		{
-			//Particle system location, can be changed dynamically if e.g. a torch is wanted
+			pickedUpFlare = true;
 
-			defaultX = gameObject_ptr->transform->position.x;
-			defaultY = gameObject_ptr->transform->position.y;
-			defaultZ = gameObject_ptr->transform->position.z;
-			offset = 100.0f;
-
-			//Create the direction vector from a start and end point
-			//and check how far away the particles are.
-			targetPoint = gameObject_ptr->transform->position;
-			targetPoint.y += offset;
-
-			startPoint = glm::vec3(defaultX, defaultY, defaultZ);
-			particlePivot = gameObject_ptr->transform->position;
-			directionVec = targetPoint - startPoint;
-
-			if (particleCount <= MAX_PARTICLES && flareAlive == false)
+			if (gameObject_ptr->objectID == ObjectType::ID::FlareGun)
 			{
-				flareAlive = true;
-				for (int i = 0; i < flareParticles; i++)
-				{
-					lastUsedParticle = FindUnusedParticle(flareParticleContainer, lastUsedParticle);
-					int particleIndex = lastUsedParticle;
-
-					flareParticleContainer[particleIndex].life = 4.0f;
-					flareParticleContainer[particleIndex].pos = startPoint;
-
-					//Fix the rest constants that's needed for a "living" looking fire.
-					//First, create a spread with values from 0.00 -> 1.00
-					float spread = (rand() % 100) / 100.0f;
-					glm::vec3 mainDir = glm::vec3(0.0f, 0.1f, 0.0f);
-
-					//Set the new direction for the particle
-					flareParticleContainer[particleIndex].speed = directionVec / 5.0f;
-
-					//Set colors
-					flareParticleContainer[particleIndex].r = 1.0f;
-					flareParticleContainer[particleIndex].g = 0;
-					flareParticleContainer[particleIndex].b = 0;
-					flareParticleContainer[particleIndex].a = 255.0f;
-
-					flareParticleContainer[particleIndex].size = 2.0f;
-				}
+				gameObject_ptr->isActive = false;
 			}
+			//Particle system location, can be changed dynamically if e.g. a torch is wanted
+			flareShotTimer += deltaTime;
 
-			particleCount = 0;
-			//Movement of the new particles
-			for (int i = 0; i < MAX_PARTICLES; i++)
+			if (flareShotTimer >= 2.0f)
 			{
-				flareParticleContainer[i].life -= 0.016f / 1.8f;
-				if (flareParticleContainer[i].life > 0.0f)
+				gameScene->gameObjects[0]->delayFlare = true;
+				defaultX = gameScene->gameObjects[0]->transform->position.x;
+				defaultY = gameScene->gameObjects[0]->transform->position.y;
+				defaultZ = gameScene->gameObjects[0]->transform->position.z;
+				offset = 100.0f;
+
+				//Create the direction vector from a start and end point
+				//and check how far away the particles are.
+				targetPoint = gameObject_ptr->transform->position;
+				targetPoint.y += offset;
+
+				startPoint = glm::vec3(defaultX, defaultY, defaultZ);// +(gameScene->gameObjects[0]->transform->forward * 1.2f);
+				particlePivot = gameObject_ptr->transform->position;
+				directionVec = targetPoint - startPoint;
+
+				if (particleCount <= MAX_PARTICLES && flareAlive == false)
 				{
-					//Control the movement with the wind
-					if (flareParticleContainer[i].pos.y <= 80.0f)
+					flareAlive = true;
+					for (int i = 0; i < flareParticles; i++)
 					{
-						flareParticleContainer[i].speed += glm::vec3(1.5f, -12.0f, 0.75f) * 0.5f * 0.016f;
+						lastUsedParticle = FindUnusedParticle(flareParticleContainer, lastUsedParticle);
+						int particleIndex = lastUsedParticle;
+
+						flareParticleContainer[particleIndex].life = 4.0f;
+						flareParticleContainer[particleIndex].pos = startPoint;
+
+						//Fix the rest constants that's needed for a "living" looking fire.
+						//First, create a spread with values from 0.00 -> 1.00
+						float spread = (rand() % 100) / 100.0f;
+						glm::vec3 mainDir = glm::vec3(0.0f, 0.1f, 0.0f);
+
+						//Set the new direction for the particle
+						flareParticleContainer[particleIndex].speed = directionVec / 5.0f;
+
+						//Set colors
+						flareParticleContainer[particleIndex].r = 1.0f;
+						flareParticleContainer[particleIndex].g = 0;
+						flareParticleContainer[particleIndex].b = 0;
+						flareParticleContainer[particleIndex].a = 255.0f;
+
+						flareParticleContainer[particleIndex].size = 2.0f;
+					}
+				}
+
+				particleCount = 0;
+				//Movement of the new particles
+				for (int i = 0; i < MAX_PARTICLES; i++)
+				{
+					flareParticleContainer[i].life -= 0.016f / 1.8f;
+					if (flareParticleContainer[i].life > 0.0f)
+					{
+						//Control the movement with the wind
+						if (flareParticleContainer[i].pos.y <= 80.0f)
+						{
+							flareParticleContainer[i].speed += glm::vec3(1.5f, -5.0f, 0.75f) * deltaTime;
+						}
+						else
+						{
+							flareParticleContainer[i].speed += glm::vec3(0.5f, -3.5f, 0.25f) * deltaTime;
+						}
+
+						flareParticleContainer[i].pos += flareParticleContainer[i].speed / 20.0f;
+						flareParticleContainer[i].cameraDistance = glm::length(flareParticleContainer[i].pos - cameraPosition);
+
+						//Set Positions
+						flareParticlePositionData[4 * particleCount + 0] = flareParticleContainer[i].pos.x;
+						flareParticlePositionData[4 * particleCount + 1] = flareParticleContainer[i].pos.y;
+						flareParticlePositionData[4 * particleCount + 2] = flareParticleContainer[i].pos.z;
+						flareParticlePositionData[4 * particleCount + 3] = flareParticleContainer[i].size;
+
+						//Set Colors
+						flareParticleColorData[4 * particleCount + 0] = flareParticleContainer[i].r * 255.0f;
+						flareParticleColorData[4 * particleCount + 1] = flareParticleContainer[i].g;
+						flareParticleColorData[4 * particleCount + 2] = flareParticleContainer[i].b;
+						flareParticleColorData[4 * particleCount + 3] = flareParticleContainer[i].a;
+						if (flareParticleContainer[i].life <= 1.0f)
+						{
+							flareParticleColorData[4 * particleCount + 3] = flareParticleContainer[i].a * flareParticleContainer[i].life;
+						}
 					}
 					else
 					{
-						flareParticleContainer[i].speed += glm::vec3(0.5f, -3.5f, 0.25f) * 0.5f * 0.016f;
+						flareParticleContainer[i].cameraDistance = -1.0f;
+						flareParticlePositionData[4 * particleCount + 3] = 0;	//If dead -> Size = 0
 					}
-
-					flareParticleContainer[i].pos += flareParticleContainer[i].speed / 20.0f;
-					flareParticleContainer[i].cameraDistance = glm::length(flareParticleContainer[i].pos - cameraPosition);
-					flarePosition = flareParticleContainer[i].pos;
-
-					//Set Positions
-					flareParticlePositionData[4 * particleCount + 0] = flareParticleContainer[i].pos.x;
-					flareParticlePositionData[4 * particleCount + 1] = flareParticleContainer[i].pos.y;
-					flareParticlePositionData[4 * particleCount + 2] = flareParticleContainer[i].pos.z;
-					flareParticlePositionData[4 * particleCount + 3] = flareParticleContainer[i].size;
-
-					//Set Colors
-					flareParticleColorData[4 * particleCount + 0] = flareParticleContainer[i].r * 255.0f;
-					flareParticleColorData[4 * particleCount + 1] = flareParticleContainer[i].g;
-					flareParticleColorData[4 * particleCount + 2] = flareParticleContainer[i].b;
-					flareParticleColorData[4 * particleCount + 3] = flareParticleContainer[i].a;
-					if (flareParticleContainer[i].life <= 1.0f)
-					{
-						flareParticleColorData[4 * particleCount + 3] = flareParticleContainer[i].a * flareParticleContainer[i].life;
-					}
+					particleCount++;
 				}
-				else
-				{
-					flareParticleContainer[i].cameraDistance = -1.0f;
-					flareParticlePositionData[4 * particleCount + 3] = 0;	//If dead -> Size = 0
-				}
-				particleCount++;
+
+				//Update particle information
+				glBindBuffer(GL_ARRAY_BUFFER, flareParticlePositionBuffer);
+				glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLfloat), flareParticlePositionData);
+
+				glBindBuffer(GL_ARRAY_BUFFER, flareParticleColorBuffer);
+				glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLubyte), flareParticleColorData);
+
+				//Apply Texture
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, flareTexture);
+				glUniform1i(glGetUniformLocation(vfxFlareShaderProgram, "particleTexture"), 0);
+
+				//Get and set matrices
+				viewProjectionMatrix = projection_matrix * view_matrix;
+				cameraRight_vector = glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
+				cameraUp_vector = glm::vec3(view_matrix[0][1], view_matrix[1][1], view_matrix[2][1]);
+				glUniform3fv(glGetUniformLocation(vfxFlareShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
+				glUniform3fv(glGetUniformLocation(vfxFlareShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
+				glUniformMatrix4fv(glGetUniformLocation(vfxFlareShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
+				glUniform3fv(glGetUniformLocation(vfxFlareShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
+				glUniform3fv(glGetUniformLocation(vfxFlareShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint));
+
+				//Draw Particles
+				renderFlareParticles();
+				glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
 			}
-
-			//Update particle information
-			glBindBuffer(GL_ARRAY_BUFFER, flareParticlePositionBuffer);
-			glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLfloat), flareParticlePositionData);
-
-			glBindBuffer(GL_ARRAY_BUFFER, flareParticleColorBuffer);
-			glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, particleCount * 4 * sizeof(GLubyte), flareParticleColorData);
-
-			//Apply Texture
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, flareTexture);
-			glUniform1i(glGetUniformLocation(vfxFlareShaderProgram, "particleTexture"), 0);
-
-			//Get and set matrices
-			viewProjectionMatrix = projection_matrix * view_matrix;
-			cameraRight_vector = glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]);
-			cameraUp_vector = glm::vec3(view_matrix[0][1], view_matrix[1][1], view_matrix[2][1]);
-			glUniform3fv(glGetUniformLocation(vfxFlareShaderProgram, "cameraRight_worldspace"), 1, glm::value_ptr(cameraRight_vector));
-			glUniform3fv(glGetUniformLocation(vfxFlareShaderProgram, "cameraUp_worldspace"), 1, glm::value_ptr(cameraUp_vector));
-			glUniformMatrix4fv(glGetUniformLocation(vfxFlareShaderProgram, "vp"), 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
-			glUniform3fv(glGetUniformLocation(vfxFlareShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
-			glUniform3fv(glGetUniformLocation(vfxFlareShaderProgram, "particlePivot"), 1, glm::value_ptr(startPoint));
-
-			//Draw Particles
-			renderFlareParticles();
-			glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particleCount);
 			break;
 		}
 	}
@@ -1495,7 +1522,7 @@ void RenderManager::Render() {
 		else if (lightsToRender.at(i)->isFlare == true)
 		{
 			lightUniform = "lights[" + std::to_string(i) + "].Position";
-			glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(flarePosition));
+			glUniform3fv(glGetUniformLocation(lightpassShaderProgram, lightUniform.c_str()), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
 		}
 		else
 		{
@@ -1721,6 +1748,17 @@ void RenderManager::renderMainMenu()
 {
 	FindObjectsToRender();
 
+	if (!gameScene->gameObjects[0]->addedMenuMusic)
+	{
+		gameScene->gameObjects[0]->menuMusic.addSound("SubtextCorrect.ogg");
+		gameScene->gameObjects[0]->addedMenuMusic = true;
+	}
+	if(!gameScene->gameObjects[0]->menuMusic.isPlaying())
+	{
+		gameScene->gameObjects[0]->menuMusic.playSound();
+		gameScene->gameObjects[0]->menuMusic.setVolume(80.0f);
+	}
+
 	view_matrix = gameScene->gameObjects[0]->getViewMatrix();
 	//projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
@@ -1740,6 +1778,9 @@ void RenderManager::renderMainMenu()
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->startButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "loadingTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->loadingTexture);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
@@ -1751,10 +1792,14 @@ void RenderManager::renderMainMenu()
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->settingsButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "loadingTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->loadingTexture);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "fade"), gameScene->gameObjects[0]->getMenuScene()->fade);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 3;
@@ -1762,6 +1807,9 @@ void RenderManager::renderMainMenu()
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->exitButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "loadingTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->loadingTexture);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
@@ -1773,6 +1821,9 @@ void RenderManager::renderMainMenu()
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->backgroundTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "loadingTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->loadingTexture);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);

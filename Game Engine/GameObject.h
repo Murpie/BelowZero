@@ -33,6 +33,9 @@ public:
 	~GameObject();
 
 	SoundMasterSFML burning;
+	SoundMasterSFML moveWallSound;
+	SoundMasterSFML menuMusic;
+
 	Zone zone;
 
 	void update(float deltaTime, float seconds);
@@ -42,8 +45,12 @@ public:
     bool hasLight;
 	bool isInteractable;
 	bool gameEnd;
+	bool delayFlare;
 	bool lighterEquipped;
 	bool moveBelowTerrain;
+	bool addedWallSound = false;
+	bool addedMenuMusic = false;
+	bool wallSoundPlayed = false;
 	float timeAlive;
 	
 	int playerHitCounter; //used to count how many hits the object has taken from player

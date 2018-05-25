@@ -94,19 +94,19 @@ void main()
 	//Mix *= vec3(0.33, 0.9, 1.0);
 
 	float coldVariable = 1.0;
-	if (Cold <= 50)
+	if (Cold <= 30)
 	{
-		coldVariable = (Cold -25) / 25;
+		coldVariable = (Cold -20) / 10;
 	}
-	if (Cold <= 25)
+	if (Cold <= 20)
 		coldVariable = 0;
 
 	float hungerVariable = 1.0;
-	if (Hunger <= 50)
+	if (Hunger <= 30)
 	{
-		hungerVariable = (Hunger - 25) / 25;
+		hungerVariable = (Hunger - 20) / 10;
 	}
-	if (Hunger <= 25)
+	if (Hunger <= 20)
 		hungerVariable = 0;
    //
 	//if (gl_FragCoord.x > ScreenX * 0.8)
