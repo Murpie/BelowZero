@@ -24,6 +24,7 @@ public:
 	MainMenuScene();
 	~MainMenuScene();
 
+	void loadLoadingTexture(std::string loadingTextureName);
 	void loadBackgroundTexture(std::string backgroundTextureName);
 	void loadButtonTexture(std::string buttonTextureName, int buttonNumber);
 	void renderFrameQuad(GLuint shader);
@@ -35,6 +36,7 @@ public:
 	void processEvents(GLFWwindow *window, float deltaTime);
 
 	GLuint backgroundTexture;
+	GLuint loadingTexture;
 	GLuint startButtonTexture;
 	GLuint settingsButtonTexture;
 	GLuint exitButtonTexture;
@@ -43,6 +45,7 @@ public:
 	unsigned int mainMenuShaderProgram;
 	
 	unsigned int backgroundFbo;
+	unsigned int loadingFBO;
 	unsigned int VBO;
 	unsigned int VAO;
 	unsigned int EBO;
