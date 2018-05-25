@@ -842,23 +842,30 @@ void RenderManager::Render() {
 	glUseProgram(vfxFireShaderProgram);
 	for (GameObject* gameObject_ptr : gameObjectsToRender)
 	{
-
-			
 		if (gameObject_ptr->getIsBurning())
 		{
 			if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire)
 			{
 				gameObject_ptr->hasSoundAttatched = true;
 				gameObject_ptr->burning.addSound("fireplace2.0.ogg");
+				gameObject_ptr->burning.setVolume(40.0f);
+				if (!gameObject_ptr->burning.isPlaying())
+				{
+					gameObject_ptr->burning.playSound();
+				}
 			}
 			else if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player)
 			{
 				gameObject_ptr->hasSoundAttatched = true;
-				gameObject_ptr->burning.addSound("fireplace.ogg");
-				gameObject_ptr->burning.setVolume(40);
+				gameObject_ptr->burning.addSound("fireplace2.0.ogg");
+				gameObject_ptr->burning.setVolume(40.0f);
+				if (!gameObject_ptr->burning.isPlaying())
+				{
+					gameObject_ptr->burning.playSound();
+				}
 			}
 
-			if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire)
+			if (gameObject_ptr->hasSoundAttatched == true && gameObject_ptr->objectID == ObjectType::ID::Campfire)
 			{
 				float mixVar = glm::length(gameScene->gameObjects[0]->getPlayer()->transform.position - gameObject_ptr->transform->position);
 				if (mixVar >= 50.0f)
@@ -869,10 +876,8 @@ void RenderManager::Render() {
 			}
 
 
-
-
-			if (gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Campfire && !gameObject_ptr->burning.isPlaying()
-				|| gameObject_ptr->hasSoundAttatched == false && gameObject_ptr->objectID == ObjectType::ID::Player && !gameObject_ptr->burning.isPlaying())
+			if (gameObject_ptr->hasSoundAttatched == true && gameObject_ptr->objectID == ObjectType::ID::Campfire && !gameObject_ptr->burning.isPlaying()
+				|| gameObject_ptr->hasSoundAttatched == true && gameObject_ptr->objectID == ObjectType::ID::Player && !gameObject_ptr->burning.isPlaying())
 			{
 				gameObject_ptr->burning.loop(true);
 				gameObject_ptr->burning.playSound();

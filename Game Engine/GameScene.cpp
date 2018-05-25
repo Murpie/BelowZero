@@ -126,7 +126,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		LeapLevel * level;
 
 		//Randomizer
-		/*srand(time(NULL));
+		srand(time(NULL));
 		randomLevel = rand() % 4;
 
 		switch (randomLevel)
@@ -145,8 +145,8 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 			break;
 		default:
 			break;
-		}*/
-		level = new LeapLevel("TestLvl.leap");
+		}
+		
 		
 
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
@@ -506,9 +506,6 @@ void GameScene::checkInteractionResponse(GameObject & other, int objectID)
 	{
 		other.setIsBurning(60.0f);
 	}
-	if (objectID == (int)ObjectType::ID::Axe)
-	{
-	}
 }
 
 void GameScene::interactionTest(GameObject & other, GLFWwindow * window)
@@ -589,40 +586,29 @@ void GameScene::collisionTest(GameObject & other, float deltaTime)
 	{
 		if (gameObject_ptr->getPlayer() != nullptr && other.objectID != ObjectType::ID::Player)
 		{
-			//if (zoneTest(gameObject_ptr, &other))
-			//{
-				float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
-				if (distance < 25)
+			float distance = glm::distance(other.transform->position, gameObject_ptr->transform->position);
+			if (distance < 25)
+			{
+				for (int i = 0; i < gameObject_ptr->bbox.size(); i++)
 				{
-					for (int i = 0; i < gameObject_ptr->bbox.size(); i++)
+					for (int j = 0; j < other.bbox.size(); j++)
 					{
-						for (int j = 0; j < other.bbox.size(); j++)
+						if (Intersection::collisionTest(*gameObject_ptr->bbox[i], gameObject_ptr->transform->position, *other.bbox[j], other.transform->position))
 						{
-							if (Intersection::collisionTest(*gameObject_ptr->bbox[i], gameObject_ptr->transform->position, *other.bbox[j], other.transform->position))
-							{
-								//std::cout << gameObject_ptr->transform->velocity.x << std::endl;
-								Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
-								//std::cout << "GAMESCENE::collisionTest()::" << gameObject_ptr->name << " -> " << other.name << std::endl;
+							Intersection::collisionResponse(*gameObject_ptr->bbox[i], *gameObject_ptr->transform, *other.bbox[j], other.transform->position);
 							
-								if (other.getIsBurning())
-								{
-										gameObject_ptr->setIsBurning(10);
-								}
-								int id = gameObject_ptr->getPlayer()->collisionResponse(other.objectID);
-
-								if (gameObject_ptr->getIsBurning() && !other.getIsBurning())
-								{
-									other.setIsBurning(60);
-								}
+							if (other.getIsBurning())
+							{
+								gameObject_ptr->setIsBurning(10);
 							}
 						}
 					}
 				}
-				if (distance < 15 && other.getIsBurning())
-				{
-					gameObject_ptr->getPlayer()->heatResponse(deltaTime);
-				}
-			//}
+			}
+			if (distance < 15 && other.getIsBurning())
+			{
+				gameObject_ptr->getPlayer()->heatResponse(deltaTime);
+			}
 		}
 	}
 }
