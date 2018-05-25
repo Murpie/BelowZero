@@ -26,12 +26,11 @@
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_Z  0x8519 
 #define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z  0x851A
 
+#define VERY_LOW_SHADOW 512
 #define LOW_SHADOW 1024
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
-#define SUPER_SHADOW 8192
-#define ULTRA_SHADOW 16384
-#define CASCADESPLITS 3
+#define CASCADESPLITS 2
 #define MAX_PARTICLES 1000					//Maximum: 1000, Intel NUC can't handle more stack than this
 #define LIGHTER_PARTICLES 100
 
@@ -251,22 +250,19 @@ private:
 	glm::vec3 shadowMapLightPosition;
 	glm::vec3 shadowMapDirection;
 
-	
 	glm::mat4 tempView;
 	glm::mat4 lightProjection;
 	glm::mat4 lightView;
-	glm::mat4 lightSpaceMatrices[3];
+	glm::mat4 lightSpaceMatrices[2];
 	glm::mat4 inverseViewMatrix;
 	glm::mat4 shadowWorldMatrix;
 
-
-	float cascadePlaneEnds[4];
-	float cascadesInClipSpace[3];
-	float shadowOrthoProjInfo[3][6];
+	float cascadePlaneEnds[3];
+	float cascadesInClipSpace[2];
+	float shadowOrthoProjInfo[2][6];
 	int depthMapTransformation;
-	unsigned int shadowMaps[3];
+	unsigned int shadowMaps[2];
 
-	unsigned int depthMapVertexArrayObject[3];
-	unsigned int depthMapBufferObject[3];
-
+	unsigned int depthMapVertexArrayObject[2];
+	unsigned int depthMapBufferObject[2];
 };

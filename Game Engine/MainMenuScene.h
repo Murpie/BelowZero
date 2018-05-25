@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <time.h>
 
 #include <GL/gl3w.h>  
 #include "ShaderBase.h"
@@ -23,6 +24,8 @@ class MainMenuScene : public Component
 public:
 	MainMenuScene();
 	~MainMenuScene();
+
+	int randomizeBackgroundImage();
 
 	void loadBackgroundTexture(std::string backgroundTextureName);
 	void loadButtonTexture(std::string buttonTextureName, int buttonNumber);
@@ -70,6 +73,8 @@ public:
 
 	double xPos;
 	double yPos;
+
+	int whichBackgroundToLoad;
 
 private:
 	Gamestate::StateOfGame stateOfGame;

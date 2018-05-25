@@ -655,10 +655,6 @@ void Player::update(float deltaTime, float seconds)
 
 void Player::processEvents(GLFWwindow * window, float deltaTime)
 {
-	hp = 100;
-	setCold(100);
-	setWater(100);
-	setFood(100);
 
 	isWalking = false;
 	movingForward = false;

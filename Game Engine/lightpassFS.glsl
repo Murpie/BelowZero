@@ -24,11 +24,11 @@ uniform sampler2D gAlbedo;
 uniform sampler2D gNormal;
 uniform sampler2D shadowMap0;
 uniform sampler2D shadowMap1;
-uniform sampler2D shadowMap2;
+//uniform sampler2D shadowMap2;
 
 uniform vec3 shadowMapLightPosition;
-uniform float cascadeEndClipSpace[3];
-uniform mat4 lightSpaceMatrix[3];
+uniform float cascadeEndClipSpace[2];
+uniform mat4 lightSpaceMatrix[2];
 uniform mat4 viewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform float water;
@@ -96,11 +96,11 @@ float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 no
 		depth = texture(shadowMap0, UVCoords).x;
 	if (cascadeIndex == 1)
 		depth = texture(shadowMap1, UVCoords).x;
-	if (cascadeIndex == 2)
-		depth = texture(shadowMap2, UVCoords).x;
+	//if (cascadeIndex == 2)
+		//depth = texture(shadowMap2, UVCoords).x;
 
 	if (z - bias > depth) // Determine If There Shall Be Shadow
-		shadow = 0.35f;
+		shadow = 0.1f;
 	else
 		shadow = 0.0f;
 
@@ -188,7 +188,7 @@ void main()
 	// =========================== TESTING SHADOWS ==================================
 	float shadowFactor = 0.0;
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		if (clipSpacePosZ <= cascadeEndClipSpace[i])// Check Which Cascade To Sample from
 		{

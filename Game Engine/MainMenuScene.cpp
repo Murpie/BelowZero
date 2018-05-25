@@ -33,15 +33,35 @@ MainMenuScene::MainMenuScene()
 
 	stbi_set_flip_vertically_on_load(true);
 
-	loadBackgroundTexture("MainMenuBackground");
-	loadButtonTexture("StartGameButton", 1);
-	loadButtonTexture("SettingsGameButton", 2);
-	loadButtonTexture("ExitGameButton", 3);
+	this->whichBackgroundToLoad = randomizeBackgroundImage();
+
+	if (whichBackgroundToLoad == 0)
+	{
+		loadBackgroundTexture("MainMenuLight");
+		loadButtonTexture("StartGameButton", 1);
+		loadButtonTexture("SettingsGameButton", 2);
+		loadButtonTexture("ExitGameButton", 3);
+	
+	}
+	if (whichBackgroundToLoad == 1)
+	{
+		loadBackgroundTexture("MainMenuDark");
+		loadButtonTexture("StartGameButtonWhite", 1);
+		loadButtonTexture("SettingsGameButtonWhite", 2);
+		loadButtonTexture("ExitGameButtonWhite", 3);
+
+	}
 }
 
 MainMenuScene::~MainMenuScene()
 {
 	deleteObjects();
+}
+
+int MainMenuScene::randomizeBackgroundImage()
+{
+	srand(time(NULL));
+	return (rand() % 2);
 }
 
 void MainMenuScene::loadBackgroundTexture(std::string backgroundTextureName)

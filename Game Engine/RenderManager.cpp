@@ -37,17 +37,19 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
 	//createMainMenuBuffer();
 
+
 	//cascadePlaneEnds[0] = 0.1f;
-	//cascadePlaneEnds[1] = 25.0f; RIGHT SHIT
-	//cascadePlaneEnds[2] = 50.0f;
-	//cascadePlaneEnds[3] = 70.0f;
+	//cascadePlaneEnds[1] = 51.0f;
+	//cascadePlaneEnds[2] = 70.0f;
+	//cascadePlaneEnds[3] = 100.0f;
 
-
+	//TESTING TWO CASCADES
 	cascadePlaneEnds[0] = 0.1f;
 	cascadePlaneEnds[1] = 51.0f;
 	cascadePlaneEnds[2] = 70.0f;
-	cascadePlaneEnds[3] = 100.0f;
-	
+
+
+
 	shatteredIce.CreateTextureData("iceNormal2.jpg");
 	damageTexture.CreateTextureData("damage1.png");
 	UiMeterTexture.CreateTextureData("UItest1.jpg");
@@ -178,15 +180,15 @@ void RenderManager::createBuffers()
 
 	// ----------========== CASCADED SHADOW MAPS ==========----------
 	glGenFramebuffers(1, &shadowFBO);
-	glGenTextures(3, shadowMaps);
-	for (int i = 0; i < 3; i++) {
+	glGenTextures(2, shadowMaps);
+	for (int i = 0; i < 2; i++) {
 		glBindTexture(GL_TEXTURE_2D, shadowMaps[i]);
 		if (i == 0)
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, HIGH_SHADOW, HIGH_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		if (i == 1)
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, MEDIUM_SHADOW, MEDIUM_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-		if (i == 2)
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, LOW_SHADOW, LOW_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, VERY_LOW_SHADOW, VERY_LOW_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		//if (i == 2)
+			//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, LOW_SHADOW, LOW_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 		//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, MEDIUM_SHADOW, MEDIUM_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -704,75 +706,60 @@ void RenderManager::Render() {
 
 	
 	// CASCADED SHADOWMAP PASS-----------------------------------------------------------------
-
-	glUseProgram(shadowMapShaderProgram);
-	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-	//glViewport(0, 0, MEDIUM_SHADOW, MEDIUM_SHADOW);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-
-	calculateOrthoProjectionMatrices(shadowMapShaderProgram);
-	glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "lightView"), 1, GL_FALSE, glm::value_ptr(lightView));
-
-
-	for (int i = 0; i < CASCADESPLITS; i++)
+	if (gameScene->gameObjects[0]->transform->position.y < 6.0)
 	{
-		if (i == 0)
-			glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
-		if (i == 1)
-			glViewport(0, 0, MEDIUM_SHADOW, MEDIUM_SHADOW);
-		if (i == 2)
-			glViewport(0, 0, LOW_SHADOW, LOW_SHADOW);
-		
-		bindForWriting(i);
-		glClear(GL_DEPTH_BUFFER_BIT);
+		glUseProgram(shadowMapShaderProgram);
+		glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 
-		setOrthoProjectionMatrix(i);
-		glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "lightProjection"), 1, GL_FALSE, glm::value_ptr(lightProjection));
+		calculateOrthoProjectionMatrices(shadowMapShaderProgram);
+		glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "lightView"), 1, GL_FALSE, glm::value_ptr(lightView));
 
-		if (gameObjectsToRender.size() > 0)
-			gameObjectsToRender[0]->materialComponent->bindTextures();
 
-		for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
+		for (int i = 0; i < CASCADESPLITS; i++)
 		{
-			gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
+			if (i == 0)
+				glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
+			if (i == 1)
+				glViewport(0, 0, VERY_LOW_SHADOW, VERY_LOW_SHADOW);
 
-			//... Rotation equipment with player
-			if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
+			bindForWriting(i);
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			setOrthoProjectionMatrix(i);
+			glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "lightProjection"), 1, GL_FALSE, glm::value_ptr(lightProjection));
+
+			//if (gameObjectsToRender.size() > 0)
+				//gameObjectsToRender[0]->materialComponent->bindTextures();
+
+			for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
 			{
-				tempMatrix = gameObjectsToRender[i]->getModelMatrix();
-				glm::vec3 forward = glm::vec3(gameObjectsToRender[i]->transform->forward);
-				glm::vec3 right = glm::vec3(gameObjectsToRender[i]->transform->right);
+				gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
 
-				tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
-				tempMatrix = glm::rotate(tempMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
-				tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldPitch + gameObjectsToRender[0]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
-			}
-			else
-			{
-				tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
-				tempMatrix = glm::rotate(tempMatrix, glm::radians(gameObjectsToRender[i]->transform->rotation.y), gameObjectsToRender[i]->transform->up);
-			}
+				//... Rotation equipment with player
+				if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
+				{
+					tempMatrix = gameObjectsToRender[i]->getModelMatrix();
+					glm::vec3 forward = glm::vec3(gameObjectsToRender[i]->transform->forward);
+					glm::vec3 right = glm::vec3(gameObjectsToRender[i]->transform->right);
 
-			//...
-			glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
-			glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
+					tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
+					tempMatrix = glm::rotate(tempMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
+					tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldPitch + gameObjectsToRender[0]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
+				}
+				else
+				{
+					tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
+					tempMatrix = glm::rotate(tempMatrix, glm::radians(gameObjectsToRender[i]->transform->rotation.y), gameObjectsToRender[i]->transform->up);
+				}
+
+				//...
+				glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
+				glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
+			}
 		}
-
-	/*	for (int i = 0; i < gameScene->gameObjects.size(); i++)
-		{
-			if (gameScene->gameObjects[i]->getTerrain() != nullptr)
-			{
-
-				gameScene->gameObjects[i]->getTerrain()->bindVertexArray();
-				glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
-
-				glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
-				break;
-			}
-		}*/
 	}
-
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1559,10 +1546,6 @@ void RenderManager::Render() {
 	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "shadowMap1"), 4);
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, shadowMaps[1]);
-
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "shadowMap2"), 5);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, shadowMaps[2]);
 	
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "shadowMapLightPosition"), 1, glm::value_ptr(shadowMapLightPosition));
 
@@ -1959,6 +1942,7 @@ void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 		glm::vec3(shadowMapLightPosition), // Position, 8 units above PlayerPos
 		glm::vec3(shadowMapDirection), // Direction, 1 unit in front of PlayerPos
 		glm::vec3(1.0, 0.0, 0.0)); // Up
+
 	
 	float fieldOfView = 90.0f;
 	float aspectRatio = (float)display_h / (float)display_w;
