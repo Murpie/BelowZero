@@ -637,6 +637,10 @@ void Player::update(float deltaTime, float seconds)
 		this->flareTimer += deltaTime;
 		if (flareTimer >= 2.0f)
 		{
+			if (!FlareSound.isPlaying())
+			{
+				FlareSound.playSound();
+			}
 			this->winFade += deltaTime / 8.0f;
 		}
 	}
@@ -1005,11 +1009,6 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 
 	else if (id == ObjectType::ID::FlareGun)
 	{
-		if (!FlareSound.isPlaying())
-		{
-			FlareSound.playSound();
-		}
-		
 		this->win = true;
 		return 42;
 	}
