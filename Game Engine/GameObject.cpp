@@ -345,7 +345,7 @@ void GameObject::moveDown(float deltaTime)
 
 	if (!addedWallSound) {
 		moveWallSound.addSound("meltWall.ogg");
-		moveWallSound.setVolume(60.0f);
+		moveWallSound.setVolume(30.0f);
 		addedWallSound = true;
 	}
 	if (!moveWallSound.isPlaying() && !wallSoundPlayed) {
