@@ -49,6 +49,14 @@ public:
 	Texture shatteredIce;
 	Texture damageTexture;
 	Texture UiMeterTexture;
+
+	Texture MainMenuTex1;
+	Texture MainMenuTex2;
+	Texture settingsWhite;
+	Texture startGameWhite;
+	Texture exitGameWhite;
+
+	float mainMenuTimer = 0.0f;
 	
 	void FindObjectsToRender();
 	void clearObjectsToRender();

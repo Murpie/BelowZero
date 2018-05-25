@@ -23,7 +23,5 @@ void main()
 	else if (buttonTransformation == 0)
 		finalPosition = vec4(aPos.x, aPos.y, 0.0, 1.0);
 
-
-	
 	gl_Position = finalPosition;
 }
