@@ -150,21 +150,6 @@ void GameObject::addComponent(Component* otherComponent)
 	components.push_back(otherComponent);
 	updateMaterialAndMeshFilterPointers();
 	updateHasLight();
-	//check if component exist
-	//int index = -1;
-	//for (int i = 0; i < components.size(); i++)
-	//{
-	//	if (*otherComponent == *components[i]) {
-	//		index = i;
-	//	}
-	//}
-	////add if not
-	//if (index == -1) {
- //       //otherComponent->gameObject = this;
-	//	components.push_back(otherComponent);
-	//}
- //   updateMaterialAndMeshFilterPointers();
- //   updateHasLight();
 }
 
 void GameObject::updateMeshFilter(int id)
@@ -181,13 +166,6 @@ void GameObject::updateMeshFilter(int id)
 		}
 	}
 }
-
-/*
-void GameObject::addComponent(Component* otherComponent)
-{
-	components.push_back(otherComponent);
-}
-*/
 
 void GameObject::deleteComponent(Component* otherComponent)
 {

@@ -87,10 +87,13 @@ Player::Player(Transform& transform) : Transformable(transform)
 
 	Swing.addSound("woosh.wav");
 	pickUpSnowSound.addSound("PickUpSnow.ogg");
+	pickUpSnowSound.setVolume(35.0f);
 	HitWAxe.addSound("AxeHit.ogg");
-	HitWAxe.setVolume(50.0f);
+	HitWAxe.setVolume(35.0f);
 	Eat.addSound("Eating.ogg");
+	Eat.setVolume(35.0f);
 	Drink.addSound("DrinkWater.wav");
+	Drink.setVolume(35.0f);
 	FlareSound.addSound("FlareSound.ogg");
 	FlareSound.setVolume(100.0f);
 	HelicopterSound.addSound("HelicopterSound.wav");
@@ -673,31 +676,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	useItem(window);
 
 	//Equipment and Stats
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
-	{
-		setCold(10);
-	}
-	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-		setWater(10);
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-		setFood(10);
-	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
-		setCold(-10);
-	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-		setWater(-10);
-	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
-		setFood(-10);
-	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-		hp -= 10;
-	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-		hp += 10;
-
-	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
-	{
-		equip("EmptyImage");
-		for (int i = 0; i < 5; i++)
-			addImageToInventory("EmptyImage", i);
-	}
 
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !isPressed && this->currentlyEquipedItem != 0)
 	{
