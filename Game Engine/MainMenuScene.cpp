@@ -38,6 +38,7 @@ MainMenuScene::MainMenuScene()
 	stbi_set_flip_vertically_on_load(true);
 
 	this->whichBackgroundToLoad = randomizeBackgroundImage();
+	loadLoadingTexture("LoadingTexture");
 
 	if (whichBackgroundToLoad == 0)
 	{
@@ -87,6 +88,12 @@ void MainMenuScene::loadLoadingTexture(std::string loadingTextureName)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		std::cout << "Loading Framebuffer not complete!" << std::endl;
 
+}
+
+int MainMenuScene::randomizeBackgroundImage()
+{
+	srand(time(NULL));
+	return (rand() % 2);
 }
 
 void MainMenuScene::loadBackgroundTexture(std::string backgroundTextureName)
