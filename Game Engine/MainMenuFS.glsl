@@ -8,6 +8,7 @@ uniform sampler2D textureToUse;
 uniform float scaling1;
 uniform float scaling2;
 uniform float scaling3;
+uniform float fade;
 float newScale;
 
 void main()
@@ -23,5 +24,5 @@ void main()
 	if (color.a < 0.35)
 		discard;
 	else
-		FragColor = color;
+		FragColor = color + fade;
 }

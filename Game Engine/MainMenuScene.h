@@ -27,6 +27,7 @@ public:
 	void loadBackgroundTexture(std::string backgroundTextureName);
 	void loadButtonTexture(std::string buttonTextureName, int buttonNumber);
 	void renderFrameQuad(GLuint shader);
+	void fadeMenu(float deltaTime);
 
 	void deleteObjects();
 
@@ -58,7 +59,8 @@ public:
 	float scaling1;
 	float scaling2;
 	float scaling3;
-
+	float fadeTimer;
+	float fade;
 
 	bool mouseIsOverButton;
 	bool buttonHasBeenClicked;
@@ -67,6 +69,7 @@ public:
 	bool buttonIsUpScaled1;
 	bool buttonIsUpScaled2;
 	bool buttonIsUpScaled3;
+	bool fadeMenuBool;
 
 	double xPos;
 	double yPos;

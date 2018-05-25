@@ -16,6 +16,10 @@ MainMenuScene::MainMenuScene()
 	this->scaling3 = 1.0;
 	this->whichButtonIsSelected = -1;
 
+	this->fade = 0.0f;
+	this->fadeTimer = 0.0f;
+	this->fadeMenuBool = false;
+
 	this->startButtonMinMax[0].x = 30;
 	this->startButtonMinMax[0].y = 381;
 	this->startButtonMinMax[1].x = 250;
@@ -252,6 +256,19 @@ void MainMenuScene::renderFrameQuad(GLuint shader)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 }
 
+void MainMenuScene::fadeMenu(float deltaTime)
+{
+	fadeTimer += deltaTime;
+	fade += deltaTime / 2;
+	
+	if (fadeTimer >= 2.0f)
+	{
+		printf("STATE OF GAME: %d", stateOfGame);
+		stateOfGame.state = Gamestate::ID::CLEAR_MENU;
+		printf("STATE OF GAME: %d", stateOfGame);
+	}
+}
+
 void MainMenuScene::deleteObjects()
 {
 	glDeleteVertexArrays(1, &VAO);
@@ -267,6 +284,11 @@ void MainMenuScene::update(float deltaTime, float seconds)
 void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 {
 	glfwGetCursorPos(window, &xPos, &yPos);
+
+	if (fadeMenuBool)
+	{
+		fadeMenu(deltaTime);
+	}
 
 	if (startButtonMinMax[0].x < xPos && xPos < startButtonMinMax[1].x && startButtonMinMax[0].y < yPos && yPos < startButtonMinMax[1].y)
 	{
@@ -377,10 +399,8 @@ void MainMenuScene::processEvents(GLFWwindow * window, float deltaTime)
 		 pressed = false;
 		if (whichButtonIsSelected == 1 && pressed == false)
 		{
-				printf("STATE OF GAME: %d", stateOfGame);
-				stateOfGame.state = Gamestate::ID::CLEAR_MENU;
-				printf("STATE OF GAME: %d", stateOfGame);
-				pressed = true;
+			fadeMenuBool = true;
+			pressed = true;
 		}
 		
 		else if (whichButtonIsSelected == 2 && pressed == false)

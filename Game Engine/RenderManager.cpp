@@ -1694,6 +1694,7 @@ void RenderManager::renderMainMenu()
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling3"), gameScene->gameObjects[0]->getMenuScene()->scaling3);
+	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "fade"), gameScene->gameObjects[0]->getMenuScene()->fade);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	gameScene->gameObjects[0]->getMenuScene()->buttonTransformations = 3;
