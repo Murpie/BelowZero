@@ -98,8 +98,8 @@ Player::Player(Transform& transform) : Transformable(transform)
 	JacketSound.addSound("JacketSwoosh.wav");
 	wolf2.addSound("WolfHowl2.ogg");
 	wolf3.addSound("WolfHowl3.wav");
-	wolf2.setVolume(70.0f);
-	wolf3.setVolume(70.0f);
+	wolf2.setVolume(50.0f);
+	wolf3.setVolume(50.0f);
 }
 
 Player::~Player()

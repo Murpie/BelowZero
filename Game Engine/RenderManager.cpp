@@ -1650,7 +1650,7 @@ void RenderManager::renderMainMenu()
 
 	if (!gameScene->gameObjects[0]->addedMenuMusic)
 	{
-		gameScene->gameObjects[0]->menuMusic.addSound("subtext.ogg");
+		gameScene->gameObjects[0]->menuMusic.addSound("SubtextCorrect.ogg");
 		gameScene->gameObjects[0]->addedMenuMusic = true;
 	}
 	if(!gameScene->gameObjects[0]->menuMusic.isPlaying())
