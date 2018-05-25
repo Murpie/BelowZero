@@ -1657,7 +1657,7 @@ void RenderManager::renderMainMenu()
 	if(!gameScene->gameObjects[0]->menuMusic.isPlaying())
 	{
 		gameScene->gameObjects[0]->menuMusic.playSound();
-		gameScene->gameObjects[0]->menuMusic.setVolume(15.0f);
+		gameScene->gameObjects[0]->menuMusic.setVolume(35.0f);
 	}
 
 	view_matrix = gameScene->gameObjects[0]->getViewMatrix();
