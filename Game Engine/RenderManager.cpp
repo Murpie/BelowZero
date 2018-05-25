@@ -949,21 +949,10 @@ void RenderManager::Render() {
 
 							fireParticleContainer[particleIndex].life = 1.0f;
 							fireParticleContainer[particleIndex].pos = startPoint;
-
-							//Fix the rest constants that's needed for a "living" looking fire.
-							//First, create a spread with values from 0.00 -> 1.00
-							float spread = (rand() % 100) / 100.0f;
 							glm::vec3 mainDir = glm::vec3(0.0f, 0.1f, 0.0f);
 
-							//Complete random
-							glm::vec3 randomDir = glm::vec3(
-								(sin(rand() % 10 - 10.0f) / 5.0f),
-								(sin(rand() % 10 - 10.0f) / 5.0f),
-								(sin(rand() % 10 - 10.0f) / 5.0f)
-							);
-
 							//Set the new direction for the particle
-							fireParticleContainer[particleIndex].speed = mainDir + directionVec / 5.0f;
+							fireParticleContainer[particleIndex].speed = mainDir + directionVec / 3.0f;
 
 							//Set colors
 							fireParticleContainer[particleIndex].r = 1.0f;
@@ -980,23 +969,23 @@ void RenderManager::Render() {
 				//Movement of the new particles
 				for (int i = 0; i < MAX_PARTICLES; i++)
 				{
-					fireParticleContainer[i].life -= 0.016f / 1.8f;
+					fireParticleContainer[i].life -= deltaTime / 1.5f;
 					if (fireParticleContainer[i].life > 0.0f)
 					{
 						//Control the movement with the wind
 						if (fireParticleContainer[i].life > 0.6f)
 						{
-							fireParticleContainer[i].speed += glm::vec3(0.0f, -0.1f, 0.0f) * 0.5f * 0.016f;							//0.016 as a universal "fake" DT
+							fireParticleContainer[i].speed += (glm::vec3(0.0f, -0.05f, 0.0f) * 0.5f) * deltaTime;
 						}
 						else if (fireParticleContainer[i].life > 0.4f)
 						{
-							fireParticleContainer[i].speed += glm::vec3(5.0f, -0.1f, 2.5f) * 0.5f * 0.016f;
+							fireParticleContainer[i].speed += (glm::vec3(2.5f, -0.05f, 1.75f) * 0.5f) * deltaTime;
 						}
 						else
 						{
-							fireParticleContainer[i].speed += glm::vec3(10.0f, -0.1f, 5.0f) * 0.5f * 0.016f;
+							fireParticleContainer[i].speed += (glm::vec3(5.0f, -0.05f, 2.5f) * 0.5f) * deltaTime;
 						}
-						fireParticleContainer[i].pos += fireParticleContainer[i].speed / 30.0f;
+						fireParticleContainer[i].pos += fireParticleContainer[i].speed / 90.0f;
 						fireParticleContainer[i].cameraDistance = glm::length(fireParticleContainer[i].pos - cameraPosition);
 
 						//Set Positions
@@ -1301,8 +1290,8 @@ void RenderManager::Render() {
 		snowParticleContainer[i].life -= deltaTime / 2.0f;
 		if (snowParticleContainer[i].life > 0.0f)
 		{
-			snowParticleContainer[i].speed += glm::vec3(20.0f, -6.0f, 10.0f) * deltaTime * 0.5f;
-			snowParticleContainer[i].pos += snowParticleContainer[i].speed / 30.0f;
+			snowParticleContainer[i].speed += (glm::vec3(20.0f, -6.0f, 10.0f) * 0.5f) * deltaTime;
+			snowParticleContainer[i].pos += snowParticleContainer[i].speed / 70.0f;
 			snowParticleContainer[i].cameraDistance = glm::length(snowParticleContainer[i].pos - cameraPosition);
 
 			//Set Positions
