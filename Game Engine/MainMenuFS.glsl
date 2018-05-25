@@ -8,9 +8,11 @@ uniform sampler2D textureToUse;
 uniform sampler2D Texture1;
 uniform sampler2D Texture2;
 uniform float Timer;
+uniform sampler2D loadingTexture;
 uniform float scaling1;
 uniform float scaling2;
 uniform float scaling3;
+uniform float fade;
 float newScale;
 uniform int buttonTransformation;
 void main()
@@ -85,9 +87,5 @@ void main()
 
 	}
 	else
-		FragColor = color;
-	//if(buttonTransformation == 0)
-	//	FragColor = vec4(LightTexture, 1.0);
-	//else
-
+		FragColor = color * abs(fade - 1) + (fade * texture(loadingTexture, TexCoords));
 }

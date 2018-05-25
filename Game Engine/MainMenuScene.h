@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <time.h>
 
 #include <GL/gl3w.h>  
 #include "ShaderBase.h"
@@ -24,9 +25,13 @@ public:
 	MainMenuScene();
 	~MainMenuScene();
 
+	void loadLoadingTexture(std::string loadingTextureName);
+	int randomizeBackgroundImage();
+
 	void loadBackgroundTexture(std::string backgroundTextureName);
 	void loadButtonTexture(std::string buttonTextureName, int buttonNumber);
 	void renderFrameQuad(GLuint shader);
+	void fadeMenu(float deltaTime);
 
 	void deleteObjects();
 
@@ -34,6 +39,7 @@ public:
 	void processEvents(GLFWwindow *window, float deltaTime);
 
 	GLuint backgroundTexture;
+	GLuint loadingTexture;
 	GLuint startButtonTexture;
 	GLuint settingsButtonTexture;
 	GLuint exitButtonTexture;
@@ -42,6 +48,7 @@ public:
 	unsigned int mainMenuShaderProgram;
 	
 	unsigned int backgroundFbo;
+	unsigned int loadingFBO;
 	unsigned int VBO;
 	unsigned int VAO;
 	unsigned int EBO;
@@ -58,7 +65,8 @@ public:
 	float scaling1;
 	float scaling2;
 	float scaling3;
-
+	float fadeTimer;
+	float fade;
 
 	bool mouseIsOverButton;
 	bool buttonHasBeenClicked;
@@ -67,9 +75,12 @@ public:
 	bool buttonIsUpScaled1;
 	bool buttonIsUpScaled2;
 	bool buttonIsUpScaled3;
+	bool fadeMenuBool;
 
 	double xPos;
 	double yPos;
+
+	int whichBackgroundToLoad;
 
 private:
 	Gamestate::StateOfGame stateOfGame;

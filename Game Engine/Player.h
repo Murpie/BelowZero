@@ -44,7 +44,6 @@ public:
 	float damage;
 	float fade;
 	float winFade;
-	float textFade;
 	float flareTimer;
 
 	std::string equipedItem;
@@ -114,6 +113,8 @@ public:
 
 	void wolfHowl(float nightTimer);
 
+	int test;
+	
 private:
 	bool isColliding = false;
 

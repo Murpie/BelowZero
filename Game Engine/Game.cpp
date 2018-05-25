@@ -191,6 +191,8 @@ void Game::menuState()
 		initScene(Scene::ID::MENU);
 		renderer->createMainMenuBuffer();
 		renderer->createButtonQuads();
+		
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		stateOfGame.state = Gamestate::ID::SHOW_MENU;
 		printCurrentState(stateOfGame.state);
 	}
@@ -216,6 +218,7 @@ void Game::levelState()
 		printCurrentState(stateOfGame.state);
 		initScene(Scene::ID::LEVEL_1);
 		renderer->createBuffers();
+		//renderer->renderDepthQuadsForVisualization();
 		stateOfGame.state = Gamestate::ID::RUN_LEVEL;
 		printCurrentState(stateOfGame.state);
 	}

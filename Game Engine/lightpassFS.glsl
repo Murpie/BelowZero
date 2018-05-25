@@ -22,11 +22,21 @@ uniform int nrOfLights;
 uniform sampler2D gPosition;
 uniform sampler2D gAlbedo;
 uniform sampler2D gNormal;
-uniform sampler2D depthMap;
-uniform mat4 LightSpaceMatrix;
-uniform int ScreenX;
-uniform int ScreenY;
+uniform sampler2D shadowMap0;
+uniform sampler2D shadowMap1;
+//uniform sampler2D shadowMap2;
+
+uniform vec3 shadowMapLightPosition;
+uniform float cascadeEndClipSpace[2];
+uniform mat4 lightSpaceMatrix[2];
+uniform mat4 viewMatrix;
+uniform mat4 ProjectionMatrix;
 uniform float water;
+
+float clipSpacePosZ;
+vec4 lightSpacePosition;
+
+
 
 vec3 getBlur()
 {
@@ -62,51 +72,61 @@ vec3 getBlur()
 	return blurColor;
 }
 
-// ----------========== DIRECTIONAL LIGHT SHADOW CALCULATION ==========----------
-float DirectionalShadowMapCalculation(vec3 FragPos, vec3 Normal, vec3 lightPos)
+
+void calculateLightSpacePositions(vec4 FragPos, int index)
 {
-	vec3 lightDirForShadow = normalize(vec3(lightPos) - FragPos);
-	vec4 shadowCoordinates = LightSpaceMatrix * vec4(FragPos, 1.0);
-	vec3 projectionCoordinates = shadowCoordinates.xyz / shadowCoordinates.w;
-	projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
+	lightSpacePosition = lightSpaceMatrix[index] * FragPos;
+}
 
-	float closestDepth = texture(depthMap, projectionCoordinates.xy).r;
-	float directionalLightshadowFactor = 0.0f;
-	float bias = 0.005;
-	directionalLightshadowFactor += projectionCoordinates.z - bias > closestDepth ? 0.35 : 0.0;
+float cascadedShadowMapCalculation(int cascadeIndex, vec4 lightSpacePos, vec3 normals, vec3 FragPos)
+{
+	float shadow = 0.0f;
+	float depth = 0.0f;
+	float z;
+	vec3 lightDirForShadow = normalize(shadowMapLightPosition - FragPos);
+	float bias = max(0.05 * (1.0 - dot(normals, lightDirForShadow)), 0.005);
+	vec3 projectionCoordinates = lightSpacePos.xyz;
 
-	//float bias = max(0.0005 * (1.0 - dot(Normal, lightDirForShadow)), 0.005);
-	//vec4 shadowCoordinates = LightSpaceMatrix * (vec4(FragPos, 1.0) + (vec4(Normal, 1.0) * 0.03));
-	/*vec2 texelSize = 1.0 / textureSize(depthMap, 0);
-	for (int x = -1; x <= 1; ++x)
-	{
-	for (int y = -1; y <= 1; ++y)
-	{
-	float pcfDepth = texture(depthMap, projectionCoordinates.xy + vec2(x, y) * texelSize).r;
-	directionalLightshadowFactor += projectionCoordinates.z - bias > pcfDepth ? 0.7 : 0.0;
-	}
-	}
-	directionalLightshadowFactor /= 9.0;*/
+	vec2 UVCoords;
+	UVCoords.x = projectionCoordinates.x * 0.5 + 0.5;
+	UVCoords.y = projectionCoordinates.y * 0.5 + 0.5;
+	z = projectionCoordinates.z * 0.5 + 0.5;
+	
+	if (cascadeIndex == 0)							// Check Which ShadowMap To Use
+		depth = texture(shadowMap0, UVCoords).x;
+	if (cascadeIndex == 1)
+		depth = texture(shadowMap1, UVCoords).x;
+	//if (cascadeIndex == 2)
+		//depth = texture(shadowMap2, UVCoords).x;
 
-	if (projectionCoordinates.z > 1.0)
-		directionalLightshadowFactor = 0.0;
+	if (z - bias > depth) // Determine If There Shall Be Shadow
+		shadow = 0.1f;
+	else
+		shadow = 0.0f;
 
-	return directionalLightshadowFactor;
+
+	return shadow;
 }
 
 void main()
 {
 	// retrieve data from G-buffer
 	vec3 FragPos = texture(gPosition, TexCoords).rgb;
+	vec4 FragPosition = texture(gPosition, TexCoords);
 	vec3 Albedo = texture(gAlbedo, TexCoords).rgb;
 	vec3 Normal = texture(gNormal, TexCoords).rgb;
+	clipSpacePosZ = (ProjectionMatrix * viewMatrix * FragPosition).z;
+
 
 	float Thirst = water;
 	float thirstVariable = 1.0;
-	if (Thirst <= 50)
+	if (Thirst <= 30)
 	{
-		thirstVariable = Thirst / 100;
+		thirstVariable = (Thirst - 20)/ 10;
 	}
+	if (Thirst <= 20)
+		thirstVariable = 0;
+
 	Albedo = mix(getBlur(), Albedo, thirstVariable);
 
 
@@ -116,7 +136,7 @@ void main()
 	vec3 lighting = vec3(0.0, 0.0, 0.0);
 	vec3 viewDir = normalize(view_position - FragPos);
 
-	float shadowFactor = 0.0f;
+
 
 	for (int i = 0; i < nrOfLights; i++)
 	{
@@ -167,10 +187,23 @@ void main()
 	float visibility = exp(-pow((distanceToPos * density), gradient));
 	visibility = clamp(visibility, 0.0, 1.0);
 
+	
+	// =========================== TESTING SHADOWS ==================================
+	float shadowFactor = 0.0;
 
+	for (int i = 0; i < 2; i++)
+	{
+		if (clipSpacePosZ <= cascadeEndClipSpace[i])// Check Which Cascade To Sample from
+		{
+			calculateLightSpacePositions(FragPosition, i);
+			shadowFactor = cascadedShadowMapCalculation(i, lightSpacePosition, Normal, FragPos);
+			break;
+		}
+	}
 
+	FragColor = lighting * (1.0f - shadowFactor);;
+	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, FragColor, visibility);
 
-	//FragColor = lighting;
-	FragColor = mix(vec3(0.749, 0.843, 0.823) * daylight, lighting, visibility);
-	//FragColor = mix(vec3(0.749, 0.843, 0.823), FragColor / 1.5);
+	
 }
+

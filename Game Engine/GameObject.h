@@ -50,6 +50,7 @@ public:
 	bool moveBelowTerrain;
 	bool addedWallSound = false;
 	bool addedMenuMusic = false;
+	bool wallSoundPlayed = false;
 	float timeAlive;
 	
 	int playerHitCounter; //used to count how many hits the object has taken from player
