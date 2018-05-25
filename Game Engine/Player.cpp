@@ -6,10 +6,11 @@ Player::Player(Transform& transform) : Transformable(transform)
 
 	click = false;
 	addClick = false;
-
+	this->coldResistance = 1.0f;
 	this->currentlyEquipedItem = -1;
 	this->equipedID = -1;
 	this->pickUp = -1;
+	this->rotateSwing = 0;
 	this->swapItem = false;
 	this->pullDown = false;
 	this->jacket = false;
@@ -38,7 +39,6 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->fade = 0.9f;
 	this->winFade = 0;
 	this->flareTimer = 0;
-	this->textFade = 1;
 	this->startGame = true;
 	this->isPressed = false;
 	this->win = false;
@@ -95,12 +95,11 @@ Player::Player(Transform& transform) : Transformable(transform)
 	FlareSound.setVolume(100.0f);
 	HelicopterSound.addSound("HelicopterSound.wav");
 
-	wolf1.addSound("WolfHowl1.ogg");
+	JacketSound.addSound("JacketSwoosh.wav");
 	wolf2.addSound("WolfHowl2.ogg");
 	wolf3.addSound("WolfHowl3.wav");
-	wolf1.setVolume(70.0f);
-	wolf2.setVolume(70.0f);
-	wolf3.setVolume(70.0f);
+	wolf2.setVolume(10.0f);
+	wolf3.setVolume(10.0f);
 }
 
 Player::~Player()
@@ -320,10 +319,7 @@ void Player::addTextToScreen(std::string item)
 	if (item == "EmptyImageTexture")
 		this->textOnScreen = false;
 	else
-	{
 		this->textOnScreen = true;
-		this->textFade = 1.0;
-	}
 
 	this->textTimer = 0.0;
 
@@ -513,11 +509,11 @@ void Player::update(float deltaTime, float seconds)
 		volume *= 0.7f;
 		HeavySnow.setVolume(volume);
 
+
+		this->cold = this->cold - (this->coldTick * 8.0f * deltaTime * this->coldResistance);
+		
 		if (!jacket)
 		{
-			float coldStrength = glm::mix(0.0f, 8.0f, volumeVar / mixVar);
-			this->cold = this->cold - (this->coldTick * 8.0f * deltaTime);
-
 			//this->damage = this->coldMeter + this->waterMeter + this->foodMeter;
 			this->hp = this->hp - (this->coldTick * 8.0f * deltaTime);
 
@@ -533,6 +529,8 @@ void Player::update(float deltaTime, float seconds)
 
 	if (swing)
 		swingAxe(deltaTime);
+	else
+		rotateSwing = 0.0f;
 
 	if (win)
 	{
@@ -598,7 +596,7 @@ void Player::update(float deltaTime, float seconds)
 
 	// DECREASE OVER TIME
 	if (this->cold <= 100)
-		this->cold = this->cold - (this->coldTick * deltaTime);
+		this->cold = this->cold - (this->coldTick * deltaTime * this->coldResistance);
 
 	if (this->water <= 100)
 		this->water = this->water - (this->waterTick * deltaTime);
@@ -633,15 +631,17 @@ void Player::update(float deltaTime, float seconds)
 	if (this->win == true)
 	{
 		this->flareTimer += deltaTime;
-		if (flareTimer <= 10.0f)
+		if (flareTimer >= 2.0f)
 		{
-			this->winFade += deltaTime / 10.0f;
+			if (!FlareSound.isPlaying())
+			{
+				FlareSound.playSound();
+			}
+			this->winFade += deltaTime / 8.0f;
 		}
 	}
 
 	// Text Fade
-	if (this->textOnScreen == true)
-		this->textFade -= 0.05f;
 	//else if (this->textOnScreen == false)
 	//this->textFade = 1.0;
 
@@ -674,7 +674,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	//Equipment and Stats
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	{
 		setCold(10);
+	}
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
 		setWater(10);
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
@@ -689,7 +691,6 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		hp -= 10;
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
 		hp += 10;
-
 
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 	{
@@ -781,7 +782,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	oldYaw = oldYaw - yaw;
 	oldPitch = oldPitch + pitch;
 
-	matrix = glm::rotate(matrix, -oldYaw, Transformable::transform.up);
+	matrix = glm::rotate(matrix, oldYaw, Transformable::transform.up);
 	glm::vec4 right = glm::vec4(matrix[0][0], matrix[1][0], matrix[2][0], 0);
 	Transformable::transform.right = right;
 
@@ -800,16 +801,19 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		oldPitch = -1.48f;
 	}
 
+
 	if (firstMouse) {
 		lastX = (float)xpos;
 		lastY = (float)ypos;
 		firstMouse = false;
 	}
 
-	xoffset = (float)xpos - lastX;
+	xoffset = lastX - (float)xpos;
 	yoffset = lastY - (float)ypos;
 	lastX = (float)xpos;
 	lastY = (float)ypos;
+
+
 
 	//... WASD Movement
 	glm::vec3 direction = glm::vec3(0);
@@ -993,7 +997,9 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 		swapItem = true;
 		pullDown = true;
 		isAlive = false;
-		this->coldTick = 0.3f;
+		this->coldResistance = 0.3f;
+		if (!JacketSound.isPlaying())
+			JacketSound.playSound();
 	}
 	else if (id == ObjectType::ID::FlareGunBox)
 	{
@@ -1002,21 +1008,9 @@ int Player::interactionResponse(const ObjectType::ID id, bool & isAlive)
 
 	else if (id == ObjectType::ID::FlareGun)
 	{
-		if (!FlareSound.isPlaying())
-		{
-			FlareSound.playSound();
-		}
-
 		this->win = true;
 		return 42;
 	}
-	/*
-	if(id == fallenTree && axeIsEquiped)
-	{
-	logs++;
-	isAlive = false;
-	}
-	*/
 
 	return -1;
 }
@@ -1131,17 +1125,17 @@ const int Player::getEquipedID()
 void Player::wolfHowl(float nightTimer)
 {
 	float wolfTimer = nightTimer / 20;
-	if (nightTimer > 20 && nightTimer < 21 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
-		wolf1.playSound();
-	
-	if (nightTimer > 38 && nightTimer < 39 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
-		wolf2.playSound();
-
-	if (nightTimer > 80 && nightTimer < 81 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	if (nightTimer > 10 && nightTimer < 11 &&  !wolf2.isPlaying() && !wolf3.isPlaying())
 		wolf3.playSound();
-
-	if (nightTimer > 90 && nightTimer < 91 && !wolf1.isPlaying() && !wolf2.isPlaying() && !wolf3.isPlaying())
+	
+	if (nightTimer > 28 && nightTimer < 29 && !wolf2.isPlaying() && !wolf3.isPlaying())
 		wolf2.playSound();
+
+	if (nightTimer > 80 && nightTimer < 81 && !wolf2.isPlaying() && !wolf3.isPlaying())
+		wolf2.playSound();
+
+	if (nightTimer > 78 && nightTimer < 79 && !wolf2.isPlaying() && !wolf3.isPlaying())
+		wolf3.playSound();
 }
 
 void Player::equipItemMesh()
@@ -1212,12 +1206,12 @@ void Player::equipItemMesh()
 
 void Player::textWarnings()
 {
-	if (transform.position.y > 10 && !jacket && !warning)
+	if (transform.position.y > 42 && !jacket && !warning)
 	{
 		addTextToScreen("ColdWarning");
 		warning = true;
 	}
-	else if (transform.position.y < 10 && warning)
+	else if (transform.position.y < 42 && warning)
 	{
 		warning = false;
 	}
@@ -1241,27 +1235,31 @@ void Player::swingAxe(float deltaTime)
 		swing = false;
 		return;
 	}
-	else if (pickUp < 0.4 && axeSwing == 0)
+	else if (axeSwing == 0)
 	{
-		pickUp += deltaTime * 2;
-		if (pickUp >= 0.4)
+		swing = true;
+		rotateSwing += deltaTime * 2.0f;
+		pickUp += deltaTime * 2.0f;
+
+		if (pickUp >= 0.4f)
 			axeSwing = 1;
 	}
-	else if (pickUp > -0.3 && axeSwing == 1)
+	else if (axeSwing == 1)
 	{
-		pickUp -= deltaTime * 7;
-		if (pickUp <= -0.3)
+		pickUp -= deltaTime * 7.0f;
+		rotateSwing -= deltaTime * 1.0f;
+		if (pickUp <= -0.3f)
 			axeSwing = 3;
 	}
-	else if (pickUp < 0 && axeSwing == 3)
+	else if (axeSwing == 3)
 	{
-		pickUp += deltaTime;
+		pickUp += deltaTime * 3.0f;
+		rotateSwing -= deltaTime * 3.0f;
 		if (pickUp >= 0)
 		{
 			pickUp = 0;
+			rotateSwing = 0;
 			swing = false;
 		}
 	}
 }
-
-

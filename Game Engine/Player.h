@@ -23,7 +23,7 @@ public:
 	SoundMasterSFML Drink;
 	SoundMasterSFML FlareSound;
 	SoundMasterSFML HelicopterSound;
-	SoundMasterSFML wolf1;
+	SoundMasterSFML JacketSound;
 	SoundMasterSFML wolf2;
 	SoundMasterSFML wolf3;
 
@@ -44,7 +44,6 @@ public:
 	float damage;
 	float fade;
 	float winFade;
-	float textFade;
 	float flareTimer;
 
 	std::string equipedItem;
@@ -105,12 +104,17 @@ public:
 	const int getEquipedID();
 	bool addClick;
 
+	int axeSwing;
 	float oldPitch;
 	float oldYaw;
 	float pickUp;
+	float rotateSwing;
+	bool swing;
 
 	void wolfHowl(float nightTimer);
 
+	int test;
+	
 private:
 	bool isColliding = false;
 
@@ -137,11 +141,11 @@ private:
 	int equipItem;
 	bool jacket;
 	int bucketContent;
-	bool swing;
-	int axeSwing;
 	bool pickUpSnow;
 	bool warning;
 	float textureTimer;
+
+	float coldResistance;
 
 	bool firstMouse;
 	float lastX, lastY;

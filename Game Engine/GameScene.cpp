@@ -117,8 +117,6 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 	{
 		// Camera - (modify position with level file?)
 		addPlayer(*meshLibrary, *matertialLibrary);
-		// Lights - (add lights with level file?)
-		addLight(glm::vec3(7, 9, -4), 0);
 		// Terrain
 		std::string heightMap = "heightMap.jpg";
 		addTerrain(heightMap, shader.getShader<TerrainShaders>()->TerrainShaderProgram);
@@ -127,7 +125,7 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		LeapLevel * level;
 
 		//Randomizer
-		srand(time(NULL));
+		/*srand(time(NULL));
 		randomLevel = rand() % 4;
 
 		switch (randomLevel)
@@ -146,7 +144,8 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 			break;
 		default:
 			break;
-		}
+		}*/
+		level = new LeapLevel("TestLvl.leap");
 		
 
 		addLevelObjects(*meshLibrary, *matertialLibrary, level);
@@ -154,6 +153,8 @@ void GameScene::initScene(MeshLib * meshLibrary, MaterialLib * matertialLibrary,
 		delete level;
 
 		makeObjectsInteractable();
+
+		//gameObjects[0]->transform->position = glm::vec3(0.0, 0.0, 0.0);
 	}
 	else if (typeOfScene == Scene::ID::MENU)
 	{
@@ -493,6 +494,7 @@ void GameScene::addMainMenu()
 	MainMenuObject->name = "MainMenu";
 	MainMenuObject->addComponent(mainMenuScene);
 	MainMenuObject->setIsRenderable(true);
+	
 	
 	gameObjects.push_back(MainMenuObject);
 }
@@ -860,8 +862,7 @@ void GameScene::setZone(GameObject & other, const bool forceUpdate)
 	if (previousZone != other.zone.zoneXY && other.getPlayer() != nullptr)
 	{
 		inZone.clear();
-		// Update directional light to follow player into new zone;
-		directionalLight->zone.zoneXY = other.zone.zoneXY;
+
 		//..
 		std::cout << other.name << " " << "new zone: " << other.zone.zoneXY.x << " " << other.zone.zoneXY.y << std::endl;
 		for (GameObject* gameObject_ptr : gameObjects)

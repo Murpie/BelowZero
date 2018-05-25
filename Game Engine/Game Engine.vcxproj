@@ -150,14 +150,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)/GameEngine/glm;%(AdditionalIncludeDirectories);SFML-2.4.2\include;$(SolutionDir)Externals\SFML 64-bit\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/GameEngine/glm;%(AdditionalIncludeDirectories);SFML-2.4.2\include;$(SolutionDir)Externals\SFML 64-bit\include;$(SolutionDir)Game Engine\LeapImporter\LeapImporter;$(SolutionDir)glfw\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>glew-1.11.0\lib\Release\x64;%(AdditionalLibraryDirectories);SFML-2.4.2\lib;$(SolutionDir)Externals\SFML 64-bit\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>glew-1.11.0\lib\Release\x64;%(AdditionalLibraryDirectories);SFML-2.4.2\lib;$(SolutionDir)Externals\SFML 64-bit\lib;$(SolutionDir)glew-1.11.0\lib\Release\x64</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;%(AdditionalDependencies);sfml-system.lib;sfml-window.lib;sfml-graphics.lib;sfml-audio.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -170,11 +170,15 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="GeometryShaders.cpp" />
+    <ClCompile Include="glew-1.11.0\include\GL\gl3w.c" />
     <ClCompile Include="ImGui\examples\libs\gl3w\GL\gl3w.c" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="ImGui\imgui_impl_glfw_gl3.cpp" />
+    <ClCompile Include="LeapImporter\LeapImporter\LeapImporter.cpp" />
+    <ClCompile Include="LeapImporter\LeapImporter\LeapLevel.cpp" />
+    <ClCompile Include="LeapImporter\LeapImporter\LeapMesh.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightpassShaders.cpp" />
     <ClCompile Include="main.cpp" />
@@ -219,6 +223,11 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="glew-1.11.0\include\GL\gl3w.h" />
+    <ClInclude Include="glew-1.11.0\include\GL\glcorearb.h" />
+    <ClInclude Include="glew-1.11.0\include\GL\glew.h" />
+    <ClInclude Include="glew-1.11.0\include\GL\glxew.h" />
+    <ClInclude Include="glew-1.11.0\include\GL\wglew.h" />
     <ClInclude Include="ImGui\examples\libs\gl3w\GL\gl3w.h" />
     <ClInclude Include="ImGui\examples\libs\gl3w\GL\glcorearb.h" />
     <ClInclude Include="ImGui\imconfig.h" />
@@ -226,6 +235,10 @@
     <ClInclude Include="ImGui\imgui_impl_glfw_gl3.h" />
     <ClInclude Include="ImGui\imgui_internal.h" />
     <ClInclude Include="Intersection.h" />
+    <ClInclude Include="LeapImporter\LeapImporter\LeapImporter.h" />
+    <ClInclude Include="LeapImporter\LeapImporter\LeapLevel.h" />
+    <ClInclude Include="LeapImporter\LeapImporter\LeapMesh.h" />
+    <ClInclude Include="LeapImporter\LeapImporter\MeshStructs.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightpassShaders.h" />
     <ClInclude Include="MainMenuScene.h">

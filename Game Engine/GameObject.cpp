@@ -10,6 +10,7 @@ GameObject::GameObject()
 	isInteractable = false;
 	isBurning = false;
 	gameEnd = false;
+	delayFlare = false;
 	lighterEquipped = false;
 	this->moveBelowTerrain = false;
 	timeLimit = 0.f;
@@ -61,6 +62,21 @@ void GameObject::update(float deltaTime, float seconds)
 				delete fireComponent;
 				fireComponent = nullptr;
 			}
+		}
+	}
+
+	if (delayFlare)
+	{
+		if (flareComponent == nullptr)
+		{
+			flareComponent = new Light(*transform);
+			flareComponent->lightType = 1;
+			flareComponent->color = glm::vec4(0.9, 0, 0, 0.5);
+			flareComponent->Linear = 0.0009;
+			flareComponent->Quadratic = 0.0032;
+			flareComponent->offset = 9;
+			flareComponent->intensity = 3.0;
+			flareComponent->isFlare = true;
 		}
 	}
 
@@ -218,26 +234,16 @@ void GameObject::setIsBurning(float timeToBurn)
 		fireComponent = new Light(*transform);
 		fireComponent->lightType = 1;
 		fireComponent->color = glm::vec4(0.9f, 0.2f, 0, 0.5f);
-		fireComponent->Linear = 10;
-		fireComponent->Quadratic = 0.15f;
-		fireComponent->offset = 2;
-		fireComponent->intensity = 0.6f;
+		fireComponent->Linear = 0.0025;
+		fireComponent->Quadratic = 0.0032f;
+		fireComponent->offset = 6;
+		fireComponent->intensity = 1.5f;
 	}
 	isBurning = true;
 }
 
 void GameObject::setGameEnd()
 {
-	if (flareComponent == nullptr)
-	{
-		flareComponent = new Light(*transform);
-		flareComponent->lightType = 1;
-		flareComponent->color = glm::vec4(0.9f, 0, 0, 0.5f);
-		flareComponent->Linear = 50;
-		flareComponent->Quadratic = 0.3f;
-		flareComponent->offset = 9;
-		flareComponent->intensity = 2.0f;
-	}
 	gameEnd = true;
 }
 
@@ -247,11 +253,11 @@ void GameObject::setLighterEquipped()
 	{
 		lighterComponent = new Light(*transform);
 		lighterComponent->lightType = 1;
-		lighterComponent->color = glm::vec4(0.9f, 0.2f, 0, 0.5f);
-		lighterComponent->Linear = 25;
-		lighterComponent->Quadratic = 0.15f;
-		lighterComponent->offset = 9;
-		lighterComponent->intensity = 0.3f;
+		lighterComponent->color = glm::vec4(0.9, 0.2, 0, 0.5);
+		lighterComponent->Linear = 0.0009;
+		lighterComponent->Quadratic = 0.0032;
+		lighterComponent->offset = 3;
+		lighterComponent->intensity = 0.5;
 		lighterComponent->isLighter = true;
 	}
 }
@@ -336,6 +342,16 @@ void GameObject::moveDown(float deltaTime)
 	timeLimit += deltaTime;
 	if (timeLimit > 20)
 		isActive = false;
+
+	if (!addedWallSound) {
+		moveWallSound.addSound("meltWall.ogg");
+		moveWallSound.setVolume(30.0f);
+		addedWallSound = true;
+	}
+	if (!moveWallSound.isPlaying() && !wallSoundPlayed) {
+		moveWallSound.playSound();
+		wallSoundPlayed = true;
+	}
 
 	transform->position.y -= 2 * deltaTime;
 }

@@ -26,10 +26,11 @@
 #define GL_TEXTURE_CUBE_MAP_POSITIVE_Z  0x8519 
 #define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z  0x851A
 
+#define VERY_LOW_SHADOW 512
 #define LOW_SHADOW 1024
 #define MEDIUM_SHADOW 2048
 #define HIGH_SHADOW 4096
-
+#define CASCADESPLITS 2
 #define MAX_PARTICLES 1000					//Maximum: 1000, Intel NUC can't handle more stack than this
 #define LIGHTER_PARTICLES 100
 
@@ -65,7 +66,7 @@ public:
 	void Update();
 	void setDeltaTime(float deltaTime);
 	void setSeconds(float seconds);
-	void setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos);
+	void setupMeshY();
 	void renderFireParticles();
 	void renderSnowParticles();
 	void renderFlareParticles();
@@ -87,6 +88,12 @@ public:
 
 	int FindUnusedParticle(Particle* container, int lastUsedParticle);
 	void ParticleLinearSort(Particle* arr, int size);
+
+	//Shadows
+	void bindForWriting(int cascadeIndex);
+	void calculateOrthoProjectionMatrices(unsigned int shaderToUse);
+	void setOrthoProjectionMatrix(int index);
+	void renderDepthQuadsForVisualization();
 
 private:
 
@@ -127,7 +134,6 @@ private:
 	//Buffers
 	unsigned int UIFBO;
 	unsigned int UITexture;
-	unsigned int shadowMap;
 	unsigned int shadowFBO;
 	unsigned int animationVAO;
 	unsigned int animationVBO;
@@ -180,8 +186,10 @@ private:
 	float defaultY;
 	float defaultZ;
 	float offset;
+	float flareShotTimer = 0;
 	int distanceToParticles = 0;
 	bool flareAlive = false;
+	bool pickedUpFlare = false;
 	glm::mat4 viewProjectionMatrix;
 	glm::vec3 startPoint;
 	glm::vec3 lighterPosition;
@@ -192,7 +200,6 @@ private:
 	glm::vec3 tempDistance;
 	glm::vec3 cameraRight_vector;
 	glm::vec3 cameraUp_vector;
-	glm::vec3 flarePosition;
 
 	GLfloat* fireParticlePositionData = 0;
 	GLfloat* snowParticlePositionData = 0;
@@ -235,4 +242,28 @@ private:
 	int display_w, display_h;
 	unsigned int vertexPos;
 	unsigned int uvPos;
+
+	//Shadow
+	glm::vec4 vView;
+	glm::vec4 vClip;
+	glm::vec4 frustrumCorners[8];
+	glm::vec4 worldSpaceFrustrumCorners[8];
+	glm::vec3 shadowMapLightPosition;
+	glm::vec3 shadowMapDirection;
+
+	glm::mat4 tempView;
+	glm::mat4 lightProjection;
+	glm::mat4 lightView;
+	glm::mat4 lightSpaceMatrices[2];
+	glm::mat4 inverseViewMatrix;
+	glm::mat4 shadowWorldMatrix;
+
+	float cascadePlaneEnds[3];
+	float cascadesInClipSpace[2];
+	float shadowOrthoProjInfo[2][6];
+	int depthMapTransformation;
+	unsigned int shadowMaps[2];
+
+	unsigned int depthMapVertexArrayObject[2];
+	unsigned int depthMapBufferObject[2];
 };

@@ -30,7 +30,7 @@ void Texture::CreateTextureData(std::string filePath)
 	//Find a way to check if the file is RGBA or RGB
 	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
@@ -49,7 +49,7 @@ glm::vec3 Texture::getRGB(int x, int y)
 	glBindTexture(GL_TEXTURE_2D, this->gTexture);
 	//glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, PBO);
 	//glReadPixels(2, 5, this->width, this->height, GL_RGBA, GL_UNSIGNED_BYTE, &pixels[0]);
-	glTexSubImage2D(this->gTexture, 0, 12, 10, this->width, this->height, GL_RGB, GL_FLOAT, &pixels[0]);
+	glTexSubImage2D(this->gTexture, 0, 12, 10, this->width, this->height, GL_RGB32F, GL_FLOAT, &pixels[0]);
 
 	return glm::vec3(1);
 }
