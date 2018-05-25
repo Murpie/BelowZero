@@ -1222,26 +1222,28 @@ void Player::swingAxe(float deltaTime)
 		swing = false;
 		return;
 	}
-	else if (pickUp < 0.4 && axeSwing == 0)
+	else if (axeSwing == 0)
 	{
 		swing = true;
-		pickUp += deltaTime * 2;
+		rotateSwing += deltaTime * 0.2f;
+		pickUp += deltaTime * 0.2f;
 
-		if (pickUp >= 0.4)
+		if (pickUp >= 0.4f)
 			axeSwing = 1;
 	}
-	else if (pickUp > -0.3 && axeSwing == 1)
+	else if (axeSwing == 1)
 	{
-		rotateSwing += deltaTime * 3;
-		if (pickUp <= -0.3)
+		pickUp -= deltaTime * 0.7f;
+		if (pickUp <= -0.3f)
 			axeSwing = 3;
 	}
-	else if (pickUp < 0 && axeSwing == 3)
+	else if (axeSwing == 3)
 	{
-		pickUp -= deltaTime * 7;
+		pickUp += deltaTime * 0.3f;
 		if (pickUp >= 0)
 		{
 			pickUp = 0;
+			rotateSwing = 0;
 			swing = false;
 		}
 	}
