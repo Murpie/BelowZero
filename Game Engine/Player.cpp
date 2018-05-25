@@ -10,6 +10,7 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->currentlyEquipedItem = -1;
 	this->equipedID = -1;
 	this->pickUp = -1;
+	this->rotateSwing = 0;
 	this->swapItem = false;
 	this->pullDown = false;
 	this->jacket = false;
@@ -532,6 +533,8 @@ void Player::update(float deltaTime, float seconds)
 
 	if (swing)
 		swingAxe(deltaTime);
+	else
+		rotateSwing = 0.0f;
 
 	if (win)
 	{
@@ -1223,27 +1226,31 @@ void Player::swingAxe(float deltaTime)
 		swing = false;
 		return;
 	}
-	else if (pickUp < 0.4 && axeSwing == 0)
+	else if (axeSwing == 0)
 	{
-		pickUp += deltaTime * 2;
-		if (pickUp >= 0.4)
+		swing = true;
+		rotateSwing += deltaTime * 2.0f;
+		pickUp += deltaTime * 2.0f;
+
+		if (pickUp >= 0.4f)
 			axeSwing = 1;
 	}
-	else if (pickUp > -0.3 && axeSwing == 1)
+	else if (axeSwing == 1)
 	{
-		pickUp -= deltaTime * 7;
-		if (pickUp <= -0.3)
+		pickUp -= deltaTime * 7.0f;
+		rotateSwing -= deltaTime * 1.0f;
+		if (pickUp <= -0.3f)
 			axeSwing = 3;
 	}
-	else if (pickUp < 0 && axeSwing == 3)
+	else if (axeSwing == 3)
 	{
-		pickUp += deltaTime;
+		pickUp += deltaTime * 3.0f;
+		rotateSwing -= deltaTime * 3.0f;
 		if (pickUp >= 0)
 		{
 			pickUp = 0;
+			rotateSwing = 0;
 			swing = false;
 		}
 	}
 }
-
-
