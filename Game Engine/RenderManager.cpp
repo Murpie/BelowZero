@@ -1610,8 +1610,8 @@ void RenderManager::Render() {
 
 	if (this->seconds > 2.0)
 		this->seconds = 0.0f;
-
-	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
+	// glBindFramebuffer(GL_FRAMEBUFFER, PPFBO); ui
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(refractionShaderProgram);
 
 	glUniform3fv(glGetUniformLocation(refractionShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
@@ -1657,7 +1657,7 @@ void RenderManager::Render() {
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	//... UI -----------------------------------------------------------------------------------------------------------------------------------
-
+	/*
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(UIShaderProgram);
 
@@ -1699,33 +1699,6 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE9);
 	glBindTexture(GL_TEXTURE_2D, UiMeterTexture.gTexture);
 
-	/*depthMapTransformation = 1;
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "shadowMap1"), 10);
-	glActiveTexture(GL_TEXTURE10);
-	glBindTexture(GL_TEXTURE_2D, shadowMaps[0]);
-	glBindVertexArray(depthMapVertexArrayObject[0]);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	depthMapTransformation = 2;
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "shadowMap2"), 11);
-	glActiveTexture(GL_TEXTURE11);
-	glBindTexture(GL_TEXTURE_2D, shadowMaps[1]);
-	glBindVertexArray(depthMapVertexArrayObject[1]);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	depthMapTransformation = 3;
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "shadowMap3"), 12);
-	glActiveTexture(GL_TEXTURE12);
-	glBindTexture(GL_TEXTURE_2D, shadowMaps[2]);
-	glBindVertexArray(depthMapVertexArrayObject[2]);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	depthMapTransformation = 0;
-	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);*/
-
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
@@ -1738,7 +1711,7 @@ void RenderManager::Render() {
 	renderQuad();
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-
+	*/
 
 	clearObjectsToRender();
 	Update();
