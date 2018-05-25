@@ -103,10 +103,13 @@ void main()
 
 	float Thirst = water;
 	float thirstVariable = 1.0;
-	if (Thirst <= 50)
+	if (Thirst <= 30)
 	{
-		thirstVariable = Thirst / 100;
+		thirstVariable = (Thirst - 20)/ 10;
 	}
+	if (Thirst <= 20)
+		thirstVariable = 0;
+
 	Albedo = mix(getBlur(), Albedo, thirstVariable);
 
 
