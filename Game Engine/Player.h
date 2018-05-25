@@ -105,9 +105,12 @@ public:
 	const int getEquipedID();
 	bool addClick;
 
+	int axeSwing;
 	float oldPitch;
 	float oldYaw;
 	float pickUp;
+	float rotateSwing;
+	bool swing;
 
 	void wolfHowl(float nightTimer);
 
@@ -137,8 +140,6 @@ private:
 	int equipItem;
 	bool jacket;
 	int bucketContent;
-	bool swing;
-	int axeSwing;
 	bool pickUpSnow;
 	bool warning;
 	float textureTimer;
