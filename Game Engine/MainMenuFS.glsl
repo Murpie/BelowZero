@@ -5,6 +5,7 @@ in vec2 TexCoords;
 vec4 color;
 
 uniform sampler2D textureToUse;
+uniform sampler2D loadingTexture;
 uniform float scaling1;
 uniform float scaling2;
 uniform float scaling3;
@@ -24,5 +25,5 @@ void main()
 	if (color.a < 0.35)
 		discard;
 	else
-		FragColor = color + fade;
+		FragColor = color * abs(fade - 1) + (fade * texture(loadingTexture, TexCoords));
 }

@@ -23,7 +23,7 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	this->terrainShaderProgram = shaderProgram->getShader<TerrainShaders>()->TerrainShaderProgram;
 	this->mainMenuShaderProgram = shaderProgram->getShader<MainMenuShader>()->MainMenuShaderProgram;
 	this->refractionShaderProgram = shaderProgram->getShader<RefractionShader>()->RefractionShaderProgram;
-	//createBuffers();
+
 	vao = 0;
 	daylight = 1;
 	time = 0;
@@ -31,11 +31,25 @@ RenderManager::RenderManager(GameScene * otherGameScene, GLFWwindow* otherWindow
 	fireFlicker = true;
 	oldPitch = 0;
 	oldYaw = 0;
-	//createBuffers();
+
 
 
 	//// CHECK AGAINST GAMESTATE TO NOT LOAD unnecessary DATA
 	//createMainMenuBuffer();
+
+
+	//cascadePlaneEnds[0] = 0.1f;
+	//cascadePlaneEnds[1] = 51.0f;
+	//cascadePlaneEnds[2] = 70.0f;
+	//cascadePlaneEnds[3] = 100.0f;
+
+	//TESTING TWO CASCADES
+	cascadePlaneEnds[0] = 0.1f;
+	cascadePlaneEnds[1] = 51.0f;
+	cascadePlaneEnds[2] = 70.0f;
+
+
+
 	shatteredIce.CreateTextureData("iceNormal2.jpg");
 	damageTexture.CreateTextureData("damage1.png");
 	UiMeterTexture.CreateTextureData("UItest1.jpg");
@@ -47,7 +61,6 @@ RenderManager::~RenderManager()
 
 	glDeleteBuffers(1, &UIFBO);
 	glDeleteBuffers(1, &UITexture);
-	glDeleteBuffers(1, &shadowMap);
 	glDeleteBuffers(1, &shadowFBO);
 	glDeleteBuffers(1, &animationVAO);
 	glDeleteBuffers(1, &animationVBO);
@@ -165,23 +178,34 @@ void RenderManager::createBuffers()
 	//screen size
 	glfwGetFramebufferSize(window, &display_w, &display_h);
 
-	//----------========== ShadowMap FBO DIRECTIONAL LIGHTS ==========----------
+	// ----------========== CASCADED SHADOW MAPS ==========----------
 	glGenFramebuffers(1, &shadowFBO);
-	glGenTextures(1, &shadowMap);
-	glBindTexture(GL_TEXTURE_2D, shadowMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, HIGH_SHADOW, HIGH_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	glGenTextures(2, shadowMaps);
+	for (int i = 0; i < 2; i++) {
+		glBindTexture(GL_TEXTURE_2D, shadowMaps[i]);
+		if (i == 0)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, HIGH_SHADOW, HIGH_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		if (i == 1)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, VERY_LOW_SHADOW, VERY_LOW_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		//if (i == 2)
+			//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, LOW_SHADOW, LOW_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, MEDIUM_SHADOW, MEDIUM_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMap, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMaps[0], 0);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
+	
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Cascaded Shadow Framebuffer not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 	//VFX
 	fireParticlePositionData = new GLfloat[MAX_PARTICLES * 4];
@@ -680,49 +704,70 @@ void RenderManager::Render() {
 	glBindFramebuffer(GL_FRAMEBUFFER, PPFBO);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	//DIRECTIONAL LIGHT SHADOWMAP PASS-----------------------------------------------------------------------------------------------------------------------
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-
-	glUseProgram(shadowMapShaderProgram);
-	setupMatrices(shadowMapShaderProgram, glm::vec3(1.0f, 1.0f, 0.0f)); //? what is gameObject[2] supposed to be?
-	glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
-	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
-
 	
-
-	for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
+	// CASCADED SHADOWMAP PASS-----------------------------------------------------------------
+	if (gameScene->gameObjects[0]->transform->position.y < 6.0)
 	{
-		tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
-		//... Rotation
-		tempMatrix = glm::rotate(tempMatrix, glm::radians(gameObjectsToRender[i]->transform->rotation.y), gameObjectsToRender[i]->transform->up);
-		glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
+		glUseProgram(shadowMapShaderProgram);
+		glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 
-		gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
-		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
-	}
-	for (int i = 0; i < gameScene->gameObjects.size(); i++)
-	{
-		if (gameScene->gameObjects[i]->getTerrain() != nullptr)
+		calculateOrthoProjectionMatrices(shadowMapShaderProgram);
+		glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "lightView"), 1, GL_FALSE, glm::value_ptr(lightView));
+
+
+		for (int i = 0; i < CASCADESPLITS; i++)
 		{
-			glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(world_matrix));
-			gameScene->gameObjects[i]->getTerrain()->bindVertexArray();
-			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
+			if (i == 0)
+				glViewport(0, 0, HIGH_SHADOW, HIGH_SHADOW);
+			if (i == 1)
+				glViewport(0, 0, VERY_LOW_SHADOW, VERY_LOW_SHADOW);
+
+			bindForWriting(i);
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			setOrthoProjectionMatrix(i);
+			glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "lightProjection"), 1, GL_FALSE, glm::value_ptr(lightProjection));
+
+			//if (gameObjectsToRender.size() > 0)
+				//gameObjectsToRender[0]->materialComponent->bindTextures();
+
+			for (unsigned int i = 0; i < gameObjectsToRender.size(); i++)
+			{
+				gameObjectsToRender[i]->meshFilterComponent->bindVertexArray();
+
+				//... Rotation equipment with player
+				if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
+				{
+					tempMatrix = gameObjectsToRender[i]->getModelMatrix();
+					glm::vec3 forward = glm::vec3(gameObjectsToRender[i]->transform->forward);
+					glm::vec3 right = glm::vec3(gameObjectsToRender[i]->transform->right);
+
+					tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
+					tempMatrix = glm::rotate(tempMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
+					tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldPitch + gameObjectsToRender[0]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
+				}
+				else
+				{
+					tempMatrix = glm::translate(glm::mat4(1), gameObjectsToRender[i]->transform->position);
+					tempMatrix = glm::rotate(tempMatrix, glm::radians(gameObjectsToRender[i]->transform->rotation.y), gameObjectsToRender[i]->transform->up);
+				}
+
+				//...
+				glUniformMatrix4fv(glGetUniformLocation(shadowMapShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
+				glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
+			}
 		}
 	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glViewport(0, 0, display_w, display_h);
-
-	glEnable(GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 	glDisable(GL_CULL_FACE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//... Terrain PASS-----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glViewport(0, 0, display_w, display_h);
 	glUseProgram(terrainShaderProgram);
 
 	glUniformMatrix4fv(glGetUniformLocation(terrainShaderProgram, "projection_matrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
@@ -741,6 +786,8 @@ void RenderManager::Render() {
 			gameScene->gameObjects[i]->getTerrain()->bindVertexArray();
 
 			glDrawElements(GL_TRIANGLE_STRIP, gameScene->gameObjects[i]->getTerrain()->indices.size(), GL_UNSIGNED_INT, 0);
+			
+			break;
 		}
 	}
 
@@ -763,7 +810,7 @@ void RenderManager::Render() {
 		if (gameObjectsToRender[i]->meshFilterComponent->meshType == 2)
 		{
 			tempMatrix = gameObjectsToRender[i]->getModelMatrix();
-			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[i]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
+			tempMatrix = glm::rotate(tempMatrix, -gameObjectsToRender[i]->getPlayer()->oldYaw, glm::vec3(0, 1, 0));
 			tempMatrix = glm::rotate(tempMatrix, glm::radians(-90.0f), glm::vec3(0, 1, 0));
 			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->rotateSwing, glm::vec3(1, 0, 0));
 			tempMatrix = glm::rotate(tempMatrix, gameObjectsToRender[0]->getPlayer()->oldPitch + gameObjectsToRender[0]->getPlayer()->pickUp, glm::vec3(0, 0, 1));
@@ -780,6 +827,7 @@ void RenderManager::Render() {
 		glUniformMatrix4fv(glGetUniformLocation(geometryShaderProgram, "world_matrix"), 1, GL_FALSE, glm::value_ptr(tempMatrix));
 		glDrawArrays(GL_TRIANGLES, 0, gameObjectsToRender[i]->meshFilterComponent->vertexCount);
 	}
+
 
 	//... VFX--------------------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, gbo);
@@ -1455,7 +1503,6 @@ void RenderManager::Render() {
 	//... LIGHTING PASS----------------------------------------------------------------------------------------------------------------------------------------
 	glBindFramebuffer(GL_FRAMEBUFFER, finalFBO);
 	glUseProgram(lightpassShaderProgram);
-	setupMatrices(lightpassShaderProgram, glm::vec3(1.0f, 1.0f, 0.0f));
 
 	//CAM pos
 	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "view_position"), 1, glm::value_ptr(gameScene->gameObjects[0]->transform->position));
@@ -1519,9 +1566,30 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, gNormal);
 
-	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "depthMap"), 3);
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "shadowMap0"), 3);
 	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, shadowMap);
+	glBindTexture(GL_TEXTURE_2D, shadowMaps[0]);
+
+	glUniform1i(glGetUniformLocation(lightpassShaderProgram, "shadowMap1"), 4);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, shadowMaps[1]);
+	
+	glUniform3fv(glGetUniformLocation(lightpassShaderProgram, "shadowMapLightPosition"), 1, glm::value_ptr(shadowMapLightPosition));
+
+	for (int i = 0; i < CASCADESPLITS; i++)
+	{
+		std::string cT = "cascadeEndClipSpace[" + std::to_string(i) + "]";
+		glUniform1f(glGetUniformLocation(lightpassShaderProgram, cT.c_str()), cascadesInClipSpace[i]);
+	}
+	for (int i = 0; i < CASCADESPLITS; i++)
+	{
+		std::string lT = "lightSpaceMatrix[" + std::to_string(i) + "]";
+		glUniformMatrix4fv(glGetUniformLocation(lightpassShaderProgram, lT.c_str()), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrices[i]));
+	}	
+
+	glUniformMatrix4fv(glGetUniformLocation(lightpassShaderProgram, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+	glUniformMatrix4fv(glGetUniformLocation(lightpassShaderProgram, "ProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+
 
 	glUniform1f(glGetUniformLocation(lightpassShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
 
@@ -1593,6 +1661,9 @@ void RenderManager::Render() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(UIShaderProgram);
 
+	//depthMapTransformation = 0;
+	//glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
+
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "theTexture"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, UITexture);
@@ -1615,6 +1686,7 @@ void RenderManager::Render() {
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "inventoryTexture5"), 6);
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->inventoryTexture[4]);
+
 	glUniform1i(glGetUniformLocation(UIShaderProgram, "textTexture"), 7);
 	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getPlayer()->textTexture);
@@ -1627,6 +1699,33 @@ void RenderManager::Render() {
 	glActiveTexture(GL_TEXTURE9);
 	glBindTexture(GL_TEXTURE_2D, UiMeterTexture.gTexture);
 
+	/*depthMapTransformation = 1;
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "shadowMap1"), 10);
+	glActiveTexture(GL_TEXTURE10);
+	glBindTexture(GL_TEXTURE_2D, shadowMaps[0]);
+	glBindVertexArray(depthMapVertexArrayObject[0]);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	depthMapTransformation = 2;
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "shadowMap2"), 11);
+	glActiveTexture(GL_TEXTURE11);
+	glBindTexture(GL_TEXTURE_2D, shadowMaps[1]);
+	glBindVertexArray(depthMapVertexArrayObject[1]);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	depthMapTransformation = 3;
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "shadowMap3"), 12);
+	glActiveTexture(GL_TEXTURE12);
+	glBindTexture(GL_TEXTURE_2D, shadowMaps[2]);
+	glBindVertexArray(depthMapVertexArrayObject[2]);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	depthMapTransformation = 0;
+	glUniform1i(glGetUniformLocation(UIShaderProgram, "depthMapTransformation"), depthMapTransformation);*/
+
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "hp"), gameScene->gameObjects[0]->getPlayer()->hp);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "cold"), gameScene->gameObjects[0]->getPlayer()->cold);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "water"), gameScene->gameObjects[0]->getPlayer()->water);
@@ -1634,11 +1733,11 @@ void RenderManager::Render() {
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "fade"), gameScene->gameObjects[0]->getPlayer()->fade);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "winFade"), gameScene->gameObjects[0]->getPlayer()->winFade);
 	glUniform1f(glGetUniformLocation(UIShaderProgram, "flareTimer"), gameScene->gameObjects[0]->getPlayer()->flareTimer);
-	glUniform1f(glGetUniformLocation(UIShaderProgram, "textFade"), gameScene->gameObjects[0]->getPlayer()->textFade);
 
 	//glBindTexture(GL_TEXTURE_2D, finalPPFBO);
 	renderQuad();
-	GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 
 
 	clearObjectsToRender();
@@ -1661,7 +1760,7 @@ void RenderManager::renderMainMenu()
 	}
 
 	view_matrix = gameScene->gameObjects[0]->getViewMatrix();
-	projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
+	//projection_matrix = glm::perspective(glm::radians(60.0f), float(display_w) / float(display_h), 0.1f, 100.0f);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1679,6 +1778,9 @@ void RenderManager::renderMainMenu()
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->startButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "loadingTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->loadingTexture);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
@@ -1690,6 +1792,9 @@ void RenderManager::renderMainMenu()
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->settingsButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "loadingTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->loadingTexture);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
@@ -1702,6 +1807,9 @@ void RenderManager::renderMainMenu()
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->exitButtonTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "loadingTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->loadingTexture);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
@@ -1713,6 +1821,9 @@ void RenderManager::renderMainMenu()
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "textureToUse"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->backgroundTexture);
+	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "loadingTexture"), 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gameScene->gameObjects[0]->getMenuScene()->loadingTexture);
 	glUniform1i(glGetUniformLocation(mainMenuShaderProgram, "buttonTransformation"), gameScene->gameObjects[0]->getMenuScene()->buttonTransformations);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling1"), gameScene->gameObjects[0]->getMenuScene()->scaling1);
 	glUniform1f(glGetUniformLocation(mainMenuShaderProgram, "scaling2"), gameScene->gameObjects[0]->getMenuScene()->scaling2);
@@ -1865,16 +1976,159 @@ void RenderManager::renderPPQuad()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 }
 
-void RenderManager::setupMatrices(unsigned int shaderToUse, glm::vec3 lightPos)
+
+void RenderManager::calculateOrthoProjectionMatrices(unsigned int shaderToUse)
 {
+	// ----------========== CASCADED SHADOWS ==========----------
+
 	glUseProgram(shaderToUse);
 
-	glm::mat4 lightProjection = glm::ortho(-10, 10, -10, 10, -10, 20);
-	lightProjection = projection_matrix;
-	glm::mat4 lightView = glm::lookAt(glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+	tempView = glm::lookAt(gameScene->gameObjects[0]->transform->position, glm::vec3(gameScene->gameObjects[0]->transform->position.x - gameScene->gameObjects[0]->transform->forward.x, gameScene->gameObjects[0]->transform->position.y, gameScene->gameObjects[0]->transform->position.z - gameScene->gameObjects[0]->transform->forward.z), gameScene->gameObjects[0]->transform->up);
+	inverseViewMatrix = glm::inverse(tempView);
+	
+	shadowMapLightPosition = glm::vec3(gameScene->gameObjects[0]->transform->position.x, 6.5, gameScene->gameObjects[0]->transform->position.z);
+	shadowMapDirection = glm::vec3(gameScene->gameObjects[0]->transform->position.x, gameScene->gameObjects[0]->transform->position.y, gameScene->gameObjects[0]->transform->position.z);
+	
+	lightView = glm::lookAt(
+		glm::vec3(shadowMapLightPosition), // Position, 8 units above PlayerPos
+		glm::vec3(shadowMapDirection), // Direction, 1 unit in front of PlayerPos
+		glm::vec3(1.0, 0.0, 0.0)); // Up
 
-	glUniformMatrix4fv(glGetUniformLocation(shaderToUse, "LightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+	
+	float fieldOfView = 90.0f;
+	float aspectRatio = (float)display_h / (float)display_w;
+	float tanHalfHeightFOV = tanf(glm::radians(fieldOfView / 2.0f));
+	float tanHalfWidthFOV = tanf(glm::radians((fieldOfView * aspectRatio) / 2.0f));
+
+	for (int i = 0; i < CASCADESPLITS; i++)
+	{
+		float xn = cascadePlaneEnds[i] * tanHalfHeightFOV;
+		float xf = cascadePlaneEnds[i + 1] * tanHalfHeightFOV;
+		float yn = cascadePlaneEnds[i] * tanHalfWidthFOV;
+		float yf = cascadePlaneEnds[i + 1] * tanHalfWidthFOV;
+
+		glm::vec4 frustrumCorners[8]
+
+		{
+			// Near Plane
+			glm::vec4(xn, yn, cascadePlaneEnds[i], 1.0f),
+			glm::vec4(-xn, yn, cascadePlaneEnds[i], 1.0f),
+			glm::vec4(xn, -yn, cascadePlaneEnds[i], 1.0f),
+			glm::vec4(-xn, -yn, cascadePlaneEnds[i], 1.0f),
+
+			// Far Plane
+			glm::vec4(xf, yf, cascadePlaneEnds[i + 1], 1.0f),
+			glm::vec4(-xf, yf, cascadePlaneEnds[i + 1], 1.0f),
+			glm::vec4(xf, -yf, cascadePlaneEnds[i + 1], 1.0f),
+			glm::vec4(-xf, -yf, cascadePlaneEnds[i + 1], 1.0f)
+		};
+
+		float minX = 200000.0;
+		float maxX = -200000.0;
+		float minY = 200000.0;
+		float maxY = -200000.0;
+		float minZ = 200000.0;
+		float maxZ = -200000.0;
+
+		for (int j = 0; j < 8; j++)
+		{
+			glm::vec4 vW = inverseViewMatrix * frustrumCorners[j];
+			worldSpaceFrustrumCorners[j] = lightView * vW;
+
+			minX = min(minX, worldSpaceFrustrumCorners[j].x);
+			maxX = max(maxX, worldSpaceFrustrumCorners[j].x);
+			minY = min(minY, worldSpaceFrustrumCorners[j].y);
+			maxY = max(maxY, worldSpaceFrustrumCorners[j].y);
+			minZ = min(minZ, worldSpaceFrustrumCorners[j].z);
+			maxZ = max(maxZ, worldSpaceFrustrumCorners[j].z);
+		}
+
+		shadowOrthoProjInfo[i][0] = maxX;
+		shadowOrthoProjInfo[i][1] = minX;
+		shadowOrthoProjInfo[i][2] = maxY;
+		shadowOrthoProjInfo[i][3] = minY;
+		shadowOrthoProjInfo[i][4] = maxZ;
+		shadowOrthoProjInfo[i][5] = minZ;
+		
+		vView = glm::vec4(0.0f, 0.0f, cascadePlaneEnds[i + 1], 1.0f);
+		vClip = projection_matrix * vView;
+		cascadesInClipSpace[i] = -vClip.z;
+	}
+}
+
+void RenderManager::setOrthoProjectionMatrix(int index)
+{
+	shadowWorldMatrix = glm::mat4(1.0);
+	lightProjection = glm::ortho(shadowOrthoProjInfo[index][1], shadowOrthoProjInfo[index][0], shadowOrthoProjInfo[index][3], shadowOrthoProjInfo[index][2], shadowOrthoProjInfo[index][5], shadowOrthoProjInfo[index][4]);
+
+	lightSpaceMatrices[index] = lightProjection * lightView * shadowWorldMatrix;
+}
+
+void RenderManager::renderDepthQuadsForVisualization()
+{
+	float depthMapQuadVertices1[] =
+	{
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		-0.3f, -0.3f, 0.0f, 0.0f,
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+	
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+		0.3f,  0.3f,  1.0f, 1.0f
+	
+	};
+	float depthMapQuadVertices2[] =
+	{
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		-0.3f, -0.3f, 0.0f, 0.0f,
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+		0.3f,  0.3f,  1.0f, 1.0f
+
+	};
+	float depthMapQuadVertices3[] =
+	{
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		-0.3f, -0.3f, 0.0f, 0.0f,
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+
+		-0.3f,  0.3f, 0.0f, 1.0f, //same
+		0.3f, -0.3f,  1.0f, 0.0f, //same
+		0.3f,  0.3f,  1.0f, 1.0f
+
+	};
+	glGenVertexArrays(1, &depthMapVertexArrayObject[0]);
+	glGenBuffers(1, &depthMapBufferObject[0]);
+	glBindVertexArray(depthMapVertexArrayObject[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, depthMapBufferObject[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(depthMapQuadVertices1), &depthMapQuadVertices1, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	glGenVertexArrays(1, &depthMapVertexArrayObject[1]);
+	glGenBuffers(1, &depthMapBufferObject[1]);
+	glBindVertexArray(depthMapVertexArrayObject[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, depthMapBufferObject[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(depthMapQuadVertices2), &depthMapQuadVertices2, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	glGenVertexArrays(1, &depthMapVertexArrayObject[3]);
+	glGenBuffers(1, &depthMapBufferObject[3]);
+	glBindVertexArray(depthMapVertexArrayObject[3]);
+	glBindBuffer(GL_ARRAY_BUFFER, depthMapBufferObject[3]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(depthMapQuadVertices3), &depthMapQuadVertices3, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
 }
 
 void RenderManager::renderFireParticles()
@@ -2096,6 +2350,13 @@ void RenderManager::ParticleLinearSort(Particle* arr, int size)
 		}
 		arr[b + 1].life = key;
 	}
+}
+
+void RenderManager::bindForWriting(int cascadeIndex)
+{
+	assert(cascadeIndex < 3);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, shadowFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMaps[cascadeIndex], 0);
 }
 
 int RenderManager::FindUnusedParticle(Particle* container, int lastUsedParticle)

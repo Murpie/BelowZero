@@ -39,7 +39,6 @@ Player::Player(Transform& transform) : Transformable(transform)
 	this->fade = 0.9f;
 	this->winFade = 0;
 	this->flareTimer = 0;
-	this->textFade = 1;
 	this->startGame = true;
 	this->isPressed = false;
 	this->win = false;
@@ -320,10 +319,7 @@ void Player::addTextToScreen(std::string item)
 	if (item == "EmptyImageTexture")
 		this->textOnScreen = false;
 	else
-	{
 		this->textOnScreen = true;
-		this->textFade = 1.0;
-	}
 
 	this->textTimer = 0.0;
 
@@ -646,8 +642,6 @@ void Player::update(float deltaTime, float seconds)
 	}
 
 	// Text Fade
-	if (this->textOnScreen == true)
-		this->textFade -= 0.05f;
 	//else if (this->textOnScreen == false)
 	//this->textFade = 1.0;
 
@@ -680,7 +674,9 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 
 	//Equipment and Stats
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+	{
 		setCold(10);
+	}
 	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
 		setWater(10);
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
@@ -786,7 +782,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	oldYaw = oldYaw - yaw;
 	oldPitch = oldPitch + pitch;
 
-	matrix = glm::rotate(matrix, -oldYaw, Transformable::transform.up);
+	matrix = glm::rotate(matrix, oldYaw, Transformable::transform.up);
 	glm::vec4 right = glm::vec4(matrix[0][0], matrix[1][0], matrix[2][0], 0);
 	Transformable::transform.right = right;
 
@@ -805,16 +801,19 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 		oldPitch = -1.48f;
 	}
 
+
 	if (firstMouse) {
 		lastX = (float)xpos;
 		lastY = (float)ypos;
 		firstMouse = false;
 	}
 
-	xoffset = (float)xpos - lastX;
+	xoffset = lastX - (float)xpos;
 	yoffset = lastY - (float)ypos;
 	lastX = (float)xpos;
 	lastY = (float)ypos;
+
+
 
 	//... WASD Movement
 	glm::vec3 direction = glm::vec3(0);
