@@ -110,7 +110,6 @@ private:
 	glm::mat4 oldrotation;
 	float oldPitch;
 	float oldYaw;
-	GLuint finalMainMenuFBOTexture;
 
 	//Time constants
 	float deltaTime;
@@ -121,7 +120,6 @@ private:
 	bool dayOrNight;
 	bool fireFlicker;
 	//Buffer Objects
-	unsigned int finalMainMenuFBO;
 	unsigned int quadVertexArrayObject;
 	unsigned int quadVertexBufferObject;
 	unsigned int buttonVertexArrayObject[3];
@@ -132,6 +130,8 @@ private:
 	unsigned char* data;
 
 	//Buffers
+	unsigned int finalMainMenuFBO;
+	unsigned int finalMainMenuFBOTexture;
 	unsigned int UIFBO;
 	unsigned int UITexture;
 	unsigned int shadowFBO;

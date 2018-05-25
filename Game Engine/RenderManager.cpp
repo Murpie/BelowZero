@@ -468,7 +468,21 @@ void RenderManager::createBuffers()
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalPPFBO, 0);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "SSAO Framebuffer not complete!" << std::endl;
+		std::cout << "PPFBO Framebuffer not complete!" << std::endl;
+
+	glGenFramebuffers(1, &finalMainMenuFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, finalMainMenuFBO);
+	glGenTextures(1, &finalMainMenuFBOTexture);
+	glBindTexture(GL_TEXTURE_2D, finalMainMenuFBOTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalMainMenuFBOTexture, 0);
+
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, finalMainMenuFBOTexture);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Main Menu Framebuffer is not complete!" << std::endl;
 
 	//.. Create UI Frame Buffer with UI Texture
 	width = 0;
@@ -540,20 +554,6 @@ void RenderManager::deleteData()
 
 void RenderManager::createMainMenuBuffer()
 {
-	glGenFramebuffers(1, &finalMainMenuFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, finalMainMenuFBO);
-
-	glGenTextures(1, &finalMainMenuFBOTexture);
-	glBindTexture(GL_TEXTURE_2D, finalMainMenuFBOTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_w, display_h, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, finalMainMenuFBOTexture, 0);
-
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, finalMainMenuFBOTexture);
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cout << "ERROR::FRAMEBUFFER:: Main Menu Framebuffer is not complete!" << std::endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	float quadVertices[] =

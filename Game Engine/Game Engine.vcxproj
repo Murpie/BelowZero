@@ -48,7 +48,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -86,8 +86,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>glew-1.11.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>glew-1.11.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>glew-1.11.0\include;$(SolutionDir)Game Engine\LeapImporter\LeapImporter;glfw\include;$(IncludePath)</IncludePath>
+    <LibraryPath>glew-1.11.0\lib\Release\x64;glfw\lib-vc2015-64;$(SolutionDir)Game Engine\LeapImporter\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -143,22 +143,22 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)/GameEngine/glm;%(AdditionalIncludeDirectories);SFML-2.4.2\include;$(SolutionDir)Externals\SFML 64-bit\include;$(SolutionDir)Game Engine\LeapImporter\LeapImporter;$(SolutionDir)glfw\include</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)glm;%(AdditionalIncludeDirectories);SFML-2.4.2\include;$(SolutionDir)Externals\SFML 64-bit\include;$(SolutionDir)Game Engine\LeapImporter\LeapImporter;$(SolutionDir)glfw\include</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>glew-1.11.0\lib\Release\x64;%(AdditionalLibraryDirectories);SFML-2.4.2\lib;$(SolutionDir)Externals\SFML 64-bit\lib;$(SolutionDir)glew-1.11.0\lib\Release\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;%(AdditionalDependencies);sfml-system.lib;sfml-window.lib;sfml-graphics.lib;sfml-audio.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>glew-1.11.0\lib\Release\x64;%(AdditionalLibraryDirectories);SFML-2.4.2\lib;$(SolutionDir)Externals\SFML 64-bit\lib;$(SolutionDir)glew-1.11.0\lib\Release\x64;$(SolutionDir)glfw\lib-vc2010-64;LeapImporter\x64\Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;LeapImporter.lib;%(AdditionalDependencies);sfml-system.lib;sfml-window.lib;sfml-graphics.lib;sfml-audio.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
