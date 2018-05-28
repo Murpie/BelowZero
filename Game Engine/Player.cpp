@@ -636,9 +636,10 @@ void Player::update(float deltaTime, float seconds)
 		this->flareTimer += deltaTime;
 		if (flareTimer >= 2.0f)
 		{
-			if (!FlareSound.isPlaying())
+			if (!FlareSound.isPlaying() && flareS == false)
 			{
 				FlareSound.playSound();
+				flareS = true;
 			}
 			this->winFade += deltaTime / 8.0f;
 		}

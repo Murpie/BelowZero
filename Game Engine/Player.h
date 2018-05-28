@@ -70,6 +70,8 @@ public:
 	unsigned int textFBO;
 	unsigned int textTexture;
 
+	bool flareS = false;
+
 	void setCold(float value);
 	void setWater(float value);
 	void setFood(float value);
