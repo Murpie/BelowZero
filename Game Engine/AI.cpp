@@ -61,8 +61,8 @@ glm::vec2 AI::getXY()
 
 void AI::setCurrentHeight(float height)
 {
-	if (height + 0.001 < Transformable::transform.position.y + 0.002);
-		this->Transformable::transform.position.y = height + 0.0;
+	if (height + 0.001 < Transformable::transform.position.y + 0.002)
+		this->Transformable::transform.position.y = height + 0.0f;
 
 	this->Transformable::transform.position.y += bounce;
 }
@@ -133,8 +133,8 @@ void AI::setNewTarget()
 	glm::vec3 currentPosition = Transformable::transform.position;
 	lastTarget = target;
 	// Get new target coords
-	float x = rand() % SPAWN_OFFSET - SPAWN_OFFSET * 0.5;
-	float z = rand() % SPAWN_OFFSET - SPAWN_OFFSET * 0.5;
+	float x = rand() % SPAWN_OFFSET - SPAWN_OFFSET * 0.5f;
+	float z = rand() % SPAWN_OFFSET - SPAWN_OFFSET * 0.5f;
 	// Update target
 	target = glm::vec3(startPosition.x + x, startPosition.y, startPosition.z + z);
 	// Direction

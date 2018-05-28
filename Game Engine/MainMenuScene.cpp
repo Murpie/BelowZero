@@ -129,7 +129,7 @@ void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonN
 	{
 		std::string texturePNG = ".png";
 		std::string filePath = buttonTextureName + texturePNG;
-		int width, height, nrOfChannels;
+		int width = 0, height = 0, nrOfChannels = 0;
 
 		// ----------========== Equipment FrameBuffer ==========----------
 		unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
@@ -163,7 +163,7 @@ void MainMenuScene::loadButtonTexture(std::string buttonTextureName, int buttonN
 	{
 		std::string texturePNG = ".png";
 		std::string filePath = buttonTextureName + texturePNG;
-		int width, height, nrOfChannels;
+		int width = 0, height = 0, nrOfChannels = 0;
 
 		// ----------========== Equipment FrameBuffer ==========----------
 		unsigned char * data = stbi_load(filePath.c_str(), &width, &height, &nrOfChannels, 0);
@@ -311,9 +311,9 @@ void MainMenuScene::fadeMenu(float deltaTime)
 	
 	if (fadeTimer >= 2.0f)
 	{
-		printf("STATE OF GAME: %d", stateOfGame);
+		//printf("STATE OF GAME: %d", stateOfGame);
 		stateOfGame.state = Gamestate::ID::CLEAR_MENU;
-		printf("STATE OF GAME: %d", stateOfGame);
+		//printf("STATE OF GAME: %d", stateOfGame);
 	}
 }
 

@@ -85,7 +85,6 @@
     <LibraryPath>glew-1.11.0/lib/Release/win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
     <IncludePath>glew-1.11.0\include;$(SolutionDir)Game Engine\LeapImporter\LeapImporter;glfw\include;$(IncludePath)</IncludePath>
     <LibraryPath>glew-1.11.0\lib\Release\x64;glfw\lib-vc2015-64;$(SolutionDir)Game Engine\LeapImporter\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -143,20 +142,16 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level1</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <Optimization>Disabled</Optimization>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)glm;%(AdditionalIncludeDirectories);SFML-2.4.2\include;$(SolutionDir)Externals\SFML 64-bit\include;$(SolutionDir)Game Engine\LeapImporter\LeapImporter;$(SolutionDir)glfw\include</AdditionalIncludeDirectories>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>glew-1.11.0\lib\Release\x64;%(AdditionalLibraryDirectories);SFML-2.4.2\lib;$(SolutionDir)Externals\SFML 64-bit\lib;$(SolutionDir)glew-1.11.0\lib\Release\x64;$(SolutionDir)glfw\lib-vc2010-64;LeapImporter\x64\Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;LeapImporter.lib;%(AdditionalDependencies);sfml-system.lib;sfml-window.lib;sfml-graphics.lib;sfml-audio.lib</AdditionalDependencies>
     </Link>
@@ -171,11 +166,6 @@
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="GeometryShaders.cpp" />
     <ClCompile Include="glew-1.11.0\include\GL\gl3w.c" />
-    <ClCompile Include="ImGui\examples\libs\gl3w\GL\gl3w.c" />
-    <ClCompile Include="ImGui\imgui.cpp" />
-    <ClCompile Include="ImGui\imgui_demo.cpp" />
-    <ClCompile Include="ImGui\imgui_draw.cpp" />
-    <ClCompile Include="ImGui\imgui_impl_glfw_gl3.cpp" />
     <ClCompile Include="LeapImporter\LeapImporter\LeapImporter.cpp" />
     <ClCompile Include="LeapImporter\LeapImporter\LeapLevel.cpp" />
     <ClCompile Include="LeapImporter\LeapImporter\LeapMesh.cpp" />
@@ -228,12 +218,6 @@
     <ClInclude Include="glew-1.11.0\include\GL\glew.h" />
     <ClInclude Include="glew-1.11.0\include\GL\glxew.h" />
     <ClInclude Include="glew-1.11.0\include\GL\wglew.h" />
-    <ClInclude Include="ImGui\examples\libs\gl3w\GL\gl3w.h" />
-    <ClInclude Include="ImGui\examples\libs\gl3w\GL\glcorearb.h" />
-    <ClInclude Include="ImGui\imconfig.h" />
-    <ClInclude Include="ImGui\imgui.h" />
-    <ClInclude Include="ImGui\imgui_impl_glfw_gl3.h" />
-    <ClInclude Include="ImGui\imgui_internal.h" />
     <ClInclude Include="Intersection.h" />
     <ClInclude Include="LeapImporter\LeapImporter\LeapImporter.h" />
     <ClInclude Include="LeapImporter\LeapImporter\LeapLevel.h" />

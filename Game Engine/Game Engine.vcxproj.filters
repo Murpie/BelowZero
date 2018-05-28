@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="imgui">
-      <UniqueIdentifier>{da1a9d6e-ef63-4da8-9d3d-8387aa2489c6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="gl3w">
-      <UniqueIdentifier>{f09f28d6-ec9f-4f2c-b049-80c740dacb71}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine Core">
       <UniqueIdentifier>{7b888a49-1dff-46dd-b435-a10742ce5f86}</UniqueIdentifier>
     </Filter>
@@ -53,21 +47,6 @@
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_glfw_gl3.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_demo.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\examples\libs\gl3w\GL\gl3w.c">
-      <Filter>gl3w</Filter>
     </ClCompile>
     <ClCompile Include="Component.cpp">
       <Filter>Source Files\GameObject &amp; Components</Filter>
@@ -191,24 +170,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ImGui\imgui_impl_glfw_gl3.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imconfig.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_internal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\examples\libs\gl3w\GL\gl3w.h">
-      <Filter>gl3w</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\examples\libs\gl3w\GL\glcorearb.h">
-      <Filter>gl3w</Filter>
-    </ClInclude>
     <ClInclude Include="MaterialLib.h">
       <Filter>Header Files\Engine Core</Filter>
     </ClInclude>

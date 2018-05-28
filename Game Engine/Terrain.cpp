@@ -358,7 +358,6 @@ bool Terrain::calculateNormal(float x, float z)
 
 	float xCoord = std::fmod(x, (float)offset) / (float)offset;
 	float zCoord = std::fmod(z, (float)offset) / (float)offset;
-	float answer;
 	float normalAngle;
 
 	if (xCoord <= (1 - zCoord))

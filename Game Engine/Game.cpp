@@ -119,7 +119,6 @@ void Game::run()
 		deltaTime = chrono::duration_cast<chrono::duration<float>>(nowDeltaTime - startDeltaTime).count() / 1000;
 		startDeltaTime = nowDeltaTime;*/
 
-		float secondsTime;
 		auto nowSeconds = chrono::high_resolution_clock::now();
 		seconds = (float)chrono::duration_cast<std::chrono::milliseconds>(nowSeconds - startSeconds).count();
 		startSeconds = nowSeconds;

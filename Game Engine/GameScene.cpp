@@ -833,8 +833,8 @@ void GameScene::setZone(GameObject & other, const bool forceUpdate)
 	float X = other.transform->position.x;
 	float Z = other.transform->position.z;
 
-	other.zone.zoneXY.x = (int)(X / 128.0f) + 0.5f;
-	other.zone.zoneXY.y = (int)(Z / 128.0f) + 0.5f;
+	other.zone.zoneXY.x = (int)((X / 128.0f) + 0.5f);
+	other.zone.zoneXY.y = (int)((Z / 128.0f) + 0.5f);
 
 	if (previousZone != other.zone.zoneXY && other.getPlayer() != nullptr)
 	{
