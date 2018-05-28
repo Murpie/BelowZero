@@ -802,7 +802,7 @@ void Player::processEvents(GLFWwindow * window, float deltaTime)
 	{
 		shift = true;
 		SnowCrunch.setPitch(1.5f);
-		setWater(-0.01f);
+		setWater(-0.005f);
 	}
 	else
 		SnowCrunch.setPitch(1.0f);

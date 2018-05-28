@@ -259,7 +259,7 @@ void Game::initWindow()
 #endif
 	primary = glfwGetMonitors(&count);
 	mode = glfwGetVideoMode(primary[0]);
-	window = glfwCreateWindow(1280, 720, windowName, NULL, NULL);
+	window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, windowName, NULL, NULL);
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(0);
 	gl3wInit();
